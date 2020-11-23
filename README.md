@@ -23,6 +23,7 @@ This version of Widgets Toolbox is intended for NEW development of uifigure or A
 
 If you have an existing MATLAB app using Widgets Toolbox content developed prior to R2020b, you may also need "Widgets Toolbox (Compatibility Support)".  
 https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox 
+https://github.com/mathworks/widgets-toolbox-legacy
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html
 
