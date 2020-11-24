@@ -79,7 +79,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         % Spinner
         Spinner (1,1) matlab.ui.control.Spinner
-
+        
     end %properties
     
     
@@ -100,7 +100,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             % Slider
             obj.Slider = uislider(obj.Grid);
             obj.Slider.ValueChangedFcn = @(h,e)obj.onSliderChanged(e);
-            obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanged(e);
+            obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanging(e);
             obj.Slider.Limits = [0 100];
             
             % Spinner
@@ -146,32 +146,49 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             % What changed?
             newValue = e.Value;
             oldValue = obj.Spinner.Value;
-            e
+            
             % Round?
             if obj.RoundFractionalValues
                 newValue = round(newValue);
                 newValue = min(max(newValue,obj.Limits(1)),obj.Limits(2));
-                updateSlider = e.EventName == "ValueChanged";
-            else
-                updateSlider = false;
             end
             
-            % Did the value change?
-            if newValue ~= oldValue
-                
-                % Prepare event data
-                evtOut = wt.eventdata.PropertyChangedData('Value', newValue, oldValue);
-                
-                % Update the state
-                obj.Spinner.Value = newValue;
-                if updateSlider && newValue ~= obj.Slider.Value
-                    obj.Slider.Value = newValue;
-                end
-                
-                % Trigger event ("ValueChanged" or "ValueChanging")
-                notify(obj, e.EventName, evtOut);
-                
-            end %if newValue ~= oldValue
+            % Prepare event data
+            evtOut = wt.eventdata.PropertyChangedData('Value', newValue, oldValue);
+            
+            % Update the state
+            obj.Spinner.Value = newValue;
+            if obj.RoundFractionalValues && newValue ~= obj.Slider.Value
+                obj.Slider.Value = newValue;
+            end
+            
+            % Trigger event ("ValueChanged" or "ValueChanging")
+            notify(obj, e.EventName, evtOut);
+            
+        end %function
+        
+        
+        function onSliderChanging(obj,e)
+            % Triggered on button pushed
+            
+            % What changed?
+            newValue = e.Value;
+            oldValue = obj.Spinner.Value;
+            
+            % Round?
+            if obj.RoundFractionalValues
+                newValue = round(newValue);
+                newValue = min(max(newValue,obj.Limits(1)),obj.Limits(2));
+            end
+            
+            % Prepare event data
+            evtOut = wt.eventdata.PropertyChangedData('Value', newValue, oldValue);
+            
+            % Update the state
+            obj.Spinner.Value = newValue;
+            
+            % Trigger event ("ValueChanging")
+            notify(obj, e.EventName, evtOut);
             
         end %function
         
@@ -184,12 +201,12 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             
             % Prepare event data
             evtOut = wt.eventdata.PropertyChangedData('Value', newValue, e.PreviousValue);
-          
+            
             % Update the state
             obj.Slider.Value = newValue;
-                
-                % Trigger event
-                notify(obj, "ValueChanged", evtOut);
+            
+            % Trigger event
+            notify(obj, "ValueChanged", evtOut);
             
         end %function
         

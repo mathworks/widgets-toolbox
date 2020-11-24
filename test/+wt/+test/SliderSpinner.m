@@ -16,7 +16,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             numRows = 8;
             rowHeight = 40;
             testCase.Grid.RowHeight = repmat({rowHeight},1,numRows);
-
+            
         end %function
         
     end %methods
@@ -53,7 +53,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
     
     %% Unit Tests
     methods (Test)
-            
+        
         function testValueProperty(testCase)
             
             % Set the value
@@ -68,7 +68,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         function testFractionalValues(testCase)
             
             % Configure the control
@@ -90,7 +90,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         function testValueBoundaries(testCase)
             
             % Configure the control
@@ -201,11 +201,6 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.drag(sliderControl,32,newValue);
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
-            
-            
-            %RAJ - debugging:
-            testCase.choose(sliderControl, rand*100);
-            obj.Slider.Value
             
             % Configure the control
             testCase.verifySetProperty("RoundFractionalValues", "off");
