@@ -1,5 +1,7 @@
 # Widgets Toolbox - MATLAB App Building Components
 
+[![View Widgets Toolbox - MATLAB App Building Components on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/83328-widgets-toolbox-matlab-app-building-components)
+
 Additional app building components to efficiently develop advanced user interfaces in MATLAB
 
 
@@ -26,4 +28,3 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 https://github.com/mathworks/widgets-toolbox-legacy
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html
-
