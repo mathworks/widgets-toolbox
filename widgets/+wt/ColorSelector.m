@@ -35,7 +35,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.ColorPicker, ?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties (Access = {?wt.ColorSelector, ?wt.test.BaseWidgetTest}, Transient, NonCopyable)
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration file="C:\Work\widgets-toolbox-2020\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox-2020\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
+  <configuration file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Widgets Toolbox - MATLAB App Building Components</param.appname>
     <param.authnamewatermark>Robyn Jackey</param.authnamewatermark>
     <param.email>rjackey@mathworks.com</param.email>
@@ -30,9 +30,15 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
     <param.version>2.0.0</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Building Components.mltbx</param.output>
-    <param.products.name />
-    <param.products.id />
-    <param.products.version />
+    <param.products.name>
+      <item>MATLAB</item>
+    </param.products.name>
+    <param.products.id>
+      <item>1</item>
+    </param.products.id>
+    <param.products.version>
+      <item>9.9</item>
+    </param.products.version>
     <param.platforms />
     <param.guid>78895307-cc36-4970-8b66-0697da8f9352</param.guid>
     <param.exclude.filters />
@@ -51,7 +57,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     <param.apps />
     <param.registered.apps />
     <param.docs />
-    <param.getting.started.guide>C:\Work\widgets-toolbox-2020\widgets\doc\GettingStarted.mlx</param.getting.started.guide>
+    <param.getting.started.guide>C:\Work\widgets-toolbox\widgets\doc\GettingStarted.mlx</param.getting.started.guide>
     <param.matlabpath.excludes />
     <param.javaclasspath.excludes />
     <param.exported.on.package>true</param.exported.on.package>
@@ -76,9 +82,6 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
       <param.email />
       <param.company />
       <param.output />
-      <param.products.name />
-      <param.products.id />
-      <param.products.version />
       <param.platforms />
       <param.exclude.filters />
       <param.exclude.pcodedmfiles />
@@ -104,21 +107,21 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
       <param.additional.sw.linux.url />
     </unset>
     <fileset.rootdir>
-      <file>C:\Work\widgets-toolbox-2020\widgets</file>
+      <file>C:\Work\widgets-toolbox\widgets</file>
     </fileset.rootdir>
     <fileset.rootfiles>
-      <file>C:\Work\widgets-toolbox-2020\widgets\+wt</file>
-      <file>C:\Work\widgets-toolbox-2020\widgets\Contents.m</file>
-      <file>C:\Work\widgets-toolbox-2020\widgets\demos.xml</file>
-      <file>C:\Work\widgets-toolbox-2020\widgets\doc</file>
-      <file>C:\Work\widgets-toolbox-2020\widgets\examples</file>
-      <file>C:\Work\widgets-toolbox-2020\widgets\icons</file>
+      <file>C:\Work\widgets-toolbox\widgets\+wt</file>
+      <file>C:\Work\widgets-toolbox\widgets\Contents.m</file>
+      <file>C:\Work\widgets-toolbox\widgets\demos.xml</file>
+      <file>C:\Work\widgets-toolbox\widgets\doc</file>
+      <file>C:\Work\widgets-toolbox\widgets\examples</file>
+      <file>C:\Work\widgets-toolbox\widgets\icons</file>
     </fileset.rootfiles>
     <fileset.depfun.included />
     <fileset.depfun.excluded />
     <fileset.package />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}" name="Widgets Toolbox - MATLAB App Building Components.mltbx" optional="false">C:\Work\widgets-toolbox-2020\deploy\Widgets Toolbox - MATLAB App Building Components.mltbx</file>
+      <file location="${PROJECT_ROOT}" name="Widgets Toolbox - MATLAB App Building Components.mltbx" optional="false">C:\Work\widgets-toolbox\deploy\Widgets Toolbox - MATLAB App Building Components.mltbx</file>
     </build-deliverables>
     <workflow />
     <matlab>

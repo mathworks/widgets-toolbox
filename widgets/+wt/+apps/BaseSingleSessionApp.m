@@ -38,7 +38,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     
     
     %% Abstract Methods (subclass must implement these)
-    methods(Abstract, Access = protected)
+    methods (Abstract, Access = protected)
         
         % Creates a new session object for the app. It must return a
         % subclass of wt.model.BaseSession
@@ -196,7 +196,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     
     
     %% Protected Methods
-    methods (Access=protected)
+    methods (Access = protected)
         
         function setup_internal(app)
             % Preform internal pre-setup necessary
