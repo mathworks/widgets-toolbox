@@ -1,6 +1,6 @@
 classdef (Abstract) BaseModel < handle & ...
         matlab.mixin.SetGetExactNames & ...
-        matlab.mixin.CustomDisplay
+        wt.mixin.DisplayNonScalarObjectAsTable
     % Base model class for apps that provides:
     %   PV pairs assignment on construction
     %   Display nonscalar arrays in table format

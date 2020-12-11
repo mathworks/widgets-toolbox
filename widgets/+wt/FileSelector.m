@@ -88,6 +88,9 @@ classdef FileSelector < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
+            % Adjust default size
+            obj.Position(3:4) = [200 25];
+            
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
             
