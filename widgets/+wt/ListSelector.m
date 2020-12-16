@@ -98,7 +98,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             obj.setup@wt.abstract.BaseWidget();
             
             % Set default size
-            obj.Position(3:4) = [120 120];
+            obj.Position(3:4) = [200 40];
             
             % Configure grid
             obj.Grid.Padding = 3;

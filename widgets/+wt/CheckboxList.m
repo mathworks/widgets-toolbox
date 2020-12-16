@@ -60,6 +60,9 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
             
+            % Set default size
+            obj.Position(3:4) = [100 130];
+            
             % Configure Grid
             obj.Grid.Padding = 10;
             obj.Grid.ColumnWidth = {'fit'};

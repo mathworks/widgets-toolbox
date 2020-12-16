@@ -5,9 +5,9 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     % Copyright 2020 The MathWorks Inc.
     
     %% Events
-    events
+    events (HasCallbackProperty, NotifyAccess = protected)
         
-        % Event triggered when a button is pushed
+        % Triggered when a button is pushed
         ButtonPushed
         
     end %events
@@ -28,14 +28,6 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         % Color of the dividers between horizontal sections
         DividerColor
-        
-    end %properties
-    
-    
-    properties (AbortSet, UsedInUpdate = false)
-        
-        % Callback triggered when a button is pushed
-        ButtonPushedFcn function_handle
         
     end %properties
     
@@ -87,6 +79,9 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [500 90];
             
             % Configure style defaults
             obj.FontColor = [1 1 1] * 0.3;
@@ -318,9 +313,6 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             
             % Trigger event
             notify(obj,"ButtonPushed",evt);
-            
-            % Trigger callback
-            obj.callCallback("ButtonPushedFcn",evt);
             
         end %function
         

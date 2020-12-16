@@ -7,9 +7,12 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
     
     
     %% Events
-    events
+    events (HasCallbackProperty, NotifyAccess = protected)
+        
+        % Triggered when the value changes
         ValueChanged
-    end
+        
+    end %events
     
     
     %% Public properties
@@ -40,15 +43,6 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
     end %properties
     
     
-    % These properties do not trigger the update method
-    properties (AbortSet, UsedInUpdate = false)
-        
-        % Callback triggered when value is changed
-        ValueChangedFcn function_handle
-        
-    end %properties
-    
-    
     
     %% Internal Properties
     properties (Access = protected, UsedInUpdate = false)
@@ -70,6 +64,9 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [120 150];
             
             % Configure Main Grid
             obj.Grid.Padding = 2;
@@ -160,13 +157,17 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
             
             % What changed?
             newValue = e.Value;
-            idxMatch = find(e.Source == obj.Slider, 1);
+            idx = find(e.Source == obj.Slider, 1);
             
             % Update the state
-            obj.Value(idxMatch) = newValue;
+            obj.Value(idx) = newValue;
             
-            % Notify listeners/callbacks
-            obj.callValueChangeCallback(idxMatch,"Value");
+            % Create event data
+            evt = wt.eventdata.SliderCheckboxChangedData(...
+                obj.Name(idx), idx, "Value", obj.State(idx), obj.Value(idx) );
+            
+            % Trigger event
+            notify(obj,"ValueChanged",evt);
             
         end %function
         
@@ -176,28 +177,17 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
             
             % What changed?
             newValue = e.Value;
-            idxMatch = find(e.Source == obj.Checkbox, 1);
+            idx = find(e.Source == obj.Checkbox, 1);
             
             % Update the state
-            obj.State(idxMatch) = newValue;
+            obj.State(idx) = newValue;
             
-            % Notify listeners/callbacks
-            obj.callValueChangeCallback(idxMatch,"State");
-            
-        end %function
-        
-        
-        function callValueChangeCallback(obj,idx,propName)
-            
-            % Call callback
+            % Create event data
             evt = wt.eventdata.SliderCheckboxChangedData(...
-                obj.Name(idx), idx, propName, obj.State(idx), obj.Value(idx) );
+                obj.Name(idx), idx, "State", obj.State(idx), obj.Value(idx) );
             
             % Trigger event
             notify(obj,"ValueChanged",evt);
-            
-            % Trigger callback
-            obj.callCallback("ValueChangedFcn",evt);
             
         end %function
         

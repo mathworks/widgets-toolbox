@@ -225,6 +225,9 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
             % Call superclass setup to establish the main grid
             obj.setup@wt.abstract.BaseWidget();
             
+            % Set default size
+            obj.Position(3:4) = [200 30];
+            
             % Configure grid
             obj.Grid.Padding = 3;
             obj.Grid.ColumnWidth = {'0x','1x',25};

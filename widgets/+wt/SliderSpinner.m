@@ -47,9 +47,6 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         MinorTickLabels
         
         % Passes through to the uispinner
-        MinorTickLabelsMode
-        
-        % Passes through to the uispinner
         MinorTicks
         
         % Passes through to the uispinner
@@ -92,6 +89,9 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [200 40];
             
             % Configure Main Grid
             obj.Grid.Padding = 2;
@@ -351,15 +351,6 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         function set.MinorTicksMode(obj,value)
             obj.Slider.MinorTicksMode = value;
-        end
-        
-        
-        function value = get.MinorTickLabelsMode(obj)
-            value = obj.Slider.MinorTickLabelsMode;
-        end
-        
-        function set.MinorTickLabelsMode(obj,value)
-            obj.Slider.MinorTickLabelsMode = value;
         end
         
     end % methods

@@ -87,6 +87,9 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
             
+            % Set default size
+            obj.Position(3:4) = [100 180];
+            
             % Configure Main Grid
             %obj.Grid.Scrollable = true;
             %obj.Grid.RowSpacing = 5;

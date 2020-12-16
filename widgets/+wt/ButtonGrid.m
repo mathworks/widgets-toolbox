@@ -75,6 +75,9 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
             % Call superclass setup to establish the main grid
             obj.setup@wt.abstract.BaseWidget();
             
+            % Set default size
+            obj.Position(3:4) = [100 30];
+            
         end %function
         
         
