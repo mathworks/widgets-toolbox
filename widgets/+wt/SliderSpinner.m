@@ -72,7 +72,8 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Slider
         Slider (1,1) matlab.ui.control.Slider

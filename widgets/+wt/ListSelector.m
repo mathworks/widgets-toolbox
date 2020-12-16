@@ -76,7 +76,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox

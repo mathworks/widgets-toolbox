@@ -30,7 +30,8 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     
     %% Setup
-    properties (Hidden, SetAccess = private)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout

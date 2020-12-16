@@ -39,7 +39,8 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox

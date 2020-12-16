@@ -3,6 +3,12 @@ classdef ListSelector < wt.test.BaseWidgetTest
     
     % Copyright 2020 The MathWorks, Inc.
     
+    %% Properties
+    properties
+        ItemNames = "TestItem" + string(1:5);
+        ItemData = "TestData" + string(1:5);
+    end
+    
     
     %% Class Setup
     methods (TestClassSetup)
@@ -31,12 +37,15 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.Widget = verifyWarningFree(testCase,fcn);
             drawnow
             
+            % Set the initial items
+            testCase.verifySetProperty("Items", testCase.ItemNames);
+            
         end %function
         
     end %methods
     
     
-    %% Unit Tests
+    %% Unit Test
     methods (Test)
             
         function testProgrammaticItemsValueSelection(testCase)
@@ -44,16 +53,12 @@ classdef ListSelector < wt.test.BaseWidgetTest
             % Get the listbox
             listControl = testCase.Widget.ListBox;
             
-            % Set the items
-            newItems = "TestItem" + string(1:5);
-            testCase.verifySetProperty("Items", newItems);
-            
             % List should still be empty
             testCase.verifyEmpty( listControl.Items );
             
             % Set the value
             newSelIdx = [2 5];
-            newValue = newItems(newSelIdx);
+            newValue = testCase.ItemNames(newSelIdx);
             testCase.verifySetProperty("Value", newValue);
             
             % List and selection should now match value
@@ -69,22 +74,19 @@ classdef ListSelector < wt.test.BaseWidgetTest
             % Get the listbox
             listControl = testCase.Widget.ListBox;
             
-            % Set the items
-            newItems = "TestItem" + string(1:5);
-            newItemsData = "TestData" + string(1:5);
-            testCase.verifySetProperty("Items", newItems);
-            testCase.verifySetProperty("ItemsData", newItemsData );
+            % Set the items data
+            testCase.verifySetProperty("ItemsData", testCase.ItemData );
             
             % List should still be empty
             testCase.verifyEmpty( listControl.Items );
             
             % Set the value
             newSelIdx = [2 5];
-            newValue = newItemsData(newSelIdx);
+            newValue = testCase.ItemData(newSelIdx);
             testCase.verifySetProperty("Value", newValue);
             
             % List and selection should now match value
-            testCase.verifyEqual(string(listControl.Items), newItems(newSelIdx));
+            testCase.verifyEqual(string(listControl.Items), testCase.ItemNames(newSelIdx));
             testCase.verifyEqual(listControl.ItemsData, newSelIdx);
             testCase.verifyEqual(testCase.Widget.SelectedIndex, newSelIdx);
             
@@ -98,16 +100,14 @@ classdef ListSelector < wt.test.BaseWidgetTest
             listControl = testCase.Widget.ListBox;
             
             % Add items to the list
-            newItems = "TestItem" + string(1:5);
             newSelIdx = [1 2 4];
-            newValue = newItems(newSelIdx);
-            testCase.verifySetProperty("Items", newItems);
+            newValue = testCase.ItemNames(newSelIdx);
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyEqual(testCase.Widget.SelectedIndex, newSelIdx);
             
             % Highlight a value in the list
             newHiliteIdx = [1 4];
-            newHilite = newItems(newHiliteIdx);
+            newHilite = testCase.ItemNames(newHiliteIdx);
             testCase.verifySetProperty("HighlightedValue", newHilite);
             
             % List selection highlight should match
@@ -123,10 +123,8 @@ classdef ListSelector < wt.test.BaseWidgetTest
             listControl = testCase.Widget.ListBox;
             
             % Add items to the list
-            newItems = "TestItem" + string(1:5);
             newSelIdx = [1 2 4];
-            newValue = newItems(newSelIdx);
-            testCase.verifySetProperty("Items", newItems);
+            newValue = testCase.ItemNames(newSelIdx);
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyEqual(testCase.Widget.SelectedIndex, newSelIdx);
             
@@ -155,17 +153,13 @@ classdef ListSelector < wt.test.BaseWidgetTest
             listControl = testCase.Widget.ListBox;
             buttonGrid = testCase.Widget.ListButtons;
             
-            % Add  a list of items
-            newItems = "TestItem" + string(1:5);
-            testCase.verifySetProperty("Items", newItems);
-            
             % Check button enables
             actValue = logical(buttonGrid.ButtonEnable);
             expValue = [true false false false];
             testCase.verifyEqual(actValue, expValue);
             
             % Now, add all items to the selected list
-            testCase.verifySetProperty("Value", newItems);
+            testCase.verifySetProperty("Value", testCase.ItemNames);
             
             % Check button enables
             testCase.verifyEquality(buttonGrid.ButtonEnable, [0 0 0 0]);
@@ -174,18 +168,18 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.choose(listControl, 1)
             
             % List selection highlight should match
-            testCase.verifyEqual(testCase.Widget.HighlightedValue, newItems(1));
+            testCase.verifyEqual(testCase.Widget.HighlightedValue, testCase.ItemNames(1));
             testCase.verifyEqual(listControl.Value, 1);
             
             % Check button enables
             testCase.verifyEquality(buttonGrid.ButtonEnable, [0 1 0 1]);
             
             % Select last item with mouse
-            lastIdx = numel(newItems);
+            lastIdx = numel(testCase.ItemNames);
             testCase.choose(listControl, lastIdx)
             
             % List selection highlight should match
-            testCase.verifyEqual(testCase.Widget.HighlightedValue, newItems(lastIdx));
+            testCase.verifyEqual(testCase.Widget.HighlightedValue, testCase.ItemNames(lastIdx));
             testCase.verifyEqual(listControl.Value, lastIdx);
             
             % Check button enables
@@ -196,7 +190,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.choose(listControl, selIdx)
             
             % List selection highlight should match
-            testCase.verifyEqual(testCase.Widget.HighlightedValue, newItems(selIdx));
+            testCase.verifyEqual(testCase.Widget.HighlightedValue, testCase.ItemNames(selIdx));
             testCase.verifyEqual(listControl.Value, selIdx);
             
             % Check button enables
@@ -206,7 +200,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.verifySetProperty("AllowDuplicates", true);
             
             % Check button enables
-            testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 1 1]);
+            testCase.verifyEquality(buttonGrid.ButtonEnable(2:4), [1 1 1]);
             
         end %function
         
@@ -221,9 +215,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             button = buttonGrid.Button;
             
             % Add a list of items and put all on list
-            newItems = "TestItem" + string(1:5);
-            testCase.verifySetProperty("Items", newItems);
-            testCase.verifySetProperty("Value", newItems);
+            testCase.verifySetProperty("Value", testCase.ItemNames);
             
             % Select multiple items with mouse
             selIdx = [2 3];
@@ -237,7 +229,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             
             % Verify new order
             newIdx = [2 3 1 4 5];
-            testCase.verifyEqual(w.Value, newItems(newIdx));
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
             
             % Verify button enables
@@ -248,7 +240,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             
             % Verify new order
             newIdx = 1:5;
-            testCase.verifyEqual(w.Value, newItems(newIdx));
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
             
             % Verify button enables
@@ -259,15 +251,14 @@ classdef ListSelector < wt.test.BaseWidgetTest
             
             % Verify new order
             newIdx = [1 4 5];
-            testCase.verifyEqual(w.Value, newItems(newIdx));
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
             
             % Verify new highlight
-            testCase.verifyEqual(w.HighlightedValue, newItems(1));
+            testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(1));
            
             % Verify button enables
-            testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 0 1]);
-            
+            testCase.verifyEquality(buttonGrid.ButtonEnable(2:4), [1 0 1]);
             
         end %function
         
@@ -285,11 +276,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             % Press the buttons
             b = w.UserButtons.Button;
             testCase.verifyNumElements(b, 2);
-            try
-                testCase.press(b(1))
-            catch
-                keyboard
-            end
+            testCase.press(b(1))
             testCase.press(b(2))
             
         end %function
