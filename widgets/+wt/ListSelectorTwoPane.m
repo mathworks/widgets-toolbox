@@ -22,6 +22,9 @@ classdef ListSelectorTwoPane < wt.ListSelector
             % Call superclass method
             obj.setup@wt.ListSelector();
             
+            % Set default size
+            obj.Position(3:4) = [200 120];
+            
             % Configure grid
             obj.Grid.ColumnWidth = {'1x',25,'1x'};
             

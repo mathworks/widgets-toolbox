@@ -76,7 +76,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     
     
     %% Internal Properties
-    properties (Access = protected)
+    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
         
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
@@ -95,6 +95,9 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             
             % Call superclass setup to establish the main grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [120 120];
             
             % Configure grid
             obj.Grid.Padding = 3;
@@ -218,8 +221,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                     
                 otherwise
                     % Trigger event for user buttons
-                    evtOut = wt.eventdata.ButtonPushedData(evt);
-                    notify(obj,"ButtonPushed",evtOut);
+                    notify(obj,"ButtonPushed",evt);
                     
             end %switch
             
@@ -428,10 +430,14 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         end
         
         function value = get.HighlightedValue(obj)
+            selIdx = obj.ListBox.Value;
+            if isempty(selIdx)
+                selIdx = [];
+            end
             if isempty(obj.ItemsData)
-                value = obj.Items(obj.ListBox.Value);
+                value = obj.Items(:,selIdx);
             else
-                value = obj.ItemsData(obj.ListBox.Value);
+                value = obj.ItemsData(:,selIdx);
             end
         end
         function set.HighlightedValue(obj,value)

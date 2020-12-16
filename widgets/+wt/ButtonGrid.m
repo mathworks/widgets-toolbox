@@ -57,7 +57,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Hidden, SetAccess = protected)
+    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
         
         % Buttons
         Button (1,:) matlab.ui.control.Button

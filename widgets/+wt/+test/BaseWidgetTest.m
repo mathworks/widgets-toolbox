@@ -58,6 +58,9 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
             fcn = @()set(testCase.Widget, propName, newValue);
             testCase.verifyWarningFree(fcn);
             
+            % Give a moment for update to run
+            drawnow
+            
             % Verify new property value
             actualValue = testCase.Widget.(propName);
             testCase.verifyEquality(actualValue, expValue);
@@ -102,9 +105,9 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
         function verifyEquality(testCase, actualValue, expValue)
             
             if ischar(expValue) || isStringScalar(expValue)
-                testCase.verifyTrue( strcmp(actualValue, expValue) );
+                testCase.verifyTrue( all(strcmp(actualValue, expValue)) );
             elseif isa(actualValue,'matlab.lang.OnOffSwitchState')
-                testCase.verifyTrue( actualValue == expValue );
+                testCase.verifyTrue( all(actualValue == expValue) );
             else
                 testCase.verifyEqual(actualValue, expValue);
             end
