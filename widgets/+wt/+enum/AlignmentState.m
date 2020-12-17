@@ -1,5 +1,5 @@
-classdef FileFolderState < logical
-    %FILEFOLDERSTATE Represent file/folder selections
+classdef AlignmentState
+    %ALIGNMENTSTATE Represent alignment selections
     %   Enumerates a list of choices
 
     % Copyright 2020 The MathWorks Inc.
@@ -7,9 +7,13 @@ classdef FileFolderState < logical
     
     %% Enumerations
     enumeration
-        file (false)
-        folder (true)
+        left
+        right
+        center
+        top
+        bottom
     end %enumeration
     
     
 end %classdef
+

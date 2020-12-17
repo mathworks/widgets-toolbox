@@ -25,8 +25,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         ValueDisplayFormat
         
         % Orientation of the spinner and slider
-        Orientation (1,1) string {mustBeMember(Orientation,...
-            ["horizontal","vertical"])} = "horizontal"
+        Orientation  (1,1) wt.enum.HorizontalVerticalState = "horizontal"
         
         % Size of spinner (width for horizontal, height for vertical
         SpinnerSize

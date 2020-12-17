@@ -72,7 +72,7 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
             obj.Grid.Padding = 2;
             obj.Grid.ColumnSpacing = 5;
             obj.Grid.RowSpacing = 5;
-            obj.Grid.ColumnWidth = {150,'1x'};
+            obj.Grid.ColumnWidth = {'fit','1x'};
             
         end %function
         
