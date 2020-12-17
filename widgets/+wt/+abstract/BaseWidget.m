@@ -75,23 +75,6 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
         end %function
         
     end %methods
-        
-    
-    
-    %% Utilities
-    methods (Access = protected)
-        
-        function callCallback(obj,callbackProp,evt)
-            % Call a function handle based callback
-            
-            fcn = obj.(callbackProp);
-            if ~isempty(fcn)
-                fcn(obj,evt);
-            end
-            
-        end %function
-        
-    end %methods
     
     
     

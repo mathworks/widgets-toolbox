@@ -10,7 +10,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
     properties (AbortSet)
         
         % The current value shown
-        Value (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [1 1 1]
+        Value matlab.internal.datatype.matlab.graphics.datatype.RGBColor = [0 1 0]
         
     end %properties
     
@@ -19,7 +19,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
     properties (AbortSet, UsedInUpdate = false)
         
         % Indicates whether to show the edit field
-        ShowEditField (1,1) logical = true;
+        ShowEditField (1,1) matlab.lang.OnOffSwitchState = true
         
     end %properties
     
@@ -55,6 +55,9 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [100 25];
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25};

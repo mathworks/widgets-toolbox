@@ -15,7 +15,6 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     %% Public properties
-%     properties (AbortSet, UsedInUpdate = false)
     properties (AbortSet)
         
         % Sections that are part of the toolbar

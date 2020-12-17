@@ -31,8 +31,7 @@ classdef FileSelector < wt.abstract.BaseWidget &...
     properties (AbortSet)
         
         % Selection type: file or folder
-        SelectionType (1,1) string ...
-            {mustBeMember(SelectionType,["file","folder"])} = "file"
+        SelectionType (1,1) wt.enum.FileFolderState = "file"
         
         % Optional root directory. If unspecified, Value uses an absolute
         % path (default). If specified, Value will show a relative path to
@@ -40,7 +39,7 @@ classdef FileSelector < wt.abstract.BaseWidget &...
         RootDirectory (1,1) string
         
         % Indicates whether to show a dropdown of recent folders
-        ShowHistory (1,1) logical = false;
+        ShowHistory (1,1) matlab.lang.OnOffSwitchState = false
         
         % List of recently selected folders to display in dropdown
         History (:,1) string

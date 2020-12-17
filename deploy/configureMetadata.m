@@ -3,6 +3,8 @@ appdesigner.customcomponent.configureMetadata(which("wt.ButtonGrid"))
 %%
 appdesigner.customcomponent.configureMetadata(which("wt.CheckboxList"))
 %%
+appdesigner.customcomponent.configureMetadata(which("wt.ColorSelector"))
+%%
 appdesigner.customcomponent.configureMetadata(which("wt.FileSelector"))
 %%
 appdesigner.customcomponent.configureMetadata(which("wt.ListSelector"))

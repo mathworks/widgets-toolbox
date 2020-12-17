@@ -31,10 +31,10 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         ItemsData (1,:)
         
         % Indicates whether to allow duplicate entries in the list
-        AllowDuplicates (1,1) logical = false;
+        AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
         
         % Indicates whether to allow sort controls %RAJ - Future feature
-        %Sortable (1,1) logical = true;
+        %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
         
     end %properties
     
@@ -98,7 +98,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             obj.setup@wt.abstract.BaseWidget();
             
             % Set default size
-            obj.Position(3:4) = [200 40];
+            obj.Position(3:4) = [120 130];
             
             % Configure grid
             obj.Grid.Padding = 3;
@@ -407,9 +407,9 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
         function value = get.Value(obj)
             if isempty(obj.ItemsData)
-                value = obj.Items(obj.ListBox.ItemsData);
+                value = obj.Items(:,obj.ListBox.ItemsData);
             else
-                value = obj.ItemsData(obj.ListBox.ItemsData);
+                value = obj.ItemsData(:,obj.ListBox.ItemsData);
             end
         end
         function set.Value(obj,value)
@@ -432,7 +432,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
         function value = get.HighlightedValue(obj)
             selIdx = obj.ListBox.Value;
-            if isempty(selIdx)
+            if isempty(selIdx) || ~isnumeric(selIdx)
                 selIdx = [];
             end
             if isempty(obj.ItemsData)

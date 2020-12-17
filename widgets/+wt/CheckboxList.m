@@ -22,7 +22,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
         Value (:,1) logical = true(6,1)
         
         % Indicates whether to show the Select All field
-        ShowSelectAll (1,1) logical = false;
+        ShowSelectAll  (1,1) matlab.lang.OnOffSwitchState = false
         
     end %properties
     

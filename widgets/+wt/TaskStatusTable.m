@@ -29,16 +29,16 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             {wt.validators.mustBeBetweenZeroAndOne} = [.8 .8 1];
         
         % Enables button and status row to display
-        ShowButtonRow (1,1) logical = true
+        ShowButtonRow (1,1) matlab.lang.OnOffSwitchState = true
         
         % Status message
         StatusMessage (1,1) string = "";
         
         % Enables the task forward button to proceed
-        EnableForward (1,1) logical = true
+        EnableForward (1,1) matlab.lang.OnOffSwitchState = true
         
         % Enables the task back button to proceed
-        EnableBack (1,1) logical = true
+        EnableBack (1,1) matlab.lang.OnOffSwitchState = true
         
     end %properties
     
