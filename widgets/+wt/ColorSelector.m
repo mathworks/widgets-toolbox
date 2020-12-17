@@ -10,7 +10,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
     properties (AbortSet)
         
         % The current value shown
-        Value (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [1 1 1]
+        Value (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 1 0]
         
     end %properties
     
