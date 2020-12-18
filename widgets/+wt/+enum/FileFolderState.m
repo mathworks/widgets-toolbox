@@ -1,4 +1,4 @@
-classdef FileFolderState < logical
+classdef FileFolderState
     %FILEFOLDERSTATE Represent file/folder selections
     %   Enumerates a list of choices
 
@@ -7,8 +7,8 @@ classdef FileFolderState < logical
     
     %% Enumerations
     enumeration
-        file (false)
-        folder (true)
+        file
+        folder
     end %enumeration
     
     

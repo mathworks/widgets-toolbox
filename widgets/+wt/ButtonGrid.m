@@ -34,10 +34,10 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
         ButtonEnable (1,:) matlab.lang.OnOffSwitchState {mustBeNonempty} = true
         
         % Orientation of the buttons
-        Orientation (1,1) wt.enum.HorizontalVerticalState = "horizontal"
+        Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
         
         % Alignment of the icon
-        IconAlignment (1,1) wt.enum.AlignmentState = "top"
+        IconAlignment (1,1) wt.enum.AlignmentState = wt.enum.AlignmentState.top
         
     end %properties
     

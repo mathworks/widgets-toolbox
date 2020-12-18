@@ -14,8 +14,15 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             "Step 5","Step 6","Step 7"]
         
         % Status of task
-        Status (:,1) wt.enum.StatusState = ["complete","warning",...
-            "error","info","running","unknown","none"]
+        Status (:,1) wt.enum.StatusState = [
+            wt.enum.StatusState.complete
+            wt.enum.StatusState.warning
+            wt.enum.StatusState.error
+            wt.enum.StatusState.info
+            wt.enum.StatusState.running
+            wt.enum.StatusState.unknown
+            wt.enum.StatusState.none
+            ];
         
         % Height of each task row
         RowHeight (1,1) double = 25
