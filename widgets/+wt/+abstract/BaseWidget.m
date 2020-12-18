@@ -78,6 +78,40 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     
     
+    %% Display customization
+    methods (Hidden, Access = protected)
+        
+        function groups = getPropertyGroups(obj)
+            % Customize how the properties are displayed
+            
+            % Ignore most superclass properties for default display
+            persistent superProps
+            if isempty(superProps)
+                superProps = properties('matlab.ui.componentcontainer.ComponentContainer');
+            end
+            
+            % Get the relevant properties
+            propNames = setdiff(properties(obj), superProps);
+            
+            % Split out the callbacks, fonts
+            isCallback = endsWith(propNames, "Fcn");
+            isFont = startsWith(propNames, "Font");
+            normalProps = propNames(~isCallback & ~isFont);
+            callbackProps = propNames(isCallback);
+            
+            % Define the groups
+            groups = [
+                matlab.mixin.util.PropertyGroup(callbackProps)
+                matlab.mixin.util.PropertyGroup(normalProps)
+                matlab.mixin.util.PropertyGroup(["Position", "Units"])
+                ];
+            
+        end %function
+        
+    end %methods
+    
+    
+    
     %% Accessors
     methods
         
