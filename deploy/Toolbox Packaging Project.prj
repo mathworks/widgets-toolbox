@@ -2,7 +2,7 @@
   <configuration file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Widgets Toolbox - MATLAB App Building Components</param.appname>
     <param.authnamewatermark>Robyn Jackey</param.authnamewatermark>
-    <param.email />
+    <param.email>rjackey@mathworks.com</param.email>
     <param.company>MathWorks Consulting</param.company>
     <param.summary>Additional app building components to efficiently develop advanced user interfaces in MATLAB</param.summary>
     <param.description>Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. 
@@ -37,7 +37,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
       <item>1</item>
     </param.products.id>
     <param.products.version>
-      <item>9.10</item>
+      <item>9.9</item>
     </param.products.version>
     <param.platforms />
     <param.guid>78895307-cc36-4970-8b66-0697da8f9352</param.guid>
@@ -78,6 +78,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     <param.additional.sw.mac.url />
     <param.additional.sw.linux.url />
     <unset>
+      <param.authnamewatermark />
       <param.email />
       <param.output />
       <param.platforms />
@@ -124,7 +125,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2021a_BASH</root>
+      <root>C:\Program Files\MATLAB\R2020b</root>
       <toolboxes>
         <toolbox name="neuralnetwork" />
       </toolboxes>
