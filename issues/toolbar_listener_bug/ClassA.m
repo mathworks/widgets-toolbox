@@ -17,10 +17,6 @@ classdef ClassA < matlab.ui.componentcontainer.ComponentContainer
     %% Protected Methods
     methods (Access = protected)
         
-        % function obj = ClassA()
-        %     obj.Instance_ClassB = ClassB;
-        % end
-        
         function setup(obj)
             obj.InstanceB = ClassB('Parent',[]);
             obj.ListenerB = [
