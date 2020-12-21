@@ -31,13 +31,13 @@ classdef FileSelector < wt.test.BaseWidgetTest
             newValue = fullfile("C:","Users");
             testCase.verifySetProperty("Value", newValue);
             drawnow
-            testCase.verifyEqual(newValue, string(editControl.Value));
+            testCase.verifyEqual(string(editControl.Value), newValue);
             
             % Set the value
             newValue = fullfile("C","Temp","filename.mat");
             testCase.verifySetProperty("Value", newValue);
             drawnow
-            testCase.verifyEqual(newValue, string(editControl.Value));
+            testCase.verifyEqual(string(editControl.Value), newValue);
             
         end %function
         
@@ -112,14 +112,14 @@ classdef FileSelector < wt.test.BaseWidgetTest
             % Type a valid value
             newValue1 = fullfile("bin");
             testCase.verifyTypeAction(dropdownControl, newValue1, "Value");
-            testCase.verifyEqual(newValue1, testCase.Widget.Value);
+            testCase.verifyEqual(testCase.Widget.Value, newValue1);
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
             
             % Verify the full path
             fullPath = fullfile(rootDir,newValue1);
-            testCase.verifyEqual(fullPath, testCase.Widget.FullPath);
+            testCase.verifyEqual(testCase.Widget.FullPath, fullPath);
             
             
             % Switch to folder mode
@@ -129,20 +129,20 @@ classdef FileSelector < wt.test.BaseWidgetTest
             newValue2 = fullfile("toolbox","matlab");
             testCase.verifySetProperty("Value", newValue2);
             drawnow
-            testCase.verifyEqual(newValue2, string(dropdownControl.Value));
+            testCase.verifyEqual(string(dropdownControl.Value), newValue2);
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
             
             % Verify the full path
             fullPath = fullfile(rootDir,newValue2);
-            testCase.verifyEqual(fullPath, testCase.Widget.FullPath);
+            testCase.verifyEqual(testCase.Widget.FullPath, fullPath);
             
             
             % Verify the history
             expValue = [newValue2; newValue1];
-            testCase.verifyEqual(expValue, testCase.Widget.History);
-            testCase.verifyEqual(expValue, string(dropdownControl.Items(:)));
+            testCase.verifyEqual(testCase.Widget.History, expValue);
+            testCase.verifyEqual(string(dropdownControl.Items(:)), expValue);
             
         end %function
         

@@ -14,9 +14,15 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             "Step 5","Step 6","Step 7"]
         
         % Status of task
-        Status (:,1) string {mustBeMember(Status,...
-            ["none","complete","warning","error","running","info","unknown"])} = ...
-            ["complete","warning","error","info","running","unknown","none"]
+        Status (:,1) wt.enum.StatusState = [
+            wt.enum.StatusState.complete
+            wt.enum.StatusState.warning
+            wt.enum.StatusState.error
+            wt.enum.StatusState.info
+            wt.enum.StatusState.running
+            wt.enum.StatusState.unknown
+            wt.enum.StatusState.none
+            ];
         
         % Height of each task row
         RowHeight (1,1) double = 25
@@ -29,16 +35,16 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             {wt.validators.mustBeBetweenZeroAndOne} = [.8 .8 1];
         
         % Enables button and status row to display
-        ShowButtonRow (1,1) logical = true
+        ShowButtonRow (1,1) matlab.lang.OnOffSwitchState = true
         
         % Status message
         StatusMessage (1,1) string = "";
         
         % Enables the task forward button to proceed
-        EnableForward (1,1) logical = true
+        EnableForward (1,1) matlab.lang.OnOffSwitchState = true
         
         % Enables the task back button to proceed
-        EnableBack (1,1) logical = true
+        EnableBack (1,1) matlab.lang.OnOffSwitchState = true
         
     end %properties
     
@@ -87,9 +93,10 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
             
+            % Set default size
+            obj.Position(3:4) = [100 180];
+            
             % Configure Main Grid
-            %obj.Grid.Scrollable = true;
-            %obj.Grid.RowSpacing = 5;
             obj.Grid.ColumnWidth = {25,'1x',25};
             obj.Grid.RowHeight = {'1x',25};
             
@@ -168,7 +175,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             
             % Update the task names and icons
             status = obj.Status;
-            imgFile = status + "_16.png";
+            imgFile = string(status) + "_16.png";
             imgFile(status=="running") = "running_16.gif";
             numImg = numel(obj.Icon);
             for idx = 1:numNew

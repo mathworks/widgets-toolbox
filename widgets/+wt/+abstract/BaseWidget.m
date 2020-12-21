@@ -30,7 +30,8 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     
     %% Setup
-    properties (Hidden, SetAccess = private)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
@@ -74,19 +75,36 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
         end %function
         
     end %methods
-        
     
     
-    %% Utilities
-    methods (Access = protected)
+    
+    %% Display customization
+    methods (Hidden, Access = protected)
         
-        function callCallback(obj,callbackProp,evt)
-            % Call a function handle based callback
+        function groups = getPropertyGroups(obj)
+            % Customize how the properties are displayed
             
-            fcn = obj.(callbackProp);
-            if ~isempty(fcn)
-                fcn(obj,evt);
+            % Ignore most superclass properties for default display
+            persistent superProps
+            if isempty(superProps)
+                superProps = properties('matlab.ui.componentcontainer.ComponentContainer');
             end
+            
+            % Get the relevant properties
+            propNames = setdiff(properties(obj), superProps);
+            
+            % Split out the callbacks, fonts
+            isCallback = endsWith(propNames, "Fcn");
+            isFont = startsWith(propNames, "Font");
+            normalProps = propNames(~isCallback & ~isFont);
+            callbackProps = propNames(isCallback);
+            
+            % Define the groups
+            groups = [
+                matlab.mixin.util.PropertyGroup(callbackProps)
+                matlab.mixin.util.PropertyGroup(normalProps)
+                matlab.mixin.util.PropertyGroup(["Position", "Units"])
+                ];
             
         end %function
         

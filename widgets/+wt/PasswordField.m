@@ -24,7 +24,8 @@ classdef PasswordField < wt.abstract.BaseWidget
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
@@ -40,6 +41,9 @@ classdef PasswordField < wt.abstract.BaseWidget
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [100 25];
             
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...

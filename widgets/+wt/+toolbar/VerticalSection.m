@@ -13,14 +13,6 @@ classdef (Sealed, Hidden) VerticalSection < wt.toolbar.BaseSection
     end %properties
     
     
-    properties (AbortSet, UsedInUpdate = false)
-        
-        % Callback triggered when a button is pushed
-        ButtonPushedFcn
-        
-    end %properties
-    
-    
     
     %% Public methods
     methods
@@ -98,9 +90,6 @@ classdef (Sealed, Hidden) VerticalSection < wt.toolbar.BaseSection
             
             % Trigger event
             notify(obj,"ButtonPushed",evt);
-            
-            % Trigger callback
-            obj.callCallback("ButtonPushedFcn",evt);
             
         end %function
         

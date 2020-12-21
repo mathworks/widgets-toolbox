@@ -15,13 +15,13 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     properties (AbortSet)
         
         % Shows time remaining during progress
-        ShowTimeRemaining (1,1) logical = true
+        ShowTimeRemaining  (1,1) matlab.lang.OnOffSwitchState = true
         
         % Enables a Cancel button during progress
-        ShowCancel (1,1) logical = false
+        ShowCancel  (1,1) matlab.lang.OnOffSwitchState = false
         
         % Indicates that progress is counting
-        Indeterminate (1,1) logical = false
+        Indeterminate  (1,1) matlab.lang.OnOffSwitchState = false
         
     end %properties
     
@@ -45,10 +45,10 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
         StatusText (1,1) string
         
         % Indicates that progress is counting
-        Running (1,1) logical = false
+        Running  (1,1) matlab.lang.OnOffSwitchState = false
         
         % Indicates that Cancel button was pressed
-        CancelRequested (1,1) logical = false
+        CancelRequested  (1,1) matlab.lang.OnOffSwitchState = false
         
         % Start time
         StartTime (1,1) datetime = NaT
@@ -224,6 +224,9 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
             
             % Call superclass setup to establish the main grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [200 30];
             
             % Configure grid
             obj.Grid.Padding = 3;

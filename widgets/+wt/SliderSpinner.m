@@ -25,8 +25,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         ValueDisplayFormat
         
         % Orientation of the spinner and slider
-        Orientation (1,1) string {mustBeMember(Orientation,...
-            ["horizontal","vertical"])} = "horizontal"
+        Orientation
         
         % Size of spinner (width for horizontal, height for vertical
         SpinnerSize
@@ -45,9 +44,6 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         % Passes through to the uispinner
         MinorTickLabels
-        
-        % Passes through to the uispinner
-        MinorTickLabelsMode
         
         % Passes through to the uispinner
         MinorTicks
@@ -72,7 +68,8 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Slider
         Slider (1,1) matlab.ui.control.Slider
@@ -91,6 +88,9 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [200 40];
             
             % Configure Main Grid
             obj.Grid.Padding = 2;
@@ -350,15 +350,6 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         function set.MinorTicksMode(obj,value)
             obj.Slider.MinorTicksMode = value;
-        end
-        
-        
-        function value = get.MinorTickLabelsMode(obj)
-            value = obj.Slider.MinorTickLabelsMode;
-        end
-        
-        function set.MinorTickLabelsMode(obj,value)
-            obj.Slider.MinorTickLabelsMode = value;
         end
         
     end % methods

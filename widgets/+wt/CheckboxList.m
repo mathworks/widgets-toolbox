@@ -22,7 +22,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
         Value (:,1) logical = true(6,1)
         
         % Indicates whether to show the Select All field
-        ShowSelectAll (1,1) logical = false;
+        ShowSelectAll  (1,1) matlab.lang.OnOffSwitchState = false
         
     end %properties
     
@@ -39,7 +39,8 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = {?wt.test.BaseWidgetTest}, Transient, NonCopyable)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox
@@ -58,6 +59,9 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
             
             % Call superclass setup first to establish the grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [100 130];
             
             % Configure Grid
             obj.Grid.Padding = 10;

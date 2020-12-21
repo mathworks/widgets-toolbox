@@ -7,10 +7,15 @@ classdef (Hidden, AllowedSubclasses = ...
     
     
     %% Events
-    events
+    events (HasCallbackProperty, NotifyAccess = protected)
         
         % Event triggered when a button is pushed
         ButtonPushed
+        
+    end %events
+        
+    
+    events (ListenAccess = ?wt.Toolbar, NotifyAccess = protected)
         
         % Triggered when properties that affect toolbar display are changed
         PropertyChanged 
@@ -24,14 +29,6 @@ classdef (Hidden, AllowedSubclasses = ...
         
         % Components that are part of this section
         Component (:,1) matlab.graphics.Graphics
-        
-    end %properties
-    
-    
-    properties (Abstract, AbortSet, UsedInUpdate = false)
-        
-        % Callback triggered when a button is pushed
-        ButtonPushedFcn function_handle
         
     end %properties
     

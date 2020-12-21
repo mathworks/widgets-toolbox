@@ -4,8 +4,10 @@ classdef ListSelectorTwoPane < wt.ListSelector
     % Copyright 2020 The MathWorks Inc.
     
     
+    
     %% Internal Properties
-    properties (Access = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The ListBox control
         AllItemsListBox (1,1) matlab.ui.control.ListBox
@@ -21,6 +23,9 @@ classdef ListSelectorTwoPane < wt.ListSelector
             
             % Call superclass method
             obj.setup@wt.ListSelector();
+            
+            % Set default size
+            obj.Position(3:4) = [200 120];
             
             % Configure grid
             obj.Grid.ColumnWidth = {'1x',25,'1x'};

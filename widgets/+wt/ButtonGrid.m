@@ -34,12 +34,10 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
         ButtonEnable (1,:) matlab.lang.OnOffSwitchState {mustBeNonempty} = true
         
         % Orientation of the buttons
-        Orientation (1,1) string {mustBeMember(Orientation,...
-            ["horizontal","vertical"])} = "horizontal"
+        Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
         
         % Alignment of the icon
-        IconAlignment (1,1) string {mustBeMember(IconAlignment,...
-            ["left", "right", "center", "top", "bottom"])} = "top"
+        IconAlignment (1,1) wt.enum.AlignmentState = wt.enum.AlignmentState.top
         
     end %properties
     
@@ -57,7 +55,8 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Hidden, SetAccess = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Buttons
         Button (1,:) matlab.ui.control.Button
@@ -73,6 +72,9 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
             
             % Call superclass setup to establish the main grid
             obj.setup@wt.abstract.BaseWidget();
+            
+            % Set default size
+            obj.Position(3:4) = [100 30];
             
         end %function
         
@@ -132,7 +134,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
                 obj.Button(idx).Text = text(idx);
                 obj.Button(idx).Tooltip = tooltip(idx);
                 obj.Button(idx).Tag = tag(idx);
-                obj.Button(idx).IconAlignment = obj.IconAlignment;
+                obj.Button(idx).IconAlignment = char(obj.IconAlignment);
                 obj.Button(idx).Enable = enable(idx);
                 
                 % Update layout

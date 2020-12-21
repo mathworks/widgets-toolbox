@@ -22,14 +22,6 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     end %properties
     
     
-    properties (AbortSet, UsedInUpdate = false)
-        
-        % Callback triggered when a button is pushed
-        ButtonPushedFcn
-        
-    end %properties
-    
-    
     properties (Dependent, SetAccess = protected)
         
         % Width of the whole section
@@ -129,9 +121,6 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
             
             % Trigger event
             notify(obj,"ButtonPushed",evt);
-            
-            % Trigger callback
-            obj.callCallback("ButtonPushedFcn",evt);
             
         end %function
         
