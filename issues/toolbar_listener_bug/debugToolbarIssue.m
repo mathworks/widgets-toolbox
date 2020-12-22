@@ -3,6 +3,9 @@ tb = wt.Toolbar();
 s = wt.toolbar.HorizontalSection();
 s.Title = "SEC 1";
 s.addButton("", "Push ME");
+vs = s.addVerticalSection();
+vs.addButton("play_24.png","Play");
+vs.addButton("stop_24.png","Stop");
 tb.Section = s;
 
 s.ButtonPushedFcn = @mySectionCallback;
@@ -13,10 +16,10 @@ tb.ButtonPushedFcn = @myToolbarCallback;
 
 
 %%
-s.triggerEvent();
+% s.triggerEvent();
 
 %%
-s.triggerEventWithData();
+% s.triggerEventWithData();
 
 
 

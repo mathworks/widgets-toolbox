@@ -33,7 +33,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     %% Internal Properties
-    properties (GetAccess = protected, SetAccess = private)
+    properties %RAJ(GetAccess = protected, SetAccess = private)
         
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
