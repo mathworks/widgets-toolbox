@@ -122,6 +122,11 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
             % Trigger event
             notify(obj,"ButtonPushed",evt);
             
+            % Trigger callback
+            if ~isempty(obj.ButtonPushedFcn)
+                feval(obj.ButtonPushedFcn, obj, evt);
+            end
+            
         end %function
         
     end %methods

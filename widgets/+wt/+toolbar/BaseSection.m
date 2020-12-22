@@ -7,7 +7,9 @@ classdef (Hidden, AllowedSubclasses = ...
     
     
     %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
+    %events (HasCallbackProperty, NotifyAccess = protected)
+    %RAJ - g2405728
+    events (NotifyAccess = protected)
         
         % Event triggered when a button is pushed
         ButtonPushed
@@ -29,6 +31,14 @@ classdef (Hidden, AllowedSubclasses = ...
         
         % Components that are part of this section
         Component (:,1) matlab.graphics.Graphics
+        
+    end %properties
+    
+    
+    properties (UsedInUpdate = false)
+        
+        % Callback
+        ButtonPushedFcn function_handle {mustBeScalarOrEmpty}
         
     end %properties
     
