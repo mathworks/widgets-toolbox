@@ -25,7 +25,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         ValueDisplayFormat
         
         % Orientation of the spinner and slider
-        Orientation
+        Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
         
         % Size of spinner (width for horizontal, height for vertical
         SpinnerSize
@@ -281,14 +281,14 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         
         function value = get.Orientation(obj)
-            value = obj.Slider.Orientation;
+            value = wt.enum.HorizontalVerticalState(obj.Slider.Orientation);
         end
         
         function set.Orientation(obj,value)
-            obj.Slider.Orientation = value;
+            obj.Slider.Orientation = char(value);
             obj.updateLayout();
         end
-        
+
         
         function value = get.MajorTicks(obj)
             value = obj.Slider.MajorTicks;
