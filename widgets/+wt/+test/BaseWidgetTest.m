@@ -25,6 +25,7 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
             testCase.Grid = uigridlayout(testCase.Figure,[numRows,1]);
             testCase.Grid.Scrollable = true;
             testCase.Grid.RowHeight = repmat({rowHeight},1,numRows);
+            testCase.Grid.BackgroundColor = [0 .8 0];
 
         end %function
         
