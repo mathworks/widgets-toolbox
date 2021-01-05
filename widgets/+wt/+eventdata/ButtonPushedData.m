@@ -41,7 +41,9 @@ classdef ButtonPushedData < event.EventData & dynamicprops
             end
             
             % Populate other data
-            obj.Text = obj.Button.Text;
+            if isprop(obj.Button,'Text')
+                obj.Text = obj.Button.Text;
+            end
             obj.Tag = obj.Button.Tag;
             if nargin >= 2
                 obj.Value = value;

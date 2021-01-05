@@ -33,13 +33,10 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             statusLabel = testCase.Widget.StatusTextLabel;
             timeLabel = testCase.Widget.RemTimeLabel;
             
-            % Get widget size
-            wPos = getpixelposition(testCase.Widget);
-            
             % Verify starting bar is empty
-            pos = getpixelposition(testCase.Widget.ProgressPanel);
+            pos = testCase.Widget.ProgressPanel.Position;
+            testCase.assumeEqual(testCase.Widget.ProgressPanel.Units, 'pixels')
             testCase.verifyEqual(pos(3), 0)
-            
             
             % Start
             testCase.verifyMethod("startProgress")
@@ -60,10 +57,12 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             testCase.verifyMethod(@setProgress, value)
             
             % Verify bar size
-            % drawnow
-            % pos = getpixelposition(testCase.Widget.ProgressPanel);
-            % testCase.verifyGreaterThan(pos(3), wPos(3)/10)
-            % testCase.verifyLessThan(pos(3), wPos(3)/2)
+            pause(0.5) %needs to resize, drawnow doesn't work!
+            testCase.assumeEqual(testCase.Widget.Units, 'pixels')
+            wPos = testCase.Widget.Position;
+            pos = testCase.Widget.ProgressPanel.Position;
+            testCase.verifyGreaterThan(pos(3), wPos(3)/10)
+            testCase.verifyLessThan(pos(3), wPos(3)/2)
             
             % Verify text and time
             actVal = string(strtrim(statusLabel.Text));
@@ -79,10 +78,10 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             testCase.verifyMethod(@setProgress, value, message)
             
             % Verify bar size
-            % drawnow
-            % pos = getpixelposition(testCase.Widget.ProgressPanel);
-            % testCase.verifyGreaterThan(pos(3), wPos(3)/2)
-            % testCase.verifyLessThan(pos(3), wPos(3))
+            pause(0.5) %needs to resize, drawnow doesn't work!
+            pos = testCase.Widget.ProgressPanel.Position;
+            testCase.verifyGreaterThan(pos(3), wPos(3)/2)
+            testCase.verifyLessThan(pos(3), wPos(3))
             
             % Verify text and time
             actVal = string(strtrim(statusLabel.Text));
@@ -100,9 +99,9 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             testCase.verifyMethod("finishProgress")
             
             % Verify bar size
-            % drawnow
-            % pos = getpixelposition(testCase.Widget.ProgressPanel);
-            % testCase.verifyEqual(pos(3), 0)
+            pause(0.5) %needs to resize, drawnow doesn't work!
+            pos = testCase.Widget.ProgressPanel.Position;
+            testCase.verifyEqual(pos(3), 0)
             
             % Verify text and time
             actVal = string(strtrim(statusLabel.Text));
@@ -129,17 +128,92 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             
         
         function testIndeterminate(testCase)
-        
+            
+            % Get the displayed image
+            indBar = testCase.Widget.IndeterminateBar;
+            
+            % Not visibile by default
+            testCase.verifyFalse(indBar.Visible);
+            
+            % Turn it on
+            testCase.verifySetProperty("Indeterminate", true);
+            
+            % Still not visible until started
+            testCase.verifyFalse(indBar.Visible);
+            
+            % Start
+            testCase.verifyMethod("startProgress")
+            
+            % Finally visible
+            testCase.verifyTrue(indBar.Visible);
+            
         end %function
             
         
         function testShowCancel(testCase)
+            
+            % Get the cancel button
+            cancelButton = testCase.Widget.CancelButton;
+            
+            % Not visibile by default
+            testCase.verifyFalse(cancelButton.Visible);
+            
+            % Enable cancel button
+            testCase.verifySetProperty("ShowCancel", true);
+            
+            % Still not visible until started
+            testCase.verifyFalse(cancelButton.Visible);
+            
+            % No cancel detected yet
+            testCase.verifyFalse(testCase.Widget.CancelRequested)
+            
+            % Start
+            testCase.verifyMethod("startProgress")
+            
+            % Finally visible
+            testCase.verifyTrue(cancelButton.Visible);
+            
+            % Advance progress
+            pause(1.5)
+            testCase.verifyMethod(@setProgress, 0.5);
+            
+            % No cancel detected yet
+            testCase.verifyFalse(testCase.Widget.CancelRequested)
+            
+            % Press the button
+            testCase.press(cancelButton);
+            
+            % Verify the cancel operation
+            testCase.verifyTrue(testCase.Widget.CancelRequested)
+            testCase.verifyGreaterThan(testCase.CallbackCount, 0)
         
         end %function
             
         
         function testShowTimeRemaining(testCase)
-        
+            
+            % Get the controls
+            timeLabel = testCase.Widget.RemTimeLabel;
+            
+            % Start
+            testCase.verifyMethod("startProgress")
+            
+            % Update 1
+            pause(2)
+            value = 0.3;
+            testCase.verifyMethod(@setProgress, value)
+            
+            % Verify the displayed time text
+            remTime = duration(timeLabel.Text,'InputFormat','mm:ss');
+            testCase.verifyGreaterThanOrEqual(remTime, seconds(1))
+            
+            % Disable the time display
+            testCase.verifySetProperty("ShowTimeRemaining", false);
+            
+            % Verify the displayed time text
+            timeText = strtrim(char(timeLabel.Text));
+            testCase.verifyEmpty(timeText)
+            
         end %function
         
     end %methods (Test)

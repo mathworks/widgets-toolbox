@@ -173,12 +173,12 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
             
             obj.update();
             
+            % Process updates immediately
+            drawnow
+            
             % Trigger event
             evt = wt.eventdata.ButtonPushedData(obj.CancelButton, "Cancel");
             notify(obj,"CancelPressed",evt);
-            
-            % Process updates immediately
-            drawnow
             
         end %function
         
@@ -237,6 +237,7 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
             % Progress panel indicator
             obj.ProgressPanel = matlab.ui.container.Panel(...
                 "Parent",obj.Grid,...
+                "Units","pixels",...
                 "BackgroundColor",[.5 .7 1],...
                 "BorderType","none");
             obj.ProgressPanel.Layout.Column = 1;
@@ -288,34 +289,43 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
         function update(obj)
             
             % Toggle visibilities
-            obj.RemTimeLabel.Visible = obj.ShowTimeRemaining;
+            remTimeVisible = obj.ShowTimeRemaining;
+            wt.utility.fastSet(obj.RemTimeLabel,"Visible",remTimeVisible);
             
             % Show/hide the indeterminate bar
-            obj.IndeterminateBar.Visible = obj.Indeterminate && obj.Running;
+            indBarVisible = obj.Indeterminate && obj.Running;
+            wt.utility.fastSet(obj.IndeterminateBar,"Visible",indBarVisible);
             
             % Update the progress indication by adjusting the beneath grid
             colWidths = [cellstr([obj.Value 1-obj.Value] + "x") {0}];
             
             % Update the status text
-            obj.StatusTextLabel.Text = "  " + obj.StatusText;
+            if strlength(obj.StatusText)
+                statusText = "  " + obj.StatusText;
+            else
+                statusText = "";
+            end
+            wt.utility.fastSet(obj.StatusTextLabel,"Text",statusText);
             
             % Update remaining time
             if obj.ShowTimeRemaining && ~isinf(obj.RemainingTime)
-                obj.RemTimeLabel.Text = string(obj.RemainingTime);
+                timeText = string(obj.RemainingTime);
+            else
+                timeText = "";
             end
+            wt.utility.fastSet(obj.RemTimeLabel,"Text",timeText);
             
             % Update cancel button
-            if obj.ShowCancel && obj.Running
-                %obj.CancelButton.Visible = true;
+            cancelVisible = obj.ShowCancel && obj.Running;
+            cancelColor = "none";
+            if cancelVisible
                 colWidths{3} = 25;
                 if obj.CancelRequested
-                    obj.CancelButton.BackgroundColor = "red";
-                else
-                    obj.CancelButton.BackgroundColor = "none";
+                    cancelColor = "red";
                 end
-            elseif obj.CancelButton.Visible
-                %obj.CancelButton.Visible = false;
+                wt.utility.fastSet(obj.CancelButton,"BackgroundColor",cancelColor);
             end
+            wt.utility.fastSet(obj.CancelButton,"Visible",cancelVisible);
             
             % Update the grid
             obj.Grid.ColumnWidth = colWidths;
