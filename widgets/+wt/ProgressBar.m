@@ -11,7 +11,6 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     
     
     %% Properties
-    
     properties (AbortSet)
         
         % Shows time remaining during progress
@@ -67,8 +66,10 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     end %properties
     
     
+    
     %% Internal Properties
-    properties (Access = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.TaskStatusTable, ?wt.test.BaseWidgetTest} )
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel

@@ -61,7 +61,8 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.TaskStatusTable, ?wt.test.BaseWidgetTest} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
@@ -244,6 +245,11 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         function onBackButtonPushed(obj,evt)
             % Triggered on button pushed
             
+            % Go back a step
+            if ~isempty(obj.SelectedIndex) && obj.SelectedIndex > 1
+                obj.SelectedIndex = obj.SelectedIndex - 1;
+            end
+            
             % Trigger event
             evtOut = wt.eventdata.ButtonPushedData(evt.Source, "Back");
             notify(obj,"ButtonPushed",evtOut);
@@ -253,6 +259,13 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         
         function onForwardButtonPushed(obj,evt)
             % Triggered on button pushed
+            
+            % Go forward a step
+            if isempty(obj.SelectedIndex) 
+                obj.SelectedIndex = 1;
+            elseif obj.SelectedIndex < numel(obj.Items)
+                obj.SelectedIndex = obj.SelectedIndex + 1;
+            end
             
             % Trigger event
             evtOut = wt.eventdata.ButtonPushedData(evt.Source, "Forward");
