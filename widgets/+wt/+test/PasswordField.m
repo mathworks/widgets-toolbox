@@ -26,9 +26,40 @@ classdef PasswordField < wt.test.BaseWidgetTest
     %% Unit Tests
     methods (Test)
             
-        function testEditing(testCase)
-        
+        function testValue(testCase)
+            
+            % Get the password field
+            passField = testCase.Widget.PasswordControl;
+            
+            % Change the value programmatically
+            newValue = "AbC435!";
+            testCase.verifySetProperty("Value", newValue);
+            testCase.verifyMatches(passField.Data, newValue);
+            
+            
+            %testCase.verifyTypeAction(passField, newValue, "Value");
+            % Verify callback triggered
+            %testCase.verifyEqual(testCase.CallbackCount, 1)
+            
         end %function
+            
+        
+        %RAJ - Unfortunately, can't type in a uihtml
+        
+        % function testTyping(testCase)
+        %
+        %     % Get the password field
+        %     passField = testCase.Widget.PasswordControl;
+        %
+        %     % Type a new value
+        %     newValue = "PasswordABC123";
+        %     testCase.verifyTypeAction(passField, newValue, "Value");
+        %     testCase.verifyMatches(passField.Data, newValue);
+        %
+        %     % Verify callback triggered
+        %     testCase.verifyEqual(testCase.CallbackCount, 1)
+        %
+        % end %function
         
     end %methods (Test)
     
