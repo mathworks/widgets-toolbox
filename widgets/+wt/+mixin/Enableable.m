@@ -46,7 +46,7 @@ classdef Enableable < handle
         
         function updateEnableableComponents(obj)
             
-            set(obj.EnableableComponents,"Enable",obj.Enable);
+            wt.utility.fastSet(obj.EnableableComponents,"Enable",obj.Enable);
             
         end %function
         

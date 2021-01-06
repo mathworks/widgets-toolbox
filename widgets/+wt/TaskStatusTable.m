@@ -160,10 +160,6 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
                     obj.Label(idx) = uilabel(obj.TaskGrid,"Text","");
                 end
                 
-                % Update the internal component lists
-                obj.FontStyledComponents = [obj.Label, obj.StatusLabel];
-                obj.EnableableComponents = [obj.Label, obj.Icon, obj.StatusLabel];
-                
             elseif numOld > numNew
                 
                 % Remove rows
@@ -174,6 +170,12 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
                 
             end %if numNew > numOld
             
+            % Update the internal component lists
+            if numOld ~= numNew
+                obj.FontStyledComponents = [obj.Label, obj.StatusLabel];
+                obj.EnableableComponents = [obj.Label, obj.Icon, obj.StatusLabel];
+            end
+                
             % Update the task names and icons
             status = obj.Status;
             imgFile = string(status) + "_16.png";

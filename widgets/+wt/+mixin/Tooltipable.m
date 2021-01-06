@@ -46,7 +46,7 @@ classdef Tooltipable < handle
         
         function updateTooltipableComponents(obj)
             
-            set(obj.TooltipableComponents,"Tooltip",obj.Tooltip);
+            wt.utility.fastSet(obj.TooltipableComponents,"Tooltip",obj.Tooltip);
             
         end %function
         

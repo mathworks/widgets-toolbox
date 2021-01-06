@@ -46,7 +46,7 @@ classdef TitleColorable < handle
         
         function updateTitleColorableComponents(obj)
             
-                set(obj.TitleColorableComponents,"FontColor",obj.TitleColor)
+            wt.utility.fastSet(obj.TitleColorableComponents,"FontColor",obj.TitleColor)
             
         end %function
         

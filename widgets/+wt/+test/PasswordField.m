@@ -25,7 +25,7 @@ classdef PasswordField < wt.test.BaseWidgetTest
     
     %% Unit Tests
     methods (Test)
-            
+        
         function testValue(testCase)
             
             % Get the password field
@@ -42,7 +42,7 @@ classdef PasswordField < wt.test.BaseWidgetTest
             %testCase.verifyEqual(testCase.CallbackCount, 1)
             
         end %function
-            
+        
         
         %RAJ - Unfortunately, can't type in a uihtml
         

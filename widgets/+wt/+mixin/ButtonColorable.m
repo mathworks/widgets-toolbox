@@ -47,7 +47,8 @@ classdef ButtonColorable < handle
         
         function updateButtonColorableComponents(obj)
             
-            set(obj.ButtonColorableComponents,"BackgroundColor",obj.ButtonColor);
+            wt.utility.fastSet(obj.ButtonColorableComponents,...
+                "BackgroundColor",obj.ButtonColor);
             
         end %function
         

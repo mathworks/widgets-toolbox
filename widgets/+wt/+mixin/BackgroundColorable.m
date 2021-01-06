@@ -48,7 +48,7 @@ classdef BackgroundColorable < handle
         function updateBackgroundColorableComponents(obj)
             
             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            set(obj.BackgroundColorableComponents(hasProp),...
+            wt.utility.fastSet(obj.BackgroundColorableComponents(hasProp),...
                 "BackgroundColor",obj.BackgroundColor);
             
         end %function

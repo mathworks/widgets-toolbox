@@ -45,7 +45,7 @@ classdef FieldColorable < handle
         
         function updateFieldColorableComponents(obj)
             
-            set(obj.FieldColorableComponents,"BackgroundColor",obj.FieldColor);
+            wt.utility.fastSet(obj.FieldColorableComponents,"BackgroundColor",obj.FieldColor);
             
         end %function
         
