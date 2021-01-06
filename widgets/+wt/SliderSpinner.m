@@ -2,7 +2,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         wt.mixin.Enableable & wt.mixin.FontStyled
     % A slider and spinner combination
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

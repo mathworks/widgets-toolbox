@@ -1,7 +1,7 @@
 classdef ButtonGrid < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2021 The MathWorks, Inc.
     
     
     %% Test Method Setup

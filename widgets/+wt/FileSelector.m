@@ -3,7 +3,7 @@ classdef FileSelector < wt.abstract.BaseWidget &...
         wt.mixin.FieldColorable & wt.mixin.ButtonColorable
     % A file/folder selection control with browse button
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

@@ -28,7 +28,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html</param.description>
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
-    <param.version>2.0.2</param.version>
+    <param.version>2.0.3</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Building Components.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>

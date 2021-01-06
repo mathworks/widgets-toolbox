@@ -1,7 +1,7 @@
 classdef FontColorable < handle
     % Mixin for component with Font color (but no other editable font properties)
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties

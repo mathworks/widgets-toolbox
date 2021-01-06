@@ -1,4 +1,4 @@
 % Widgets Toolbox - MATLAB App Building Components
-% Version 2.0.0 (R2020b) 24-Nov-2020
+% Version 2.0.3 (R2020b) 06-Jan-2021
 %
-% Copyright 2020 The MathWorks Inc.
+% Copyright 2020-2021 The MathWorks Inc.

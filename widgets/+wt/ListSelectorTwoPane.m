@@ -1,7 +1,7 @@
 classdef ListSelectorTwoPane < wt.ListSelector
     % Select from an array of items and add them to a list
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     

@@ -3,7 +3,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         wt.mixin.ButtonColorable
     % A table showing status of multiple tasks
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

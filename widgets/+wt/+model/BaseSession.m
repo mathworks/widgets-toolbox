@@ -6,7 +6,7 @@ classdef BaseSession < wt.model.BaseModel
     % trigger a public event "PropertyChanged" when value is set. The app
     % will listen for these changes.
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2021 The MathWorks, Inc.
     
     
     %% Properties

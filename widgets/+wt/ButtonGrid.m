@@ -2,7 +2,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable
     % A grid of buttons with a single callback/event
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Events

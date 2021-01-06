@@ -3,7 +3,7 @@ classdef (Hidden, AllowedSubclasses = ...
         BaseSection < wt.abstract.BaseWidget & wt.mixin.FontStyled
     % Base class for a toolbar section
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Events

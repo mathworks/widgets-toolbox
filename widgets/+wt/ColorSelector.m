@@ -3,7 +3,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
         wt.mixin.FieldColorable
     % A color selection control with browse button
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

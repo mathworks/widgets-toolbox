@@ -1,7 +1,7 @@
 classdef Tooltipable < handle
     % Mixin for component with Tooltip property
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties

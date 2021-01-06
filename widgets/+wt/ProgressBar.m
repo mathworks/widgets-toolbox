@@ -1,7 +1,7 @@
 classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     % A progress bar with status and cancel button
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Events
