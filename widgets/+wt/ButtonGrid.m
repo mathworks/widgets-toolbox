@@ -2,7 +2,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable
     % A grid of buttons with a single callback/event
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Events
@@ -58,7 +58,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget &...
     properties ( Transient, NonCopyable, ...
             Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
-        % Buttons
+        % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
         
     end %properties

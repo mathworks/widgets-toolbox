@@ -1,7 +1,7 @@
 classdef TitleColorable < handle
     % Mixin for component with Title font color
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -46,7 +46,7 @@ classdef TitleColorable < handle
         
         function updateTitleColorableComponents(obj)
             
-                set(obj.TitleColorableComponents,"FontColor",obj.TitleColor)
+            wt.utility.fastSet(obj.TitleColorableComponents,"FontColor",obj.TitleColor)
             
         end %function
         

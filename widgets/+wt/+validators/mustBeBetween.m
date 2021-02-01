@@ -7,7 +7,7 @@ function mustBeBetween(A,minA,maxA)
 %     end
 %
 
-% Copyright 2020 The MathWorks, Inc.
+% Copyright 2020-2021 The MathWorks, Inc.
 
 if any(A(:) > maxA | A(:) < minA)
     error('wt:validators:mustBeBetween',...

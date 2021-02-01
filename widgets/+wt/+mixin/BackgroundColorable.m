@@ -2,7 +2,7 @@ classdef BackgroundColorable < handle
     % Mixin for component with colorable background
     %
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -48,7 +48,7 @@ classdef BackgroundColorable < handle
         function updateBackgroundColorableComponents(obj)
             
             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            set(obj.BackgroundColorableComponents(hasProp),...
+            wt.utility.fastSet(obj.BackgroundColorableComponents(hasProp),...
                 "BackgroundColor",obj.BackgroundColor);
             
         end %function

@@ -1,7 +1,7 @@
 classdef Enableable < handle
     % Mixin for component with Enable property
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -46,7 +46,7 @@ classdef Enableable < handle
         
         function updateEnableableComponents(obj)
             
-            set(obj.EnableableComponents,"Enable",obj.Enable);
+            wt.utility.fastSet(obj.EnableableComponents,"Enable",obj.Enable);
             
         end %function
         

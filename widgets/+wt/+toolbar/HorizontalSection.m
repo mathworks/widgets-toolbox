@@ -1,7 +1,7 @@
 classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     % A row of horizontally stacked controls for a toolbar
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties
@@ -43,7 +43,7 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     properties (Dependent, SetAccess = protected)
         
         % Indicates which components are vertical sections
-        IsVerticalSection
+        IsVerticalSection (:,1) logical
         
     end %properties
     
@@ -161,8 +161,12 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
         
         
         function value = get.IsVerticalSection(obj)
-            types = get(obj.Component,'Type');
-           value = types == lower("wt.toolbar.VerticalSection");
+            if isempty(obj.Component)
+                value = false(0,1);
+            else
+                types = get(obj.Component,'Type');
+                value = types == lower("wt.toolbar.VerticalSection");
+            end
         end
         
         

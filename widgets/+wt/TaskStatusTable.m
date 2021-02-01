@@ -3,7 +3,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         wt.mixin.ButtonColorable
     % A table showing status of multiple tasks
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties
@@ -61,7 +61,8 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.TaskStatusTable, ?wt.test.BaseWidgetTest} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
@@ -159,10 +160,6 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
                     obj.Label(idx) = uilabel(obj.TaskGrid,"Text","");
                 end
                 
-                % Update the internal component lists
-                obj.FontStyledComponents = [obj.Label, obj.StatusLabel];
-                obj.EnableableComponents = [obj.Label, obj.Icon, obj.StatusLabel];
-                
             elseif numOld > numNew
                 
                 % Remove rows
@@ -173,6 +170,12 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
                 
             end %if numNew > numOld
             
+            % Update the internal component lists
+            if numOld ~= numNew
+                obj.FontStyledComponents = [obj.Label, obj.StatusLabel];
+                obj.EnableableComponents = [obj.Label, obj.Icon, obj.StatusLabel];
+            end
+                
             % Update the task names and icons
             status = obj.Status;
             imgFile = string(status) + "_16.png";
@@ -244,6 +247,11 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         function onBackButtonPushed(obj,evt)
             % Triggered on button pushed
             
+            % Go back a step
+            if ~isempty(obj.SelectedIndex) && obj.SelectedIndex > 1
+                obj.SelectedIndex = obj.SelectedIndex - 1;
+            end
+            
             % Trigger event
             evtOut = wt.eventdata.ButtonPushedData(evt.Source, "Back");
             notify(obj,"ButtonPushed",evtOut);
@@ -253,6 +261,13 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         
         function onForwardButtonPushed(obj,evt)
             % Triggered on button pushed
+            
+            % Go forward a step
+            if isempty(obj.SelectedIndex) 
+                obj.SelectedIndex = 1;
+            elseif obj.SelectedIndex < numel(obj.Items)
+                obj.SelectedIndex = obj.SelectedIndex + 1;
+            end
             
             % Trigger event
             evtOut = wt.eventdata.ButtonPushedData(evt.Source, "Forward");

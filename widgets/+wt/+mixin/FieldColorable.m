@@ -1,7 +1,7 @@
 classdef FieldColorable < handle
     % Mixin for component with colorable text field
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     %% Properties
     properties (AbortSet)
@@ -45,7 +45,7 @@ classdef FieldColorable < handle
         
         function updateFieldColorableComponents(obj)
             
-            set(obj.FieldColorableComponents,"BackgroundColor",obj.FieldColor);
+            wt.utility.fastSet(obj.FieldColorableComponents,"BackgroundColor",obj.FieldColor);
             
         end %function
         

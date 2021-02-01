@@ -2,7 +2,7 @@ classdef ButtonColorable < handle
     % Mixin for component with colorable button
     %
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -47,7 +47,8 @@ classdef ButtonColorable < handle
         
         function updateButtonColorableComponents(obj)
             
-            set(obj.ButtonColorableComponents,"BackgroundColor",obj.ButtonColor);
+            wt.utility.fastSet(obj.ButtonColorableComponents,...
+                "BackgroundColor",obj.ButtonColor);
             
         end %function
         

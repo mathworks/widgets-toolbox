@@ -1,7 +1,7 @@
 classdef PasswordField < wt.abstract.BaseWidget
     % A password entry field
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

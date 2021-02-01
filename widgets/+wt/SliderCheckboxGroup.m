@@ -3,7 +3,7 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Events

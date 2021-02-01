@@ -1,7 +1,7 @@
 classdef FontColorable < handle
     % Mixin for component with Font color (but no other editable font properties)
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -47,11 +47,16 @@ classdef FontColorable < handle
         function updateFontColorableComponents(obj)
             
                 hasFontColorProp = isprop(obj.FontColorableComponents,"FontColor");
+                
+                wt.utility.fastSet(obj.FontColorableComponents(hasFontColorProp),...
+                    "FontColor",obj.FontColor);
+                
+                
                 hasForegroundColorProp = ~hasFontColorProp & ...
                     isprop(obj.FontColorableComponents,"ForegroundColor");
                 
-                set(obj.FontColorableComponents(hasFontColorProp),"FontColor",obj.FontColor);
-                set(obj.FontColorableComponents(hasForegroundColorProp),"ForegroundColor",obj.FontColor);
+                wt.utility.fastSet(obj.FontColorableComponents(hasForegroundColorProp),...
+                    "ForegroundColor",obj.FontColor);
             
         end %function
         

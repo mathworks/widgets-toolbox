@@ -2,7 +2,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable
     % A checkbox list
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Public properties

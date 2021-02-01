@@ -1,7 +1,7 @@
 classdef FontStyled < handle
     % Mixin for component with Font properties
 
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     
     %% Properties
@@ -81,7 +81,7 @@ classdef FontStyled < handle
             if nargin > 1
                 % Update specific property
                 hasProp = isprop(obj.FontStyledComponents,prop);
-                set(obj.FontStyledComponents(hasProp),prop,value);
+                wt.utility.fastSet(obj.FontStyledComponents(hasProp),prop,value);
             else
                 % Update all
                 obj.updateFontStyledComponents("FontName",obj.FontName)

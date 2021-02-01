@@ -7,7 +7,7 @@ classdef ValueChangedData < event.EventData & dynamicprops
     %           obj = wt.eventdata.ValueChangedData(...,'p1',v1,...)
     %
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2021 The MathWorks, Inc.
 
     %% Properties
     properties (SetAccess = protected)

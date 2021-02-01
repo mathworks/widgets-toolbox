@@ -2,7 +2,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         & wt.mixin.FontStyled
     % A configurable toolbar
     
-    % Copyright 2020 The MathWorks Inc.
+    % Copyright 2020-2021 The MathWorks Inc.
     
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -33,7 +33,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     %% Internal Properties
-    properties %RAJ(GetAccess = protected, SetAccess = private)
+    properties (Transient, NonCopyable, Access = {?wt.test.BaseWidgetTest})
         
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
@@ -56,13 +56,18 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         % Listen to button pushes in sections
         ButtonPushedListener event.listener
         
-        % Sections that are open outside the toolbar
-        OpenSection wt.toolbar.HorizontalSection
+    end %properties
+    
+    
+    properties (Dependent, NonCopyable, Access = {?wt.test.BaseWidgetTest})
+    
+        % Indicates which sections are open
+        SectionIsOpen (:,1) logical
         
     end %properties
     
     
-    properties (Constant, Access = protected)
+    properties (Constant, Access = private)
     
         % The down arrow mask for the button icons
         BUTTON_MASK (:,:) logical = sectionButtonIconMask()
@@ -99,9 +104,6 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             
             % Add a dummy section to color the empty space
             obj.DummySection = uicontainer(obj.Grid);
-            %obj.DummySection = uipanel(obj.Grid);
-            %obj.DummySection.BorderType = 'none';
-            %obj.DummySection.Title = '';
             obj.DummySection.Layout.Row = [1 2];
             obj.BackgroundColorableComponents = obj.DummySection;
             
@@ -199,9 +201,6 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         function updateLayout(obj)
             % Dynamically configure the toolbar based on space
-             
-            % Close any open sections
-            obj.closePanel();
             
             % Return if no sections to show
             if isempty(obj.Section)
@@ -307,8 +306,8 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         function onButtonPushed(obj,evt)
             
-            % Close any open panel
-            obj.closePanel();
+            % Close any open sections
+            obj.updateLayout();
             
             % Trigger event
             notify(obj,"ButtonPushed",evt);
@@ -327,56 +326,56 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             
             % Which panel?
             sectionButton = e.Source;
-            section = obj.Section(obj.SectionButton == sectionButton);
+            isActivatedSection = obj.SectionButton == sectionButton;
+            section = obj.Section(isActivatedSection);
             
-            % Is it the button for a panel that's already open? If so, just
-            % close it and return
-            if isequal(section, obj.OpenSection)
-               obj.closePanel();
-               return
+            % Get the status of section panels to change
+            isOpenSection = obj.SectionIsOpen;
+            isDeactivating = isOpenSection & ~isActivatedSection;
+            isActivating = ~isOpenSection & isActivatedSection;
+            
+            % Is the pushed section already open?
+            if any(isOpenSection(isActivatedSection))
+                % Instead update the layout to closse it
+                obj.updateLayout();
+                return
             end
             
-            % Close any open sections
-            obj.closePanel();
-            
-            
-            % Where are things located now?
-            bPos = getpixelposition(sectionButton, true);
-            fig = ancestor(obj,'figure');
-            figPos = getpixelposition(fig);
-            figureWidth = figPos(3);
-            
-            % Where should the panel go?
-            panelX = bPos(1);
-            panelWidth = section.TotalWidth;
-            panelHeight = bPos(4) - obj.Grid.RowHeight{2} - obj.Grid.RowSpacing;
-            panelY = bPos(2) - panelHeight;
-            
-            % Adjust panel X position if needed
-            panelRightEdge = panelX + panelWidth;
-            if panelRightEdge > figureWidth
-                panelX = figureWidth - panelWidth;
+            % Close any deactivated sections
+            if any(isDeactivating)
+                set(obj.Section(isDeactivating), 'Visible', 'off');
             end
             
-            % Now, position and show the panel as a dropdown
-            panelPos = [panelX panelY panelWidth panelHeight];
-            obj.OpenSection = section;
-            section.Parent = fig;
-            setpixelposition(section, panelPos, true);
-            section.Visible = 'on';
-            
-        end %function
-        
-        
-        function closePanel(obj)
-            
-            % Is a section panel open?
-            if ~isempty(obj.OpenSection)
+            % Activate the specified section
+            if any(isActivating)
                 
-                obj.OpenSection.Parent = [];
-                obj.OpenSection(:) = [];
+                % Where are things located now?
+                bPos = getpixelposition(sectionButton, true);
+                fig = ancestor(obj,'figure');
+                wt.utility.fastSet(fig,"Units","pixels");
+                figureWidth = fig.Position(3);
                 
-            end %if ~isempty(obj.OpenSection)
+                % Where should the panel go?
+                panelX = bPos(1);
+                panelWidth = section.TotalWidth;
+                panelHeight = bPos(4) - obj.Grid.RowHeight{2} - obj.Grid.RowSpacing;
+                panelY = bPos(2) - panelHeight - 1;
+                
+                % Adjust panel X position if needed
+                panelRightEdge = panelX + panelWidth;
+                if panelRightEdge > figureWidth
+                    panelX = figureWidth - panelWidth;
+                end
+                
+                % Now, position and show the panel as a dropdown
+                panelPos = [panelX panelY panelWidth panelHeight];
+                
+                % Turn it on
+                set(obj.Section(isActivating), 'Parent', fig);
+                set(obj.Section(isActivating), 'Position', panelPos);
+                set(obj.Section(isActivating), 'Visible', 'on');
+                
+            end %if any(isActivating)
             
         end %function
         
@@ -391,6 +390,13 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         end
         function set.DividerColor(obj,value)
             obj.Grid.BackgroundColor = value;
+        end
+        
+        function value = get.SectionIsOpen(obj)
+            value = false(size(obj.Section));
+            for idx = 1:numel(obj.Section)
+                value(idx) = ~isequal(obj.Section(idx).Parent, obj.Grid);
+            end
         end
         
     end %methods

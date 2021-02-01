@@ -1,8 +1,8 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
   <configuration file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Widgets Toolbox - MATLAB App Building Components</param.appname>
-    <param.authnamewatermark>Robyn Jackey</param.authnamewatermark>
-    <param.email>rjackey@mathworks.com</param.email>
+    <param.authnamewatermark>MathWorks Consulting</param.authnamewatermark>
+    <param.email>consulting@mathworks.com</param.email>
     <param.company>MathWorks Consulting</param.company>
     <param.summary>Additional app building components to efficiently develop advanced user interfaces in MATLAB</param.summary>
     <param.description>Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. 
@@ -28,7 +28,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html</param.description>
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
-    <param.version>2.0.2</param.version>
+    <param.version>2.0.3</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Building Components.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>

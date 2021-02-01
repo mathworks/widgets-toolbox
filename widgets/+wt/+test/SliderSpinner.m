@@ -1,26 +1,8 @@
 classdef SliderSpinner < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020 The MathWorks, Inc.
-    
-    
-    %% Class Setup
-    methods (TestClassSetup)
-        
-        function createFigure(testCase)
-            
-            % Call superclass method
-            testCase.createFigure@wt.test.BaseWidgetTest();
-            
-            % Modify the grid row height
-            numRows = 8;
-            rowHeight = 40;
-            testCase.Grid.RowHeight = repmat({rowHeight},1,numRows);
-            
-        end %function
-        
-    end %methods
-    
+    % Copyright 2020-2021 The MathWorks, Inc.
+
     
     %% Test Method Setup
     methods (TestMethodSetup)
@@ -29,6 +11,11 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             
             fcn = @()wt.SliderSpinner(testCase.Grid);
             testCase.Widget = verifyWarningFree(testCase,fcn);
+            
+            % Set callback
+            testCase.Widget.ValueChangedFcn = @(s,e)onCallbackTriggered(testCase,e);
+            
+            % Ensure it renders
             drawnow
             
         end %function
@@ -126,6 +113,9 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             expValue = 1;
             testCase.verifyTypeAction(spinnerControl, newValue, "Value", expValue);
             
+            % Verify callback triggered
+            testCase.verifyEqual(testCase.CallbackCount, 1)
+            
             % Type an invalid value
             newValue = 398;
             expValue = 1;
@@ -133,6 +123,9 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             
             % If continuing in this test, need a pause(1) to wait for error
             % flag to disappear!
+            
+            % Verify callback did not trigger on invalid!
+            testCase.verifyEqual(testCase.CallbackCount, 1)
             
         end %function
         
@@ -148,12 +141,17 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
             
+            % Verify callback triggered
+            testCase.verifyEqual(testCase.CallbackCount, 1)
+           
+            
             % Click the spinner buttons
             expValue = 0;
             testCase.press(spinnerControl,'down');
             testCase.press(spinnerControl,'down');
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
+            
             
             % Test the boundaries
             expValue = 0;
@@ -187,6 +185,10 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.choose(sliderControl,newValue);
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
+            
+            % Verify callback triggered
+            testCase.verifyEqual(testCase.CallbackCount, 1)
+            
             
             % Drag the slider
             newValue = 32;

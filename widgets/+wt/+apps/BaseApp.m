@@ -2,7 +2,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
     
-    % Copyright 2020 The MathWorks, Inc.
+    % Copyright 2020-2021 The MathWorks, Inc.
     
     
     %% Properties
@@ -18,10 +18,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         % Model class for App preferences
         %(may subclass wt.model.Preferences to add more prefs)
-        Preferences (1,1) wt.model.Preferences 
+        Preferences (1,1) wt.model.Preferences
         
         % Name of group to store preferences (defaults to class name)
-        PreferenceGroup (1,1) string 
+        PreferenceGroup (1,1) string
         
     end %properties
     
@@ -39,7 +39,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
     end %properties
     
-        
+    
     
     %% Internal properties
     properties (Hidden, SetAccess = immutable)
@@ -80,8 +80,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     methods
         
         function forceUpdate(app)
-           % Forces update to run (For debugging only!)
-           
+            % Forces update to run (For debugging only!)
+            
             app.update();
             
         end %function
@@ -130,10 +130,11 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Set up components
             app.setup_internal();
             app.setup();
-            app.SetupComplete = true;
             
             % Set any P-V pairs
-            set(app,varargin{:});
+            if ~isempty(varargin)
+                set(app, varargin{:});
+            end
             
             % Register the app with App Designer
             registerApp(app, app.Figure)
@@ -141,14 +142,20 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Ensure it's on screen
             app.moveOnScreen();
             
+            % Mark the setup complete
+            app.SetupComplete = true;
+            
+            % Now, make it visible
+            app.Figure.Visible = 'on';
+            
+            % Force drawing to finish
+            drawnow
+            
             % Update the app
             app.update();
             
             % Update the title
             app.updateTitle();
-            
-            % Now, make it visible
-            app.Figure.Visible = 'on';
             
         end %function
         
@@ -183,7 +190,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             
         end %function
         
-
+        
         function selection = promptYesNoCancel(app, message, title, default, icon)
             % Prompt the user with a yes/no/cancel selection
             
@@ -202,7 +209,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 "DefaultOption",default,...
                 "CancelOption","Cancel",...
                 "Icon",icon);
-  
+            
         end %function
         
         
