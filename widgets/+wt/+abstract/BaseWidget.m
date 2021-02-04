@@ -12,7 +12,22 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
         
     end %properties
+    
+    
+    properties (Access = private)
+        
+        % Used internally to indicate when setup has finished
+        SetupFinished_I (1,1) logical = false
+        
+    end %properties
 
+    
+    properties (UsedInUpdate, Access = private)
+        
+        % Used internally to request update call
+        RequestUpdate_I (1,1) logical = false
+        
+    end %properties
     
     
     %% Debugging Methods
@@ -44,6 +59,9 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
         function setup(obj)
             % Configure the widget
             
+            % Use CreateFcn to tell when setup finishes
+            obj.CreateFcn = @(src,evt)obj.toggleSetupFinished_I();
+            
             % Grid Layout to manage building blocks
             obj.Grid = uigridlayout(obj);
             obj.Grid.ColumnWidth = {'1x'};
@@ -66,11 +84,44 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     methods (Access = protected)
         
         function updateBackgroundColorableComponents(obj)
+            % Update components that are affected by BackgroundColor
             
             obj.Grid.BackgroundColor = obj.BackgroundColor;
             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
             set(obj.BackgroundColorableComponents(hasProp),...
                 "BackgroundColor",obj.BackgroundColor);
+            
+        end %function
+        
+        
+        function requestUpdate(obj)
+            % Request update method to run
+            
+            if ~obj.SetupFinished_I
+                % Do nothing
+            elseif verLessThan('matlab','9.10')
+                % g228243 Force a call to update
+                obj.update();
+            else
+                % Trigger set of a UsedInUpdate property to request update
+                % during next drawnow. (for optimal efficiency)
+                obj.RequestUpdate_I = true;
+            end
+            
+        end %function
+        
+    end %methods
+    
+    
+    
+    %% Private Methods
+    methods (Access = private)
+            
+        function toggleSetupFinished_I(obj)
+            % Indicate setup is complete
+            
+            obj.SetupFinished_I = true;
+            obj.CreateFcn = '';
             
         end %function
         

@@ -142,11 +142,25 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             
             % Load the file
             if strlength(sessionPath)
+                
+                % Freeze the figure with a progress dialog
+                dlg = uiprogressdlg(app.Figure);
+                dlg.Title = "Loading Session";
+                dlg.Message = sessionPath;
+                dlg.Indeterminate = true;
+                cleanupObj = onCleanup(@()delete(dlg));
+                
+                % Load the session
                 sessionObj = wt.model.BaseSession.open(sessionPath);
                 sessionObj.FilePath = sessionPath;
+                
+                % Store the session - triggers app.update()
                 app.Session = sessionObj;
+                
+                % Update the title
                 app.updateTitle();
-            end
+                
+            end %if strlength(sessionPath)
             
         end %function
         
@@ -265,10 +279,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function set.Session(app,value)
             app.Session = value;
-            app.attachSessionListeners();
             if app.SetupComplete
                 app.update();
             end
+            app.attachSessionListeners();
         end
         
         function value = get.HasValidSession(app)
