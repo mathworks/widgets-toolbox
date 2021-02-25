@@ -143,13 +143,17 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
             end
             
             % Get the relevant properties
-            propNames = setdiff(properties(obj), superProps);
+            allProps = properties(obj);
+            propNames = setdiff(allProps, superProps, 'stable');
+            
+            % Remove props we don't need to see
+            propNames( startsWith(propNames, "Font") ) = [];
+            propNames( matches(propNames, "Enable") ) = [];
             
             % Split out the callbacks, fonts
             isCallback = endsWith(propNames, "Fcn");
-            isFont = startsWith(propNames, "Font");
             isColor = endsWith(propNames, "Color");
-            normalProps = propNames(~isCallback & ~isFont & ~isColor);
+            normalProps = propNames(~isCallback & ~isColor);
             callbackProps = propNames(isCallback & ~isColor);
             
             % Define the groups
@@ -158,6 +162,9 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
                 matlab.mixin.util.PropertyGroup(normalProps)
                 matlab.mixin.util.PropertyGroup(["Position", "Units"])
                 ];
+            
+            % Ignore empty groups
+            groups(~[groups.NumProperties]) = [];
             
         end %function
         
