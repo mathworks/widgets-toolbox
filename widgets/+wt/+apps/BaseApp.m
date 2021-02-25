@@ -145,17 +145,17 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Mark the setup complete
             app.SetupComplete = true;
             
-            % Now, make it visible
-            app.Figure.Visible = 'on';
-            
-            % Force drawing to finish
-            drawnow
-            
             % Update the app
             app.update();
             
             % Update the title
             app.updateTitle();
+            
+            % Force drawing to finish
+            drawnow
+            
+            % Now, make it visible
+            app.Figure.Visible = 'on';
             
         end %function
         
