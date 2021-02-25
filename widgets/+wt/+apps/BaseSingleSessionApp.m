@@ -28,7 +28,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     end %properties
     
     
-    properties (Access = private)
+    properties (Transient, NonCopyable, Access = private)
         
         % Listener to changes within Session object
         SessionChangedListener event.listener

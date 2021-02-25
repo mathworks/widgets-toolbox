@@ -42,7 +42,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     
     
     %% Internal properties
-    properties (Hidden, SetAccess = immutable)
+    properties (Hidden, Transient, NonCopyable, SetAccess = immutable)
         
         % Figure window of the app
         Figure matlab.ui.Figure
@@ -53,7 +53,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     end %properties
     
     
-    properties (Access = protected)
+    properties (Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseApp, ?wt.test.BaseWidgetTest} )
         
         % Last used folder (for file operations)
         LastFolder (1,1) string = pwd

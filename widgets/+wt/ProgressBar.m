@@ -69,7 +69,7 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.TaskStatusTable, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel

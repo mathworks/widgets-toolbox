@@ -1,5 +1,6 @@
 classdef SliderSpinner < wt.abstract.BaseWidget &...
-        wt.mixin.Enableable & wt.mixin.FontStyled
+        wt.mixin.Enableable & wt.mixin.FontStyled &...
+        wt.mixin.FieldColorable
     % A slider and spinner combination
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -112,6 +113,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             % Update the internal component lists
             obj.FontStyledComponents = [obj.Spinner, obj.Slider];
             obj.EnableableComponents = [obj.Spinner, obj.Slider];
+            obj.FieldColorableComponents = [obj.Spinner];
             
         end %function
         
@@ -288,7 +290,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
             obj.Slider.Orientation = char(value);
             obj.updateLayout();
         end
-
+        
         
         function value = get.MajorTicks(obj)
             value = obj.Slider.MajorTicks;

@@ -16,7 +16,8 @@ classdef ButtonColorable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Access = protected)
+    properties (AbortSet, Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % List of graphics controls to apply to
         ButtonColorableComponents (:,1) matlab.graphics.Graphics
@@ -47,7 +48,12 @@ classdef ButtonColorable < handle
         
         function updateButtonColorableComponents(obj)
             
-            wt.utility.fastSet(obj.ButtonColorableComponents,...
+            % If the component has ButtonColor, use that. Otherwise, use
+            % BackgroundColor.
+            hasProp = isprop(obj.ButtonColorableComponents,'ButtonColor');
+            wt.utility.fastSet(obj.ButtonColorableComponents(hasProp),...
+                "ButtonColor",obj.ButtonColor);
+            wt.utility.fastSet(obj.ButtonColorableComponents(~hasProp),...
                 "BackgroundColor",obj.ButtonColor);
             
         end %function

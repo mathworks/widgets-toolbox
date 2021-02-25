@@ -33,7 +33,8 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     %% Internal Properties
-    properties (Transient, NonCopyable, Access = {?wt.test.BaseWidgetTest})
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox

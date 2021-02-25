@@ -15,7 +15,8 @@ classdef FontColorable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Access = protected)
+    properties (AbortSet, Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % List of graphics controls to apply to
         FontColorableComponents (:,1) matlab.graphics.Graphics

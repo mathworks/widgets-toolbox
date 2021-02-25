@@ -31,7 +31,7 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     
     
     
-    %% Internal Properties
+    %% Read-Only Properties
     properties (SetAccess = protected)
         
         % Listen to button pushes in sections

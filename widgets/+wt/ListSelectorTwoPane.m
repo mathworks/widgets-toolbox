@@ -48,6 +48,7 @@ classdef ListSelectorTwoPane < wt.ListSelector
             % Update the internal component lists
             obj.FontStyledComponents(end+1) = obj.AllItemsListBox;
             obj.EnableableComponents(end+1) = obj.AllItemsListBox;
+            obj.FieldColorableComponents(end+1) = obj.AllItemsListBox;
             
         end %function
         

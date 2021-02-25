@@ -23,7 +23,8 @@ classdef (Abstract) BaseModel < handle & ...
     
     
     %% Internal Properties
-    properties (Transient, Access = protected)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Listeners to public properties
         PropListeners

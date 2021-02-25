@@ -62,7 +62,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.TaskStatusTable, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
@@ -138,6 +138,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             obj.ForwardButton.Layout.Column = 3;
             
             % Update the internal component lists
+            obj.BackgroundColorableComponents = [obj.TaskGrid];
             obj.ButtonColorableComponents = [obj.BackButton, obj.ForwardButton];
            
         end %function
