@@ -45,7 +45,8 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
     
     
     %% Internal Properties
-    properties (Access = protected, UsedInUpdate = false)
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % Checkboxes
         Checkbox (1,:) matlab.ui.control.CheckBox

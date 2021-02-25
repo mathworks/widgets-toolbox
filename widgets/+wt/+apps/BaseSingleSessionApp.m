@@ -28,7 +28,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     end %properties
     
     
-    properties (Access = private)
+    properties (Transient, NonCopyable, Access = private)
         
         % Listener to changes within Session object
         SessionChangedListener event.listener
@@ -63,10 +63,19 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 end
             end %if app.Dirty
             
+            % Freeze the figure with a progress dialog
+            dlg = uiprogressdlg(app.Figure);
+            dlg.Title = "New Session";
+            dlg.Indeterminate = true;
+            cleanupObj = onCleanup(@()delete(dlg));
+            
             % Instantiate the new session
             sessionObj = app.createNewSession();
             app.Session = sessionObj;
             app.updateTitle();
+            
+            % Force an update prior to the progress dialog closing
+            drawnow
             
         end %function
         
@@ -108,11 +117,24 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             
             % Save the file
             if strlength(sessionPath)
+                
+                % Freeze the figure with a progress dialog
+                dlg = uiprogressdlg(app.Figure);
+                dlg.Title = "Save Session";
+                dlg.Message = sessionPath;
+                dlg.Indeterminate = true;
+                cleanupObj = onCleanup(@()delete(dlg));
+                
+                % Save the session
                 app.Session.save();
                 app.Session.FilePath = sessionPath;
                 app.Session.Dirty = false;
                 app.updateTitle();
-            end
+                
+                % Force an update prior to the progress dialog closing
+                drawnow
+                
+            end %if strlength(sessionPath)
             
         end %function
         
@@ -145,7 +167,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 
                 % Freeze the figure with a progress dialog
                 dlg = uiprogressdlg(app.Figure);
-                dlg.Title = "Loading Session";
+                dlg.Title = "Load Session";
                 dlg.Message = sessionPath;
                 dlg.Indeterminate = true;
                 cleanupObj = onCleanup(@()delete(dlg));
@@ -159,6 +181,9 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 
                 % Update the title
                 app.updateTitle();
+                
+                % Force an update prior to the progress dialog closing
+                drawnow
                 
             end %if strlength(sessionPath)
             
@@ -201,6 +226,13 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 end
             end %if app.Dirty
             
+            
+            % Freeze the figure with a progress dialog
+            dlg = uiprogressdlg(app.Figure);
+            dlg.Message = "Closing";
+            dlg.Indeterminate = true;
+            
+            % Delete the app
             app.delete();
             
         end %function

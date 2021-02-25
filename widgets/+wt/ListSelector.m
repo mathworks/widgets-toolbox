@@ -1,5 +1,6 @@
 classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
-         wt.mixin.FontStyled & wt.mixin.ButtonColorable
+         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
+         wt.mixin.FieldColorable
     % Select from an array of items and add them to a list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -133,9 +134,11 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                 'ButtonPushed',@(h,e)obj.onButtonPushed(e) );
             
             % Update the internal component lists
+            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons];
             obj.FontStyledComponents = [obj.ListBox, obj.UserButtons, obj.ListButtons];
             obj.EnableableComponents = [obj.ListBox, obj.UserButtons, obj.ListButtons];
             obj.ButtonColorableComponents = [obj.UserButtons obj.ListButtons];
+            obj.FieldColorableComponents = [obj.ListBox];
             
         end %function
         

@@ -14,7 +14,8 @@ classdef FieldColorable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Access = protected)
+    properties (AbortSet, Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % List of graphics controls to apply to
         FieldColorableComponents (:,1) matlab.graphics.Graphics

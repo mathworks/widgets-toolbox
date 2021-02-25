@@ -6,7 +6,8 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     
     %% Internal properties
-    properties (AbortSet, Access = protected)
+    properties (AbortSet, Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % List of graphics controls that BackgroundColor should apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
@@ -14,7 +15,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     end %properties
     
     
-    properties (Access = private)
+    properties (Transient, NonCopyable, Access = {?wt.test.BaseWidgetTest})
         
         % Used internally to indicate when setup has finished
         SetupFinished_I (1,1) logical = false
@@ -22,7 +23,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     end %properties
 
     
-    properties (UsedInUpdate, Access = private)
+    properties (Transient, NonCopyable, UsedInUpdate, Access = {?wt.test.BaseWidgetTest})
         
         % Used internally to request update call
         RequestUpdate_I (1,1) logical = false
@@ -142,13 +143,18 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
             end
             
             % Get the relevant properties
-            propNames = setdiff(properties(obj), superProps);
+            allProps = properties(obj);
+            propNames = setdiff(allProps, superProps, 'stable');
+            
+            % Remove props we don't need to see
+            propNames( startsWith(propNames, "Font") ) = [];
+            propNames( matches(propNames, "Enable") ) = [];
             
             % Split out the callbacks, fonts
             isCallback = endsWith(propNames, "Fcn");
-            isFont = startsWith(propNames, "Font");
-            normalProps = propNames(~isCallback & ~isFont);
-            callbackProps = propNames(isCallback);
+            isColor = endsWith(propNames, "Color");
+            normalProps = propNames(~isCallback & ~isColor);
+            callbackProps = propNames(isCallback & ~isColor);
             
             % Define the groups
             groups = [
@@ -156,6 +162,9 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
                 matlab.mixin.util.PropertyGroup(normalProps)
                 matlab.mixin.util.PropertyGroup(["Position", "Units"])
                 ];
+            
+            % Ignore empty groups
+            groups(~[groups.NumProperties]) = [];
             
         end %function
         
