@@ -1,6 +1,6 @@
 classdef DatetimeSelector < wt.abstract.BaseWidget &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable
-    % A date time selection control
+    % A date and time selection control
     
     % Copyright 2021 The MathWorks Inc.
     

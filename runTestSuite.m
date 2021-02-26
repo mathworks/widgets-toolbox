@@ -5,7 +5,7 @@ function [testSuite, result] = runTestSuite()
 
 
 %% Create test suite
-testSuite = matlab.unittest.TestSuite.fromProject(currentProject);
+testSuite = matlab.unittest.TestSuite.fromPackage('wt.test');
 
 
 %% Run tests
