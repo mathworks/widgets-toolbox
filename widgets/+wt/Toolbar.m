@@ -33,7 +33,8 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     %% Internal Properties
-    properties (Transient, NonCopyable, Access = {?wt.test.BaseWidgetTest})
+    properties ( Transient, NonCopyable, ...
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
         
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
@@ -60,7 +61,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     properties (Dependent, NonCopyable, Access = {?wt.test.BaseWidgetTest})
-    
+        
         % Indicates which sections are open
         SectionIsOpen (:,1) logical
         
@@ -68,7 +69,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     
     properties (Constant, Access = private)
-    
+        
         % The down arrow mask for the button icons
         BUTTON_MASK (:,:) logical = sectionButtonIconMask()
         
@@ -116,7 +117,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         function update(obj)
             % Update the toolbar
-             
+            
             % Update each section
             numSections = numel(obj.Section);
             for sIdx = 1:numSections
@@ -381,7 +382,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
     end %methods
     
-
+    
     %% Accessors
     methods
         
@@ -415,11 +416,11 @@ mask = logical([
     0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0
-    1 1 1 1 1 1 1 1 1 
-    0 1 1 1 1 1 1 1 0 
-    0 0 1 1 1 1 1 0 0 
-    0 0 0 1 1 1 0 0 0 
-    0 0 0 0 1 0 0 0 0 
+    1 1 1 1 1 1 1 1 1
+    0 1 1 1 1 1 1 1 0
+    0 0 1 1 1 1 1 0 0
+    0 0 0 1 1 1 0 0 0
+    0 0 0 0 1 0 0 0 0
     ]);
 
 end %function
