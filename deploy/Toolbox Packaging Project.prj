@@ -1,7 +1,7 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
   <configuration file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Widgets Toolbox - MATLAB App Building Components</param.appname>
-    <param.authnamewatermark>MathWorks Consulting</param.authnamewatermark>
+    <param.authnamewatermark>Robyn Jackey (MathWorks Consulting)</param.authnamewatermark>
     <param.email>consulting@mathworks.com</param.email>
     <param.company>MathWorks Consulting</param.company>
     <param.summary>Additional app building components to efficiently develop advanced user interfaces in MATLAB</param.summary>
@@ -78,7 +78,6 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     <param.additional.sw.mac.url />
     <param.additional.sw.linux.url />
     <unset>
-      <param.authnamewatermark />
       <param.email />
       <param.output />
       <param.platforms />
