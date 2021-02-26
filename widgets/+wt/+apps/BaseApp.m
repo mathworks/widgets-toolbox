@@ -54,7 +54,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     
     
     properties (Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseApp, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.apps.BaseApp, ?wt.test.BaseWidgetTest} )
         
         % Last used folder (for file operations)
         LastFolder (1,1) string = pwd

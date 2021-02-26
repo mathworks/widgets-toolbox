@@ -248,7 +248,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             % Preform internal pre-setup necessary
             
             % Instantiate initial session
-            app.Session = createNewSession(app);
+            app.Session = app.createNewSession();
             
         end %function
         

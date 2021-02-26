@@ -28,7 +28,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html</param.description>
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
-    <param.version>2.1.0</param.version>
+    <param.version>2.1.1</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Building Components.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
@@ -110,7 +110,6 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     </fileset.rootdir>
     <fileset.rootfiles>
       <file>C:\Work\widgets-toolbox\widgets\+wt</file>
-      <file>C:\Work\widgets-toolbox\widgets\Contents.m</file>
       <file>C:\Work\widgets-toolbox\widgets\demos.xml</file>
       <file>C:\Work\widgets-toolbox\widgets\doc</file>
       <file>C:\Work\widgets-toolbox\widgets\examples</file>
