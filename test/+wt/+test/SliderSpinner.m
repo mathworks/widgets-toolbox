@@ -212,7 +212,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             expValue = 91.24;
             testCase.drag(sliderControl,14,newValue);
             testCase.verifyControlValues(expValue);
-            testCase.verifyEqual(testCase.Widget.Value, expValue);
+            testCase.verifyEqual(testCase.Widget.Value, expValue, 'AbsTol', 1e-5);
             
         end %function
         
