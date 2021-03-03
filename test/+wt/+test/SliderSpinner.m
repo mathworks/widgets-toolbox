@@ -30,7 +30,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             % Verifies the control fields have the specified value
             
             drawnow
-            testCase.verifyEqual(testCase.Widget.Spinner.Value, value);
+            testCase.verifyEqual(testCase.Widget.Spinner.Value, value, 'AbsTol', 1e-5);
             testCase.verifyEqual(testCase.Widget.Slider.Value, value, 'AbsTol', 1e-5);
             
         end %function
@@ -197,7 +197,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
             
-            % Drag the slider to a fraction (with rounding on)
+            % Drag the slider to a fraction (with rounding turned on)
             newValue = 13.65;
             expValue = 14;
             testCase.drag(sliderControl,32,newValue);
@@ -207,7 +207,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             % Configure the control
             testCase.verifySetProperty("RoundFractionalValues", "off");
             
-            % Drag the slider to a fraction (with rounding off)
+            % Drag the slider to a fraction (with rounding turned off)
             newValue = 91.24;
             expValue = 91.24;
             testCase.drag(sliderControl,14,newValue);
