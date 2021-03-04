@@ -15,8 +15,9 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             % Set callback
             testCase.Widget.CancelPressedFcn = @(s,e)onCallbackTriggered(testCase,e);
             
-            % Ensure it renders
+            % Ensure it renders and resizes fully
             drawnow
+            pause(2) %needs time to resize, drawnow doesn't work!
             
         end %function
         
@@ -40,10 +41,12 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             
             % Start
             testCase.verifyMethod("startProgress")
+            drawnow
             
             % Start with message
             message = "Now started";
             testCase.verifyMethod("startProgress", message)
+            drawnow
             
             % Verify text and time
             testCase.verifyMatches(statusLabel.Text, message)
@@ -51,13 +54,12 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             
             
             % Update 1
-            pause(2)
             value = 0.3;
             message = "";
             testCase.verifyMethod(@setProgress, value)
+            pause(2) %needs time to resize, drawnow doesn't work!
             
             % Verify bar size
-            pause(0.5) %needs to resize, drawnow doesn't work!
             testCase.assumeEqual(testCase.Widget.Units, 'pixels')
             wPos = testCase.Widget.Position;
             pos = testCase.Widget.ProgressPanel.Position;
@@ -72,13 +74,12 @@ classdef ProgressBar < wt.test.BaseWidgetTest
 
             
             % Update 2 with message
-            pause(2)
             value = 0.6;
             message = "60% Complete";
             testCase.verifyMethod(@setProgress, value, message)
+            pause(2) %needs time to resize, drawnow doesn't work!
             
             % Verify bar size
-            pause(0.5) %needs to resize, drawnow doesn't work!
             pos = testCase.Widget.ProgressPanel.Position;
             testCase.verifyGreaterThan(pos(3), wPos(3)/2)
             testCase.verifyLessThan(pos(3), wPos(3))
@@ -97,9 +98,9 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             % Finish
             message = "";
             testCase.verifyMethod("finishProgress")
+            pause(2) %needs time to resize, drawnow doesn't work!
             
             % Verify bar size
-            pause(0.5) %needs to resize, drawnow doesn't work!
             pos = testCase.Widget.ProgressPanel.Position;
             testCase.verifyEqual(pos(3), 0)
             
@@ -174,7 +175,6 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             testCase.verifyTrue(cancelButton.Visible);
             
             % Advance progress
-            pause(1.5)
             testCase.verifyMethod(@setProgress, 0.5);
             
             % No cancel detected yet
@@ -198,12 +198,14 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             % Start
             testCase.verifyMethod("startProgress")
             
-            % Update 1
+            % Wait a few seconds so the progress bar tracks time
             pause(2)
+            
+            % Update 1 - Tell the status bar it's 30% done after 2 seconds
             value = 0.3;
             testCase.verifyMethod(@setProgress, value)
             
-            % Verify the displayed time text
+            % Verify the displayed time text is positive
             remTime = duration(timeLabel.Text,'InputFormat','mm:ss');
             testCase.verifyGreaterThanOrEqual(remTime, seconds(1))
             

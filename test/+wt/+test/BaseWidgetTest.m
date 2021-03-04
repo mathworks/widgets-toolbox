@@ -165,6 +165,9 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
             end
             fcn_send = @()fcn(testCase.Widget, varargin{:});
             testCase.verifyWarningFree(fcn_send);
+
+            % Give a moment for update to run
+            drawnow
             
         end %function
         
