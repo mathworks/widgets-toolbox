@@ -233,7 +233,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                         case wt.enum.ListAddSource.Items
                             obj.promptToAddListItems()
                             
-                        case wt.enum.ListAddSource.Custom
+                        case wt.enum.ListAddSource.ButtonPushedFcn
                             notify(obj,"ButtonPushed",evt);
                             
                     end %switch obj.AddSource

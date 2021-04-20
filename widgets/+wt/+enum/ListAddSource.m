@@ -8,7 +8,7 @@ classdef ListAddSource
     %% Enumerations
     enumeration
         Items
-        Custom
+        ButtonPushedFcn
     end %enumeration
     
     
