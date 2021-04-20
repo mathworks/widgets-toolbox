@@ -73,9 +73,6 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         % Additional user buttons
         UserButtons wt.ButtonGrid
         
-        % The list sorting buttons
-        ListButtons wt.ButtonGrid
-        
     end %properties
     
     
@@ -86,6 +83,9 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
+        
+        % The list sorting buttons
+        ListButtons wt.ButtonGrid
         
         % Listen to button pushes in sections
         ButtonPushedListener event.listener
