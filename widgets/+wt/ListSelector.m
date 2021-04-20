@@ -37,6 +37,10 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         % Indicates whether to allow sort controls %RAJ - Future feature
         %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
         
+        % Inidicates what to do when add button is pressed (select from
+        % Items or custom using ButtonPushed event or ButtonPushedFcn)
+        AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
+        
     end %properties
     
     
@@ -152,8 +156,19 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             obj.ListBox.Items = obj.Items(selIdx);
             obj.ListBox.ItemsData = selIdx;
             
+            % Update button enable states
+            obj.updateEnables();
+            
+        end %function
+        
+        
+        function updateEnables(obj)
+            
             % Button enables
             if obj.Enable
+                
+                % What is selected?
+                selIdx = obj.SelectedIndex;
                 
                 % Highlighted selection in list?
                 hiliteIdx = obj.getListBoxSelectedIndex();
@@ -196,8 +211,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                 newValue = itemsData(evt.Value);
             end
             
-            % Force update
-            obj.update();
+            % Update button enable states
+            obj.updateEnables();
             
             % Trigger event
             evtOut = wt.eventdata.ValueChangedData(newValue, oldValue);
@@ -212,7 +227,16 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             switch evt.Tag
                 
                 case 'Add'
-                    obj.promptToAddListItems()
+                    
+                    switch obj.AddSource
+                        
+                        case wt.enum.ListAddSource.Items
+                            obj.promptToAddListItems()
+                            
+                        case wt.enum.ListAddSource.Custom
+                            notify(obj,"ButtonPushed",evt);
+                            
+                    end %switch obj.AddSource
                     
                 case 'Remove'
                     obj.removeListBoxSelection();
