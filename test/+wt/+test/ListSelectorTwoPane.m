@@ -253,6 +253,9 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             % Move items up
             testCase.press(button(3))
             
+            % Give a moment for update to run
+            drawnow
+            
             % Verify new order
             newIdx = [2 3 1 4 5];
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
@@ -264,6 +267,9 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             % Move items down
             testCase.press(button(4))
             
+            % Give a moment for update to run
+            drawnow
+            
             % Verify new order
             newIdx = 1:5;
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
@@ -274,6 +280,9 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
             % Delete items
             testCase.press(button(2))
+            
+            % Give a moment for update to run
+            drawnow
             
             % Verify new order
             newIdx = [1 4 5];
