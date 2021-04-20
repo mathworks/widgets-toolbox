@@ -1,6 +1,6 @@
 classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
-         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-         wt.mixin.FieldColorable
+        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
+        wt.mixin.FieldColorable
     % Select from an array of items and add them to a list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -19,7 +19,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         HighlightedValueChanged
         
     end %events
-                
+    
     
     
     %% Public properties
@@ -93,7 +93,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     end %properties
     
     
- 
+    
     %% Protected methods
     methods (Access = protected)
         
@@ -183,7 +183,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                     ~isempty(hiliteIdx) % Delete Button
                     numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
                     numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
-                ];
+                    ];
                 
             end %if obj.Enable
             
@@ -253,8 +253,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                     
             end %switch
             
-            % Force update
-            obj.update();
+            % Request update
+            obj.requestUpdate();
             
         end %function
         
@@ -485,6 +485,6 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
     end %methods
     
-        
+    
 end % classdef
 
