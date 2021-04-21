@@ -76,6 +76,7 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.press(hourControl,"down");
             actVal = testCase.Widget.Value;
             testCase.verifyEqual(actVal, dt_0 - hours(1));
+            drawnow
             testCase.verifyEqual(dateControl.Value, dt_0 - days(1)); %datepicker strips the time
             testCase.verifyEqual(hourControl.Value, 11);
             testCase.verifyEqual(minuteControl.Value, 0);
@@ -87,6 +88,7 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.press(hourControl,"up");
             actVal = testCase.Widget.Value;
             testCase.verifyEqual(actVal, dt_0 + hours(1));
+            drawnow
             testCase.verifyEqual(dateControl.Value, dt_0);
             testCase.verifyEqual(hourControl.Value, 1);
             testCase.verifyEqual(minuteControl.Value, 0);
@@ -97,6 +99,7 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.press(secondControl,"down");
             actVal = testCase.Widget.Value;
             testCase.verifyEqual(actVal, dt_0 + hours(1) - seconds(1));
+            drawnow
             testCase.verifyEqual(dateControl.Value, dt_0);
             testCase.verifyEqual(hourControl.Value, 12);
             testCase.verifyEqual(minuteControl.Value, 59);
@@ -122,6 +125,7 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.press(minuteControl,"down");
             actVal = testCase.Widget.Value;
             testCase.verifyEqual(actVal, dt_12 - minutes(1));
+            drawnow
             testCase.verifyEqual(dateControl.Value, dt_0);
             testCase.verifyEqual(hourControl.Value, 11);
             testCase.verifyEqual(minuteControl.Value, 59);

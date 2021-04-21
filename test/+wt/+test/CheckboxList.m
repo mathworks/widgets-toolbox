@@ -128,8 +128,9 @@ classdef CheckboxList < wt.test.BaseWidgetTest
             testCase.choose(AllCheck);
             
             % Verify new value
-            testCase.verifyEqual([cbox.Value]', allTrue);
             testCase.verifyEqual(testCase.Widget.Value, allTrue);
+            drawnow
+            testCase.verifyEqual([cbox.Value]', allTrue);
             
             % Verify callback fired
             testCase.verifyEqual(testCase.CallbackCount, 1);
