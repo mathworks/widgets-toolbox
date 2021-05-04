@@ -115,12 +115,9 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             
             % Create the list buttons
             obj.ListButtons = wt.ButtonGrid(obj.Grid);
-            obj.ListButtons.Icon = ["right_24.png", "left_24.png"];
-            obj.ListButtons.ButtonTag = ["Add", "Remove"];
             obj.ListButtons.Layout.Column = 2;
             obj.ListButtons.Layout.Row = 1;
             obj.ListButtons.Orientation = "vertical";
-            obj.ListButtons.ButtonHeight = {28 28};
             
             % Create an additional button grid for custom buttons
             obj.UserButtons = wt.ButtonGrid(obj.Grid,"Icon",[]);
@@ -159,13 +156,13 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             
             % Is the list sortable?
             if obj.Sortable
-                obj.ListButtons.Icon(3:4) = ["up_24.png", "down_24.png"];
-                obj.ListButtons.ButtonTag(3:4) = ["Up", "Down"];
-                obj.ListButtons.ButtonHeight(3:4) = {28};
+                obj.ListButtons.Icon = ["right_24.png", "left_24.png", "up_24.png", "down_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
+                obj.ListButtons.ButtonHeight = {28 28 28 28};
             else
-                obj.ListButtons.Icon(3:end) = [];
-                obj.ListButtons.ButtonTag(3:end) = [];
-                obj.ListButtons.ButtonHeight(3:end) = [];
+                obj.ListButtons.Icon = ["right_24.png", "left_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove"];
+                obj.ListButtons.ButtonHeight = {28 28};
             end
             
             % Update the list
