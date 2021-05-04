@@ -1,6 +1,6 @@
 classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
-         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-         wt.mixin.FieldColorable
+        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
+        wt.mixin.FieldColorable
     % Select from an array of items and add them to a list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -19,7 +19,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         HighlightedValueChanged
         
     end %events
-                
+    
     
     
     %% Public properties
@@ -36,6 +36,10 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
         % Indicates whether to allow sort controls %RAJ - Future feature
         %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
+        
+        % Inidicates what to do when add button is pressed (select from
+        % Items or custom using ButtonPushed event or ButtonPushedFcn)
+        AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
         
     end %properties
     
@@ -69,9 +73,6 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         % Additional user buttons
         UserButtons wt.ButtonGrid
         
-        % The list sorting buttons
-        ListButtons wt.ButtonGrid
-        
     end %properties
     
     
@@ -83,13 +84,16 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
         
+        % The list sorting buttons
+        ListButtons wt.ButtonGrid
+        
         % Listen to button pushes in sections
         ButtonPushedListener event.listener
         
     end %properties
     
     
- 
+    
     %% Protected methods
     methods (Access = protected)
         
@@ -152,8 +156,19 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             obj.ListBox.Items = obj.Items(selIdx);
             obj.ListBox.ItemsData = selIdx;
             
+            % Update button enable states
+            obj.updateEnables();
+            
+        end %function
+        
+        
+        function updateEnables(obj)
+            
             % Button enables
             if obj.Enable
+                
+                % What is selected?
+                selIdx = obj.SelectedIndex;
                 
                 % Highlighted selection in list?
                 hiliteIdx = obj.getListBoxSelectedIndex();
@@ -168,7 +183,7 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                     ~isempty(hiliteIdx) % Delete Button
                     numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
                     numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
-                ];
+                    ];
                 
             end %if obj.Enable
             
@@ -196,8 +211,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                 newValue = itemsData(evt.Value);
             end
             
-            % Force update
-            obj.update();
+            % Update button enable states
+            obj.updateEnables();
             
             % Trigger event
             evtOut = wt.eventdata.ValueChangedData(newValue, oldValue);
@@ -212,7 +227,16 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             switch evt.Tag
                 
                 case 'Add'
-                    obj.promptToAddListItems()
+                    
+                    switch obj.AddSource
+                        
+                        case wt.enum.ListAddSource.Items
+                            obj.promptToAddListItems()
+                            
+                        case wt.enum.ListAddSource.ButtonPushedFcn
+                            notify(obj,"ButtonPushed",evt);
+                            
+                    end %switch obj.AddSource
                     
                 case 'Remove'
                     obj.removeListBoxSelection();
@@ -229,8 +253,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                     
             end %switch
             
-            % Force update
-            obj.update();
+            % Request update
+            obj.requestUpdate();
             
         end %function
         
@@ -461,6 +485,6 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
     end %methods
     
-        
+    
 end % classdef
 
