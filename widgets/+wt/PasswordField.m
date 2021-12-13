@@ -1,4 +1,6 @@
-classdef PasswordField < wt.abstract.BaseWidget
+classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.ErrorHandling & wt.mixin.GridOrganized
+    
     % A password entry field
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -24,8 +26,7 @@ classdef PasswordField < wt.abstract.BaseWidget
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+    properties ( Transient, NonCopyable)
         
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
@@ -39,8 +40,8 @@ classdef PasswordField < wt.abstract.BaseWidget
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Establish Grid for Control
+            obj.establishGrid();
             
             % Set default size
             obj.Position(3:4) = [100 25];
@@ -65,6 +66,18 @@ classdef PasswordField < wt.abstract.BaseWidget
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
             
         end %function
+
+        function establishGrid(obj)
+
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = [2];            
+
+        end
         
         
         function update(obj)
