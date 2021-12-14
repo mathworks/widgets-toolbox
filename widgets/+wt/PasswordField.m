@@ -1,5 +1,5 @@
 classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.ErrorHandling & wt.mixin.GridOrganized
+    wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.BackgroundColorable
     
     % A password entry field
     
@@ -12,6 +12,7 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
         % The current value shown
         Value (1,1) string
         
+                
     end %properties
     
     
@@ -26,7 +27,7 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable)
+    properties (Transient, NonCopyable)
         
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
@@ -34,14 +35,17 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
     
     
-    
     %% Protected methods
     methods (Access = protected)
         
         function setup(obj)
             
-            % Establish Grid for Control
+            % Establish Grid for Control         
             obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [100 25];
@@ -64,20 +68,12 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
                 'Parent',obj.Grid,...
                 'HTMLSource',html,...
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
+
+
             
         end %function
 
-        function establishGrid(obj)
-
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = [2];            
-
-        end
+ 
         
         
         function update(obj)
@@ -87,6 +83,16 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
             
         end %function
         
+%         function updateBackgroundColorableComponents(obj)
+%             % Override Default BGC Update with Additional Components
+%             obj.Grid.BackgroundColor = obj.BackgroundColor;
+%             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
+%             set(obj.BackgroundColorableComponents(hasProp),...
+%                 "BackgroundColor",obj.BackgroundColor);
+% 
+%         end
+
+
     end %methods
     
     

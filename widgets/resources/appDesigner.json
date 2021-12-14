@@ -122,13 +122,13 @@
     {
       "className": "wt.PasswordField",
       "componentName": "Password Field",
-      "description": "A password entry field where the text is hidden as dots.",
+      "description": "A password entry field where the text is hidden as dots. Derives from ui.componentcontainer.ComponentContainer",
       "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB3RJTUUH5AwREjotE4Db3QAAAapJREFUSIntlE1IFGEYgJ9vdn5k8bSeFnYhMIggCHElJSVoiQhkO9ScZIOgk3jQhCXpRxQPIjsEXaOjBXuJokuBnQoXWgkykmovwjoHl/RgSbPTzNsh8ahGfnTxOb6H5+H7XnjhiP+NymazxSAItMgdx0GVSiXJ5XJaArVaDTOdTuO6rpaA7/sYURRpkQNEUYShzb7DbiDwa4y6AwzNPOHHzuxXc5mJoXNcvf2IzfjPLN78wtT1PIXxB6yHByiUvfsiEsrD8Utigai2lMy+qotIJI/vXRFbIdjtcvfpsoiIPJsrimMgWEkZm6/KXnieJ4YyDAi/8a76khCQnxssVOvABkuLL2gJ0PrOwuJnYJv3b58TxEC4zes3K7QO+kW6MCSOweqgp/ciFqDaUuR7jwMpuvsGsRVgt5PvOwEk6TpbwDEAK8n5/pPY+wRMJAJMijen+bi6RfP0MCMXOgFwRyb5UG/y9dg1xgqnABi8cYeJT2sspS5zyz2z/xPK5fKei/oXPM8T/TswTVObPJFIYDYaDSqVipaA7/uoTCaj5VwrpXAc59C9R/w9vwGf2g17roftigAAAABJRU5ErkJggg==",
       "category": "Widgets Toolbox",
       "authorName": "Robyn Jackey - MathWorks Consulting",
       "authorEmail": "",
-      "version": "2.1",
-      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAZCAIAAABIPBwcAAAAB3RJTUUH5AwREjoxB4GHkgAAAG9JREFUWIXt0DEOgCAABMHDyAP4Cf//GgUWJvZbGNDsNNdeNpHeUO4ZY6z9sblaa55Yc86lZ3ZXSklyrL7xJcYCjAUYCzAWYCzAWICxAGMBxgKMBRgLMBZgLMBYgLEAYwHGAowFnElaa7331U/0Lxe5Kwbwb3BHfQAAAABJRU5ErkJggg==",
+      "version": "3.0",
+      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAZCAIAAABIPBwcAAAAB3RJTUUH5QwOEwsZNo3WgQAAAJRJREFUWIXt2bEJwzAURVE7eJr3Kk2nibSWZtAIKRwSQ4r4VVLgnsYCN5/Lx4W8jzE23POYPcA/Oc5HKWXuHCuT1Frb2KyfJNk+z8f1Re99xjxLq7W+z2xWgFgBYgWIFSBWgFgBYgWIFSBWgFgBYgWIFSBWgFgBYgWIFfhc/tm+XnTh22uzbEuaO8r6dn6F3cc3K/AE7UoQuvgib+gAAAAASUVORK5CYII=",
       "defaultPosition": [
         1,
         1,
@@ -139,13 +139,13 @@
     {
       "className": "wt.ProgressBar",
       "componentName": "Progress Bar",
-      "description": "A progress bar that can optionally display time remaining, status message, and cancel button. It can also be made indeterminate to show \"busy\" status.",
+      "description": "A progress bar that can optionally display time remaining, status message, and cancel button. It can also be made indeterminate to show \"busy\" status. Inherits from UI Component Container + Mixins.",
       "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB3RJTUUH5AwREiAHeBbo0AAAAN1JREFUSIntlLFKxEAURc8bJ9ktoojICmu5aUTETmwE/8zOPxDsV/YPAv6M5BM2MbsKknnPYgUJVhMJIuTANLe4Z5p3YeSvESAbWhAGFUynB3Z4dI2RABZdEIJxcZ5xOp908qqqKIoCmZ2c2eXVE2r7gEYL3t6V+7sFtzdpJy/LkjzP8WZK225Qk16C0Crb7Stw3MmbpgHARTdGMgpGwT8Q+N0c7X096VHhSJLJjzRNd5ftTdfoxzOqGfGX7Ehsw+PDC6vl91SICHVd471HRCid6/t7ACOEQQd55Jd8AujXQbk6YnXJAAAAAElFTkSuQmCC",
       "category": "Widgets Toolbox",
       "authorName": "Robyn Jackey - MathWorks Consulting",
       "authorEmail": "",
-      "version": "2.1",
-      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAeCAIAAADmXcb7AAAAB3RJTUUH5AwREiALcaCk+wAAAGxJREFUeJzt0kENACEQwMDj/ItdCZigISEzCvrompkPTvtvB/AmY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWiQ2jJAMMhsTjyAAAAABJRU5ErkJggg==",
+      "version": "3.0",
+      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAeCAIAAADmXcb7AAAAB3RJTUUH5QwOExwLwLcjXwAAAGxJREFUeJzt0kENACEQwMDj/ItdCZigISEzCvrompkPTvtvB/AmY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWCWORMBYJY5EwFgljkTAWiQ2jJAMMhsTjyAAAAABJRU5ErkJggg==",
       "defaultPosition": [
         1,
         1,
@@ -222,6 +222,6 @@
       ]
     }
   ],
-  "schema": 1,
+  "schema": 2,
   "MATLABRelease": "R2021b"
 }

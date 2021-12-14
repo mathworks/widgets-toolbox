@@ -6,10 +6,7 @@ classdef GridOrganized < handle
     properties (AbortSet, Transient, NonCopyable)
         
         % GridLayout
-        Grid (1,1) matlab.ui.container.GridLayout = uigridlayout;
-
-        % List of graphics controls that BackgroundColor should apply to
-        BackgroundColorableComponents (:,1) matlab.graphics.Graphics
+        Grid (1,1) matlab.ui.container.GridLayout
 
     end
 
@@ -17,13 +14,17 @@ classdef GridOrganized < handle
     %% Accessors
     methods (Access = protected)
 
-        function updateBackgroundColorableComponents(obj)
-            % Update components that are affected by BackgroundColor
-            
-            hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            set(obj.BackgroundColorableComponents(hasProp),...
-                "BackgroundColor",obj.BackgroundColor);
-            
-        end %function
+       function establishGrid(obj)
+
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;            
+
+       end
+       
     end
 end

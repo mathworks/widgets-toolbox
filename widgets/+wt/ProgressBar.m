@@ -1,4 +1,6 @@
-classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
+classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.FontStyled 
+    
     % A progress bar with status and cancel button
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -69,7 +71,7 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel
@@ -224,7 +226,7 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
         function setup(obj)
             
             % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            obj.establishGrid();
             
             % Set default size
             obj.Position(3:4) = [200 30];

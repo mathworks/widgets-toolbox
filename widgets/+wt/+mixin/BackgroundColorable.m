@@ -6,10 +6,11 @@ classdef BackgroundColorable < handle
     
     
     %% Properties
-    properties (AbortSet, Abstract)
+    properties (AbortSet, Abstract, ...
+            Access = {?matlab.ui.componentcontainer.ComponentContainer})
+
+        %BackgroundColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne}
         
-        % Background Color
-        BackgroundColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne}
         
     end %properties
     
@@ -17,7 +18,7 @@ classdef BackgroundColorable < handle
     
     %% Internal properties
     properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer})
         
         % List of graphics controls to apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
@@ -47,12 +48,26 @@ classdef BackgroundColorable < handle
     methods (Access = protected)
         
         function updateBackgroundColorableComponents(obj)
+           
             
             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
             wt.utility.fastSet(obj.BackgroundColorableComponents(hasProp),...
                 "BackgroundColor",obj.BackgroundColor);
             
         end %function
+
+
+        function listenForBackgroundChange(obj)
+
+            % Establish Listener for Background Color Change
+            addlistener(obj,'BackgroundColor','PostSet',...
+                @(h,e)obj.updateBackgroundColorableComponents());
+
+        end
+
+        
+
+        
         
     end %methods
     
