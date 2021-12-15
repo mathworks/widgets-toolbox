@@ -123,7 +123,6 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
             
             obj.SetupFinished_I = true;
             obj.CreateFcn = '';
-            disp('pee pee');
             
         end %function
         

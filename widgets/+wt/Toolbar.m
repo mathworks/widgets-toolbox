@@ -1,5 +1,8 @@
-classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
-        & wt.mixin.FontStyled
+classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.BackgroundColorable & ...
+    wt.mixin.TitleColorable & ...
+    wt.mixin.FontStyled
+    
     % A configurable toolbar
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -82,8 +85,12 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Establish Grid for Control         
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [500 90];

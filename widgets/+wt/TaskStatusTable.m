@@ -1,6 +1,8 @@
-classdef TaskStatusTable < wt.abstract.BaseWidget &...
+classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-        wt.mixin.ButtonColorable
+        wt.mixin.ButtonColorable & wt.mixin.BackgroundColorable
+
     % A table showing status of multiple tasks
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -62,7 +64,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest,?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
@@ -91,9 +93,14 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
-            
+            % Call Grid setup first to establish the grid
+            obj.establishGrid();
+
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
+
             % Set default size
             obj.Position(3:4) = [100 180];
             
