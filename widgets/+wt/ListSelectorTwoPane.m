@@ -1,6 +1,8 @@
-classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
+classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable
+        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable
+
     % Select from an array of items and add them to a list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -75,7 +77,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
@@ -96,7 +98,11 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         function setup(obj)
             
             % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [200 160];
@@ -183,6 +189,12 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             
         end %function
         
+        function requestUpdate(obj)
+
+            % Request Update Method to Run
+            obj.update();
+
+        end 
         
         function updateEnables(obj)
             

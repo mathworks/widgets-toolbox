@@ -1,5 +1,8 @@
-classdef CheckboxList < wt.abstract.BaseWidget &...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable
+classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable 
+       
+
     % A checkbox list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -40,7 +43,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox
@@ -57,8 +60,12 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Call Grid setup first to establish the grid
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            %obj.BackgroundColorableComponents = obj.Grid;
+            %obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [100 130];

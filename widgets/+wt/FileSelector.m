@@ -1,4 +1,5 @@
-classdef FileSelector < wt.abstract.BaseWidget &...
+classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable &...
         wt.mixin.FieldColorable & wt.mixin.ButtonColorable
     % A file/folder selection control with browse button
@@ -70,7 +71,7 @@ classdef FileSelector < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
@@ -91,8 +92,8 @@ classdef FileSelector < wt.abstract.BaseWidget &...
             % Adjust default size
             obj.Position(3:4) = [200 25];
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Call Grid setup first to establish the grid
+            obj.establishGrid();
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25};

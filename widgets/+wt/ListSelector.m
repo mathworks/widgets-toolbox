@@ -1,6 +1,9 @@
-classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
+classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.BackgroundColorable & ...
+        wt.mixin.GridOrganized & wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
         wt.mixin.FieldColorable
+
     % Select from an array of items and add them to a list
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -78,8 +81,8 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+    properties (Transient, NonCopyable, ...
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainerComponentContainer})
         
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
@@ -100,7 +103,10 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         function setup(obj)
             
             % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [120 130];
@@ -160,6 +166,13 @@ classdef ListSelector < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             obj.updateEnables();
             
         end %function
+
+        function requestUpdate(obj)
+
+            % Request Update Method to Run
+            obj.update();
+
+        end
         
         
         function updateEnables(obj)

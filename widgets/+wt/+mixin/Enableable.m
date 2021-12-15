@@ -16,7 +16,7 @@ classdef Enableable < handle
     
     %% Internal properties
     properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % List of graphics controls to apply to
         EnableableComponents (:,1) matlab.graphics.Graphics

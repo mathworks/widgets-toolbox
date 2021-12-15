@@ -1,4 +1,5 @@
-classdef DatetimeSelector < wt.abstract.BaseWidget &...
+classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable
     % A date and time selection control
     
@@ -83,8 +84,8 @@ classdef DatetimeSelector < wt.abstract.BaseWidget &...
                 "TimeZone","local",...
                 "Format","dd-MMM-uuuu hh:mm aa");
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Call Grid Mixin first to establish the grid
+            obj.establishGrid();
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'9x',5,'4x','4x',0,0};

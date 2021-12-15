@@ -1,4 +1,5 @@
-classdef ColorSelector < wt.abstract.BaseWidget &...
+classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.FieldColorable
     % A color selection control with browse button
@@ -36,7 +37,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainerComponentContainer} )
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
@@ -54,7 +55,7 @@ classdef ColorSelector < wt.abstract.BaseWidget &...
         function setup(obj)
             
             % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            obj.establishGrid();
             
             % Set default size
             obj.Position(3:4) = [100 25];

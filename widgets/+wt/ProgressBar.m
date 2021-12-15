@@ -71,7 +71,7 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel

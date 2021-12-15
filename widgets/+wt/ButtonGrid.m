@@ -1,5 +1,8 @@
-classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer &...
+classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & ...
+        wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable
+
     % A grid of buttons with a single callback/event
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -56,7 +59,7 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
@@ -71,7 +74,11 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer &...
         function setup(obj)
             
             % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [100 30];

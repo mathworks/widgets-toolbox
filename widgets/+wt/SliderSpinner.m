@@ -1,6 +1,7 @@
-classdef SliderSpinner < wt.abstract.BaseWidget &...
+classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.Enableable & wt.mixin.FontStyled &...
-        wt.mixin.FieldColorable
+        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable
     % A slider and spinner combination
     
     % Copyright 2020-2021 The MathWorks Inc.
@@ -70,7 +71,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Slider
         Slider (1,1) matlab.ui.control.Slider
@@ -87,8 +88,12 @@ classdef SliderSpinner < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Establish Grid for Control         
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [200 40];

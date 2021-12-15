@@ -1,5 +1,8 @@
-classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
+classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
+        wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled
+
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
@@ -63,8 +66,12 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Call Grid setup first to establish the grid
+            obj.establishGrid();
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [120 150];
