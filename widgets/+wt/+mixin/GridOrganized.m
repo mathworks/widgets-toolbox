@@ -1,6 +1,8 @@
 classdef GridOrganized < handle
     % Mixin for component to be organized within a 1x1 UIGridLayout
     %
+    
+    % Copyright 2020-2022 The MathWorks Inc.
 
     %% Properties
     properties (AbortSet, Transient, NonCopyable)

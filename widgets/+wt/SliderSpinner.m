@@ -1,10 +1,9 @@
 classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.Enableable & wt.mixin.FontStyled &...
         wt.mixin.FieldColorable & wt.mixin.BackgroundColorable
     % A slider and spinner combination
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -71,8 +70,11 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
+        % Grid Layout
+        Grid (1,1) matlab.ui.container.GridLayout
+
         % Slider
         Slider (1,1) matlab.ui.control.Slider
         
@@ -88,20 +90,15 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
-            % Establish Grid for Control         
-            obj.establishGrid();
-
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
-            obj.listenForBackgroundChange();
-            
             % Set default size
             obj.Position(3:4) = [200 40];
             
-            % Configure Main Grid
-            obj.Grid.Padding = 2;
-            obj.Grid.ColumnSpacing = 5;
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj,[1 2]);
             obj.Grid.ColumnWidth = {'1x',75};
+            obj.Grid.ColumnSpacing = 5;
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.Padding = [0 0 0 0];
             
             % Slider
             obj.Slider = uislider(obj.Grid);
@@ -116,6 +113,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Spinner.Limits = [0 100];
             
             % Update the internal component lists
+            obj.BackgroundColorableComponents = obj.Grid;
             obj.FontStyledComponents = [obj.Spinner, obj.Slider];
             obj.EnableableComponents = [obj.Spinner, obj.Slider];
             obj.FieldColorableComponents = [obj.Spinner];
