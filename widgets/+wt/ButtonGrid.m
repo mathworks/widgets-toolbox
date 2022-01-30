@@ -59,7 +59,7 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
