@@ -1,9 +1,9 @@
 classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.FontStyled 
+    wt.mixin.FontStyled 
     
     % A progress bar with status and cancel button
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -75,6 +75,9 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Indeterminate bar
         IndeterminateBar (1,1) matlab.ui.control.Image
@@ -225,8 +228,13 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
-            % Call superclass setup to establish the main grid
-            obj.establishGrid();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
             % Set default size
             obj.Position(3:4) = [200 30];

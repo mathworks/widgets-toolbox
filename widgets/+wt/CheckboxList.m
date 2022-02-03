@@ -1,11 +1,11 @@
 classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable 
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
+        wt.mixin.BackgroundColorable
        
 
     % A checkbox list
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -20,6 +20,7 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
             "Item 5"
             "Item 6"
             ]
+
         
         % The current value shown
         Value (:,1) logical = true(6,1)
@@ -43,10 +44,13 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox
+
+        % Grid 
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Select All checkbox
         AllCheck (1,1) matlab.ui.control.CheckBox
@@ -60,13 +64,17 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
-            % Call Grid setup first to establish the grid
-            obj.establishGrid();
-
-            % Establish Background Color Listener
-            %obj.BackgroundColorableComponents = obj.Grid;
-            %obj.listenForBackgroundChange();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
+            % Allow Background Color to be Changed
+            obj.BackgroundColorableComponents = obj.Grid;
+
             % Set default size
             obj.Position(3:4) = [100 130];
             
@@ -77,8 +85,8 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowSpacing = 5;
             obj.Grid.Scrollable = true;
             
-            % Default background to white
-            obj.BackgroundColor = [1 1 1];
+            % Default background to Control Color
+            obj.BackgroundColor = [0.94 0.94 0.94];
             
             % Create the Select All checkbox
             obj.AllCheck = matlab.ui.control.CheckBox(...

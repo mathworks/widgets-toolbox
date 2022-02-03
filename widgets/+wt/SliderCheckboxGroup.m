@@ -1,12 +1,11 @@
 classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.ErrorHandling & wt.mixin.GridOrganized &...
         wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled
 
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -49,8 +48,11 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
         
+        % Grid for Layout
+        Grid (1,1) matlab.ui.container.GridLayout
+
         % Checkboxes
         Checkbox (1,:) matlab.ui.control.CheckBox
         
@@ -66,12 +68,16 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         
         function setup(obj)
             
-            % Call Grid setup first to establish the grid
-            obj.establishGrid();
+            % Create and set Default Grid Properties
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;        
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
-            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [120 150];

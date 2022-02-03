@@ -1,12 +1,11 @@
 classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.ErrorHandling & wt.mixin.BackgroundColorable & ...
-        wt.mixin.GridOrganized & wt.mixin.Enableable &...
+        wt.mixin.BackgroundColorable & wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
         wt.mixin.FieldColorable
 
     % Select from an array of items and add them to a list
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -82,10 +81,13 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties (Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainerComponentContainer})
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer})
         
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % The list sorting buttons
         ListButtons wt.ButtonGrid
@@ -102,11 +104,13 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
-            % Call superclass setup to establish the main grid
-            obj.establishGrid();
-
-            % Establish Background Color Listener
-            obj.listenForBackgroundChange();
+            % Construct Default Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
             % Set default size
             obj.Position(3:4) = [120 130];
@@ -144,7 +148,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 'ButtonPushed',@(h,e)obj.onButtonPushed(e) );
             
             % Update the internal component lists
-            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons];
+            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons obj.Grid];
             obj.FontStyledComponents = [obj.ListBox, obj.UserButtons, obj.ListButtons];
             obj.EnableableComponents = [obj.ListBox, obj.UserButtons, obj.ListButtons];
             obj.ButtonColorableComponents = [obj.UserButtons obj.ListButtons];
@@ -166,13 +170,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.updateEnables();
             
         end %function
-
-        function requestUpdate(obj)
-
-            % Request Update Method to Run
-            obj.update();
-
-        end
         
         
         function updateEnables(obj)
@@ -267,7 +264,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             end %switch
             
             % Request update
-            obj.requestUpdate();
+            obj.update();
             
         end %function
         

@@ -70,7 +70,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
         
         % Grid Layout
         Grid (1,1) matlab.ui.container.GridLayout

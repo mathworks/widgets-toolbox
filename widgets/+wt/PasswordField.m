@@ -1,9 +1,9 @@
 classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.BackgroundColorable
+    wt.mixin.BackgroundColorable
     
     % A password entry field
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -27,7 +27,11 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties (Transient, NonCopyable)
+    properties (Transient, NonCopyable, ...
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+        
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
@@ -40,12 +44,16 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
-            % Establish Grid for Control         
-            obj.establishGrid();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
-            obj.listenForBackgroundChange();
             
             % Set default size
             obj.Position(3:4) = [100 25];

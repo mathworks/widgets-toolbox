@@ -1,11 +1,11 @@
 classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.ErrorHandling & wt.mixin.GridOrganized & wt.mixin.Enableable &...
+        wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
         wt.mixin.FieldColorable & wt.mixin.BackgroundColorable
 
     % Select from an array of items and add them to a list
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -77,10 +77,13 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % The right listbox control
         RightList (1,1) matlab.ui.control.ListBox
@@ -97,12 +100,13 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         
         function setup(obj)
             
-            % Call superclass setup to establish the main grid
-            obj.establishGrid();
-
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
-            obj.listenForBackgroundChange();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
             % Set default size
             obj.Position(3:4) = [200 160];
@@ -144,7 +148,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 'ButtonPushed',@(h,e)obj.onButtonPushed(e) );
             
             % Update the internal component lists
-            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons];
+            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons obj.Grid];
             obj.FontStyledComponents = [obj.RightList, obj.UserButtons, ...
                 obj.ListButtons, obj.LeftList];
             obj.EnableableComponents = [obj.RightList, obj.UserButtons, ...
@@ -189,12 +193,6 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             
         end %function
         
-        function requestUpdate(obj)
-
-            % Request Update Method to Run
-            obj.update();
-
-        end 
         
         function updateEnables(obj)
             
@@ -300,7 +298,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             end %switch
             
             % Request update
-            obj.requestUpdate();
+            obj.update();
             
         end %function
         
