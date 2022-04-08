@@ -1,7 +1,8 @@
 classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ...
     wt.mixin.BackgroundColorable & ...
     wt.mixin.TitleColorable & ...
-    wt.mixin.FontStyled
+    wt.mixin.FontStyled & ...
+    wt.mixin.PropertyViewable
     
     % A configurable toolbar
     
@@ -94,7 +95,7 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
             
             % Set default size
             obj.Position(3:4) = [500 90];
@@ -211,7 +212,14 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
             obj.updateLayout();
             
         end %function
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
         
         function updateLayout(obj)
             % Dynamically configure the toolbar based on space

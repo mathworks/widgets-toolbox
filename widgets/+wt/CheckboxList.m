@@ -1,6 +1,6 @@
 classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-        wt.mixin.BackgroundColorable
+        wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
        
 
     % A checkbox list
@@ -86,7 +86,7 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.Scrollable = true;
             
             % Default background to Control Color
-            obj.BackgroundColor = [0.94 0.94 0.94];
+            obj.BackgroundColor = [1 1 1];
             
             % Create the Select All checkbox
             obj.AllCheck = matlab.ui.control.CheckBox(...
@@ -156,8 +156,16 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
             end
             
         end %function
-        
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
+
+
         function updateFontStyledComponents(obj,varargin)
             
             % Call superclass method first

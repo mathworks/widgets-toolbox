@@ -1,11 +1,11 @@
 classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable & ...
+        wt.mixin.PropertyViewable
 
     % A grid of buttons with a single callback/event
     
-    % Copyright 2020-2022 The MathWorks Inc.
-    
+    % Copyright 2020-2022 The MathWorks Inc.  
     
     
     %% Events
@@ -29,9 +29,6 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Tooltip
         Tooltip (1,:) string
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
         
         % Tag
         ButtonTag (1,:) string
@@ -66,6 +63,9 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
     end %properties
     
@@ -173,6 +173,14 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
             notify(obj,"ButtonPushed",evtOut);
             
         end %function
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+            
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
         
     end %methods
     

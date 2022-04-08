@@ -1,7 +1,7 @@
 classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable
+        wt.mixin.FieldColorable & wt.mixin.PropertyViewable
 
     % Select from an array of items and add them to a list
     
@@ -110,7 +110,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
             
             % Set default size
             obj.Position(3:4) = [120 130];
@@ -169,6 +169,15 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Update button enable states
             obj.updateEnables();
             
+        end %function
+
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
         end %function
         
         

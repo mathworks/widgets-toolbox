@@ -1,6 +1,7 @@
 classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled
+        wt.mixin.Enableable & wt.mixin.FontStyled & ...
+        wt.mixin.PropertyViewable
 
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
@@ -74,7 +75,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;        
+            obj.Grid.Padding = 0;        
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
@@ -147,7 +148,14 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
             end
             
         end %function
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end        
         
         function updateEnableableComponents(obj)
             

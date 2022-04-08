@@ -1,5 +1,5 @@
 classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.FontStyled 
+    wt.mixin.FontStyled & wt.mixin.PropertyViewable
     
     % A progress bar with status and cancel button
     
@@ -341,6 +341,14 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.ColumnWidth = colWidths;
             
         end %function
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end % function        
         
     end %methods
     

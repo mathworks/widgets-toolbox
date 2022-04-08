@@ -1,7 +1,8 @@
 classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.ErrorHandling & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable &...
-        wt.mixin.FieldColorable & wt.mixin.ButtonColorable
+        wt.mixin.FieldColorable & wt.mixin.ButtonColorable & ...
+        wt.mixin.PropertyViewable
     % A file/folder selection control with browse button
     
     % Copyright 2020-2022 The MathWorks Inc.
@@ -101,7 +102,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25};
@@ -166,6 +167,15 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             
         end %function
         
+        
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+
         
         function updateButtonIcon(obj)
             

@@ -1,5 +1,5 @@
 classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.BackgroundColorable
+    wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
     
     % A password entry field
     
@@ -50,7 +50,7 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
@@ -91,6 +91,14 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
             
         end %function
         
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end % function
+
 %         function updateBackgroundColorableComponents(obj)
 %             % Override Default BGC Update with Additional Components
 %             obj.Grid.BackgroundColor = obj.BackgroundColor;

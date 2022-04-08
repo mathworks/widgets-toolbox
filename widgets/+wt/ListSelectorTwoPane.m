@@ -1,7 +1,8 @@
 classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable
+        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
+        wt.mixin.PropertyViewable
 
     % Select from an array of items and add them to a list
     
@@ -106,7 +107,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
             
             % Set default size
             obj.Position(3:4) = [200 160];
@@ -193,7 +194,15 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             
         end %function
         
-        
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+
+
         function updateEnables(obj)
             
             % Button enables

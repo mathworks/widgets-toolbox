@@ -1,5 +1,6 @@
 classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable & ...
+        wt.mixin.PropertyViewable
     % A date and time selection control
     
     % Copyright 2022 The MathWorks Inc.
@@ -92,7 +93,7 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;   
+            obj.Grid.Padding = 0;   
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'9x',5,'4x','4x',0,0};
@@ -214,6 +215,15 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
         end %function
         
         
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+        
+
         function onDateEdited(obj,evt)
             % Triggered on edits
             
