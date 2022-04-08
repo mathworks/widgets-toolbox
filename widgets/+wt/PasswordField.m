@@ -1,7 +1,9 @@
-classdef PasswordField < wt.abstract.BaseWidget
+classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
+    
     % A password entry field
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -10,6 +12,7 @@ classdef PasswordField < wt.abstract.BaseWidget
         % The current value shown
         Value (1,1) string
         
+                
     end %properties
     
     
@@ -24,8 +27,11 @@ classdef PasswordField < wt.abstract.BaseWidget
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+    properties (Transient, NonCopyable, ...
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+        
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
@@ -33,14 +39,21 @@ classdef PasswordField < wt.abstract.BaseWidget
     end %properties
     
     
-    
     %% Protected methods
     methods (Access = protected)
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
             
             % Set default size
             obj.Position(3:4) = [100 25];
@@ -63,8 +76,12 @@ classdef PasswordField < wt.abstract.BaseWidget
                 'Parent',obj.Grid,...
                 'HTMLSource',html,...
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
+
+
             
         end %function
+
+ 
         
         
         function update(obj)
@@ -74,6 +91,24 @@ classdef PasswordField < wt.abstract.BaseWidget
             
         end %function
         
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end % function
+
+%         function updateBackgroundColorableComponents(obj)
+%             % Override Default BGC Update with Additional Components
+%             obj.Grid.BackgroundColor = obj.BackgroundColor;
+%             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
+%             set(obj.BackgroundColorableComponents(hasProp),...
+%                 "BackgroundColor",obj.BackgroundColor);
+% 
+%         end
+
+
     end %methods
     
     

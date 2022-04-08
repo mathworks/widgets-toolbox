@@ -1,9 +1,12 @@
-classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
-        wt.mixin.Enableable & wt.mixin.FontStyled
+classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled & ...
+        wt.mixin.PropertyViewable
+
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -46,8 +49,11 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
         
+        % Grid for Layout
+        Grid (1,1) matlab.ui.container.GridLayout
+
         % Checkboxes
         Checkbox (1,:) matlab.ui.control.CheckBox
         
@@ -63,8 +69,16 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Create and set Default Grid Properties
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;        
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
             
             % Set default size
             obj.Position(3:4) = [120 150];
@@ -134,7 +148,14 @@ classdef SliderCheckboxGroup < wt.abstract.BaseWidget &...
             end
             
         end %function
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end        
         
         function updateEnableableComponents(obj)
             

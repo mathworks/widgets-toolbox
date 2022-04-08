@@ -2,57 +2,57 @@ classdef BackgroundColorable < handle
     % Mixin for component with colorable background
     %
 
-    % Copyright 2020-2021 The MathWorks Inc.
-    
-    
-    %% Properties
-    properties (AbortSet, Abstract)
-        
-        % Background Color
-        BackgroundColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne}
-        
-    end %properties
-    
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Internal properties
     properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer})
         
         % List of graphics controls to apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
         
+        BackgroundColorListener event.proplistener
+
     end %properties
     
-    
-    
-    %% Accessors
-    methods
-        
-%         function set.BackgroundColor(obj,value)
-%             obj.BackgroundColor = value;
-%             obj.updateBackgroundColorableComponents()
-%         end
-        
-        function set.BackgroundColorableComponents(obj,value)
-            obj.BackgroundColorableComponents = value;
-            obj.updateBackgroundColorableComponents()
-        end
-        
-    end %methods
-    
-    
+  
     
     %% Methods
     methods (Access = protected)
         
         function updateBackgroundColorableComponents(obj)
-            
+           
             hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
             wt.utility.fastSet(obj.BackgroundColorableComponents(hasProp),...
-                "BackgroundColor",obj.BackgroundColor);
+                "BackgroundColor",obj.BackgroundColor); %#ok<MCNPN> 
             
         end %function
+
+
+        function listenForBackgroundChange(obj)
+
+            % Establish Listener for Background Color Change
+            if isempty(obj.BackgroundColorListener)
+                obj.BackgroundColorListener = ...
+                    addlistener(obj,'BackgroundColor','PostSet',...
+                    @(h,e)obj.updateBackgroundColorableComponents());
+            end
+
+        end %function
+
+    end %methods
+    
+
+
+    %% Accessors
+    methods
+        
+        function set.BackgroundColorableComponents(obj,value)
+            obj.BackgroundColorableComponents = value;
+            obj.listenForBackgroundChange();
+            obj.updateBackgroundColorableComponents()
+        end
         
     end %methods
     

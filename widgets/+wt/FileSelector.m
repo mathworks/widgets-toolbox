@@ -1,9 +1,11 @@
-classdef FileSelector < wt.abstract.BaseWidget &...
+classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.ErrorHandling & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable &...
-        wt.mixin.FieldColorable & wt.mixin.ButtonColorable
+        wt.mixin.FieldColorable & wt.mixin.ButtonColorable & ...
+        wt.mixin.PropertyViewable
     % A file/folder selection control with browse button
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -70,10 +72,13 @@ classdef FileSelector < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Edit control or dropdown
         EditControl (1,1) matlab.ui.control.EditField
@@ -91,8 +96,13 @@ classdef FileSelector < wt.abstract.BaseWidget &...
             % Adjust default size
             obj.Position(3:4) = [200 25];
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25};
@@ -157,6 +167,15 @@ classdef FileSelector < wt.abstract.BaseWidget &...
             
         end %function
         
+        
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+
         
         function updateButtonIcon(obj)
             

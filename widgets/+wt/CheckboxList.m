@@ -1,8 +1,11 @@
-classdef CheckboxList < wt.abstract.BaseWidget &...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable
+classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
+        wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
+       
+
     % A checkbox list
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -17,6 +20,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
             "Item 5"
             "Item 6"
             ]
+
         
         % The current value shown
         Value (:,1) logical = true(6,1)
@@ -40,10 +44,13 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox
+
+        % Grid 
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Select All checkbox
         AllCheck (1,1) matlab.ui.control.CheckBox
@@ -57,9 +64,17 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
+            % Allow Background Color to be Changed
+            obj.BackgroundColorableComponents = obj.Grid;
+
             % Set default size
             obj.Position(3:4) = [100 130];
             
@@ -70,7 +85,7 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
             obj.Grid.RowSpacing = 5;
             obj.Grid.Scrollable = true;
             
-            % Default background to white
+            % Default background to Control Color
             obj.BackgroundColor = [1 1 1];
             
             % Create the Select All checkbox
@@ -141,8 +156,16 @@ classdef CheckboxList < wt.abstract.BaseWidget &...
             end
             
         end %function
-        
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
+
+
         function updateFontStyledComponents(obj,varargin)
             
             % Call superclass method first

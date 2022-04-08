@@ -1,9 +1,11 @@
-classdef TaskStatusTable < wt.abstract.BaseWidget &...
+classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-        wt.mixin.ButtonColorable
+        wt.mixin.ButtonColorable & wt.mixin.BackgroundColorable & ...
+        wt.mixin.PropertyViewable
+
     % A table showing status of multiple tasks
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Public properties
@@ -62,10 +64,13 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest,?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
+
+        % Main Grid for Layout
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Task Labels
         Label (1,:) matlab.ui.control.Label
@@ -91,9 +96,17 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
-            
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
+
             % Set default size
             obj.Position(3:4) = [100 180];
             
@@ -138,7 +151,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             obj.ForwardButton.Layout.Column = 3;
             
             % Update the internal component lists
-            obj.BackgroundColorableComponents = [obj.TaskGrid];
+            obj.BackgroundColorableComponents = [obj.TaskGrid obj.Grid];
             obj.ButtonColorableComponents = [obj.BackButton, obj.ForwardButton];
            
         end %function
@@ -226,6 +239,13 @@ classdef TaskStatusTable < wt.abstract.BaseWidget &...
             
         end %function
         
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
         
         function updateEnableableComponents(obj)
             

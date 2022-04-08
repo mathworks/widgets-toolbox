@@ -1,7 +1,9 @@
-classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
+classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.FontStyled & wt.mixin.PropertyViewable
+    
     % A progress bar with status and cancel button
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -69,10 +71,13 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Indeterminate bar
         IndeterminateBar (1,1) matlab.ui.control.Image
@@ -223,8 +228,13 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
         
         function setup(obj)
             
-            % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 2;   
             
             % Set default size
             obj.Position(3:4) = [200 30];
@@ -331,6 +341,14 @@ classdef ProgressBar < wt.abstract.BaseWidget & wt.mixin.FontStyled
             obj.Grid.ColumnWidth = colWidths;
             
         end %function
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end % function        
         
     end %methods
     

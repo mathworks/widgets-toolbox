@@ -1,8 +1,9 @@
-classdef DatetimeSelector < wt.abstract.BaseWidget &...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable
+classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable & ...
+        wt.mixin.PropertyViewable
     % A date and time selection control
     
-    % Copyright 2021 The MathWorks Inc.
+    % Copyright 2022 The MathWorks Inc.
     
     
     %% Events
@@ -49,10 +50,13 @@ classdef DatetimeSelector < wt.abstract.BaseWidget &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Button
         DateControl (1,1) matlab.ui.control.DatePicker
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % Hour control
         HourControl (1,1) matlab.ui.control.Spinner
@@ -83,8 +87,13 @@ classdef DatetimeSelector < wt.abstract.BaseWidget &...
                 "TimeZone","local",...
                 "Format","dd-MMM-uuuu hh:mm aa");
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Default Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
             
             % Configure Grid
             obj.Grid.ColumnWidth = {'9x',5,'4x','4x',0,0};
@@ -206,6 +215,15 @@ classdef DatetimeSelector < wt.abstract.BaseWidget &...
         end %function
         
         
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+        
+
         function onDateEdited(obj,evt)
             % Triggered on edits
             

@@ -1,9 +1,12 @@
-classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
+classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.Enableable &...
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable
+        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
+        wt.mixin.PropertyViewable
+
     % Select from an array of items and add them to a list
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events
@@ -75,10 +78,13 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % The right listbox control
         RightList (1,1) matlab.ui.control.ListBox
@@ -95,8 +101,13 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
         
         function setup(obj)
             
-            % Call superclass setup to establish the main grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
             
             % Set default size
             obj.Position(3:4) = [200 160];
@@ -138,7 +149,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
                 'ButtonPushed',@(h,e)obj.onButtonPushed(e) );
             
             % Update the internal component lists
-            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons];
+            obj.BackgroundColorableComponents = [obj.ListButtons, obj.UserButtons obj.Grid];
             obj.FontStyledComponents = [obj.RightList, obj.UserButtons, ...
                 obj.ListButtons, obj.LeftList];
             obj.EnableableComponents = [obj.RightList, obj.UserButtons, ...
@@ -183,7 +194,15 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             
         end %function
         
-        
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+
+
         function updateEnables(obj)
             
             % Button enables
@@ -288,7 +307,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & wt.mixin.Enableable &...
             end %switch
             
             % Request update
-            obj.requestUpdate();
+            obj.update();
             
         end %function
         

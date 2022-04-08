@@ -1,8 +1,12 @@
-classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
-        & wt.mixin.FontStyled
+classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ...
+    wt.mixin.BackgroundColorable & ...
+    wt.mixin.TitleColorable & ...
+    wt.mixin.FontStyled & ...
+    wt.mixin.PropertyViewable
+    
     % A configurable toolbar
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2022 The MathWorks Inc.
     
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -34,10 +38,13 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
         
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
         
         % The label for each section
         SectionLabel (:,1) matlab.ui.control.Label
@@ -82,8 +89,13 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
         
         function setup(obj)
             
-            % Call superclass setup first to establish the grid
-            obj.setup@wt.abstract.BaseWidget();
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.RowSpacing = 2;
+            obj.Grid.ColumnSpacing = 2;
+            obj.Grid.Padding = 0;   
             
             % Set default size
             obj.Position(3:4) = [500 90];
@@ -106,7 +118,9 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             % Add a dummy section to color the empty space
             obj.DummySection = uicontainer(obj.Grid);
             obj.DummySection.Layout.Row = [1 2];
-            obj.BackgroundColorableComponents = obj.DummySection;
+
+            % Set Colorable Background Objects
+            obj.BackgroundColorableComponents = [obj.DummySection obj.Grid];
             
             % Listen to size changes
             obj.SizeChangedListener = event.listener(obj,'SizeChanged',...
@@ -198,7 +212,14 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & wt.mixin.TitleColorable ...
             obj.updateLayout();
             
         end %function
-        
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
         
         function updateLayout(obj)
             % Dynamically configure the toolbar based on space
