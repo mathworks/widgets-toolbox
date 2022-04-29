@@ -80,6 +80,7 @@ classdef Toolbar < wt.test.BaseWidgetTest
         
             fcn = @()addButton(section, icon, name);
             button = testCase.verifyWarningFree(fcn);
+            drawnow
             
             % Verify the buttons changed
             newButton = section.Component(end);
@@ -103,6 +104,7 @@ classdef Toolbar < wt.test.BaseWidgetTest
         
             fcn = @()addStateButton(section, icon, name);
             button = testCase.verifyWarningFree(fcn);
+            drawnow
             
             % Verify the buttons changed
             newButton = section.Component(end);
@@ -124,6 +126,7 @@ classdef Toolbar < wt.test.BaseWidgetTest
         
             fcn = @()addVerticalSection(section);
             section = testCase.verifyWarningFree(fcn);
+            drawnow
             
         end %function
         
@@ -141,6 +144,7 @@ classdef Toolbar < wt.test.BaseWidgetTest
                     section(sIdx).addButton("", string(bIdx));
                 end
             end
+            drawnow
             
             % Attach the sections to the toolbar
             testCase.verifySetProperty("Section", section)
