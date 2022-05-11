@@ -1,8 +1,6 @@
 classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
-       
-
     % A checkbox list
     
     % Copyright 2020-2022 The MathWorks Inc.
