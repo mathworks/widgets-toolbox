@@ -125,11 +125,17 @@ classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
             drawnow
 
             % Verify state
-            testCase.verifyEqual(testCase.Widget.Value, [.1 .2 .3 .4])
-            testCase.verifyEqual([slider.Value], [.1 .2 .3 .4])
+            expValue =  [.1 .2 .3 .4];
+            testCase.verifyEqual(testCase.Widget.Value, expValue)
+            testCase.verifyEqual([slider.Value], expValue)
             
             % Verify callback fired (may be many times during drag)
-            testCase.verifyGreaterThanOrEqual(testCase.CallbackCount, 4)
+            testCase.verifyGreaterThan(testCase.CallbackCount, 1)
+
+            % Set value and verify
+            expValue =  [.5 .6 .7 .8];
+            testCase.verifySetProperty("Value", [.1 .2 .3 .4])
+            testCase.verifyEqual([slider.Value], expValue)
 
         end %function
         
@@ -140,22 +146,62 @@ classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
             slider = testCase.Widget.Slider;
             cbox = testCase.Widget.Checkbox;
 
-            % Adjust sliders
+            % Set value
+            expValue =  [.1 .2 .3 .4];
+            testCase.verifySetProperty("Value", expValue)
 
-            % Toggle a checkbox
+
+            % --- Toggle a checkbox off --- %
             testCase.press(cbox(2))
             drawnow
 
-            % Verify state
-            testCase.verifyEqual([cbox.Value], [true false true true])
-            testCase.verifyEqual(testCase.Widget.State, [true false true true])
-            testCase.verifyEqual(testCase.Widget.Value, [.1 0 .3 .4])
+            % Verify State
+            expState = [true false true true];
+            testCase.verifyEqual([cbox.Value], expState)
+            testCase.verifyEqual(testCase.Widget.State, expState)
+            testCase.verifyEqual(logical([slider.Enable]), expState)
 
-            testCase.verifyTrue(slider(1).Enable)
-            testCase.verifyFalse(slider(2).Enable)
-            testCase.verifyTrue(slider(3).Enable)
-            testCase.verifyTrue(slider(4).Enable)
+            % Verify Value
+            expValue =  [.1 0 .3 .4];
+            testCase.verifyEqual(testCase.Widget.Value, expValue)
+            testCase.verifyEqual([slider.Value], expValue)
+
+
+            % --- Toggle all checkbox states off --- %
+            expState = false(1,4);
+            testCase.verifySetProperty("State", expState)
+
+            % Verify State
+            testCase.verifyEqual([cbox.Value], expState)
+            testCase.verifyEqual(testCase.Widget.State, expState)
+            testCase.verifyEqual(logical([slider.Enable]), expState)
+
+            % Verify Value
+            expValue =  [0 0 0 0];
+            testCase.verifyEqual(testCase.Widget.Value, expValue)
+            testCase.verifyEqual([slider.Value], expValue)
+
+
+            % --- Toggle all checkbox back on --- %
+            testCase.press(cbox(1))
+            testCase.press(cbox(2))
+            testCase.press(cbox(3))
+            testCase.press(cbox(4))
+            drawnow
+
+            % Verify State
+            expState = true(1,4);
+            testCase.verifyEqual([cbox.Value], expState)
+            testCase.verifyEqual(testCase.Widget.State, expState)
+            testCase.verifyEqual(logical([slider.Enable]), expState)
+
+            % Verify Value
+            expValue =  [.1 .2 .3 .4];
+            testCase.verifyEqual(testCase.Widget.Value, expValue)
+            testCase.verifyEqual([slider.Value], expValue)
             
+            % Verify callback fired (may be many times during drag)
+            testCase.verifyGreaterThan(testCase.CallbackCount, 1)
             
         end %function
         
