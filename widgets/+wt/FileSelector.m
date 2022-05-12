@@ -15,6 +15,9 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % The current value shown. If a RootDirectory is used, this will be
         % a relative path to the root.
         Value (1,1) string
+
+        % Filter applicable to the uigetfile/uiputfile dialog
+        Filter string
         
     end %properties
     
@@ -85,6 +88,9 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         EditControl (1,1) matlab.ui.control.EditField
         DropdownControl (1,1) matlab.ui.control.DropDown
         
+        % Image for invalid file
+        WarnImage (1,1) matlab.ui.control.Image
+        
     end %properties
     
     
@@ -95,40 +101,49 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function setup(obj)
             
             % Adjust default size
-            obj.Position(3:4) = [200 25];
+            obj.Position(3:4) = [400 25];
             
             % Construct Grid Layout to Manage Building Blocks
             obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.ColumnWidth = {'1x',25,25,25};
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
             obj.Grid.Padding = 0;   
             
-            % Configure Grid
-            obj.Grid.ColumnWidth = {'1x',25};
-            obj.Grid.RowHeight = {'1x'};
-            
             % Create the standard edit control
             obj.EditControl = matlab.ui.control.EditField(...
                 "Parent",obj.Grid,...
                 "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
+            obj.EditControl.Layout.Column = [1 3];
+            obj.EditControl.Layout.Row = 1;
             
-            % Create the optional dropdown control
+            % Create the optional dropdown control (unparented for now)
             obj.DropdownControl = matlab.ui.control.DropDown(...
                 "Parent",[],...
                 "Editable",true,...
                 "Value","",...
                 "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
-            %"Visible",false,...
-            %obj.DropdownControl.Layout.Column = 1;
+            %obj.DropdownControl.Layout.Column = [1 3];
+            %obj.DropdownControl.Layout.Row = 1;
             
             % Create Button
             obj.ButtonControl = matlab.ui.control.Button(...
                 "Parent",obj.Grid,...
                 "Text","",...
                 "ButtonPushedFcn",@(h,e)obj.onButtonPushed(e));
+            obj.ButtonControl.Layout.Column = 4;
+            obj.ButtonControl.Layout.Row = 1;
             obj.updateButtonIcon();
+
+            % Create overlay
+            obj.WarnImage = matlab.ui.control.Image(...
+                "Parent",obj.Grid,...
+                "ScaleMethod","none",...
+                "Visible","off",...
+                "ImageSource","warning_16.png");
+            obj.WarnImage.Layout.Column = 3;
+            obj.WarnImage.Layout.Row = 1;
             
             % Update the internal component lists
             obj.FontStyledComponents = [obj.EditControl, obj.DropdownControl];
@@ -166,6 +181,10 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj.EditControl.Value = obj.Value;
                 
             end %if obj.ShowHistory
+
+            % Show the warning icon?
+            showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath;
+            obj.WarnImage.Visible = showWarn;
             
         end %function
         
@@ -200,8 +219,11 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 if isempty(obj.DropdownControl.Parent)
                     obj.EditControl.Parent = [];
                     obj.DropdownControl.Parent = obj.Grid;
-                    obj.DropdownControl.Layout.Column = 1;
+                    obj.DropdownControl.Layout.Column = [1 3];
                     obj.DropdownControl.Layout.Row = 1;
+                    obj.WarnImage.Parent = [];
+                    obj.WarnImage.Parent = obj.Grid;
+                    obj.WarnImage.Layout.Column = 2;
                 end
             else
                 % Using edit control
@@ -209,8 +231,11 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 if isempty(obj.EditControl.Parent)
                     obj.DropdownControl.Parent = [];
                     obj.EditControl.Parent = obj.Grid;
-                    obj.EditControl.Layout.Column = 1;
+                    obj.EditControl.Layout.Column = [1 3];
                     obj.EditControl.Layout.Row = 1;
+                    obj.WarnImage.Parent = [];
+                    obj.WarnImage.Parent = obj.Grid;
+                    obj.WarnImage.Layout.Column = 3;
                 end
             end %if obj.ShowHistory
             
@@ -228,12 +253,18 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             else
                 initialPath = pwd;
             end
+
+            % Get the filter
+            filter = obj.Filter;
+            if isempty(filter)
+                filter = "";
+            end
             
             % Prompt user for the path
             if obj.SelectionType == "file"
-                [fileName,pathName] = uigetfile(initialPath,"Select a file");
+                [fileName,pathName] = uigetfile(filter,"Select a file",initialPath);
             else
-                pathName = uigetdir(initialPath,"Select a folder");
+                pathName = uigetdir(initialPath, "Select a folder");
                 fileName = "";
             end
             
@@ -392,8 +423,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function value = get.ValueIsValidPath(obj)
             filePath = fullfile(obj.RootDirectory, obj.Value);
-            value = ( obj.SelectionType == "file" && exist(filePath,"file") ) || ...
-                ( obj.SelectionType == "folder" && exist(filePath,"dir") );
+            value = ( obj.SelectionType == "file" && isfile(filePath) ) || ...
+                ( obj.SelectionType == "folder" && isfolder(filePath) );
         end
         
     end % methods
