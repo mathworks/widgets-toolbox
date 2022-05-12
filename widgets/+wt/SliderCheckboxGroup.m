@@ -224,6 +224,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         function value = get.Value(obj)
             value = obj.Value;
             value((end+1):numel(obj.Name)) = 1;
+            value(~obj.State) = 0;
         end
         
         function value = get.State(obj)
