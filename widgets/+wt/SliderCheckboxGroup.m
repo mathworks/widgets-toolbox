@@ -149,6 +149,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
             
         end %function
 
+        
         function propGroups = getPropertyGroups(obj)
             % Override the ComponentContainer GetPropertyGroups with newly
             % customiziable mixin. This can probably also be specific to each control.
@@ -157,6 +158,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
 
         end        
         
+
         function updateEnableableComponents(obj)
             
             % Call superclass method first

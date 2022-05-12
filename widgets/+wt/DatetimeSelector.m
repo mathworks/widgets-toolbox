@@ -1,9 +1,10 @@
 classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable & ...
         wt.mixin.PropertyViewable
-    % A date and time selection control
     
-    % Copyright 2022 The MathWorks Inc.
+    % Date and time selection control
+    
+    % Copyright 2020-2022 The MathWorks Inc.
     
     
     %% Events

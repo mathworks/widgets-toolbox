@@ -1,7 +1,8 @@
 classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.FieldColorable & wt.mixin.PropertyViewable
-    % A color selection control with browse button
+    
+    % Color selection control with browse button
     
     % Copyright 2020-2022 The MathWorks Inc.
     

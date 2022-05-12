@@ -2,8 +2,8 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable & ...
         wt.mixin.PropertyViewable
-
-    % A grid of buttons with a single callback/event
+    
+    % Array of buttons with a single callback/event
     
     % Copyright 2020-2022 The MathWorks Inc.  
     
@@ -76,6 +76,9 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
+            % Set default size
+            obj.Position(3:4) = [100 30];
+            
             % Create and set Default Grid Properties
             obj.Grid = uigridlayout(obj);
             obj.Grid.ColumnWidth = {'1x'};
@@ -86,9 +89,6 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
-            
-            % Set default size
-            obj.Position(3:4) = [100 30];
             
         end %function
         
@@ -207,4 +207,3 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
     
         
 end % classdef
-

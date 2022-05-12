@@ -44,6 +44,9 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
+            % Set default size
+            obj.Position(3:4) = [100 25];
+            
             % Construct Grid Layout to Manage Building Blocks
             obj.Grid = uigridlayout(obj);
             obj.Grid.ColumnWidth = {'1x'};
@@ -54,9 +57,6 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Establish Background Color Listener
             obj.BackgroundColorableComponents = obj.Grid;
-            
-            % Set default size
-            obj.Position(3:4) = [100 25];
             
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
@@ -77,19 +77,16 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
                 'HTMLSource',html,...
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
 
-
-            
         end %function
 
  
-        
-        
         function update(obj)
             
             % Update the edit control text
             obj.PasswordControl.Data = obj.Value;
             
         end %function
+        
         
         function propGroups = getPropertyGroups(obj)
             % Override the ComponentContainer GetPropertyGroups with newly

@@ -3,7 +3,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable &...
         wt.mixin.FieldColorable & wt.mixin.ButtonColorable & ...
         wt.mixin.PropertyViewable
-    % A file/folder selection control with browse button
+    
+    % File or folder selection control with browse button
     
     % Copyright 2020-2022 The MathWorks Inc.
     
