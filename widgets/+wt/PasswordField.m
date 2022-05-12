@@ -54,9 +54,6 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
             obj.Grid.Padding = 0;   
-
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
             
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
@@ -76,6 +73,9 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
                 'Parent',obj.Grid,...
                 'HTMLSource',html,...
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
+
+            % Establish Background Color Listener
+            obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 

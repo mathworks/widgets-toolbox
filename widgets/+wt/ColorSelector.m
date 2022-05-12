@@ -1,4 +1,5 @@
 classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.FieldColorable & wt.mixin.PropertyViewable
     
@@ -88,6 +89,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.FieldColorableComponents = [obj.EditControl];
             obj.EnableableComponents = [obj.EditControl, obj.ButtonControl];
             obj.TooltipableComponents = [obj.EditControl, obj.ButtonControl];
+            obj.BackgroundColorableComponents = obj.Grid;
             
         end %function
         

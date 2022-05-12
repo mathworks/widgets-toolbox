@@ -1,4 +1,5 @@
 classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.BackgroundColorable & ...
         wt.mixin.FontStyled & wt.mixin.PropertyViewable
 
     % A progress bar with status and cancel button
@@ -292,6 +293,7 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Update the internal component lists
             obj.FontStyledComponents = [obj.StatusTextLabel obj.RemTimeLabel];
+            obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 
