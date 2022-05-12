@@ -38,7 +38,7 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
 
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
 
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
@@ -67,7 +67,7 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
     end %properties
 
 
-    properties (Dependent, NonCopyable, Access = {?wt.test.BaseWidgetTest})
+    properties (Dependent, NonCopyable, Access = {?matlab.uitest.TestCase})
 
         % Indicates which sections are open
         SectionIsOpen (:,1) logical

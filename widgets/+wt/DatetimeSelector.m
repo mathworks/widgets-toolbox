@@ -51,7 +51,7 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Button
         DateControl (1,1) matlab.ui.control.DatePicker

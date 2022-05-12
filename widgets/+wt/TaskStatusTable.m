@@ -64,7 +64,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest,?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase,?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout

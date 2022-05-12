@@ -43,7 +43,7 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox

@@ -78,7 +78,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
 
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
