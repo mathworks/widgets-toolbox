@@ -259,6 +259,9 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             if isempty(filter)
                 filter = "";
             end
+
+            % Get the figure (to restore focus)
+            fig = ancestor(obj,"figure");
             
             % Prompt user for the path
             if obj.SelectionType == "file"
@@ -266,6 +269,11 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             else
                 pathName = uigetdir(initialPath, "Select a folder");
                 fileName = "";
+            end
+
+            % Restore figure focus
+            if isscalar(fig) && isvalid(fig)
+                figure(fig)
             end
             
             % Proceed if user didn't cancel
