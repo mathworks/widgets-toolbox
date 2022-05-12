@@ -134,7 +134,7 @@ classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
 
             % Set value and verify
             expValue =  [.5 .6 .7 .8];
-            testCase.verifySetProperty("Value", [.1 .2 .3 .4])
+            testCase.verifySetProperty("Value", expValue)
             testCase.verifyEqual([slider.Value], expValue)
 
         end %function
