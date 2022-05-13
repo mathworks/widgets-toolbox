@@ -2,12 +2,9 @@
 
 [![View Widgets Toolbox - MATLAB App Designer Components on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/83328-widgets-toolbox-matlab-app-building-components)
 
-Additional app building components to efficiently develop advanced user interfaces in MATLAB
+Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB and App Designer. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. 
 
-
-Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. 
-
-The toolbox provides additional UI controls and higher-level components that implement common building blocks needed in MATLAB apps. Components include: 
+Components include: 
 
 - Grid of buttons grouped together
 - List of checkboxes and labels grouped together
