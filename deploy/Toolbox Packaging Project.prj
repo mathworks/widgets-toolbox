@@ -112,7 +112,6 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     <fileset.rootfiles>
       <file>C:\Work\widgets-toolbox\widgets\+wt</file>
       <file>C:\Work\widgets-toolbox\widgets\demos.xml</file>
-      <file>C:\Work\widgets-toolbox\widgets\DesktopToolset.xml</file>
       <file>C:\Work\widgets-toolbox\widgets\doc</file>
       <file>C:\Work\widgets-toolbox\widgets\examples</file>
       <file>C:\Work\widgets-toolbox\widgets\icons</file>
