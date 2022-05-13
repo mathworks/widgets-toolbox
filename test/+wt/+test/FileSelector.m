@@ -53,6 +53,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             % Type a valid value
             newValue = string(matlabroot);
             testCase.verifyTypeAction(editControl, newValue, "Value");
+
+            % Verify the warn image does not show
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
@@ -63,6 +66,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Verify the ValueIsValidPath value
             testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image shows
+            testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
         
@@ -81,6 +87,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image does not show
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
             
             % Type an invalid value
             newValue = "some bad file path";
@@ -88,6 +97,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Verify the ValueIsValidPath value
             testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image shows
+            testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
         
@@ -116,6 +128,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image does not show
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
             
             % Verify the full path
             fullPath = fullfile(rootDir,newValue1);
@@ -133,6 +148,9 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Verify the ValueIsValidPath value
             testCase.verifyTrue(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image does not show
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
             
             % Verify the full path
             fullPath = fullfile(rootDir,newValue2);

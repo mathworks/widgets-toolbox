@@ -7,7 +7,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     %% Internal properties
     properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase} )
         
         % List of graphics controls that BackgroundColor should apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
@@ -15,7 +15,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     end %properties
     
     
-    properties (Transient, NonCopyable, Access = {?wt.test.BaseWidgetTest})
+    properties (Transient, NonCopyable, Access = {?matlab.uitest.TestCase})
         
         % Used internally to indicate when setup has finished
         SetupFinished_I (1,1) logical = false
@@ -23,7 +23,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     end %properties
 
     
-    properties (Transient, NonCopyable, UsedInUpdate, Access = {?wt.test.BaseWidgetTest})
+    properties (Transient, NonCopyable, UsedInUpdate, Access = {?matlab.uitest.TestCase})
         
         % Used internally to request update call
         RequestUpdate_I (1,1) logical = false
@@ -47,7 +47,7 @@ classdef (Abstract) BaseWidget < matlab.ui.componentcontainer.ComponentContainer
     
     %% Setup
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase} )
         
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout

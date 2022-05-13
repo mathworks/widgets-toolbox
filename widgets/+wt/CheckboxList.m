@@ -1,9 +1,8 @@
 classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
-       
-
-    % A checkbox list
+    
+    % List of checkbox items
     
     % Copyright 2020-2022 The MathWorks Inc.
     
@@ -44,7 +43,7 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Item checkboxes
         ItemCheck (1,:) matlab.ui.control.CheckBox
@@ -63,6 +62,9 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
     methods (Access = protected)
         
         function setup(obj)
+
+            % Set default size
+            obj.Position(3:4) = [100 130];
             
             % Construct Grid Layout to Manage Building Blocks
             obj.Grid = uigridlayout(obj);
@@ -74,9 +76,6 @@ classdef CheckboxList < matlab.ui.componentcontainer.ComponentContainer & ...
             
             % Allow Background Color to be Changed
             obj.BackgroundColorableComponents = obj.Grid;
-
-            % Set default size
-            obj.Position(3:4) = [100 130];
             
             % Configure Grid
             obj.Grid.Padding = 10;

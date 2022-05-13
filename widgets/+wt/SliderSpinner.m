@@ -2,6 +2,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & wt.mixin.FontStyled &...
         wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
         wt.mixin.PropertyViewable
+
     % A slider and spinner combination
     
     % Copyright 2020-2022 The MathWorks Inc.
@@ -71,7 +72,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
         
         % Grid Layout
         Grid (1,1) matlab.ui.container.GridLayout
@@ -128,6 +129,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
             
         end %function
         
+        
         function propGroups = getPropertyGroups(obj)
             % Override the ComponentContainer GetPropertyGroups with newly
             % customiziable mixin. This can probably also be specific to each control.
@@ -136,6 +138,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
 
         end
         
+
         function updateLayout(obj)
             
             if obj.Orientation == "vertical"

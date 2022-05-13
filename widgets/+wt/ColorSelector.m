@@ -1,7 +1,9 @@
 classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.BackgroundColorable & ...
         wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
         wt.mixin.FieldColorable & wt.mixin.PropertyViewable
-    % A color selection control with browse button
+    
+    % Color selection control with browse button
     
     % Copyright 2020-2022 The MathWorks Inc.
     
@@ -36,7 +38,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
@@ -87,6 +89,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.FieldColorableComponents = [obj.EditControl];
             obj.EnableableComponents = [obj.EditControl, obj.ButtonControl];
             obj.TooltipableComponents = [obj.EditControl, obj.ButtonControl];
+            obj.BackgroundColorableComponents = obj.Grid;
             
         end %function
         

@@ -49,7 +49,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?wt.test.BaseWidgetTest} )
+            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
         
         % Grid for Layout
         Grid (1,1) matlab.ui.container.GridLayout
@@ -149,6 +149,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
             
         end %function
 
+        
         function propGroups = getPropertyGroups(obj)
             % Override the ComponentContainer GetPropertyGroups with newly
             % customiziable mixin. This can probably also be specific to each control.
@@ -157,6 +158,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
 
         end        
         
+
         function updateEnableableComponents(obj)
             
             % Call superclass method first
@@ -222,6 +224,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         function value = get.Value(obj)
             value = obj.Value;
             value((end+1):numel(obj.Name)) = 1;
+            value(~obj.State) = 0;
         end
         
         function value = get.State(obj)

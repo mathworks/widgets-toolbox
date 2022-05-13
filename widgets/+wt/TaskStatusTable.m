@@ -64,7 +64,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.test.BaseWidgetTest,?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?matlab.uitest.TestCase,?matlab.ui.componentcontainer.ComponentContainer} )
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
@@ -95,6 +95,9 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
     methods (Access = protected)
         
         function setup(obj)
+
+            % Set default size
+            obj.Position(3:4) = [100 180];
             
             % Construct Grid Layout to Manage Building Blocks
             obj.Grid = uigridlayout(obj);
@@ -103,12 +106,6 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.RowSpacing = 2;
             obj.Grid.ColumnSpacing = 2;
             obj.Grid.Padding = 0;   
-
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
-
-            % Set default size
-            obj.Position(3:4) = [100 180];
             
             % Configure Main Grid
             obj.Grid.ColumnWidth = {25,'1x',25};
@@ -239,6 +236,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             
         end %function
         
+        
         function propGroups = getPropertyGroups(obj)
             % Override the ComponentContainer GetPropertyGroups with newly
             % customiziable mixin. This can probably also be specific to each control.
@@ -247,6 +245,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
 
         end
         
+
         function updateEnableableComponents(obj)
             
             % Call superclass method first

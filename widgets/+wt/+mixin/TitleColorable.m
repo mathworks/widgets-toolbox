@@ -16,7 +16,7 @@ classdef TitleColorable < handle
     
     %% Internal properties
     properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
+            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
         
         % List of graphics controls to apply to
         TitleColorableComponents (:,1) matlab.graphics.Graphics

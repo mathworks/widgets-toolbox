@@ -1,6 +1,6 @@
 classdef BackgroundColorable < handle
+    
     % Mixin for component with colorable background
-    %
 
     % Copyright 2020-2022 The MathWorks Inc.
     

@@ -24,7 +24,7 @@ classdef (Abstract) BaseModel < handle & ...
     
     %% Internal Properties
     properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest} )
+            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase} )
         
         % Listeners to public properties
         PropListeners
