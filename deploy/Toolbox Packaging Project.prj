@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.toolbox" plugin-version="1.0">
-  <configuration file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
+  <configuration build-checksum="384519049" file="C:\Work\widgets-toolbox\deploy\Toolbox Packaging Project.prj" location="C:\Work\widgets-toolbox\deploy" name="Toolbox Packaging Project" target="target.toolbox" target-name="Package Toolbox">
     <param.appname>Widgets Toolbox - MATLAB App Building Components</param.appname>
     <param.authnamewatermark>Robyn Jackey (MathWorks Consulting)</param.authnamewatermark>
     <param.email />
@@ -29,7 +29,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html</param.description>
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
-    <param.version>2.1.3</param.version>
+    <param.version>2.2.0</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Building Components.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
@@ -38,7 +38,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
       <item>1</item>
     </param.products.id>
     <param.products.version>
-      <item>9.10</item>
+      <item>9.12</item>
     </param.products.version>
     <param.platforms />
     <param.guid>78895307-cc36-4970-8b66-0697da8f9352</param.guid>
@@ -124,11 +124,10 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2021a</root>
+      <root>C:\Program Files\MATLAB\R2022a</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
         <toolbox name="embeddedcoder" />
-        <toolbox name="neuralnetwork" />
       </toolboxes>
       <toolbox>
         <matlabcoder>
@@ -139,11 +138,6 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
         <embeddedcoder>
           <enabled>true</enabled>
         </embeddedcoder>
-      </toolbox>
-      <toolbox>
-        <neuralnetwork>
-          <enabled>true</enabled>
-        </neuralnetwork>
       </toolbox>
     </matlab>
     <platform>
