@@ -283,9 +283,25 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                     % Get the original value
                     oldValue = obj.Value;
 
+                    % Get the highlighted items from the left list, so we
+                    % can keep that the same
+                    leftData = obj.LeftList.ItemsData;
+                    leftValue = obj.LeftList.Value;
+                    leftSelIdx = find(ismember(leftData, leftValue));
+
                     % Update the selection
                     newSelIdx = [obj.SelectedIndex obj.LeftList.Value];
                     obj.SelectedIndex = newSelIdx;
+
+                    % Try to restore the left list highlights
+                    newNumLeft = numel(leftData) - numel(leftSelIdx);
+                    newLeftValue = leftData;
+                    newLeftValue(leftSelIdx) = [];
+                    isOutOfBounds = leftSelIdx > newNumLeft;
+                    leftSelIdx = leftSelIdx - sum(isOutOfBounds);
+                    leftSelIdx(leftSelIdx < 1) = [];
+                    drawnow
+                    obj.LeftList.Value = newLeftValue(leftSelIdx);
 
                     % Trigger event
                     evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
