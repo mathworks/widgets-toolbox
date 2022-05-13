@@ -126,8 +126,8 @@ classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
 
             % Verify state
             expValue =  [.1 .2 .3 .4];
-            testCase.verifyEqual(testCase.Widget.Value, expValue)
-            testCase.verifyEqual([slider.Value], expValue)
+            testCase.verifyEqual(testCase.Widget.Value, expValue, "AbsTol", 0.001)
+            testCase.verifyEqual([slider.Value], expValue, "AbsTol", 0.001)
             
             % Verify callback fired (may be many times during drag)
             testCase.verifyGreaterThan(testCase.CallbackCount, 1)
