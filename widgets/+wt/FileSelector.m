@@ -355,8 +355,9 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 numAbove = max(numel(rootParts) - idx + 1, 0);
                 if numAbove>0
                     
-                    obj.throwError("Path '%s' is not within the root directory '%s'.",...
-                        fullPath, obj.RootDirectory);
+                    msg = "Select a path beneath the root:" + ...
+                        newline + newline + obj.RootDirectory;
+                    obj.throwError(msg);
                     
                 else
                     
