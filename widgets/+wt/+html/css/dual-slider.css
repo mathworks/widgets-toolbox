@@ -1,0 +1,222 @@
+/* Fix any font sizing issues*/
+* {
+    font: inherit;
+}
+
+
+:root {
+    /*Define CSS Properties*/
+    --w: 100%;
+    --h: em;
+
+    /*Thumb Properties*/
+    --sliderThumbWidth: 2em;
+
+    /* Color Properties*/
+    --baseThumbColor: #007ee6 /*#F5F5F5*/;
+    --selectedThumbColor: #d78825;
+    --rangeFillColor: #99d1ff;
+    --unfilledColor: #dee2e6;
+    --ticksColor: #000000;
+    --invisibleColor: #0000;
+}
+
+/* Set Wrapper Styling*/
+.wrap {
+    /* Create a Variable for Filled Bar Between Thumbs*/
+    --dif: calc(var(--max) - var(--min));
+    --g: calc(var(--w) - var(--sliderThumbWidth));
+
+    /*Set up organization for Sliders*/
+    display: grid;
+
+    /* Add Row for Display of Values */
+    /* grid-template: repeat(2,-webkit-max-content) 2em/1fr 1fr; */
+    grid-template: repeat(2,max-content) 2em / 1fr 1fr;
+    
+    overflow: hidden;
+    position: relative;
+    margin: 2px auto;
+    width: var(--w);
+    background: linear-gradient(to top, rgba(0,0,0,0) 0.5em, var(--unfilledColor) 0.5em 1.5em, transparent 0);
+
+    font-family: ubuntu mono, consolas, monaco, monospace;
+}
+.wrap::before, .wrap::after {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    background: linear-gradient(to top, rgba(0,0,0,0) 0.5em, var(--rangeFillColor) 0.5em 1.5em, transparent 0);
+    content: "";
+}
+
+/*Calculate Filled Region Between Thumbs*/
+.wrap::before {
+    margin-left: calc(var(--sliderThumbWidth)/2 + (var(--sliderA) - var(--min))/var(--dif)*var(--g));
+    width: calc((var(--sliderB) - var(--sliderA))/var(--dif)*var(--g));
+}
+.wrap::after {
+    margin-left: calc(var(--sliderThumbWidth)/2 + (var(--sliderB) - var(--min))/var(--dif)*var(--g));
+    width: calc((var(--sliderA) - var(--sliderB))/var(--dif)*var(--g));
+}
+
+/*Set TickMark container Styling*/
+.tickMarks {
+    /* Set Up TickMark Propeties*/
+    --ticksThickness: 10%;
+    --numTicks: calc((var(--max) - var(--min)) + 1);
+    --numTicks: 101;
+    --fullBlockSize: calc((100% - var(--numTicks)*var(--ticksThickness))/(var(--numTicks) + 0) + var(--ticksThickness));
+    
+    display: grid;
+
+    grid-template: repeat(1,-webkit-max-content) 1em/1fr 1fr;
+    grid-template: repeat(1,max-content) 1em/1fr 1fr;
+
+    /* Span the Exact Distance Needed*/
+    width: calc(var(--w) - var(--sliderThumbWidth)/2 + var(--fullBlockSize));
+    height: 10px;
+
+    overflow: hidden;
+    position: relative;
+    margin: 2px auto;
+
+    /* Create Coloration for Linearly Space Tick Marks*/
+    background: linear-gradient(to right, 
+        var(--invisibleColor)  calc(50% - var(--ticksThickness)),  
+        var(--ticksColor) 0 calc(50% + var(--ticksThickness)), 
+        var(--invisibleColor) 0 calc(100% - var(--ticksThickness)));
+
+    /* Create Sizing Boundary for the Coloration to be Spread Among*/
+    background-size: var(--fullBlockSize) 50%;
+
+  
+    /* background: linear-gradient(to right, 
+        #0000  calc(50% - var(--ticksThickness)),  
+        var(--ticksColor) calc(50% + var(--ticksThickness)), 
+        red 50%,
+        red calc(50% - var(--ticksThickness))); */
+  
+  
+}
+.tickMarks::before, .tickMarks::after {
+    grid-column: 3/span 2;
+    grid-row: 3;
+}
+
+
+[id=multi-lbl] {
+    grid-column: 1/span 2;
+}
+
+
+.sr-only {
+    /*Set Up Sliders into One Slider*/
+    position: absolute;
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+}
+
+
+/*Set Position of Range-Type Objects in HTML*/
+input[type=range] {
+
+    /* Organize range slider positions*/
+    grid-column: 1/span 2;
+    grid-row: 3;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    margin: 0;
+
+    /* height: var(--h); */
+
+    /*Reset default colors and styling of range slider*/
+    background: none;
+    --col: var(--baseThumbColor);
+    pointer-events: none; /*Removes blocking of clicks on stacked sliders*/
+
+}
+
+/*Clear Slider Default Appereance*/
+input[type=range]::-webkit-slider-runnable-track,
+input[type=range]::-webkit-slider-thumb,
+input[type=range] {
+    -webkit-appearance: none;
+}
+
+/*Rebuild Slider Track*/
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 100%;
+    background: none;
+}
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 100%;
+    background: none;
+}
+
+/*Rebuild Slider Thumbs*/
+input[type=range]::-webkit-slider-thumb {
+    /*Design Slider Thumb*/
+    border: 0px;
+    width: 1em;
+    height: 100%;
+    border-radius: 0;    
+
+    /* background: linear-gradient(0deg, #000 0px, transparent 0),
+        calc(1em - 1px), 
+        radial-gradient(circle, var(--col) calc(1em), transparent 0); */
+
+    /*Set Shape of the Thumb Based on the Color*/
+    background-color: var(--col); 
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+
+    pointer-events: auto;
+}
+input[type=range]::-moz-range-thumb {
+    /*Redesign Slider Thumb*/
+    border: none;
+    width: 2em;
+    height: 100%;
+    border-radius: 0;
+    /* background: linear-gradient(0deg, #000 0px, transparent 0),
+        calc(1em - 1px), 
+        radial-gradient(circle, var(--col) calc(1em), transparent 0); */
+
+    /*Set Shape of the Thumb Based on the Color*/
+    background-color: var(--col); 
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    
+    pointer-events: auto;
+}
+
+/*Set Selected Slider Thumb Coloration when Moving*/
+input[type=range]:focus {
+    z-index: 2;
+    outline: none;
+}
+input[type=range]:focus, 
+input[type=range]:focus + output {
+    --col: var(--selectedThumbColor);
+}
+
+/*Set Up Value Output CSS*/
+output {
+    grid-row: 2;
+    color: var(--col);
+}
+output:last-child {
+    text-align: right;
+}
+output::after {
+    counter-reset: c var(--c);
+    content: "--" attr(for) ": " counter(c) ";";
+}
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <!--Link CSS Stylesheets-->
+    <!--<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="css/dual-slider.css">
+
+    <!--Import JQuery from Local-->
+    <!--<script src="bootstrap/jquery-3.6.0.min.js"></script>-->
+
+    <!--Import JS Module-->
+    <!--<script src="bootstrap/js/bootstrap.min.js"></script>-->
+    
+    <script src="js/dualrangeslider.js"></script>
+    
+</head>
+<body>
+
+    <div class="wrap" role="group" aria-labelledby="multi-lbl" style="--a: -30; --b: 20; --min: -50; --max: 50">
+        <div id="multi-lbl">Multi thumb slider:</div>
+
+        <!--Define Slider A HTML-->
+        <label class="sr-only" for="sliderA">Value A:</label>
+        <input id="sliderA" type="range" min="-50" value="-30" max="50"/>
+        <output for="sliderA" style="--c: var(--a)"></output>
+
+        <!--Define Slider B HTML-->
+        <label class="sr-only" for="sliderB">Value B:</label>
+        <input id="sliderB" type="range" min="-50" value="20" max="50"/>
+        <output for="sliderB" style="--c: var(--b)"></output>
+
+    </div>
+
+</body>
+</html>

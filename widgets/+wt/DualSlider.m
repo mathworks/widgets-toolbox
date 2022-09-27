@@ -1,13 +1,44 @@
-classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer
+classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled & ...
+        wt.mixin.PropertyViewable
+
     %DUALSLIDER A value range slider that has two tabs, allowing for user
     %selection of min/max values.
 
     % Copyright 2022 The MathWorks Inc.
+
+    %% Intro Setting Public Properties
+    properties (Access=public, AbortSet, SetObservable)
+        % Data Struct, used to pass data back and forth between MATLAB
+        % and HTML. Initialized with default values for DualSlider.
+        Data (1,1) struct 
+    end
     
     %% Public Properties
-    properties 
-        Data
-    end
+    properties (Dependent, AbortSet, SetObservable)
+        % These properties do not trigger the update method
+
+        % - Value of the Dual Slider Thumbs (Lower/Upper)
+        Value (1,2) double
+
+        % - Range Limits of the Slider
+        % Limits of Slider (Min/Max)
+        Limits (1,2) double
+
+    end % properties
+
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+        % Callback Events for the DualSlider
+
+        % Triggered on value changed
+        ValueChanged
+
+        % Triggered on value changing during slider motion
+        ValueChanging
+
+    end %events
+
 
     %% Internal Component Propeties
     properties (Transient, NonCopyable, ...
@@ -22,6 +53,12 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer
 
     end %properties
     
+    %% Accessor Methods for Displaying Properties in App Window
+    methods (Hidden, Access = protected)
+
+
+
+    end %methods
 
     %% Protected Methods
     methods (Access = protected)
@@ -40,27 +77,44 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer
             obj.Grid.RowSpacing = 0;
             obj.Grid.Padding = [0 0 0 0];
 
-            % Create and place HTML component inside Grid
-            obj.HTMLComponent = uihtml(obj.Grid);
+            % Create Initial Data Structure
+            obj.Data = struct("LowerValue",5,...
+                "UpperValue",95,...
+                "LowerLimit",0,...
+                "UpperLimit",100);
 
-            % Assign HTML Source
+            % -- Create and place HTML component inside Grid
+            % Make HTML Component and add Source
+            obj.HTMLComponent = uihtml(obj.Grid);
             obj.addHTMLSource();
 
+            % Encode Data Structure and Pass to HTML
+            obj.HTMLComponent.Data = jsonencode(obj.Data);           
 
             % Assign HTML Data and ChangedFcn
-            obj.HTMLComponent.Data = struct("Name","Sammy");
-            obj.HTMLComponent.DataChangedFcn = @(s,e)notifyDataChanged(obj);           
+            obj.HTMLComponent.DataChangedFcn = ...
+                @(s,e)notifyDataChanged(obj);    
 
+                
         end %function
 
 
         % Component Update Method
         function update(obj)
-
+            % Update Properties of HTML Dual Slider
 
             
 
         end %function
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This will prevent the multiple defintion
+            % of getPropertyGroups.
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end
+
 
         % HTML Data Source Addition
         function addHTMLSource(obj)
@@ -77,13 +131,60 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer
 
         % HTML Component DataChgFunction
         function notifyDataChanged(obj)
+            % DataNotify Callback for HTML
+            % Fires when HTML Data Struct has changed from using the HTML
+            % component. Need to write the updated data changes back to the
+            % MATLAB object properties.
 
-            % Notify Data Changed
-            disp(obj.Data);
+            % Update Data Structure
+            obj.Data = jsondecode(obj.HTMLComponent.Data);
+
+            % - Update Internal DualSlider Properties from New Data 
+            % Slider Values
+            obj.Value = [obj.Data.LowerValue,obj.Data.UpperValue];
+            % Slider Limits
+            obj.Limits = [obj.Data.LowerLimit,obj.Data.UpperLimit];
+
+            % - Notify Value Changing Function
+            notify(obj,"ValueChanged");
+            notify(obj,"ValueChanging");
 
         end %function
 
     end %methods
+
+
+    % Accessor Methods for Dependent Properties
+    methods
+
+        % -- Test Value
+        function value = get.Value(obj)
+            % Query Values from HTML Data
+            value = [obj.Data.LowerValue, obj.Data.UpperValue];
+        end
+        function set.Value(obj,value)
+            % Store Input Thumb Position Values inside HTML Data
+            obj.Data.LowerValue = value(1);
+            obj.Data.UpperValue = value(2);
+        end
+
+        % -- Limits Getter/Setter Value
+        function value = get.Limits(obj)
+            % Query Limits from HTML Data
+            value = [obj.Data.LowerLimit, obj.Data.UpperLimit];
+        end
+        function set.Limits(obj,value)
+            % Store Input Limits inside HTML Data
+            obj.Data.LowerLimit = value(1);
+            obj.Data.UpperLimit = value(2);
+        end
+
+    end %methods
+
+
+
+
+
 
 end %classdef
 
