@@ -93,7 +93,10 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Assign HTML Data and ChangedFcn
             obj.HTMLComponent.DataChangedFcn = ...
-                @(s,e)notifyDataChanged(obj);    
+                @(s,e)notifyDataChanged(obj);   
+
+            % Update Method
+            update(obj);
 
                 
         end %function
@@ -101,8 +104,8 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
 
         % Component Update Method
         function update(obj)
-            % Update Properties of HTML Dual Slider
-
+            % Update Properties of HTML Dual Slider on Startup
+            
             
 
         end %function
@@ -166,17 +169,26 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
             % Store Input Thumb Position Values inside HTML Data
             obj.Data.LowerValue = value(1);
             obj.Data.UpperValue = value(2);
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);  
+
         end
 
         % -- Limits Getter/Setter Value
         function value = get.Limits(obj)
             % Query Limits from HTML Data
             value = [obj.Data.LowerLimit, obj.Data.UpperLimit];
+
         end
         function set.Limits(obj,value)
             % Store Input Limits inside HTML Data
             obj.Data.LowerLimit = value(1);
             obj.Data.UpperLimit = value(2);
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);  
+
         end
 
     end %methods

@@ -63,11 +63,13 @@
 .tickMarks {
     /* Set Up TickMark Propeties*/
     --ticksThickness: 10%;
-    --numTicks: calc((var(--max) - var(--min)) + 1);
+    /* --numTicks: calc((var(--max) - var(--min)) + 1); */
     --numTicks: 101;
     --fullBlockSize: calc((100% - var(--numTicks)*var(--ticksThickness))/(var(--numTicks) + 0) + var(--ticksThickness));
     
     display: grid;
+
+    
 
     grid-template: repeat(1,-webkit-max-content) 1em/1fr 1fr;
     grid-template: repeat(1,max-content) 1em/1fr 1fr;

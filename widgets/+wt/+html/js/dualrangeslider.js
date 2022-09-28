@@ -55,6 +55,29 @@ function setup(htmlComponent){
     minSlider.value = htmlData.LowerValue;
     maxSlider.value = htmlData.UpperValue;
 
+    // Set Slider Limits based on MATLAB Data
+    // Update Min Slider
+    minSlider.min = htmlData.LowerLimit;
+    minSlider.max = htmlData.UpperLimit
+    // Update Max Slider
+    maxSlider.min = htmlData.LowerLimit;
+    maxSlider.max = htmlData.UpperLimit;
+
+    // Trigger Repaint of CSS for Slider Positions
+    const dualSlider = document.getElementById("dualSlider");
+    dualSlider.style.setProperty("--sliderA",+htmlData.LowerValue);
+    dualSlider.style.setProperty("--sliderB",+htmlData.UpperValue);
+    dualSlider.style.setProperty("--min",+htmlData.LowerLimit);
+    dualSlider.style.setProperty("--max",+htmlData.UpperLimit);
+
+    // Calculate Number of Ticks
+    let numTicks = (htmlData.UpperLimit - htmlData.LowerLimit) + 1;
+
+    // Set CSS TickMarks Amount
+    const ticks = document.getElementById("ticks");
+    ticks.style.setProperty("--numTicks",numTicks);
+
+
   })
 
   // Eventlistener for Input Sliders
@@ -100,5 +123,8 @@ function setup(htmlComponent){
     htmlComponent.Data = JSON.stringify(htmlData);
 
   }, false);
+
+  // Trigger EventListener Callback
+
 
 }
