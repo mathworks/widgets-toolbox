@@ -65,7 +65,7 @@ function setup(htmlComponent){
 
     // Trigger Repaint of CSS for Slider Positions
     const dualSlider = document.getElementById("dualSlider");
-      dualSlider.style.setProperty("--sliderA",htmlData.LowerValue);
+    dualSlider.style.setProperty("--sliderA",htmlData.LowerValue);
     dualSlider.style.setProperty("--sliderB",htmlData.UpperValue);
     dualSlider.style.setProperty("--min",htmlData.LowerLimit);
     dualSlider.style.setProperty("--max",htmlData.UpperLimit);
