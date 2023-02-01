@@ -203,7 +203,7 @@ input[type=range]:focus + output {
     --col: var(--selectedThumbColor);
 }
 
-/*Set Up Value Output CSS*/
+/*Set Up String Label Above Slider in CSS*/
 output {
     grid-row: 2;
     color: var(--col);
@@ -213,9 +213,23 @@ output:last-child {
 }
 output::after {
     counter-reset: c var(--c);
-    content: "--" attr(for) ": " counter(c) ";";
+    content: counter(c);
 }
 
+/*Set Up Labels for Above Slider CSS */
+.sliderLabels {
+  display: table;
+  width: 100%;
+  margin: 0;
+}
+.sliderLabels>#MinLabel {
+  text-align: left;
+  display: table-cell;
+}
+.sliderLabels>#MaxLabel {
+  text-align: right;
+  display: table-cell;
+}
 
 
 

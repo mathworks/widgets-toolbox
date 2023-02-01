@@ -77,6 +77,11 @@ function setup(htmlComponent){
     const ticks = document.getElementById("ticks");
     ticks.style.setProperty("--numTicks",numTicks);
 
+    // Update the Label Content
+    // let sliderLabelA = document.getElementById("MinLabel");
+    // let sliderLabelB = document.getElementById("MaxLabel");
+    // sliderLabelA.textContent = htmlData.MinLabel;
+    // sliderLabelB.textContent = htmlData.MaxLabel;
 
   })
 

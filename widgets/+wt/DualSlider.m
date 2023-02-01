@@ -5,7 +5,7 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
     %DUALSLIDER A value range slider that has two tabs, allowing for user
     %selection of min/max values.
 
-    % Copyright 2022 The MathWorks Inc.
+    % Copyright 2022-2023 The MathWorks Inc.
 
     %% Intro Setting Public Properties
     properties (Access=public, AbortSet, SetObservable)
@@ -24,6 +24,10 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
         % - Range Limits of the Slider
         % Limits of Slider (Min/Max)
         Limits (1,2) double
+
+        % - Slider Tags
+        MinLabel (1,1) string
+        MaxLabel (1,1) string
 
     end % properties
 
@@ -81,7 +85,9 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Data = struct("LowerValue",5,...
                 "UpperValue",95,...
                 "LowerLimit",0,...
-                "UpperLimit",100);
+                "UpperLimit",100,...
+                "MinLabel","5",...
+                "MaxLabel","32");
 
             % -- Create and place HTML component inside Grid
             % Make HTML Component and add Source
@@ -147,6 +153,9 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Value = [obj.Data.LowerValue,obj.Data.UpperValue];
             % Slider Limits
             obj.Limits = [obj.Data.LowerLimit,obj.Data.UpperLimit];
+            % Slider Labels
+            obj.MinLabel = obj.Data.MinLabel;
+            obj.MaxLabel = obj.Data.MaxLabel;
 
             % - Notify Value Changing Function
             notify(obj,"ValueChanged");
@@ -190,6 +199,33 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.HTMLComponent.Data = jsonencode(obj.Data);  
 
         end
+
+        % -- Labels Getter/Setter
+        % Min Slider Label
+        function value = get.MinLabel(obj)
+            % Query Label from HTML Data
+            value = obj.Data.MinLabel;
+        end %function
+        function set.MinLabel(obj,value)
+            % Store Input Label inside HTML Data
+            obj.Data.MinLabel = value;
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);
+        end %function
+
+        % Max Slider Label
+        function value = get.MaxLabel(obj)
+            % Query Label from HTML Data
+            value = obj.Data.MaxLabel;
+        end %function
+        function set.MaxLabel(obj,value)
+            % Store Input Label inside HTML Data
+            obj.Data.MaxLabel = value;
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);
+        end %function
 
     end %methods
 

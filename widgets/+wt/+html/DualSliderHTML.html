@@ -21,18 +21,25 @@
 </head>
 <body>
 
+    <!-- <div id="labels">
+        <h1 class="sliderLabels">
+            <span id="MinLabel">5</span>
+            <span id="MaxLabel">95</span>
+        </h1>
+    </div> -->
+
     <div id="dualSlider" class="wrap" role="group" aria-labelledby="multi-lbl" style="--sliderA: 0; --sliderB: 80; --sliderStep: 1; --min: 0; --max: 100">
         <!-- <div id="multi-lbl">Multi thumb slider:</div> -->
 
         <!--Define Slider A HTML-->
         <label class="sr-only" for="sliderA">Value A:</label>
         <input id="sliderA" type="range" min="0" value="0" max="100" step="1"/>
-        <output for="sliderA" style="--c: var(--sliderA)"></output>
+        <output id="sliderALabel" for="sliderA" style="--c: var(--sliderA)"></output>
 
         <!--Define Slider B HTML-->
         <label class="sr-only" for="sliderB">Value B:</label>
         <input id="sliderB" type="range" min="0" value="80" max="100" step="1"/>
-        <output for="sliderB" style="--c: var(--sliderB)"></output>
+        <output id="sliderBLabel" for="sliderB" style="--c: var(--sliderB)"></output>
 
     </div>
     
