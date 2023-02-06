@@ -29,6 +29,12 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
         MinLabel (1,1) string
         MaxLabel (1,1) string
 
+        % - TicksCount
+        TicksCount (1,1) double
+
+        % - MapData
+        MapData (1,:)
+
     end % properties
 
     %% Events
@@ -82,12 +88,14 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.Padding = [0 0 0 0];
 
             % Create Initial Data Structure
-            obj.Data = struct("LowerValue",5,...
-                "UpperValue",95,...
-                "LowerLimit",0,...
-                "UpperLimit",100,...
+            obj.Data = struct("LowerValue",3,...
+                "UpperValue",8,...
+                "LowerLimit",1,...
+                "UpperLimit",11,...
                 "MinLabel","5",...
-                "MaxLabel","32");
+                "MaxLabel","32",...
+                "TicksCount",51,...
+                "MapData",linspace(0,1,11));
 
             % -- Create and place HTML component inside Grid
             % Make HTML Component and add Source
@@ -222,6 +230,32 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
         function set.MaxLabel(obj,value)
             % Store Input Label inside HTML Data
             obj.Data.MaxLabel = value;
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);
+        end %function
+
+        % TicksCount Value
+        function value = get.TicksCount(obj)
+            % Query Label from HTML Data
+            value = obj.Data.TicksCount;
+        end %function
+        function set.TicksCount(obj,value)
+            % Store Input Label inside HTML Data
+            obj.Data.TicksCount = value;
+
+            % Encode Data Structure and Pass to HTML (Update HTML Control)
+            obj.HTMLComponent.Data = jsonencode(obj.Data);
+        end %function
+
+        % MapData Value
+        function value = get.MapData(obj)
+            % Query Label from HTML Data
+            value = obj.Data.MapData;
+        end %function
+        function set.MapData(obj,value)
+            % Store Input Label inside HTML Data
+            obj.Data.MapData = value;
 
             % Encode Data Structure and Pass to HTML (Update HTML Control)
             obj.HTMLComponent.Data = jsonencode(obj.Data);

@@ -60,50 +60,6 @@
     width: calc((var(--sliderA) - var(--sliderB))/var(--dif)*var(--g));
 }
 
-/*Set TickMark container Styling*/
-.tickMarks {
-    /* Set Up TickMark Propeties*/
-    --ticksThickness: 5%;
-    /* --numTicks: calc((var(--max) - var(--min)) + 1); */
-    --numTicks: 9;
-    --fullBlockSize: calc((100% - var(--numTicks)*var(--ticksThickness))/(var(--numTicks) + 0) + var(--ticksThickness));
-    
-    display: grid;
-
-    grid-template: repeat(1,-webkit-max-content) 1em/1fr 1fr;
-    grid-template: repeat(1,max-content) 1em/1fr 1fr;
-
-    /* Span the Exact Distance Needed*/
-    width: calc(var(--w) - var(--sliderThumbWidth)/2 + var(--fullBlockSize));
-    height: 10px;
-
-    overflow: hidden;
-    position: relative;
-    margin: 2px auto;
-
-    /* Create Coloration for Linearly Space Tick Marks*/
-    background: linear-gradient(to right, 
-        var(--invisibleColor)  calc(50% - var(--ticksThickness)),  
-        var(--ticksColor) 0 calc(50% + var(--ticksThickness)), 
-        var(--invisibleColor) 0 calc(100% - var(--ticksThickness)));
-
-    /* Create Sizing Boundary for the Coloration to be Spread Among*/
-    background-size: var(--fullBlockSize) 50%;
-
-
-    /* background: linear-gradient(to right, 
-        #0000  calc(50% - var(--ticksThickness)),  
-        var(--ticksColor) calc(50% + var(--ticksThickness)), 
-        red 50%,
-        red calc(50% - var(--ticksThickness))); */
-  
-  
-}
-.tickMarks::before, .tickMarks::after {
-    grid-column: 3/span 2;
-    grid-row: 3;
-}
-
 
 [id=multi-lbl] {
     grid-column: 1/span 2;
@@ -206,6 +162,9 @@ input[type=range]:focus + output {
 output {
     grid-row: 2;
     color: var(--col);
+    height: 0;
+    visibility: hidden;
+    visibility: collapse;
 }
 output:last-child {
     text-align: right;
@@ -252,7 +211,7 @@ output::after {
 }
 
 .tickInnerSpace {
-    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--numTicks)/4))) / (var(--numTicks) - 1));
+    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--displayTicks)/4))) / (var(--displayTicks) - 1));
     height: 100%;
     display: inline-block;
     border: none;
@@ -268,8 +227,6 @@ output::after {
 }
 
 
-
-
 .tickEdgeSpaceSVG {
     width: calc(var(--sliderThumbWidth)  * (3/8));
     height: 100%;    
@@ -279,7 +236,7 @@ output::after {
 }
 
 .tickInnerSpaceSVG {
-    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--numTicks)/4))) / (var(--numTicks) - 1));
+    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--displayTicks)/4))) / (var(--displayTicks) - 1));
     height: 100%;
     display: inline-block;
     border: none;

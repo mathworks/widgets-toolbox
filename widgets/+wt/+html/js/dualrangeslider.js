@@ -70,21 +70,31 @@ function setup(htmlComponent){
     dualSlider.style.setProperty("--min",htmlData.LowerLimit);
     dualSlider.style.setProperty("--max",htmlData.UpperLimit);
 
-    // Calculate Number of Ticks
-    let numTicks = (htmlData.UpperLimit - htmlData.LowerLimit) + 1;
+    // Calculate Number of Actual Ticks
+    let actualTicks = (htmlData.UpperLimit - htmlData.LowerLimit) + 1;
 
     // Set CSS TickMarks Amount
     const ticks = document.getElementById("tickContent");
-    ticks.style.setProperty("--numTicks",numTicks);
+    let displayTicks = htmlData.TicksCount;
+
+    ticks.style.setProperty("--maxTicks",displayTicks);
+
+    // Restrict Display Ticks by Actual Ticks
+    if (actualTicks < displayTicks){
+      displayTicks = actualTicks;
+    }
+    
+    // Assign Styling
+    ticks.style.setProperty("--displayTicks",displayTicks);
 
     // Update TickMarks
-    //createTickMarks();
+    createTickMarks();
 
     // Update the Label Content
-    // let sliderLabelA = document.getElementById("MinLabel");
-    // let sliderLabelB = document.getElementById("MaxLabel");
-    // sliderLabelA.textContent = htmlData.MinLabel;
-    // sliderLabelB.textContent = htmlData.MaxLabel;
+    let sliderLabelA = document.getElementById("MinLabel");
+    let sliderLabelB = document.getElementById("MaxLabel");
+    sliderLabelA.textContent = htmlData.MinLabel;
+    sliderLabelB.textContent = htmlData.MaxLabel;
 
   })
 
@@ -123,6 +133,12 @@ function setup(htmlComponent){
     // Cap Style and Display String for New Position
     _t.parentNode.style.setProperty(`--${_t.id}`, +_t.value);
 
+    // Update the Label Content
+    let sliderLabelA = document.getElementById("MinLabel");
+    let sliderLabelB = document.getElementById("MaxLabel");
+    sliderLabelA.textContent = htmlData.MinLabel;//htmlData.MapData[minSlider.value - 1];
+    sliderLabelB.textContent = htmlData.MaxLabel;//htmlData.MapData[maxSlider.value - 1];
+
     // Store New Slider Values back in data
     htmlData.LowerValue = parseInt(minSlider.value);
     htmlData.UpperValue = parseInt(maxSlider.value);
@@ -130,21 +146,19 @@ function setup(htmlComponent){
     // Rebuild HTML Data
     htmlComponent.Data = JSON.stringify(htmlData);
 
-    // Update TickMarks
-    //createTickMarks();
-
   }, false);
 
 
 } //function
 
 
+
 // Create Tickmarks Function
 function createTickMarks(){
-  // CREATETICKMARKS - Function to dynamically generate SVGs for the DualSlider 
+  // CREATETICKMARKS - Function to dynamically generate divs for the DualSlider 
   // to properly space the TickMarks used to indicate thumb position.
 
-  // Clear Container Div of Children 
+  // Clear Container Div
   clearTickContainer();
 
   // Create Outer Edge Block #1
@@ -158,13 +172,11 @@ function createTickMarks(){
 
 } //function
 
-
-
 function clearTickContainer(){
   // CLEARTICKCONTAINER - Function to remove existing TickMark Divs to prepare for 
   // a redraw of tickmark color rectangles.
 
-  let tickContainer = document.getElementById("tickSVG");
+  let tickContainer = document.getElementById("tickContent");
 
   // While there is a first child, remove it. Yields no children.
   while (tickContainer.firstChild){
@@ -173,73 +185,53 @@ function clearTickContainer(){
 
 } //function
 
-
-
-
-
-
 function createOuterEdgeSpace(){
-  // CREATEOUTEREDGESPACE - Function to make an outer edge space SVG.
-  // Define SVG Link
-  const svgSource = "http://www.w3.org/2000/svg";
+  // CREATEOUTEREDGESPACE - Function to make an outer edge space div.
+  // Make Div and classify it as an edge space.
+  var div = document.createElement('div');
+  div.className = 'tickEdgeSpace';
 
-  // Make SVG Container
-  const svgElement = document.getElementById("tickSVG");
-
-  // Create Rect and Classify it as Tick Edge Space
-  let svgRect = document.createElementNS(svgSource,"rect");
-  svgRect.setAttribute("class","tickEdgeSpaceSVG")
-
-  // Append Rect to SVG Container
-  svgElement.appendChild(svgRect);
+  // Append it to the collection of Tick Divs
+  document.getElementById('tickContent').appendChild(div);
 
 } //function
 
-
-
 function createTicksAndInnerSpaces(){
-  // CREATETICKSANDINNERSPACES - Function to make the actual tickmark and inner space SVGs.
+  // CREATETICKSANDINNERSPACES - Function to make the actual tickmark and inner space divs.
   // This is assumed to start placing tick marks right after the first outer edge space by 
   // iterating through the number of ticks.
-  // Define SVG Link
-  const svgSource = "http://www.w3.org/2000/svg";
 
   // Set CSS TickMarks Amount
   const ticks = document.getElementById("tickContent");
-  let numTicks = ticks.style.getPropertyValue("--numTicks");
+  let numTicks = ticks.style.getPropertyValue("--displayTicks");
 
-  // Get Reference to SVG Container
-  const svgElement = document.getElementById("tickSVG");
-
-  console.log(numTicks);
+  // Change # of Ticks
+  console.log(numTicks)
 
   // Iterate through # of Ticks
   for (var i = 0; i < numTicks; i++)
   {
-    // Create Rect and Classify it as Tick Mark Block
-    let svgTickMarkRect = document.createElementNS(svgSource,"rect");
-    svgTickMarkRect.setAttribute("class","tickBlockSVG")
+    // Make TickMark Div and classify it as a TickMark Block
+    var div = document.createElement("div");
+    div.className = "tickBlock";
 
-    // Append Rect to SVG Container
-    svgElement.appendChild(svgTickMarkRect);
+    // Append it to the collection of Tick Divs
+    document.getElementById("tickContent").appendChild(div);
 
     // If we aren't on the LAST tickmark, make a Tick Inner Space
     if (i < (numTicks-1))
     {
-      // Create Rect and Classify it as Tick Mark Block
-      let svgInnerRect = document.createElementNS(svgSource,"rect");
-      svgInnerRect.setAttribute("class","tickInnerSpaceSVG")
+      // Make TickMark Div and classify it as a TickMark Block
+      var div = document.createElement("div");
+      div.className = "tickInnerSpace";
 
-      // Append Rect to SVG Container
-      svgElement.appendChild(svgInnerRect);
-
+      // Append it to the collection of Tick Divs
+      document.getElementById("tickContent").appendChild(div);
     } //endif
 
   } //forloop
 
 } //function
 
-
-
-// Make Tcks
+// 
 createTickMarks();
