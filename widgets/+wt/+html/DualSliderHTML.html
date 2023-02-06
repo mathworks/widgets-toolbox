@@ -16,7 +16,7 @@
     <!--Import JS Module-->
     <!--<script src="bootstrap/js/bootstrap.min.js"></script>-->
     
-    <script src="js/dualrangeslider.js"></script>
+    <script src="js/tickmarkcreator.js" defer></script>
     
 </head>
 <body>
@@ -28,22 +28,28 @@
         </h1>
     </div> -->
 
-    <div id="dualSlider" class="wrap" role="group" aria-labelledby="multi-lbl" style="--sliderA: 0; --sliderB: 80; --sliderStep: 1; --min: 0; --max: 100">
+    <div id="dualSlider" class="wrap" role="group" aria-labelledby="multi-lbl" style="--sliderA: 20; --sliderB: 60; --sliderStep: 1; --min: 0; --max: 100">
         <!-- <div id="multi-lbl">Multi thumb slider:</div> -->
 
         <!--Define Slider A HTML-->
         <label class="sr-only" for="sliderA">Value A:</label>
-        <input id="sliderA" type="range" min="0" value="0" max="100" step="1"/>
+        <input id="sliderA" type="range" min="0" value="20" max="100" step="1"/>
         <output id="sliderALabel" for="sliderA" style="--c: var(--sliderA)"></output>
 
         <!--Define Slider B HTML-->
         <label class="sr-only" for="sliderB">Value B:</label>
-        <input id="sliderB" type="range" min="0" value="80" max="100" step="1"/>
+        <input id="sliderB" type="range" min="0" value="60" max="100" step="1"/>
         <output id="sliderBLabel" for="sliderB" style="--c: var(--sliderB)"></output>
 
     </div>
     
-    <div id="ticks" class="tickMarks">
+    <!-- <div id="ticks" class="tickMarks">
+    </div> -->
+
+    <div class="tickContainer" id="tickContent" style="--numTicks: 101">
+        <svg id="tickSVG" viewbox="0 0 100 100">
+
+        </svg>
     </div>
 
 </body>

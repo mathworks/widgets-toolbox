@@ -74,8 +74,11 @@ function setup(htmlComponent){
     let numTicks = (htmlData.UpperLimit - htmlData.LowerLimit) + 1;
 
     // Set CSS TickMarks Amount
-    const ticks = document.getElementById("ticks");
+    const ticks = document.getElementById("tickContent");
     ticks.style.setProperty("--numTicks",numTicks);
+
+    // Update TickMarks
+    //createTickMarks();
 
     // Update the Label Content
     // let sliderLabelA = document.getElementById("MinLabel");
@@ -127,9 +130,116 @@ function setup(htmlComponent){
     // Rebuild HTML Data
     htmlComponent.Data = JSON.stringify(htmlData);
 
+    // Update TickMarks
+    //createTickMarks();
+
   }, false);
 
-  // Trigger EventListener Callback
+
+} //function
 
 
-}
+// Create Tickmarks Function
+function createTickMarks(){
+  // CREATETICKMARKS - Function to dynamically generate SVGs for the DualSlider 
+  // to properly space the TickMarks used to indicate thumb position.
+
+  // Clear Container Div of Children 
+  clearTickContainer();
+
+  // Create Outer Edge Block #1
+  createOuterEdgeSpace();
+
+  // Create Ticks and Inner Spaces
+  createTicksAndInnerSpaces();
+
+  // Create Outer Edge Block #2
+  createOuterEdgeSpace();
+
+} //function
+
+
+
+function clearTickContainer(){
+  // CLEARTICKCONTAINER - Function to remove existing TickMark Divs to prepare for 
+  // a redraw of tickmark color rectangles.
+
+  let tickContainer = document.getElementById("tickSVG");
+
+  // While there is a first child, remove it. Yields no children.
+  while (tickContainer.firstChild){
+    tickContainer.removeChild(tickContainer.firstChild);
+  } //while
+
+} //function
+
+
+
+
+
+
+function createOuterEdgeSpace(){
+  // CREATEOUTEREDGESPACE - Function to make an outer edge space SVG.
+  // Define SVG Link
+  const svgSource = "http://www.w3.org/2000/svg";
+
+  // Make SVG Container
+  const svgElement = document.getElementById("tickSVG");
+
+  // Create Rect and Classify it as Tick Edge Space
+  let svgRect = document.createElementNS(svgSource,"rect");
+  svgRect.setAttribute("class","tickEdgeSpaceSVG")
+
+  // Append Rect to SVG Container
+  svgElement.appendChild(svgRect);
+
+} //function
+
+
+
+function createTicksAndInnerSpaces(){
+  // CREATETICKSANDINNERSPACES - Function to make the actual tickmark and inner space SVGs.
+  // This is assumed to start placing tick marks right after the first outer edge space by 
+  // iterating through the number of ticks.
+  // Define SVG Link
+  const svgSource = "http://www.w3.org/2000/svg";
+
+  // Set CSS TickMarks Amount
+  const ticks = document.getElementById("tickContent");
+  let numTicks = ticks.style.getPropertyValue("--numTicks");
+
+  // Get Reference to SVG Container
+  const svgElement = document.getElementById("tickSVG");
+
+  console.log(numTicks);
+
+  // Iterate through # of Ticks
+  for (var i = 0; i < numTicks; i++)
+  {
+    // Create Rect and Classify it as Tick Mark Block
+    let svgTickMarkRect = document.createElementNS(svgSource,"rect");
+    svgTickMarkRect.setAttribute("class","tickBlockSVG")
+
+    // Append Rect to SVG Container
+    svgElement.appendChild(svgTickMarkRect);
+
+    // If we aren't on the LAST tickmark, make a Tick Inner Space
+    if (i < (numTicks-1))
+    {
+      // Create Rect and Classify it as Tick Mark Block
+      let svgInnerRect = document.createElementNS(svgSource,"rect");
+      svgInnerRect.setAttribute("class","tickInnerSpaceSVG")
+
+      // Append Rect to SVG Container
+      svgElement.appendChild(svgInnerRect);
+
+    } //endif
+
+  } //forloop
+
+} //function
+
+
+
+// Make Tcks
+createTickMarks();

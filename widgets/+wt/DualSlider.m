@@ -8,7 +8,7 @@ classdef DualSlider < matlab.ui.componentcontainer.ComponentContainer & ...
     % Copyright 2022-2023 The MathWorks Inc.
 
     %% Intro Setting Public Properties
-    properties (Access=public, AbortSet, SetObservable)
+    properties (Access=private, AbortSet, SetObservable)
         % Data Struct, used to pass data back and forth between MATLAB
         % and HTML. Initialized with default values for DualSlider.
         Data (1,1) struct 

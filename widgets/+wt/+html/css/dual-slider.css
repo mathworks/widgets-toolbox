@@ -7,10 +7,11 @@
 :root {
     /*Define CSS Properties*/
     --w: 100%;
-    --h: em;
+    --h: 1em;
 
     /*Thumb Properties*/
-    --sliderThumbWidth: 2em;
+    --sliderThumbWidth: 1em;
+    /* --numTicks: 9; */
 
     /* Color Properties*/
     --baseThumbColor: #007ee6 /*#F5F5F5*/;
@@ -62,14 +63,12 @@
 /*Set TickMark container Styling*/
 .tickMarks {
     /* Set Up TickMark Propeties*/
-    --ticksThickness: 10%;
+    --ticksThickness: 5%;
     /* --numTicks: calc((var(--max) - var(--min)) + 1); */
-    --numTicks: 101;
+    --numTicks: 9;
     --fullBlockSize: calc((100% - var(--numTicks)*var(--ticksThickness))/(var(--numTicks) + 0) + var(--ticksThickness));
     
     display: grid;
-
-    
 
     grid-template: repeat(1,-webkit-max-content) 1em/1fr 1fr;
     grid-template: repeat(1,max-content) 1em/1fr 1fr;
@@ -91,7 +90,7 @@
     /* Create Sizing Boundary for the Coloration to be Spread Among*/
     background-size: var(--fullBlockSize) 50%;
 
-  
+
     /* background: linear-gradient(to right, 
         #0000  calc(50% - var(--ticksThickness)),  
         var(--ticksColor) calc(50% + var(--ticksThickness)), 
@@ -162,7 +161,7 @@ input[type=range]::-moz-range-track {
 input[type=range]::-webkit-slider-thumb {
     /*Design Slider Thumb*/
     border: 0px;
-    width: 1em;
+    width: var(--sliderThumbWidth);
     height: 100%;
     border-radius: 0;    
 
@@ -179,7 +178,7 @@ input[type=range]::-webkit-slider-thumb {
 input[type=range]::-moz-range-thumb {
     /*Redesign Slider Thumb*/
     border: none;
-    width: 2em;
+    width: var(--sliderThumbWidth);
     height: 100%;
     border-radius: 0;
     /* background: linear-gradient(0deg, #000 0px, transparent 0),
@@ -231,6 +230,69 @@ output::after {
   display: table-cell;
 }
 
+
+/* Tick Blocks CSS Styling */
+.tickContainer {
+  /* Span the Exact Distance Needed*/
+  width: calc(var(--w));
+  height: 10px;
+  
+  /* Set Positioning Rules */
+  overflow: hidden;
+  position: relative;
+  margin: 2px auto;
+}
+
+.tickEdgeSpace {
+    width: calc(var(--sliderThumbWidth)  * (3/8));
+    height: 100%;
+    display: inline-block;
+    border: none;
+    background-color: var(--invisibleColor);
+}
+
+.tickInnerSpace {
+    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--numTicks)/4))) / (var(--numTicks) - 1));
+    height: 100%;
+    display: inline-block;
+    border: none;
+    background-color: var(--invisibleColor);
+}
+
+.tickBlock {
+    width: calc(var(--sliderThumbWidth) * (1/4));
+    height: 100%;
+    display: inline-block;
+    border: none;
+    background-color: var(--ticksColor);
+}
+
+
+
+
+.tickEdgeSpaceSVG {
+    width: calc(var(--sliderThumbWidth)  * (3/8));
+    height: 100%;    
+    display: inline-block;
+    border: none;
+    fill: blue;
+}
+
+.tickInnerSpaceSVG {
+    width: calc((100% - (var(--sliderThumbWidth) * (3/4)) - (var(--sliderThumbWidth) * (var(--numTicks)/4))) / (var(--numTicks) - 1));
+    height: 100%;
+    display: inline-block;
+    border: none;
+    background-color: red;
+}
+
+.tickBlockSVG {
+    width: calc(var(--sliderThumbWidth) * (1/4));
+    height: 100%;
+    display: inline-block;
+    border: none;
+    background-color: var(--ticksColor);
+}
 
 
 
