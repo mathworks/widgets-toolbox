@@ -1,32 +1,47 @@
 classdef BackgroundColorable < handle
-    
-    % Mixin for component with colorable background
+    % Mixin to add styles to a component
 
-    % Copyright 2020-2022 The MathWorks Inc.
-    
-    
+    % Copyright 2020-2023 The MathWorks Inc.
+
+
     %% Internal properties
-    properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer})
-        
+    properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % List of graphics controls to apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
-        
+
+        % Listener to background color changes
         BackgroundColorListener event.proplistener
 
     end %properties
-    
-  
-    
+
+
+    %% Accessors
+    methods
+
+        function set.BackgroundColorableComponents(obj,value)
+            obj.BackgroundColorableComponents = value;
+            obj.updateBackgroundColorableComponents()
+            obj.listenForBackgroundChange();
+        end
+
+    end %methods
+
+
+
     %% Methods
     methods (Access = protected)
-        
+
         function updateBackgroundColorableComponents(obj)
-           
-            hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            wt.utility.fastSet(obj.BackgroundColorableComponents(hasProp),...
-                "BackgroundColor",obj.BackgroundColor); %#ok<MCNPN> 
-            
+
+            % What needs to be updated?
+            comps = obj.BackgroundColorableComponents;
+            newValue = obj.BackgroundColor; %#ok<MCNPN> 
+            propNames = ["BackgroundColor","Color"];
+
+            % Set the subcomponent properties in prioritized order
+            wt.utility.setStylePropsInPriority(comps, propNames, newValue);
+
         end %function
 
 
@@ -42,18 +57,5 @@ classdef BackgroundColorable < handle
         end %function
 
     end %methods
-    
 
-
-    %% Accessors
-    methods
-        
-        function set.BackgroundColorableComponents(obj,value)
-            obj.BackgroundColorableComponents = value;
-            obj.listenForBackgroundChange();
-            obj.updateBackgroundColorableComponents()
-        end
-        
-    end %methods
-    
 end %classdef

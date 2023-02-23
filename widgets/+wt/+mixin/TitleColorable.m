@@ -1,7 +1,7 @@
 classdef TitleColorable < handle
     % Mixin for component with Title font color
 
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Properties
@@ -15,9 +15,8 @@ classdef TitleColorable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
-        
+    properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % List of graphics controls to apply to
         TitleColorableComponents (:,1) matlab.graphics.Graphics
         
@@ -46,8 +45,14 @@ classdef TitleColorable < handle
     methods (Access = protected)
         
         function updateTitleColorableComponents(obj)
-            
-            wt.utility.fastSet(obj.TitleColorableComponents,"FontColor",obj.TitleColor)
+
+            % What needs to be updated?
+            comps = obj.TitleColorableComponents;
+            newValue = obj.TitleColor;
+            propNames = ["FontColor","ForegroundColor"];
+
+            % Set the subcomponent properties in prioritized order
+            wt.utility.setStylePropsInPriority(comps, propNames, newValue);
             
         end %function
         
