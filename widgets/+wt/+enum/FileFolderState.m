@@ -9,6 +9,7 @@ classdef FileFolderState
     enumeration
         file
         folder
+        putfile
     end %enumeration
     
     

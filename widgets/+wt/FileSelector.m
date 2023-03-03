@@ -6,7 +6,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     % File or folder selection control with browse button
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Public properties
@@ -36,7 +36,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     properties (AbortSet)
         
-        % Selection type: file or folder
+        % Selection type: (get)file, folder, putfile
         SelectionType (1,1) wt.enum.FileFolderState = wt.enum.FileFolderState.file
         
         % Optional root directory. If unspecified, Value uses an absolute
@@ -75,8 +75,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
@@ -197,6 +196,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Update the button icon
             if obj.SelectionType == "file"
                 obj.ButtonControl.Icon = "folder_file_24.png";
+            elseif obj.SelectionType == "putfile"
+                obj.ButtonControl.Icon = "folder_file_24.png";
             else
                 obj.ButtonControl.Icon = "folder_24.png";
             end
@@ -260,6 +261,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Prompt user for the path
             if obj.SelectionType == "file"
                 [fileName,pathName] = uigetfile(filter,"Select a file",initialPath);
+            elseif obj.SelectionType == "putfile"
+                [fileName,pathName] = uiputfile(filter,"Specify an output file",initialPath);
             else
                 pathName = uigetdir(initialPath, "Select a folder");
                 fileName = "";
@@ -306,6 +309,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             
             % Filter to valid paths
             if obj.SelectionType == "file"
+                fcn = @(x)gt(exist(fullfile(obj.RootDirectory, x),"file"), 0);
+            elseif obj.SelectionType == "putfile"
                 fcn = @(x)gt(exist(fullfile(obj.RootDirectory, x),"file"), 0);
             else
                 fcn = @(x)eq(exist(fullfile(obj.RootDirectory, x),"dir"), 7);
@@ -427,6 +432,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function value = get.ValueIsValidPath(obj)
             filePath = fullfile(obj.RootDirectory, obj.Value);
             value = ( obj.SelectionType == "file" && isfile(filePath) ) || ...
+                ( obj.SelectionType == "putfile" && isfolder(fileparts(filePath)) ) || ...
                 ( obj.SelectionType == "folder" && isfolder(filePath) );
         end
         
