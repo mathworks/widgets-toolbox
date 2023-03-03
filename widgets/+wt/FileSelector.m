@@ -112,36 +112,30 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.Padding = 0;   
             
             % Create the standard edit control
-            obj.EditControl = matlab.ui.control.EditField(...
-                "Parent",obj.Grid,...
-                "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
+            obj.EditControl = uieditfield(obj.Grid);
+            obj.EditControl.ValueChangedFcn = @(h,e)obj.onTextChanged(e);
             obj.EditControl.Layout.Column = [1 3];
             obj.EditControl.Layout.Row = 1;
             
             % Create the optional dropdown control (unparented for now)
-            obj.DropdownControl = matlab.ui.control.DropDown(...
-                "Parent",[],...
-                "Editable",true,...
-                "Value","",...
-                "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
-            %obj.DropdownControl.Layout.Column = [1 3];
-            %obj.DropdownControl.Layout.Row = 1;
+            obj.DropdownControl = uidropdown("Parent",[]);
+            obj.DropdownControl.Editable = true;
+            obj.DropdownControl.Value = "";
+            obj.DropdownControl.ValueChangedFcn = @(h,e)obj.onTextChanged(e);
             
             % Create Button
-            obj.ButtonControl = matlab.ui.control.Button(...
-                "Parent",obj.Grid,...
-                "Text","",...
-                "ButtonPushedFcn",@(h,e)obj.onButtonPushed(e));
+            obj.ButtonControl = uibutton(obj.Grid);
+            obj.ButtonControl.Text = "";
+            obj.ButtonControl.ButtonPushedFcn = @(h,e)obj.onButtonPushed(e);
             obj.ButtonControl.Layout.Column = 4;
             obj.ButtonControl.Layout.Row = 1;
             obj.updateButtonIcon();
 
             % Create overlay
-            obj.WarnImage = matlab.ui.control.Image(...
-                "Parent",obj.Grid,...
-                "ScaleMethod","none",...
-                "Visible","off",...
-                "ImageSource","warning_16.png");
+            obj.WarnImage = uiimage(obj.Grid);
+            obj.WarnImage.ScaleMethod = "none";
+            obj.WarnImage.Visible = "off";
+            obj.WarnImage.ImageSource = "warning_16.png";
             obj.WarnImage.Layout.Column = 3;
             obj.WarnImage.Layout.Row = 1;
             
