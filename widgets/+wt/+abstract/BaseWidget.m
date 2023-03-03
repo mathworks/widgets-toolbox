@@ -63,7 +63,7 @@ classdef (Abstract) BaseWidget < ...
         function obj = BaseWidget(varargin)
 
             % Attach internal postSetup callback
-            args = horzcat(varargin(:), {"CreateFcn",  @(src,evt)postSetup_I(src)});
+            args = horzcat(varargin, {"CreateFcn",  @(src,evt)postSetup_I(src)});
 
             % Call superclass constructor
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(args{:});
