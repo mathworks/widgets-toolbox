@@ -92,6 +92,9 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         % Listen to button pushes in sections
         ButtonPushedListener event.listener
 
+        % Flag to retain selections when moving left (-1) or right (1)
+        MoveSelectionFlag (1,1) int8 = 0
+
     end %properties
 
 
@@ -162,9 +165,6 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function update(obj)
 
-            % What is selected?
-            selIdx = obj.SelectedIndex;
-
             % Is the list sortable?
             if obj.Sortable
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png", "up_24.png", "down_24.png"];
@@ -176,18 +176,37 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 obj.ListButtons.ButtonHeight = {28 28};
             end
 
-            % Update the list
-            obj.RightList.Items = obj.Items(selIdx);
-            obj.RightList.ItemsData = selIdx;
+            % Prepare the updated right list
+            selIdx = obj.SelectedIndex;
+            rightItems = obj.Items(selIdx);
+            rightItemsData = selIdx;
 
-            % Update button enable states
-            obj.updateEnables();
-
-            % Update the list of choices
+            % Prepare the updated left list
             itemIds = 1:numel(obj.Items);
-            isNotSelected = ~ismember(itemIds, obj.SelectedIndex);
-            obj.LeftList.Items = obj.Items(isNotSelected);
-            obj.LeftList.ItemsData = itemIds(isNotSelected);
+            isNotSelected = ~ismember(itemIds, selIdx);
+            leftItems = obj.Items(isNotSelected);
+            leftItemsData = itemIds(isNotSelected);
+
+            % If a move left/right operation just occurred, should
+            % selection be retained?
+            if obj.MoveSelectionFlag == -1
+                rightData = obj.RightList.ItemsData;
+                rightValue = obj.RightList.Value;
+                rightSelIdx = find(ismember(rightData, rightValue))
+            elseif obj.MoveSelectionFlag == 1
+                leftData = obj.LeftList.ItemsData;
+                leftValue = obj.LeftList.Value;
+                leftSelIdx = find(ismember(leftData, leftValue))
+            end
+
+            % Clear MoveSelectionFlag
+            obj.MoveSelectionFlag = 0;
+
+            % Update the displays
+            obj.LeftList.Items = leftItems;
+            obj.LeftList.ItemsData = leftItemsData;
+            obj.RightList.Items = rightItems;
+            obj.RightList.ItemsData = rightItemsData;
 
             % Update button enable states
             obj.updateEnables();
@@ -279,33 +298,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             switch evt.Tag
 
                 case 'Add'
-
-                    % Get the original value
-                    oldValue = obj.Value;
-
-                    % Get the highlighted items from the left list, so we
-                    % can keep that the same
-                    leftData = obj.LeftList.ItemsData;
-                    leftValue = obj.LeftList.Value;
-                    leftSelIdx = find(ismember(leftData, leftValue));
-
-                    % Update the selection
-                    newSelIdx = [obj.SelectedIndex obj.LeftList.Value];
-                    obj.SelectedIndex = newSelIdx;
-
-                    % Try to restore the left list highlights
-                    newNumLeft = numel(leftData) - numel(leftSelIdx);
-                    newLeftValue = leftData;
-                    newLeftValue(leftSelIdx) = [];
-                    isOutOfBounds = leftSelIdx > newNumLeft;
-                    leftSelIdx = leftSelIdx - sum(isOutOfBounds);
-                    leftSelIdx(leftSelIdx < 1) = [];
-                    drawnow
-                    obj.LeftList.Value = newLeftValue(leftSelIdx);
-
-                    % Trigger event
-                    evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
-                    notify(obj,"ValueChanged",evtOut);
+                    obj.addListBoxSelection();
 
                 case 'Remove'
                     obj.removeListBoxSelection();
@@ -342,8 +335,43 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         end %function
 
 
+        function addListBoxSelection(obj)
+            % Adds the currently selected items to the right listbox
+
+            % Get the original value
+            oldValue = obj.Value;
+
+            % Get the highlighted items from the left list, so we
+            % can keep that the same
+            % leftData = obj.LeftList.ItemsData;
+            % leftValue = obj.LeftList.Value;
+            % leftSelIdx = find(ismember(leftData, leftValue));
+
+            obj.MoveSelectionFlag = 1;
+            % Update the selection
+            leftSelId = obj.LeftList.Value;
+            newSelId = [obj.SelectedIndex leftSelId];
+            obj.SelectedIndex = newSelId;
+
+            % Try to restore the left list highlights
+            % newNumLeft = numel(leftData) - numel(leftSelIdx);
+            % newLeftValue = leftData;
+            % newLeftValue(leftSelIdx) = [];
+            % isOutOfBounds = leftSelIdx > newNumLeft;
+            % leftSelIdx = leftSelIdx - sum(isOutOfBounds);
+            % leftSelIdx(leftSelIdx < 1) = [];
+            % drawnow
+            % obj.LeftList.Value = newLeftValue(leftSelIdx);
+
+            % Trigger event
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+            notify(obj,"ValueChanged",evtOut);
+
+        end %function
+
+
         function removeListBoxSelection(obj)
-            % Removes the currently selected items from the listbox
+            % Removes the currently selected items from the rightlistbox
 
             % What's currently selected?
             idxSel = obj.getListBoxSelectedIndex();
@@ -355,6 +383,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 oldValue = obj.Value;
 
                 % Remove it
+                obj.MoveSelectionFlag = -1;
                 obj.RightList.Items(idxSel) = [];
                 obj.RightList.ItemsData(idxSel) = [];
 
