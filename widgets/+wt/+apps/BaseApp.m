@@ -2,7 +2,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+    % Copyright 2020-2023 The MathWorks, Inc.
     
     
     %% Properties
@@ -53,8 +53,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     end %properties
     
     
-    properties (Transient, NonCopyable, ...
-            Access = {?wt.apps.BaseApp, ?matlab.uitest.TestCase} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Last used folder (for file operations)
         LastFolder (1,1) string = pwd

@@ -4,7 +4,7 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % A progress bar with status and cancel button
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
 
 
     %% Events
@@ -71,9 +71,8 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel
 

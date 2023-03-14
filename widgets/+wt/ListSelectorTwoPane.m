@@ -6,7 +6,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
     
     % Dual lists where selected items are moved from left to right
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
 
 
     %% Events
@@ -77,9 +77,8 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
 

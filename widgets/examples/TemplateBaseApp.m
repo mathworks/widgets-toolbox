@@ -1,16 +1,13 @@
 classdef TemplateBaseApp < wt.apps.BaseApp
     % Implements a template for a BaseApp
+    
+    % Copyright 2020-2023 The MathWorks Inc.
 
 
     %% Internal Components
     %   Create properties here for each control, layout, or view component
     %   that will be placed directly into the main app window.
-    properties ( Transient, NonCopyable, SetAccess = protected )
-
-        % Once the app is created and debugged, consider also protecting
-        % get access to these properties. Leave them accessible to unit
-        % tests, however. Use this example:
-        % GetAccess = {?matlab.uitest.TestCase, ?wt.apps.BaseApp})
+    properties ( Transient, NonCopyable, Hidden, SetAccess = protected )
 
         % Grid Layouts
         % (BaseApp already brings "Grid", the main Grid layout in the window)
