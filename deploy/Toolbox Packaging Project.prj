@@ -29,7 +29,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html</param.description>
     <param.screenshot>${PROJECT_ROOT}\widgets_logo.png</param.screenshot>
-    <param.version>2.2.1</param.version>
+    <param.version>2.3.0</param.version>
     <param.output>${PROJECT_ROOT}\Widgets Toolbox - MATLAB App Designer Components.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
@@ -38,7 +38,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
       <item>1</item>
     </param.products.id>
     <param.products.version>
-      <item>9.12</item>
+      <item>9.13</item>
     </param.products.version>
     <param.platforms />
     <param.guid>78895307-cc36-4970-8b66-0697da8f9352</param.guid>
@@ -126,7 +126,7 @@ Planning a complex or business-critical app? MathWorks Consulting can advise you
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2022a</root>
+      <root>C:\Program Files\MATLAB\R2022b</root>
       <toolboxes>
         <toolbox name="matlabcoder" />
         <toolbox name="embeddedcoder" />
