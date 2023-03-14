@@ -2,17 +2,11 @@ classdef PropertyViewable < handle
     % Mixin for component to organize the display of properties in the
     % command window.
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
 
-    %% Properties
-    properties (AbortSet, Transient, NonCopyable)
-        
-
-    end
-
-
-    %% Accessors
-    methods (Hidden, Access = protected)
+    
+    %% Protected Methods
+    methods (Access = protected)
 
         function groups = getPropertyGroups(obj)
             % Customize how the properties are displayed
@@ -47,7 +41,8 @@ classdef PropertyViewable < handle
             % Ignore Empty Groups
             groups(~[groups.NumProperties]) = [];
 
-       end
-       
-    end
-end
+        end %function
+        
+    end %methods
+    
+end %classdef

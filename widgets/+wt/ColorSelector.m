@@ -37,8 +37,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button

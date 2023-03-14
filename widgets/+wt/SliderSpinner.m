@@ -5,7 +5,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % A slider and spinner combination
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Public properties
@@ -71,8 +71,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Grid Layout
         Grid (1,1) matlab.ui.container.GridLayout

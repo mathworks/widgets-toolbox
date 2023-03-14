@@ -5,7 +5,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % A table showing status of multiple tasks
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Public properties
@@ -63,8 +63,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase,?matlab.ui.componentcontainer.ComponentContainer} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout

@@ -1,7 +1,7 @@
 classdef ErrorHandling < handle
     %ErrorHandling Error handling methods
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     methods ( Access = protected )
         
@@ -24,7 +24,11 @@ classdef ErrorHandling < handle
             end
             
             % Locate ancestor figure
-            fig = ancestor(obj,'figure');
+            if isprop(obj,"Figure")
+                fig = obj.Figure;
+            else
+                fig = ancestor(obj,'figure');
+            end
             
             % Place in a dialog if possible
             if ~isempty(fig)

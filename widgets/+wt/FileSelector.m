@@ -6,7 +6,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     % File or folder selection control with browse button
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Public properties
@@ -36,7 +36,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     properties (AbortSet)
         
-        % Selection type: file or folder
+        % Selection type: (get)file, folder, putfile
         SelectionType (1,1) wt.enum.FileFolderState = wt.enum.FileFolderState.file
         
         % Optional root directory. If unspecified, Value uses an absolute
@@ -75,8 +75,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
@@ -112,36 +111,30 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.Padding = 0;   
             
             % Create the standard edit control
-            obj.EditControl = matlab.ui.control.EditField(...
-                "Parent",obj.Grid,...
-                "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
+            obj.EditControl = uieditfield(obj.Grid);
+            obj.EditControl.ValueChangedFcn = @(h,e)obj.onTextChanged(e);
             obj.EditControl.Layout.Column = [1 3];
             obj.EditControl.Layout.Row = 1;
             
             % Create the optional dropdown control (unparented for now)
-            obj.DropdownControl = matlab.ui.control.DropDown(...
-                "Parent",[],...
-                "Editable",true,...
-                "Value","",...
-                "ValueChangedFcn",@(h,e)obj.onTextChanged(e));
-            %obj.DropdownControl.Layout.Column = [1 3];
-            %obj.DropdownControl.Layout.Row = 1;
+            obj.DropdownControl = uidropdown("Parent",[]);
+            obj.DropdownControl.Editable = true;
+            obj.DropdownControl.Value = "";
+            obj.DropdownControl.ValueChangedFcn = @(h,e)obj.onTextChanged(e);
             
             % Create Button
-            obj.ButtonControl = matlab.ui.control.Button(...
-                "Parent",obj.Grid,...
-                "Text","",...
-                "ButtonPushedFcn",@(h,e)obj.onButtonPushed(e));
+            obj.ButtonControl = uibutton(obj.Grid);
+            obj.ButtonControl.Text = "";
+            obj.ButtonControl.ButtonPushedFcn = @(h,e)obj.onButtonPushed(e);
             obj.ButtonControl.Layout.Column = 4;
             obj.ButtonControl.Layout.Row = 1;
             obj.updateButtonIcon();
 
             % Create overlay
-            obj.WarnImage = matlab.ui.control.Image(...
-                "Parent",obj.Grid,...
-                "ScaleMethod","none",...
-                "Visible","off",...
-                "ImageSource","warning_16.png");
+            obj.WarnImage = uiimage(obj.Grid);
+            obj.WarnImage.ScaleMethod = "none";
+            obj.WarnImage.Visible = "off";
+            obj.WarnImage.ImageSource = "warning_16.png";
             obj.WarnImage.Layout.Column = 3;
             obj.WarnImage.Layout.Row = 1;
             
@@ -202,6 +195,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             
             % Update the button icon
             if obj.SelectionType == "file"
+                obj.ButtonControl.Icon = "folder_file_24.png";
+            elseif obj.SelectionType == "putfile"
                 obj.ButtonControl.Icon = "folder_file_24.png";
             else
                 obj.ButtonControl.Icon = "folder_24.png";
@@ -266,6 +261,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Prompt user for the path
             if obj.SelectionType == "file"
                 [fileName,pathName] = uigetfile(filter,"Select a file",initialPath);
+            elseif obj.SelectionType == "putfile"
+                [fileName,pathName] = uiputfile(filter,"Specify an output file",initialPath);
             else
                 pathName = uigetdir(initialPath, "Select a folder");
                 fileName = "";
@@ -312,6 +309,8 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             
             % Filter to valid paths
             if obj.SelectionType == "file"
+                fcn = @(x)gt(exist(fullfile(obj.RootDirectory, x),"file"), 0);
+            elseif obj.SelectionType == "putfile"
                 fcn = @(x)gt(exist(fullfile(obj.RootDirectory, x),"file"), 0);
             else
                 fcn = @(x)eq(exist(fullfile(obj.RootDirectory, x),"dir"), 7);
@@ -433,6 +432,7 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function value = get.ValueIsValidPath(obj)
             filePath = fullfile(obj.RootDirectory, obj.Value);
             value = ( obj.SelectionType == "file" && isfile(filePath) ) || ...
+                ( obj.SelectionType == "putfile" && isfolder(fileparts(filePath)) ) || ...
                 ( obj.SelectionType == "folder" && isfolder(filePath) );
         end
         

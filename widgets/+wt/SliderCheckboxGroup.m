@@ -6,7 +6,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
     
     
     %% Events
@@ -48,8 +48,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Grid for Layout
         Grid (1,1) matlab.ui.container.GridLayout

@@ -8,7 +8,7 @@ classdef (Abstract) BaseModel < handle & ...
     %     to enable apps/widgets to listen to model changes
     %    
 
-    % Copyright 2020-2021 The MathWorks, Inc.
+    % Copyright 2020-2023 The MathWorks, Inc.
     
 
     
@@ -23,8 +23,7 @@ classdef (Abstract) BaseModel < handle & ...
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?matlab.uitest.TestCase} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = private)
         
         % Listeners to public properties
         PropListeners

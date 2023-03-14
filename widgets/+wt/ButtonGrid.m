@@ -5,7 +5,7 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % Array of buttons with a single callback/event
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
 
 
     %% Events
@@ -58,9 +58,8 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
 

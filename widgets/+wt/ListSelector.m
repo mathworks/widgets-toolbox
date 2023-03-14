@@ -5,7 +5,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     
     % Select from an array of items and add them to a list
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2023 The MathWorks Inc.
 
 
     %% Events
@@ -80,9 +80,8 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
     %% Internal Properties
-    properties (Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer})
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
 
