@@ -485,8 +485,11 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             else
                 value = obj.ItemsData(:,selIdx);
             end
-        end
+        end        
         function set.HighlightedValue(obj,value)
+            if isempty(value)
+                return;
+            end
             if isempty(obj.ItemsData)
                 [~, obj.RightList.Value] = ismember(value, obj.Items);
             else
