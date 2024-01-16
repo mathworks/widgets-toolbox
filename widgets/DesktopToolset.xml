@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<toolset id="user_apps_toolset" template="false">
-   <tool app_file_path="examples/WidgetsExampleApp.mlapp" handler_class="com.mathworks.deployment.desktop.toolstrip.ToolboxToolSetExtensionHandler" id="78895307-cc36-4970-8b66-0697da8f9352:examples/WidgetsExampleApp.mlapp" label="Widgets Toolbox Examples App" quick_access_eligible="false" toolset_id="user_apps_toolset">
-      <callback>WidgetsExampleApp</callback>
-      <icon filename="matlab_app_generic_icon_24"/>
-      <icon filename="matlab_app_generic_icon_16"/>
-      <parent_tool id="my_apps" toolset_id="apps_toolset"/>
-   </tool>
-</toolset>
