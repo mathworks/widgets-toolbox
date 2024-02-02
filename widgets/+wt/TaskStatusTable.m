@@ -224,11 +224,13 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             
             % Update selected task
             selLabel = obj.Label(obj.SelectedIndex);
-            nonSelLabel = obj.Label(obj.Label ~= selLabel);
-            wt.utility.fastSet(nonSelLabel,"BackgroundColor",'none');
             if ~isempty(selLabel)
+                nonSelLabel = obj.Label(obj.Label ~= selLabel);
                 wt.utility.fastSet(selLabel,"BackgroundColor",obj.SelectionColor);
+            else
+                nonSelLabel = obj.Label;
             end
+            wt.utility.fastSet(nonSelLabel,"BackgroundColor",'none');
             
             % Update the button enables
             obj.updateEnableableComponents();
@@ -251,8 +253,8 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.updateEnableableComponents@wt.mixin.Enableable();
             
             % Can we go forward or back, based on selected task?
-            canGoBack = obj.SelectedIndex > 1;
-            canGoForward = obj.SelectedIndex < numel(obj.Items);
+            canGoBack = ~isempty(obj.SelectedIndex) && obj.SelectedIndex > 1;
+            canGoForward = isempty(obj.SelectedIndex) || obj.SelectedIndex < numel(obj.Items);
             backEnable = obj.Enable && obj.EnableBack && canGoBack;
             forwardEnable = obj.Enable && obj.EnableForward && canGoForward;
             
