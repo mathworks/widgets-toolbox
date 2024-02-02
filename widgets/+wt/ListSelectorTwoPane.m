@@ -301,7 +301,8 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
                 otherwise
                     % Trigger event for user buttons
-                    notify(obj,"ButtonPushed",evt);
+                    evtOut = wt.eventdata.ButtonPushedData(evt.Button);
+                    notify(obj,"ButtonPushed",evtOut);
 
             end %switch
 
