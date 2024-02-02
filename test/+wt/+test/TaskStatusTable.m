@@ -121,7 +121,22 @@ classdef TaskStatusTable < wt.test.BaseWidgetTest
             % Verify selection color of selected label
             actValue = testCase.Widget.Label(newIdx).BackgroundColor;
             testCase.verifyEqual(actValue, selColor)
-            
+
+            % Now, programmatically change the index to empty
+            newIdx = [];
+            testCase.verifySetProperty("SelectedIndex", newIdx);
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, newIdx)
+
+            % Can't press back
+            testCase.verifyFalse(backButton.Enable)
+            testCase.press(backButton)
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, newIdx)
+
+            % Push forward
+            testCase.verifyTrue(fwdButton.Enable)
+            testCase.press(fwdButton)
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, 1)
+
         end %function
             
         
