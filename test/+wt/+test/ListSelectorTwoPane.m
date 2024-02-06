@@ -305,7 +305,170 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 5);
             
         end %function
+
+
+
+        function testHighlightedSelectionChange(testCase)
+
+            % Get the RightList and button grid
+            w = testCase.Widget;
+            leftlistControl = testCase.Widget.LeftList;
+            rightListControl = testCase.Widget.RightList;
+            buttonGrid = testCase.Widget.ListButtons;
+            button = buttonGrid.Button;
+            
+            % Add a list of items and put all on list
+            testCase.verifySetProperty("Value", testCase.ItemNames(1));
+            
+            % Select multiple items with mouse
+            selIdx = [2 3];
+            testCase.choose(leftlistControl, selIdx)
+            
+            % Check button enables
+            testCase.verifyEquality(buttonGrid.ButtonEnable, [1 0 0 0]);
+            
+            % Move items to the right
+            testCase.press(button(1))
+            
+            % Give a moment for update to run
+            drawnow
+
+            % Verify new order
+            newIdx = [1 3 4];
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+            % Verify highlighted values
+            testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(newIdx(selIdx)));
+            testCase.verifyEqual(w.LeftList.Value, 2);
+
+            % Select item to deselect
+            selIdx = 1;
+            testCase.choose(rightListControl, selIdx)
+
+            % Check button enables
+            testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 0 1]);
+
+            % Move items to the left
+            testCase.press(button(2))
+
+            % Verify new order
+            newIdx = [3 4];
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+            % Verify highlighted values
+            testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(newIdx(1)));
+            testCase.verifyEqual(w.LeftList.Value, 1);
+
+            % Verify callbacks fired
+            testCase.verifyEqual(testCase.CallbackCount, 3);
+
+        end
         
+        function testItemsChange(testCase)
+
+            % Get the RightList and button grid
+            w = testCase.Widget;
+            leftlistControl = testCase.Widget.LeftList;
+            buttonGrid = testCase.Widget.ListButtons;
+            button = buttonGrid.Button;
+
+            for idx = 1:numel(w.Items)
+
+                % Select last item
+                testCase.choose(leftlistControl, numel(w.Items) + 1 - idx)
+            
+                % Check button enables
+                switch idx
+                    case 1
+                        testCase.verifyEquality(buttonGrid.ButtonEnable, [1 0 0 0]);
+                    case 2
+                        testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 0 0]);
+                    otherwise
+                        testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 1 0]);
+                end
+                
+                % Move items to the right
+                testCase.press(button(1))
+                
+                % Give a moment for update to run
+                drawnow
+            end
+
+            % Check button enables
+            testCase.verifyEquality(buttonGrid.ButtonEnable, [0 1 1 0]);
+
+            % Verify new order
+            newIdx = 5:-1:1;
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+            % Change items
+            newSel = [1 3 5];
+            w.Items = w.Items(newSel);
+
+            % Give a moment for update to run
+            drawnow
+
+            % Verify new value and selected index
+            testCase.verifyEqual(w.Value, testCase.ItemNames([5 3 1]));
+            testCase.verifyEqual(w.SelectedIndex, [3 2 1]);
+            testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(5));
+
+            % Move items to the left
+            testCase.press(button(2))
+            testCase.press(button(2))
+
+            % Give a moment for update to run
+            drawnow
+
+            % Verify new order
+            newIdx = 1;
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, 1);
+            testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(1));
+            testCase.verifyEqual(w.LeftList.Value, 2);
+            
+        end
+
+
+        function testSortable(testCase)
+
+            % Get the RightList and button grid
+            w = testCase.Widget;
+            leftlistControl = testCase.Widget.LeftList;
+            buttonGrid = testCase.Widget.ListButtons;
+            button = buttonGrid.Button;
+
+            for idx = 1:numel(w.Items)
+
+                % Select last item
+                testCase.choose(leftlistControl, numel(w.Items) + 1 - idx)
+                
+                % Move items to the right
+                testCase.press(button(1))
+                
+                % Give a moment for update to run
+                drawnow
+            end
+
+            % Verify new order
+            newIdx = 5:-1:1;
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+            % Set sortable
+            w.Sortable = false;
+
+            % Give a moment for update to run
+            drawnow
+
+            % Check new order
+            newIdx = 1:5;
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+        end
         
             
         function testUserButtons(testCase)
