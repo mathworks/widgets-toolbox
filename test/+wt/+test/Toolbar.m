@@ -158,7 +158,8 @@ classdef Toolbar < wt.test.BaseWidgetTest
     methods (Test)
         
         function testHorizontalSection(testCase)
-
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsGreaterThan
             % Add a single horizontal section (always required)
             fcn = @()wt.toolbar.HorizontalSection();
             section = verifyWarningFree(testCase, fcn);
@@ -180,9 +181,8 @@ classdef Toolbar < wt.test.BaseWidgetTest
             
             % Verify the section width
             testCase.verifyNumElements(testCase.Widget.Grid.ColumnWidth, 2)
-            sectionWidth = testCase.Widget.Grid.ColumnWidth{1};
             minWidth = 99; %pixels
-            testCase.verifyGreaterThan(sectionWidth, minWidth)
+            testCase.verifyThat(@()testCase.Widget.Grid.ColumnWidth{1}, Eventually(IsGreaterThan(minWidth)));
             
         end %function
         
