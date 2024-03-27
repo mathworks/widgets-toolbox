@@ -317,16 +317,16 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             w.UserButtons.Icon = ["plot_24.png","play_24.png"];
             drawnow            
             
-            % Press the buttons
+            % Add user buttons
             b = w.UserButtons.Button;
             testCase.verifyNumElements(b, 2);
             
-            %RAJ - not working
-            %testCase.press(b(1))
-            %testCase.press(b(2))
+            % Press user buttons
+            testCase.press(b(1))
+            testCase.press(b(2))
             
             % Verify callbacks fired
-            %testCase.verifyEqual(testCase.CallbackCount, 2);
+            testCase.verifyEqual(testCase.CallbackCount, 2);
             
         end %function
         
