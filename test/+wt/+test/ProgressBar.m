@@ -28,6 +28,8 @@ classdef ProgressBar < wt.test.BaseWidgetTest
     methods (Test)
             
         function testProgress(testCase)
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsEqualTo
             % Test the progress steps
             
             % Get the controls
@@ -35,9 +37,8 @@ classdef ProgressBar < wt.test.BaseWidgetTest
             timeLabel = testCase.Widget.RemTimeLabel;
             
             % Verify starting bar is empty
-            pos = testCase.Widget.ProgressPanel.Position;
             testCase.assumeEqual(testCase.Widget.ProgressPanel.Units, 'pixels')
-            testCase.verifyEqual(pos(3), 0)
+            testCase.verifyThat(@()testCase.Widget.ProgressPanel.Position(3),Eventually(IsEqualTo(0)));
             
             % Start
             testCase.verifyMethod("startProgress")
