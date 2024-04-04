@@ -2,7 +2,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
     
-    % Copyright 2020-2023 The MathWorks, Inc.
+    % Copyright 2020-2024 The MathWorks, Inc.
     
     
     %% Properties
@@ -425,7 +425,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function value = get.PreferenceGroup(app)
             value = app.PreferenceGroup;
-            if isempty(value)
+            if ~strlength(value)
                 value = class(app);
             end
             value = matlab.lang.makeValidName(value);
