@@ -43,7 +43,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
-        SelectedIndex (1,:)
+        SelectedIndex (1,:) {mustBeInteger, mustBePositive}
 
         % The current selection
         Value (1,:)
@@ -164,6 +164,21 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             % What is selected?
             selIdx = obj.SelectedIndex;
 
+            % Update the list of choices
+            if ~obj.Sortable
+                selIdx = sort(selIdx);
+            end
+            
+            % Update the list on right side
+            obj.RightList.Items = obj.Items(selIdx);
+            obj.RightList.ItemsData = selIdx;
+
+            % Update the list on left side
+            itemIds = 1:obj.getMaximumValidItemsNumber;
+            isSelected = ismember(itemIds, obj.SelectedIndex);
+            obj.LeftList.Items = obj.Items(~isSelected);
+            obj.LeftList.ItemsData = itemIds(~isSelected);
+
             % Is the list sortable?
             if obj.Sortable
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png", "up_24.png", "down_24.png"];
@@ -175,21 +190,21 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 obj.ListButtons.ButtonHeight = {28 28};
             end
 
-            % Update the list
-            obj.RightList.Items = obj.Items(selIdx);
-            obj.RightList.ItemsData = selIdx;
-
             % Update button enable states
             obj.updateEnables();
 
-            % Update the list of choices
-            itemIds = 1:numel(obj.Items);
-            isNotSelected = ~ismember(itemIds, obj.SelectedIndex);
-            obj.LeftList.Items = obj.Items(isNotSelected);
-            obj.LeftList.ItemsData = itemIds(isNotSelected);
+        end %function
 
-            % Update button enable states
-            obj.updateEnables();
+        function val = getMaximumValidItemsNumber(obj)
+            % Returns maximum valid selected index.
+            % Takes into account ItemsData and Items.
+
+            % Is ItemsData available?
+            if ~isempty(obj.ItemsData)
+                val = min(numel(obj.ItemsData), numel(obj.Items));
+            else
+                val = numel(obj.Items);
+            end
 
         end %function
 
@@ -219,7 +234,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
                 % Toggle button enables
                 obj.ListButtons.ButtonEnable = [
-                    numel(selIdx) < numel(obj.Items) %Add Button
+                    numel(selIdx) < obj.getMaximumValidItemsNumber %Add Button
                     ~isempty(hiliteIdx) % Delete Button
                     numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
                     numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
@@ -442,20 +457,29 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function value = get.SelectedIndex(obj)
             value = obj.RightList.ItemsData;
-        end
+            value(value > obj.getMaximumValidItemsNumber) = [];
+        end        
         function set.SelectedIndex(obj,value)
             if ~obj.Sortable
                 value = sort(value);
             end
+            if any(value > numel(obj.Items))
+                error("widgets:ListSelectorTwoPane:InvalidIndex",...
+                        "'SelectedIndex' must be within the length of the 'Items' property.")
+            end
+            if ~isempty(obj.ItemsData) && any(value > numel(obj.ItemsData))
+                error("widgets:ListSelectorTwoPane:InvalidIndex",...
+                        "'SelectedIndex' must be within the length of the 'ItemsData' property.")
+            end            
             obj.RightList.Items = obj.Items(value);
             obj.RightList.ItemsData = value;
         end
 
         function value = get.Value(obj)
             if isempty(obj.ItemsData)
-                value = obj.Items(:,obj.RightList.ItemsData);
+                value = obj.Items(:, obj.SelectedIndex);
             else
-                value = obj.ItemsData(:,obj.RightList.ItemsData);
+                value = obj.ItemsData(:, obj.SelectedIndex);
             end
         end
         function set.Value(obj,value)
@@ -468,9 +492,17 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                     [tf, selIdx] = ismember(value, obj.ItemsData);
                 end
                 if ~all(tf)
-                    warning("widgets:ListSelector:InvalidValue",...
-                        "Attempt to set an invalid Value to the list.")
-                    selIdx(~tf) = [];
+                    if isempty(obj.ItemsData)
+                        prop = 'Items';
+                    else
+                        prop = 'ItemsData';
+                    end
+                    error("widgets:ListSelectorTwoPane:InvalidValue",...
+                        "'Value' must be an element defined in the '%s' property.", prop)
+                end
+                if ~isempty(obj.ItemsData) && numel(tf) > numel(obj.Items)
+                    error("widgets:ListSelectorTwoPane:InvalidValue",...
+                        "'Value' must be an element defined in the 'ItemsData' property within the length of the 'Items' property.")
                 end
                 obj.SelectedIndex = selIdx;
             end
