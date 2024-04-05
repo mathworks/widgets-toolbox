@@ -6,7 +6,7 @@ classdef BaseSession < wt.model.BaseModel
     % trigger a public event "PropertyChanged" when value is set. The app
     % will listen for these changes.
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+    % Copyright 2020-2024 The MathWorks, Inc.
     
     
     %% Properties
@@ -18,7 +18,7 @@ classdef BaseSession < wt.model.BaseModel
     end %properties
     
     
-    properties (AbortSet, Transient)
+    properties (AbortSet, Transient, SetObservable)
         
         % Path to store the session file
         FilePath (1,1) string
@@ -29,7 +29,7 @@ classdef BaseSession < wt.model.BaseModel
     end %properties
     
     
-    properties
+    properties (AbortSet, SetObservable)
         
         % Description of the session (optional)
         Description (1,1) string
@@ -83,10 +83,6 @@ classdef BaseSession < wt.model.BaseModel
         end %function
         
     end %methods
-    
-    
-   
-    
     
     
     %% Accessors
