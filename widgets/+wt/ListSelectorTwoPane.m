@@ -293,17 +293,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             switch evt.Tag
 
                 case 'Add'
-
-                    % Get the original value
-                    oldValue = obj.Value;
-
-                    % Update the selection
-                    newSelIdx = [obj.SelectedIndex obj.LeftList.Value];
-                    obj.SelectedIndex = newSelIdx;
-
-                    % Trigger event
-                    evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
-                    notify(obj,"ValueChanged",evtOut);
+                    obj.addListBoxSelection();
 
                 case 'Remove'
                     obj.removeListBoxSelection();
@@ -330,13 +320,42 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         function selIdx = getListBoxSelectedIndex(obj)
             % Get the current selected row indices in the listbox
 
-            warnState = warning('off','MATLAB:structOnObject');
-            s = struct(obj.RightList);
-            warning(warnState);
-            selIdx = s.SelectedIndex;
-            if isequal(selIdx, -1)
+            if isempty(obj.RightList.Value)
                 selIdx = [];
+            else
+                selIdx = find(ismember(obj.RightList.ItemsData, obj.RightList.Value));
             end
+
+        end %function
+
+
+        function addListBoxSelection(obj)
+            % Adds the currently selected items from the listbox
+
+            % What's currently selected?
+            idxSel = obj.LeftList.Value;
+
+            % Is there something to add?
+            if ~isempty(idxSel)
+
+                % Get the original value
+                oldValue = obj.Value;
+    
+                % Update the selection
+                newSelIdx = [obj.SelectedIndex idxSel];
+                obj.SelectedIndex = newSelIdx;
+    
+                % Request update
+                obj.update();
+    
+                % Set selection on right side
+                obj.RightList.Value = idxSel;
+    
+                % Trigger event
+                evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+                notify(obj,"ValueChanged",evtOut);
+
+            end %if
 
         end %function
 
@@ -345,8 +364,9 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             % Removes the currently selected items from the listbox
 
             % What's currently selected?
-            idxSel = obj.getListBoxSelectedIndex();
 
+            idxSel = obj.RightList.Value;
+            
             % Is there something to remove?
             if ~isempty(idxSel)
 
@@ -354,8 +374,14 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 oldValue = obj.Value;
 
                 % Remove it
-                obj.RightList.Items(idxSel) = [];
-                obj.RightList.ItemsData(idxSel) = [];
+                rmSel = ismember(obj.SelectedIndex, idxSel);
+                obj.SelectedIndex(rmSel) = [];
+
+                % Request update
+                obj.update()
+
+                % Set selection on left side
+                obj.LeftList.Value = idxSel;
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
@@ -374,7 +400,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             selIdx = obj.getListBoxSelectedIndex();
 
             % Make indices to all items as they are now
-            idxNew = 1:numel(obj.RightList.Items);
+            idxNew = 1:numel(obj.SelectedIndex);
             idxOld = idxNew;
 
             % Find the last stable item that doesn't move
@@ -437,8 +463,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 oldValue = obj.Value;
 
                 % Make the shift
-                obj.RightList.Items = obj.RightList.Items(idxNew);
-                obj.RightList.ItemsData = obj.RightList.ItemsData(idxNew);
+                obj.SelectedIndex = obj.SelectedIndex(idxNew);
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
