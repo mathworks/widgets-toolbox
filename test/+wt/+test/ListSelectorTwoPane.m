@@ -117,6 +117,45 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 0);
             
         end %function
+
+
+        function testProgrammaticItemsAndItemsDataValueSelection(testCase)
+
+            % Get the RightList
+            listControl = testCase.Widget.RightList;
+            
+            % Set fewer items than items data
+            testCase.verifySetProperty("Items", testCase.ItemNames(1:3) );
+            testCase.verifySetProperty("ItemsData", testCase.ItemData );
+            
+            % List should still be empty
+            testCase.verifyEmpty( listControl.Items );
+            
+            % Set the value outside of the current acceptable range
+            newSelIdx = [2 5];
+            newValue = testCase.ItemData(newSelIdx);
+            testCase.verifyError(@() testCase.verifySetProperty("Value", newValue), ...
+                "widgets:ListSelectorTwoPane:InvalidIndex");
+            
+            % Set the value inside range
+            newSelIdx = [1 2];
+            newValue = testCase.ItemData(newSelIdx);
+            testCase.verifySetProperty("Value", newValue);
+
+            % List and selection should now match value
+            testCase.verifyEqual(string(listControl.Items), testCase.ItemNames(newSelIdx));
+            testCase.verifyEqual(listControl.ItemsData, newSelIdx);
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, newSelIdx);
+            
+            % Validate the left list items
+            leftIdx = 3;
+            leftList = testCase.Widget.LeftList;
+            testCase.verifyEqual(string(leftList.Items), testCase.ItemNames(leftIdx));
+            testCase.verifyEqual(leftList.ItemsData, leftIdx);
+            
+            % Verify callback did not fire
+            testCase.verifyEqual(testCase.CallbackCount, 0);
+        end        
         
         
         function testHighlightedValue(testCase)
@@ -174,7 +213,6 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 2);
             
         end %function
-        
         
             
         function testButtonEnables(testCase)
@@ -306,7 +344,6 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
         end %function
         
-        
             
         function testUserButtons(testCase)
             
@@ -329,7 +366,6 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 2);
             
         end %function
-        
         
             
         function testStyleProperties(testCase)
