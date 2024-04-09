@@ -12,7 +12,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (AbortSet)
         
         % The current value shown
-        Value (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 1 0]
+        Value (1,3) double {mustBeInRange(Value,0,1)} = [0 1 0]
         
     end %properties
     

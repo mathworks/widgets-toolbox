@@ -31,7 +31,7 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (Dependent, UsedInUpdate = false)
 
         % Bar color
-        BarColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne}
+        BarColor (1,3) double {mustBeInRange(BarColor,0,1)}
 
     end %properties
 
@@ -41,7 +41,7 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (SetAccess = protected, UsedInUpdate = false)
 
         % Current progress value
-        Value (1,1) double {mustBeNonnegative, mustBeLessThanOrEqual(Value,1)} = 0
+        Value (1,1) double {mustBeInRange(Value,0,1)} = 0
 
         % Current status text displayed
         StatusText (1,1) string

@@ -34,7 +34,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Selection color
         SelectionColor (1,3) double ...
-            {wt.validators.mustBeBetweenZeroAndOne} = [.8 .8 1];
+            {mustBeInRange(SelectionColor,0,1)} = [.8 .8 1];
         
         % Enables button and status row to display
         ShowButtonRow (1,1) matlab.lang.OnOffSwitchState = true
