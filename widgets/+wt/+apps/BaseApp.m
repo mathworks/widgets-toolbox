@@ -164,7 +164,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Destructor
             
             % Store last position in preferences
-            if isscalar(app.Figure) && isvalid(app.Figure)
+            if isscalar(app.Figure) && isprop(app.Figure, "Position")
                 app.setPreference('Position',app.Figure.Position)
             end
             
