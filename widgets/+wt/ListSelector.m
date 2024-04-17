@@ -487,6 +487,10 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             end
         end
         function set.HighlightedValue(obj,value)
+            if isempty(value)
+                obj.ListBox.Value = {};
+                return;
+            end
             if isempty(obj.ItemsData)
                 [~, obj.ListBox.Value] = ismember(value, obj.Items);
             else
