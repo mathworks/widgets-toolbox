@@ -425,7 +425,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function value = get.PreferenceGroup(app)
             value = app.PreferenceGroup;
-            if isempty(value)
+            if ~strlength(value)
                 value = class(app);
             end
             value = matlab.lang.makeValidName(value);
