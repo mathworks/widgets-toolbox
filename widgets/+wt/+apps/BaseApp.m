@@ -165,9 +165,6 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Update the title
             app.updateTitle();
             
-            % Force drawing to finish
-            drawnow
-            
             % Now, make it visible
             if isfield(options, 'Visible')
                 app.Figure.Visible = options.Visible;
