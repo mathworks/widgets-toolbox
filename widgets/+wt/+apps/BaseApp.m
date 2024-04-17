@@ -93,8 +93,21 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     %% Constructor / destructor
     methods (Access = public)
         
-        function app = BaseApp(varargin)
+        function app = BaseApp(options)
+
             % Constructor
+
+            arguments
+                options.?wt.apps.BaseApp
+                options.Preferences (1,1) wt.model.Preferences = wt.model.Preferences;
+                options.PreferenceGroup (1,1) string = "";
+            end
+
+            % Check for preference input and assign it first, in case
+            % Preferences was subclassed
+            app.Preferences = options.Preferences;
+            app.PreferenceGroup = options.PreferenceGroup;
+            options = rmfield(options, ["Preferences" "PreferenceGroup"]);
             
             % Create the figure and hide until components are created
             app.Figure = uifigure( ...
@@ -132,8 +145,9 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             app.setup();
             
             % Set any P-V pairs
-            if ~isempty(varargin)
-                set(app, varargin{:});
+            cellArgs = namedargs2cell(options);
+            if ~isempty(cellArgs)
+                set(app, cellArgs{:});
             end
             
             % Register the app with App Designer
@@ -155,7 +169,11 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             drawnow
             
             % Now, make it visible
-            app.Figure.Visible = 'on';
+            if isfield(options, 'Visible')
+                app.Figure.Visible = options.Visible;
+            else
+                app.Figure.Visible = 'on';
+            end
             
         end %function
         
