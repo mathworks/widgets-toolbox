@@ -179,6 +179,12 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             % Destructor
             
             % Store last position in preferences
+
+            % Note: Use isprop instead of isvalid. 
+            % If a user deletes the figure instead of the app, 
+            % this delete method is still triggered. Although
+            % not yet fully deleted (prop values still available), 
+            % the app and figure are not valid at this point. 
             if isscalar(app.Figure) && isprop(app.Figure, "Position")
                 app.setPreference('Position',app.Figure.Position)
             end
