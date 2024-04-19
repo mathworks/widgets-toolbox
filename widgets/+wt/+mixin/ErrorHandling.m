@@ -12,7 +12,7 @@ classdef ErrorHandling < handle
             arguments
                 obj (1,1) wt.mixin.ErrorHandling
                 err % string or MException
-                title (1,1) string = "Error"
+                title (1,1) string = "Internal Error in " + class(obj)
             end
             
             % Prepare the message
@@ -25,7 +25,7 @@ classdef ErrorHandling < handle
             
             % Locate ancestor figure
             if isprop(obj,"Figure")
-                fig = obj.Figure;
+                fig = obj.Figure; %#ok<MCNPN>
             else
                 fig = ancestor(obj,'figure');
             end
@@ -55,7 +55,7 @@ classdef ErrorHandling < handle
             
             % Locate ancestor figure
             if isprop(obj,"Figure")
-                fig = obj.Figure;
+                fig = obj.Figure; %#ok<MCNPN>
             else
                 fig = ancestor(obj,'figure');
             end
