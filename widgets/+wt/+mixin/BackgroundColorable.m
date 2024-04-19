@@ -10,8 +10,8 @@ classdef BackgroundColorable < handle
         % List of graphics controls to apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
 
-        % Listener to background color changes
-        BackgroundColorListener event.proplistener
+        % Listener to update method
+        UpdateListener event.listener
 
     end %properties
 
@@ -47,10 +47,12 @@ classdef BackgroundColorable < handle
 
         function listenForBackgroundChange(obj)
 
-            % Establish Listener for Background Color Change
-            if isempty(obj.BackgroundColorListener)
-                obj.BackgroundColorListener = ...
-                    addlistener(obj,'BackgroundColor','PostSet',...
+            % Establish Listener for PostUpdate event triggered by a background 
+            % color change. Listen to PostUpdate event to reload widget with 
+            % custom background color from AppDesigner.
+            if isempty(obj.UpdateListener)
+                obj.UpdateListener = ...
+                    addlistener(obj,'PostUpdate',...
                     @(h,e)obj.updateBackgroundColorableComponents());
             end
 
