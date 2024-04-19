@@ -2,10 +2,10 @@ classdef Sex
     % Implements a selection list
 
     enumeration
-        Unspecified
-        Male
-        Female
-        Other
+        unspecified
+        male
+        female
+        other
     end
 
 end %classdef

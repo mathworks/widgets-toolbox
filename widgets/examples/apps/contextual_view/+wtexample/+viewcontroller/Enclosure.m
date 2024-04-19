@@ -41,7 +41,7 @@ classdef Enclosure < wt.abstract.BaseViewController
 
             obj.NameLabel = uilabel(obj.Grid,...
                 "Text","Name:",...
-                "Tooltip","Name of the enclosure",...
+                "Tooltip",tooltip,...
                 "HorizontalAlignment","right");
             obj.NameLabel.Layout.Row = 1;
             obj.NameLabel.Layout.Column = 1;
@@ -89,7 +89,7 @@ classdef Enclosure < wt.abstract.BaseViewController
             else
                 % NO - disable controls, show default model values
                 enable = false;
-                model = wtexample.model.Exhibit;
+                model = wtexample.model.Enclosure;
             end
 
             % Update the fields

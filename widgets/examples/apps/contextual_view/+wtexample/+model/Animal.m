@@ -6,7 +6,10 @@ classdef Animal < wt.model.BaseModel
     properties (AbortSet, SetObservable)
 
         % Name of the animal
-        Name (1,1) string = ""
+        Name (1,1) string
+
+        % Species of the animal
+        Species (1,1) string
 
         % Birth date of the animal
         BirthDate (1,1) datetime = NaT

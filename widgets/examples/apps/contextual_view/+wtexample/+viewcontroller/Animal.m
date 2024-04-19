@@ -12,13 +12,21 @@ classdef Animal < wt.abstract.BaseViewController
     
     %% Internal Components
     properties (Transient, Hidden, SetAccess = protected)
+        
+        SpeciesLabel matlab.ui.control.Label
+        SpeciesField matlab.ui.control.Label
 
         NameLabel matlab.ui.control.Label
         NameField matlab.ui.control.EditField
 
-        % LocationLabel matlab.ui.control.Label
-        % LocationFieldX matlab.ui.control.NumericEditField
-        % LocationFieldY matlab.ui.control.NumericEditField
+        BirthDateLabel matlab.ui.control.Label
+        BirthDateField matlab.ui.control.DatePicker
+        
+        AgeLabel matlab.ui.control.Label
+        AgeField matlab.ui.control.Label
+
+        SexLabel matlab.ui.control.Label
+        SexField matlab.ui.control.DropDown
 
     end %properties
 
@@ -32,49 +40,75 @@ classdef Animal < wt.abstract.BaseViewController
             obj.setup@wt.abstract.BaseViewController();
 
             % Configure grid
-            obj.Grid.ColumnWidth = {'fit','1x','1x'};
-            obj.Grid.RowHeight = {'fit','fit'};
+            obj.Grid.ColumnWidth = {'fit','1x'};
+            obj.Grid.RowHeight = {'fit','fit','fit','fit','fit'};
+
+
+            % Species field
+            tooltip = "Species of the animal";
+
+            obj.SpeciesLabel = uilabel(obj.Grid,...
+                "Text","Species:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+
+            obj.SpeciesField = uilabel(obj.Grid,...
+                "Text","",...
+                "Tooltip",tooltip);
 
 
             % Name field
-            tooltip = "Name of the enclosure";
+            tooltip = "Name of the animal";
 
             obj.NameLabel = uilabel(obj.Grid,...
                 "Text","Name:",...
-                "Tooltip","Name of the enclosure",...
+                "Tooltip",tooltip,...
                 "HorizontalAlignment","right");
-            obj.NameLabel.Layout.Row = 1;
-            obj.NameLabel.Layout.Column = 1;
 
             obj.NameField = uieditfield(obj.Grid,...
                 "Tooltip",tooltip,...
                 "ValueChangedFcn",@(~,evt)onFieldEdited(obj,evt,"Name"));
-            obj.NameField.Layout.Row = 1;
-            obj.NameField.Layout.Column = [2 3];
+        
 
+            % BirthDate field
+            tooltip = "Birthdate of the animal";
 
-            % Location fields
-            % tooltip = "Point location of the enclosure";
-            % 
-            % obj.LocationLabel = uilabel(obj.Grid,...
-            %     "Text","Location:",...
-            %     "Tooltip",tooltip,...
-            %     "HorizontalAlignment","right");
-            % obj.LocationLabel.Layout.Row = 2;
-            % obj.LocationLabel.Layout.Column = 1;
-            % 
+            obj.BirthDateLabel = uilabel(obj.Grid,...
+                "Text","BirthDate:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
 
-            % obj.LocationFieldX = uieditfield(obj.Grid,'numeric',...
-            %     "Tooltip",tooltip,...
-            %     "ValueChangedFcn",@(~,evt)onFieldEdited(obj,evt,"Location",1));
-            % obj.LocationFieldX.Layout.Row = 2;
-            % obj.LocationFieldX.Layout.Column = 2;
-            % 
-            % obj.LocationFieldY = uieditfield(obj.Grid,'numeric',...
-            %     "Tooltip",tooltip,...
-            %     "ValueChangedFcn",@(~,evt)onFieldEdited(obj,evt,"Location",2));
-            % obj.LocationFieldY.Layout.Row = 2;
-            % obj.LocationFieldY.Layout.Column = 3;
+            obj.BirthDateField = uidatepicker(obj.Grid,...
+                "Tooltip",tooltip,...
+                "ValueChangedFcn",@(~,evt)onFieldEdited(obj,evt,"BirthDate"));
+        
+      
+            % Age field
+            tooltip = "Age of the animal";
+
+            obj.AgeLabel = uilabel(obj.Grid,...
+                "Text","Age:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+
+            obj.AgeField = uilabel(obj.Grid,...
+                "Text","",...
+                "Tooltip",tooltip);
+        
+            
+            % Sex field
+            tooltip = "Sex of the animal";
+
+            obj.SexLabel = uilabel(obj.Grid,...
+                "Text","Sex:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+
+            items = string(enumeration("wtexample.enum.Sex"));
+            obj.SexField = uidropdown(obj.Grid,...
+                "Tooltip",tooltip,...
+                "Items",items,...
+                "ValueChangedFcn",@(~,evt)onFieldEdited(obj,evt,"Sex")); 
 
         end %function
 
@@ -89,21 +123,29 @@ classdef Animal < wt.abstract.BaseViewController
             else
                 % NO - disable controls, show default model values
                 enable = false;
-                model = wtexample.model.Exhibit;
+                model = wtexample.model.Animal;
             end
 
             % Update the fields
+            species = model.Species;
+            obj.SpeciesField.Text = species;
+            obj.SpeciesField.Enable = enable;
+
             name = model.Name;
             obj.NameField.Value = name;
             obj.NameField.Enable = enable;
-            % 
-            % locX = model.Location(1);
-            % obj.LocationFieldX.Value = locX;
-            % obj.LocationFieldX.Enable = enable;
-            % 
-            % locY = model.Location(2);
-            % obj.LocationFieldY.Value = locY;
-            % obj.LocationFieldY.Enable = enable;
+
+            birthDate = model.BirthDate;
+            obj.BirthDateField.Value = birthDate;
+            obj.BirthDateField.Enable = enable;
+
+            age = model.Age;
+            obj.AgeField.Text = string(age);
+            obj.AgeField.Enable = enable;
+
+            sex = model.Sex;
+            obj.SexField.Value = sex;
+            obj.SexField.Enable = enable;
 
         end %function
 
