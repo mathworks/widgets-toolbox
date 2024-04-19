@@ -14,10 +14,10 @@ classdef FontStyled < handle
         FontSize (1,1) double {mustBePositive,mustBeFinite} = 12
 
         % Font weight (normal/bold)
-        FontWeight {mustBeMember(FontWeight,{'normal','bold'})} = 'normal'
+        FontWeight (1,1) wt.enum.FontWeightState = 'normal'
 
         % Font angle (normal/italic)
-        FontAngle {mustBeMember(FontAngle,{'normal','italic'})} = 'normal'
+        FontAngle (1,1) wt.enum.FontAngleState = 'normal'
 
         % Font color
         FontColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 0 0]
