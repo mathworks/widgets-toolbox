@@ -42,9 +42,9 @@ classdef PropertyChangedData < event.EventData & dynamicprops
             end
             
             % Any remaining varargin are dynamic property-value pairs
-            for idx=1:numel(varargin)
-                thisProp = varargin{idx};
-                thisValue = remArgs.(thisProp);
+            for idx = 1:floor(numel(varargin) / 2)
+                thisProp = varargin{(idx - 1) * 2 + 1};
+                thisValue = varargin{(idx - 1) * 2 + 2};
                 obj.addprop(thisProp);
                 obj.(thisProp) = thisValue;
             end
