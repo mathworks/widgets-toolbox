@@ -24,8 +24,12 @@ classdef PropertyChangedData < event.EventData & dynamicprops
             % Set the changed property name
             obj.Property = propName;
             
-            % Is input a MATLAB eventdata?
-            if isa(newValue,'matlab.ui.eventdata.ValueChangedData')
+            % Is input a MATLAB or widget eventdata?
+            if isa(newValue,'wt.eventdata.ValueChangedData') || ...
+                isa(newValue,'wt.eventdata.PropertyChangedData')
+                obj.Value = newValue.Value;
+                obj.PreviousValue = newValue.PreviousValue;
+            elseif isa(newValue,'matlab.ui.eventdata.ValueChangedData')
                 obj.Value = newValue.Value;
                 obj.PreviousValue = newValue.PreviousValue;
             elseif isa(newValue,'matlab.ui.eventdata.ValueChangingData')
