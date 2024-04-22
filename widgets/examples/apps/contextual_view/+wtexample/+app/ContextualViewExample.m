@@ -140,12 +140,12 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                 viewClass = replace(modelClass,".model.",".viewcontroller.");
 
                 % Launch the contextual pane for the selected data type
-                app.ContextualPane.launchPane(viewClass, model);
+                app.ContextualPane.launchView(viewClass, model);
 
             else
 
                 % Clear the contextual pane
-                app.ContextualPane.launchPane("");
+                app.ContextualPane.launchView("");
 
             end %if
 

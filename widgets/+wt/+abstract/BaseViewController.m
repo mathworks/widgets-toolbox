@@ -1,8 +1,8 @@
 classdef BaseViewController < ...
         matlab.ui.componentcontainer.ComponentContainer %& ...
-        % wt.mixin.BackgroundColorable & ...
-        % wt.mixin.PropertyViewable & ...
-        % wt.mixin.ErrorHandling
+    % wt.mixin.BackgroundColorable & ...
+    % wt.mixin.PropertyViewable & ...
+    % wt.mixin.ErrorHandling
     % Base class for views/controllers referencing a BaseModel class
 
 
@@ -24,16 +24,16 @@ classdef BaseViewController < ...
 
     %% Internal Properties
     properties (Hidden, SetAccess = protected)
-        
+
         % Internal grid to place outer panel contents
         OuterGrid matlab.ui.container.GridLayout
 
         % Outer panel with optional title
         OuterPanel matlab.ui.container.Panel
-        
+
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
-        
+
     end %properties
 
 
@@ -49,10 +49,10 @@ classdef BaseViewController < ...
 
 
     properties (Transient, UsedInUpdate, Access = private)
-        
+
         % Internal flag to trigger an update call
         Dirty (1,1) logical = false
-        
+
     end %properties
 
 
@@ -63,7 +63,6 @@ classdef BaseViewController < ...
 
             % Call superclass constructor
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(varargin{:});
-            
 
             % Listen to Model property being set
             obj.ModelSetListener_BVC = listener(obj,"Model","PostSet",...
@@ -75,7 +74,7 @@ classdef BaseViewController < ...
 
     %% Protected Methods
     methods (Access = protected)
-        
+
         function setup(obj)
             % Configure the widget
 
@@ -105,14 +104,14 @@ classdef BaseViewController < ...
             obj.Grid.ColumnSpacing = 5;
             obj.Grid.RowSpacing = 10;
             obj.Grid.Scrollable = true;
-            
+
         end %function
 
 
         function update(obj)
 
             % Do nothing - required for ComponentContainer
-            
+
             disp("Updating BaseViewController: " + class(obj));
 
         end %function
@@ -135,7 +134,7 @@ classdef BaseViewController < ...
 
             arguments
                 obj (1,1) wt.abstract.BaseViewController
-                evt 
+                evt
                 fieldName (1,1) string
                 index (1,:) double {mustBeInteger,mustBePositive} = 1
             end
