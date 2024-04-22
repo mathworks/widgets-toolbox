@@ -52,6 +52,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
             % Add toolbar
             app.Toolbar = wt.Toolbar(app.Grid);
+            app.Toolbar.DividerColor = [.8 .8 .8];
             app.Toolbar.Layout.Row = 1;
             app.Toolbar.Layout.Column = [1 2];
             app.Toolbar.Section = [fileSection, exhibitSection];

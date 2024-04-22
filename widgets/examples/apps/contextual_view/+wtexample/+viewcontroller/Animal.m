@@ -115,6 +115,9 @@ classdef Animal < wt.abstract.BaseViewController
 
         function update(obj)
 
+            % Call superclass method
+            obj.update@wt.abstract.BaseViewController();
+
             % Is there a valid model?
             if isscalar(obj.Model) && isvalid(obj.Model)
                 % YES - enable controls and get the model

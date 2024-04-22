@@ -166,9 +166,11 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
-        function update(~)
+        function update(obj)
 
             % Do nothing - required for ComponentContainer
+            
+            disp("Updating ContextualViewPane: " + class(obj));
 
         end %function
 
@@ -220,7 +222,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
 
-            % Deactivate the current pane
+            % Deactivate the old pane
             if isscalar(obj.ActivePane) && ~isequal(obj.ActivePane, pane)
                 obj.deactivatePane_Private(obj.ActivePane);
             end
@@ -230,13 +232,13 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 pane.Parent = obj.Grid;
             end
 
+            % Set pane as the active pane
+            obj.ActivePane = pane;
+
             % Attach model
             if ~isempty(model) && isvalid(model)
                 obj.attachModel_Private(model)
             end
-
-            % Set pane as the active pane
-            obj.ActivePane = pane;
 
         end %function
 
