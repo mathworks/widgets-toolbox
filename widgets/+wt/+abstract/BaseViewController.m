@@ -108,11 +108,9 @@ classdef BaseViewController < ...
         end %function
 
 
-        function update(obj)
+        function update(~)
 
             % Do nothing - required for ComponentContainer
-
-            disp("Updating BaseViewController: " + class(obj));
 
         end %function
 

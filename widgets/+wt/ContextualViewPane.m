@@ -131,11 +131,9 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
-        function update(obj)
+        function update(~)
 
             % Do nothing - required for ComponentContainer
-            
-            disp("Updating ContextualViewPane: " + class(obj));
 
         end %function
 
@@ -239,10 +237,8 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 model wt.model.BaseModel
             end
 
-            % Deactivate the old view
-            if isscalar(obj.ActiveView) && ~isequal(obj.ActiveView, view)
-                obj.deactivateView_Private(obj.ActiveView);
-            end
+            % Get the old view
+            oldView = obj.ActiveView;
 
             % Assign parent
             if ~isequal(view.Parent, obj.Grid)
@@ -251,12 +247,20 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             view.Visible = true;
 
             % Set view as the active view
-            obj.ActiveView = view;
+            if ~isequal(obj.ActiveView, view)
+                obj.ActiveView = view;
+                cleanupObj = onCleanup(@()obj.deactivateView_Private(oldView));
+            end
 
             % Attach model
             if ~isempty(model) && isvalid(model)
                 obj.attachModel_Private(view, model)
             end
+
+            % % Deactivate the view, removing model and parent
+            % oldView.Parent(:) = [];
+            % oldView.Visible = false;
+            % oldView.Model(:) = [];
 
         end %function
 
@@ -267,6 +271,10 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 obj (1,1) wt.ContextualViewPane
                 view (1,1) wt.abstract.BaseViewController = obj.ActiveView
             end
+
+            % Enable any prior view changes to finish, avoiding any
+            % "flashing" effects during the change
+            drawnow
 
             % Deactivate the view, removing model and parent
             view.Model(:) = [];
