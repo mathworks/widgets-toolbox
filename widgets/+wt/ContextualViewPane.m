@@ -269,7 +269,12 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Deactivate a view, removing from view and removing model
             arguments
                 obj (1,1) wt.ContextualViewPane
-                view (1,1) wt.abstract.BaseViewController = obj.ActiveView
+                view wt.abstract.BaseViewController = obj.ActiveView
+            end
+
+            % Return now if view provided is empty
+            if isempty(view) || ~isvalid(view)
+                return
             end
 
             % Enable any prior view changes to finish, avoiding any

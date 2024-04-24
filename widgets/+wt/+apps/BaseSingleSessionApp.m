@@ -265,13 +265,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             end
             
         end %function
-        
-    end %methods
-    
-    
-    
-    %% Private Methods
-    methods (Access = private)
+
         
         function onSessionChanged(app,~)
             % Triggered when a SetObservable property in the session has
@@ -280,6 +274,33 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             
             % Trigger an update
             app.update();
+            
+        end %function
+        
+        
+        function onModelChanged(~,~)
+            % Triggered when a ModelChanged event occurs in the session.
+            % May be overridden for custom behavior using incoming event
+            % data. Format: onModelChanged(app,evt)
+            
+        end %function
+        
+    end %methods
+    
+    
+    
+    %% Private Methods
+    methods (Access = private)
+        
+        
+        function onModelChanged_private(app,e)
+            % Triggered when a ModelChanged event occurs in the session.
+        
+            % Update the app title
+            app.updateTitle();
+            
+            % Call the app's model changed method
+            app.onModelChanged(e);
             
         end %function
         
@@ -297,9 +318,11 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function attachSessionListeners(app)
             
-            app.SessionChangedListener = event.listener(app.Session,...
-                'PropertyChanged',@(h,e)onSessionChanged_private(app,e));
-            
+            app.SessionChangedListener = [
+                listener(app.Session,'PropertyChanged',@(h,e)onSessionChanged_private(app,e));
+                listener(app.Session,'ModelChanged',@(h,e)onModelChanged_private(app,e));
+                ];
+
         end %function
         
     end %methods

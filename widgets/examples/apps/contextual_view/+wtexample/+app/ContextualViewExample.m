@@ -17,6 +17,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
         ExhibitAddButton
         ExhibitDeleteButton
 
+
+        % NewSelection (:,1) wt.model.BaseModel {mustBeScalarOrEmpty}
+
     end %properties
 
 
@@ -85,25 +88,27 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function update(app)
 
+            disp("Updating app: ContextualViewExample");
+
             % Populate tree
             delete(app.Tree.Children);
 
             % Add exhibit nodes within the zoo
-            for exhibit = app.Session.Exhibit'
+            for exhibit = app.Session.Exhibit
 
                 exhNode = uitreenode(app.Tree,...
                     "Text","Exhibit: " + exhibit.Name,...
                     "NodeData",exhibit);
 
                 % Add enclosure nodes within this exhibit
-                for enclosure = exhibit.Enclosure'
+                for enclosure = exhibit.Enclosure
 
                     encNode = uitreenode(exhNode,...
                         "Text","Enclosure: " + enclosure.Name,...
                         "NodeData",enclosure);
 
                     % Add animal nodes within this enclosure
-                    for animal = enclosure.Animal'
+                    for animal = enclosure.Animal
 
                         uitreenode(encNode,...
                             "Text","Animal: " + animal.Name,...
@@ -117,6 +122,24 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
             % Expand the top level
             expand(app.Tree)
+
+            % If a new selection is requested, change it now
+            % if isscalar(app.NewSelection) && isvalid(app.NewSelection)
+            % 
+            % end
+
+            % Select the new node
+            % app.Tree.SelectedNodes = app.Tree.Children(end);
+            %RJ - need to add selection states in the session! That
+            %way, update can properly select the tree choice.
+
+        end %function
+
+        
+        function onModelChanged(app,evt)
+
+            disp("app.onModelChanged");
+            disp(evt);
 
         end %function
 
@@ -200,12 +223,12 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                     % Add a new exhibit
                     newItem = wtexample.model.Exhibit;
                     newItem.Name = "New Exhibit";
+
+                    % Add the new exhibit
                     app.Session.Exhibit(end+1) = newItem;
 
-                    % Select the new node
-                    app.Tree.SelectedNodes = app.Tree.Children(end);
-                    %RJ - need to add selection states in the session! That
-                    %way, update can properly select the tree choice.
+                    % Indicate the new exhibit should be selected at the next update
+                    app.NewSelection = newItem;
 
                 case 'Delete'
 

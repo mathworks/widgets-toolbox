@@ -15,7 +15,7 @@ classdef Animal < wt.model.BaseModel
         BirthDate (1,1) datetime = NaT
 
         % Sex of the animal
-        Sex (1,1) wtexample.enum.Sex = wtexample.enum.Sex.Unspecified
+        Sex (1,1) wtexample.enum.Sex = wtexample.enum.Sex.unspecified
 
     end %properties
 

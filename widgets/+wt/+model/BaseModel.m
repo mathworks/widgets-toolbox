@@ -17,6 +17,9 @@ classdef (Abstract) BaseModel < handle & ...
         
         % Triggered when SetObservable properties are changed
         PropertyChanged 
+
+        % Triggered when an aggregated / nested model has changed
+        ModelChanged
         
     end %events
     
@@ -27,10 +30,12 @@ classdef (Abstract) BaseModel < handle & ...
         
         % Listeners to public properties
         PropListeners
-        
+
+        % Listeners to any aggregated / nested handle class models
+        AggregatedModelListeners
+
     end %properties
-    
-    
+
     
     %% Constructor
     methods
@@ -45,7 +50,7 @@ classdef (Abstract) BaseModel < handle & ...
             % Create listeners to public properties
             obj.createPropListeners();
             
-        end %function obj = ObjectModel(varargin)
+        end %function
     end %methods
     
     
@@ -70,9 +75,69 @@ classdef (Abstract) BaseModel < handle & ...
     
     
     %% Protected Methods
-    
+
+
     methods (Access=protected)
-        
+
+        function attachModelListeners(obj,propNames)
+            % Call this method to attach listeners to aggregated /
+            % nested models that are handle class
+
+            arguments
+                obj (1,1) wt.model.BaseModel
+                propNames (1,:) string
+            end
+                
+            % Preallocate array of listeners
+            newListeners = event.listener.empty(0,1);
+
+            % Loop on each property requested, in case of multiple
+            % properties having aggregated handle objects
+            for thisProp = propNames
+
+                % Get the model(s) to listen to
+                aggregatedObjects = obj.(thisProp);
+
+                % Skip this property if empty
+                if isempty(aggregatedObjects)
+                    continue
+                end
+
+                % These objects must be handle!
+                allAreHandle = all(isa(aggregatedObjects,'handle'));
+                assert(allAreHandle,...
+                    "Expected %s to contain a handle class object.",...
+                    thisProp);
+
+                % Clear any invalid objects
+                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
+
+                % Create listener to property changes within the model(s)
+                newPropListeners = listener(aggregatedObjects,...
+                'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
+
+                % newPropListeners = listener(aggregatedObjects,...
+                % 'PropertyChanged',@(src,evt)notify(obj,"PropertyChanged",evt));
+                
+                % Create listener to nested/aggregated models inside the
+                % model(s)
+                newModelListeners = listener(aggregatedObjects,...
+                'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
+
+                % newModelListeners = listener(aggregatedObjects,...
+                % 'ModelChanged',@(src,evt)notify(obj,"ModelChanged",evt));
+
+                % Gather the new listeners together
+                newListeners = vertcat(newPropListeners(:), newModelListeners(:));
+
+            end %for
+
+            % Store the results
+            obj.AggregatedModelListeners = newListeners';
+
+        end %function
+
+
         % This method is similar to
         % matlab.io.internal.mixin.HasPropertiesAsNVPairs, but this one
         % generally performs faster.
@@ -132,6 +197,25 @@ classdef (Abstract) BaseModel < handle & ...
             
             evt = wt.eventdata.PropertyChangedData(e.Source.Name, obj.(e.Source.Name));
             obj.notify('PropertyChanged',evt)
+            
+        end %function
+        
+        
+        function onAggregatedPropertyChanged(obj,e)
+            
+            evt = wt.eventdata.ModelChangedData(...
+                e.Source, e.Property, e.Value, {e.Source});
+            obj.notify('ModelChanged',evt)
+            
+        end %function
+        
+        
+        function onAggregatedModelChanged(obj,e)
+            
+            stack = horzcat({e.Source}, e.Stack);
+            evt = wt.eventdata.ModelChangedData(...
+                e.Model, e.Property, e.Value, stack);
+            obj.notify('ModelChanged',evt)
             
         end %function
         
