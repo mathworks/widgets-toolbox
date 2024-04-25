@@ -61,8 +61,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
             app.Toolbar.Section = [fileSection, exhibitSection];
 
             % Create navigation tree
-            app.Tree = uitree(app.Grid,...
-                "SelectionChangedFcn",@(~,evt)onTreeSelection(app,evt));
+            app.Tree = uitree(app.Grid);
+            app.Tree.SelectionChangedFcn = @(~,evt)onTreeSelection(app,evt);
+            app.Tree.FontSize = 14;
             app.Tree.Layout.Row = 2;
             app.Tree.Layout.Column = 1;
 
@@ -98,6 +99,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
                 exhNode = uitreenode(app.Tree,...
                     "Text","Exhibit: " + exhibit.Name,...
+                    "Icon","exhibit.png",...
                     "NodeData",exhibit);
 
                 % Add enclosure nodes within this exhibit
@@ -105,6 +107,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
                     encNode = uitreenode(exhNode,...
                         "Text","Enclosure: " + enclosure.Name,...
+                        "Icon","enclosure.png",...
                         "NodeData",enclosure);
 
                     % Add animal nodes within this enclosure
@@ -112,6 +115,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
                         uitreenode(encNode,...
                             "Text","Animal: " + animal.Name,...
+                            "Icon","animal.png",...
                             "NodeData",animal);
 
                     end %for
@@ -138,7 +142,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function onModelChanged(app,evt)
 
-            disp("app.onModelChanged");
+            disp("app.onModelChanged called with event data:");
             disp(evt);
 
         end %function
