@@ -135,7 +135,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         end %function
 
-        
+
         function onModelChanged(app,evt)
 
             disp("app.onModelChanged");
@@ -228,7 +228,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                     app.Session.Exhibit(end+1) = newItem;
 
                     % Indicate the new exhibit should be selected at the next update
-                    app.NewSelection = newItem;
+                    % app.NewSelection = newItem;
 
                 case 'Delete'
 

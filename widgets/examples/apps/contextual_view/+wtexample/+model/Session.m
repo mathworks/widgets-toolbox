@@ -1,14 +1,6 @@
 classdef Session < wt.model.BaseSession
     % Implements the session class for the app
 
-    % %% Events
-    % events
-    % 
-    %     % Triggered on Exhibit model being modified
-    %     ModelChanged
-    % 
-    % end %events
-
 
     %% Public Properties
     properties (SetObservable)
@@ -29,50 +21,6 @@ classdef Session < wt.model.BaseSession
             obj.attachModelListeners("Exhibit");
         end
     end %methods
-
-
-    % %% Private Properties
-    % properties (Access = private)
-    % 
-    %     % Listen to changes in nested handle classes
-    %     ExhibitChangedListeners
-    % 
-    % end %properties
-    
-    
-    
-    %% Constructor
-    % methods
-    %     function obj = Session(varargin)
-    %         % Constructor
-    % 
-    %         % Create listeners to exhibit changes
-    %         obj.createPropListeners();
-    % 
-    %     end %function
-    % end %methods
-
-
-    
-    %% Private Methods
-    % methods (Access = private)
-    % 
-    %     function onExhibitChanged_private(obj,evt)
-    % 
-    %         % Notify event to fire
-    %         obj.notify("ExhibitChanged", evt)
-    % 
-    %     end %function
-    % 
-    % 
-    %     function attachExhibitListeners(obj)
-    % 
-    %         obj.ExhibitChangedListeners = event.listener(obj.Exhibit,...
-    %             'PropertyChanged',@(src,evt)onExhibitChanged_private(obj,evt));
-    % 
-    %     end %function
-    % 
-    % end %methods
 
 
 

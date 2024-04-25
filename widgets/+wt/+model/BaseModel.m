@@ -8,7 +8,7 @@ classdef (Abstract) BaseModel < handle & ...
     %     to enable apps/widgets to listen to model changes
     %    
 
-    % Copyright 2020-2023 The MathWorks, Inc.
+    % Copyright 2020-2024 The MathWorks, Inc.
     
 
     
