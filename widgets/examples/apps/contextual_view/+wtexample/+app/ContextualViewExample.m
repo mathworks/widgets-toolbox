@@ -125,7 +125,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
             end %for
 
             % Expand the top level
-            expand(app.Tree)
+            % expand(app.Tree)
 
             % If a new selection is requested, change it now
             % if isscalar(app.NewSelection) && isvalid(app.NewSelection)

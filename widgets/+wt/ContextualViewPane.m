@@ -58,12 +58,14 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         function value = get.LoadedViews(obj)
             value = obj.LoadedViews;
             % Remove any deleted views from the list
-            value(~isvalid(value)) = [];
+            keepItems = arrayfun(@isvalid, value);
+            value(~keepItems) = [];
         end
 
         function set.LoadedViews(obj,value)
             % Remove any deleted views from the list
-            value(~isvalid(value)) = [];
+            keepItems = arrayfun(@isvalid, value);
+            value(~keepItems) = [];
             obj.LoadedViews = value;
         end
 
@@ -101,17 +103,24 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
-        % function launchViewByModelClassRule(obj, model)
-        %     % Launch view type automatically based on class of model provided
-        %
-        %     arguments
-        %         obj (1,1) wt.ContextualViewPane
-        %         model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
-        %     end
-        %
-        %
-        %
-        % end %function
+        function reset(obj)
+            % Reset the control by deactivating current view and delete loaded views
+
+            % Deactivate any active view
+            obj.deactivateView_Private();
+
+            % Delete any loaded views
+            delete(obj.LoadedViews);
+            obj.LoadedViews(:) = [];
+
+            % Delete any orphaned children
+            delete(obj.Grid.Children);
+
+            % Reset the layout state
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {'1x'};
+
+        end %function
 
     end %methods
 
@@ -217,10 +226,21 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 obj.LoadedViews = vertcat(obj.LoadedViews, view);
 
             catch err
+
+                % Clean up partially loaded children
+                delete(obj.Grid.Children(2:end))
+
+                % Throw an error
                 message = sprintf("Error launching view (%s).\n\n%s",...
                     viewClass, err.message);
                 obj.throwError(message);
-            end
+
+                % Deactivate current pane
+                obj.deactivateView_Private();
+
+                return
+
+            end %try
 
             % Activate the view
             obj.activateView_Private(view, model)
@@ -257,11 +277,6 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 obj.attachModel_Private(view, model)
             end
 
-            % % Deactivate the view, removing model and parent
-            % oldView.Parent(:) = [];
-            % oldView.Visible = false;
-            % oldView.Model(:) = [];
-
         end %function
 
 
@@ -284,7 +299,6 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Deactivate the view, removing model and parent
             view.Model(:) = [];
             view.Parent(:) = [];
-            view.Visible = false;
 
             % Remove view from the active view property
             if isequal(obj.ActiveView, view)
