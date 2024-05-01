@@ -1,0 +1,150 @@
+classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.Enableable & wt.mixin.FontStyled &...
+        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
+        wt.mixin.PropertyViewable & wt.mixin.Tooltipable
+
+    % Pair of numeric edit fields for range selection
+
+    % Copyright 2024 The MathWorks Inc.
+
+
+
+    %RJ - Need unit tests
+    %RJ - Use standard LowerLimitInclusive, etc.
+
+
+    %% Public properties
+    properties (AbortSet)
+
+        % Values of the range (min/max)
+        Value (1,2) double = [0 1]
+
+        % Optional limits of the range (min/max)
+        Limits (1,2) double = [-inf inf]
+
+        % % Is the lower limit inclusive?
+        % LowerLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
+        % 
+        % % Is the upper limit inclusive?
+        % UpperLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
+
+        % Are limits inclusive?
+        LimitsInclusive (1,2) matlab.lang.OnOffSwitchState = [true true]
+
+    end %properties
+
+
+    methods
+        function set.Value(obj,value)
+            validateattributes(value,{'double'},{'increasing'})
+            obj.Value = value;
+        end
+        function set.Limits(obj,value)
+            validateattributes(value,{'double'},{'increasing'})
+            obj.Limits = value;
+        end
+    end
+
+
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered on value changed, has companion callback
+        ValueChanged
+
+    end %events
+
+
+    %% Internal Properties
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+
+        % Grid
+        Grid (1,1) matlab.ui.container.GridLayout
+
+        % Edit fields
+        EditField (1,2) matlab.ui.control.NumericEditField
+
+    end %properties
+
+
+    %% Protected methods
+    methods (Access = protected)
+
+        function setup(obj)
+
+            % Construct Grid Layout to Manage Building Blocks
+            obj.Grid = uigridlayout(obj);
+            obj.Grid.ColumnWidth = {'1x','1x'};
+            obj.Grid.RowHeight = {'1x'};
+            obj.Grid.ColumnSpacing = 5;
+            obj.Grid.Padding = 0;
+
+            % Set default size
+            obj.Position(3:4) = [100 25];
+
+            % Create the edit field
+            obj.EditField = [...
+                uieditfield(obj.Grid,'numeric'), ...
+                uieditfield(obj.Grid,'numeric') ];
+            obj.EditField(1).UpperLimitInclusive = false;
+            obj.EditField(2).LowerLimitInclusive = false;
+            set(obj.EditField,"ValueChangedFcn",@(h,e)obj.onValueChanged(e));
+
+            % Update the internal component lists
+            obj.FontStyledComponents = obj.EditField;
+            obj.FieldColorableComponents = obj.EditField;
+            obj.EnableableComponents = obj.EditField;
+            obj.TooltipableComponents = obj.EditField;
+            obj.BackgroundColorableComponents = obj.Grid;
+
+        end %function
+
+
+        function update(obj)
+
+            % Update the edit field limits
+            obj.EditField(1).LowerLimitInclusive = obj.LimitsInclusive(1);
+            obj.EditField(1).Limits = [obj.Limits(1) obj.Value(2)];
+
+            obj.EditField(2).UpperLimitInclusive = obj.LimitsInclusive(2);
+            obj.EditField(2).Limits = [obj.Value(1) obj.Limits(2)];
+
+            % Update the edit field values
+            obj.EditField(1).Value = obj.Value(1);
+            obj.EditField(2).Value = obj.Value(2);
+
+        end %function
+
+
+        function propGroups = getPropertyGroups(obj)
+            % Override the ComponentContainer GetPropertyGroups with newly
+            % customiziable mixin. This can probably also be specific to each control.
+
+            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+
+        end %function
+
+
+
+        function onValueChanged(obj,~)
+            % Triggered on edit field interaction
+
+            % Get prior value
+            oldValue = obj.Value;
+
+            % Get new value
+            newValue = [obj.EditField.Value];
+
+            % Store new result
+            obj.Value = newValue;
+
+            % Trigger event
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+            notify(obj,"ValueChanged",evtOut);
+
+        end %function
+
+    end %methods
+
+
+end % classdef
