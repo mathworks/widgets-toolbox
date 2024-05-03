@@ -7,10 +7,9 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % Copyright 2024 The MathWorks Inc.
 
-
     %RJ - Need unit tests
-    %RJ - How to throw an error if entries have a restriction applied?
-
+    %RJ - Improve error if a restriction needs enforcement. Like display a
+    % message but still accept their input?
 
     %% Public properties
     properties (AbortSet)
@@ -69,6 +68,7 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Grid.ColumnWidth = {'1x','1x','1x'};
             obj.Grid.RowHeight = {'1x'};
             obj.Grid.ColumnSpacing = 5;
+            obj.Grid.RowSpacing = 5;
             obj.Grid.Padding = 0;
 
             % Set default size
@@ -85,19 +85,60 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
             % How many fields?
             numElements = numel(obj.Value);
             numFields = numel(obj.EditField);
-            if numFields ~= numElements
+            numRows = numel(obj.Grid.RowHeight);
+            numCols = numel(obj.Grid.ColumnWidth);
+            if numFields ~= numElements || ...
+                    numRows > 1 && numElements > 1 && obj.Orientation == "horizontal" || ...
+                    numCols > 1 && numElements > 1 && obj.Orientation == "vertical"
                 obj.createEditFields(numElements);
             end
 
-            % Update the edit field limits
-            set(obj.EditField,"LowerLimitInclusive",obj.LowerLimitInclusive)
-            set(obj.EditField,"UpperLimitInclusive",obj.UpperLimitInclusive)
-            set(obj.EditField,"Limits",obj.Limits)
-
-            % Update the edit field values
+            % Loop on each edit field to update it
             for idx = 1:numElements
+
+                % Update the edit fields values
                 obj.EditField(idx).Value = obj.Value(idx);
-            end
+
+                % Caculate limits
+                lowerLimit = obj.Limits(1);
+                upperLimit = obj.Limits(2);
+                lowerLimitInclusive = obj.LowerLimitInclusive;
+                upperLimitInclusive = obj.UpperLimitInclusive;
+
+                switch (obj.Restriction)
+
+                    case wt.enum.ArrayRestriction.increasing
+
+                        if idx > 1
+                            lowerLimit = obj.Value(idx-1);
+                            lowerLimitInclusive = false;
+                        end
+
+                        if idx < numElements
+                            upperLimit = obj.Value(idx+1);
+                            upperLimitInclusive = false;
+                        end
+
+                    case wt.enum.ArrayRestriction.decreasing
+
+                        if idx > 1
+                            upperLimit = obj.Value(idx-1);
+                            upperLimitInclusive = false;
+                        end
+
+                        if idx < numElements
+                            lowerLimit = obj.Value(idx+1);
+                            lowerLimitInclusive = false;
+                        end
+
+                end %switch
+
+                % Apply restrictions
+                obj.EditField(idx).Limits = [lowerLimit upperLimit];
+                obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
+                obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
+
+            end %for
 
         end %function
 

@@ -8,9 +8,9 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
     % Copyright 2024 The MathWorks Inc.
 
 
-
     %RJ - Need unit tests
-    %RJ - Use standard LowerLimitInclusive, etc.
+    %RJ - Improve error if a restriction needs enforcement. Like display a
+    % message but still accept their input?
 
 
     %% Public properties
@@ -22,14 +22,11 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
         % Optional limits of the range (min/max)
         Limits (1,2) double = [-inf inf]
 
-        % % Is the lower limit inclusive?
-        % LowerLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
-        % 
-        % % Is the upper limit inclusive?
-        % UpperLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
+        % Is the lower limit inclusive?
+        LowerLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
 
-        % Are limits inclusive?
-        LimitsInclusive (1,2) matlab.lang.OnOffSwitchState = [true true]
+        % Is the upper limit inclusive?
+        UpperLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
 
     end %properties
 
@@ -103,10 +100,10 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
         function update(obj)
 
             % Update the edit field limits
-            obj.EditField(1).LowerLimitInclusive = obj.LimitsInclusive(1);
+            obj.EditField(1).LowerLimitInclusive = obj.LowerLimitInclusive;
             obj.EditField(1).Limits = [obj.Limits(1) obj.Value(2)];
 
-            obj.EditField(2).UpperLimitInclusive = obj.LimitsInclusive(2);
+            obj.EditField(2).UpperLimitInclusive = obj.UpperLimitInclusive;
             obj.EditField(2).Limits = [obj.Value(1) obj.Limits(2)];
 
             % Update the edit field values
