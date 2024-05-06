@@ -8,6 +8,8 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
     % Copyright 2024 The MathWorks Inc.
 
     %RJ - Need unit tests
+    %RJ - need to limit max array size and incorporate pagination or
+    %similar
     %RJ - Improve error if a restriction needs enforcement. Like display a
     % message but still accept their input?
 

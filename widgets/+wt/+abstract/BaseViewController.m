@@ -71,6 +71,20 @@ classdef BaseViewController < ...
         end %function
     end %methods
 
+    
+    %% Debugging Methods
+    methods
+        
+        function forceUpdate(obj)
+            % Forces update to run (For debugging only!)
+
+            disp("DEBUG: Forcing update for " + class(obj));
+            obj.update();
+
+        end %function
+        
+    end %methods
+
 
     %% Protected Methods
     methods (Access = protected)
@@ -138,6 +152,9 @@ classdef BaseViewController < ...
             end
 
             newValue = evt.Value;
+            if ~isscalar(newValue) && isscalar(obj.Model.(fieldName)(index))
+                newValue = newValue(index);
+            end
             obj.Model.(fieldName)(index) = newValue;
 
         end %function

@@ -123,7 +123,7 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
 
-        function onValueChanged(obj,~)
+        function onValueChanged(obj,evt)
             % Triggered on edit field interaction
 
             % Get prior value
@@ -131,12 +131,14 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Get new value
             newValue = [obj.EditField.Value];
+            index = find(evt.Source == obj.EditField, 1);
 
             % Store new result
             obj.Value = newValue;
 
             % Trigger event
-            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue,...
+                "Index", index);
             notify(obj,"ValueChanged",evtOut);
 
         end %function
