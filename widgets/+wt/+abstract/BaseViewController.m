@@ -1,8 +1,5 @@
 classdef BaseViewController < ...
-        matlab.ui.componentcontainer.ComponentContainer %& ...
-    % wt.mixin.BackgroundColorable & ...
-    % wt.mixin.PropertyViewable & ...
-    % wt.mixin.ErrorHandling
+        matlab.ui.componentcontainer.ComponentContainer
     % Base class for views/controllers referencing a BaseModel class
 
 
@@ -13,13 +10,6 @@ classdef BaseViewController < ...
         Model wt.model.BaseModel
 
     end %properties
-
-    % methods
-    %     function set.Model(obj,value)
-    %         obj.Model = value;
-    %         obj.attachModelListener();
-    %     end
-    % end
 
 
     %% Internal Properties
@@ -137,6 +127,12 @@ classdef BaseViewController < ...
         end %function
 
 
+        function attachModelListener_BVC(obj)
+            obj.ModelPropertyChangedListener_BVC = listener(obj.Model,...
+                "PropertyChanged", @(~,~)requestUpdate(obj));
+        end
+
+
         function onFieldEdited(obj,evt,fieldName,index)
             % This is a generic callback that simple controls may use For
             % example, the ValueChangedFcn for an edit field may call this
@@ -160,15 +156,5 @@ classdef BaseViewController < ...
         end %function
 
     end %methods
-
-
-
-    %% Private methods
-    methods (Access = private)
-        function attachModelListener_BVC(obj)
-            obj.ModelPropertyChangedListener_BVC = listener(obj.Model,...
-                "PropertyChanged", @(~,~)requestUpdate(obj));
-        end
-    end
 
 end %classdef
