@@ -38,7 +38,7 @@ classdef (Abstract) BaseWidget < ...
     properties (Transient, Access = private)
         
         % Flag to indicate earlier release (to be updated during setup)
-        IsPre21a (1,1) logical = verLessThan('matlab','9.10')
+        IsPre21a (1,1) logical = isMATLABReleaseOlderThan("R2021a")
         
     end %properties
 

@@ -317,12 +317,16 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function selIdx = getListBoxSelectedIndex(obj)
             % Get the current selected row indices in the listbox
 
-            warnState = warning('off','MATLAB:structOnObject');
-            s = struct(obj.ListBox);
-            warning(warnState);
-            selIdx = s.SelectedIndex;
-            if isequal(selIdx, -1)
-                selIdx = [];
+            if isMATLABReleaseOlderThan("R2023b")
+                warnState = warning('off','MATLAB:structOnObject');
+                s = struct(obj.ListBox);
+                warning(warnState);
+                selIdx = s.SelectedIndex;
+                if isequal(selIdx, -1)
+                    selIdx = [];
+                end
+            else
+                selIdx = obj.ListBox.ValueIndex;
             end
 
         end %function
