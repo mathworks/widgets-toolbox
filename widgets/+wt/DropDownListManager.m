@@ -25,8 +25,8 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
     %% Public properties
     properties (AbortSet, Dependent, UsedInUpdate = false)
 
-        % Index of displayed items that are currently added to the list
-        ValueIndex {mustBeNonnegative, mustBeInteger, mustBeScalarOrEmpty}
+        % Index of selected list item
+        Index {mustBeNonnegative, mustBeInteger, mustBeScalarOrEmpty}
 
         % The current selection
         Value (1,:)
@@ -77,7 +77,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.DropDown.ItemsData = 1:numel(value);
         end
 
-        function value = get.ValueIndex(obj)
+        function value = get.Index(obj)
             if isMATLABReleaseOlderThan("R2023b")
                 warnState = warning('off','MATLAB:structOnObject');
                 s = struct(obj.DropDown);
@@ -88,7 +88,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             end
         end
 
-        function set.ValueIndex(obj,value)
+        function set.Index(obj,value)
             if isMATLABReleaseOlderThan("R2023b")
                 obj.DropDown.Value = obj.DropDown.ItemsData(value);
             else
@@ -155,8 +155,8 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         ListButtons wt.ButtonGrid
 
         % Buttons
-        AddButton matlab.ui.control.StateButton
-        RenameButton matlab.ui.control.StateButton
+        AddButton matlab.ui.control.Button
+        RenameButton matlab.ui.control.Button
         RemoveButton matlab.ui.control.Button
 
         % Listen to button pushes in sections
@@ -199,19 +199,19 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.EditField.Visible = false;
 
             % Create the buttons
-            obj.AddButton = uibutton(obj.Grid,'state');
+            obj.AddButton = uibutton(obj.Grid);
             obj.AddButton.Icon = "addYellow_24.png";
             obj.AddButton.Text = "";
             obj.AddButton.Layout.Column = 2;
             obj.AddButton.Layout.Row = 1;
-            obj.AddButton.ValueChangedFcn = @(src,evt)obj.onAddButton(evt);
+            obj.AddButton.ButtonPushedFcn = @(src,evt)obj.onAddButton();
 
-            obj.RenameButton = uibutton(obj.Grid,'state');
+            obj.RenameButton = uibutton(obj.Grid);
             obj.RenameButton.Icon = "edit_24.png";
             obj.RenameButton.Text = "";
             obj.RenameButton.Layout.Column = 3;
             obj.RenameButton.Layout.Row = 1;
-            obj.RenameButton.ValueChangedFcn = @(src,evt)obj.onRenameButton(evt);
+            obj.RenameButton.ButtonPushedFcn = @(src,evt)obj.onRenameButton();
 
             obj.RemoveButton = uibutton(obj.Grid);
             obj.RemoveButton.Icon = "delete_24.png";
@@ -220,170 +220,101 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.RemoveButton.Layout.Row = 1;
             obj.RemoveButton.ButtonPushedFcn = @(src,~)obj.onRemoveButton();
 
-            % Update listeners
-            % obj.ButtonPushedListener = event.listener(...
-            %     [obj.AddButton, obj.RemoveButton],...
-            %     'ButtonPushed',@(h,e)obj.onButtonPushed(e) );
-
             % Update the internal component lists
             % obj.BackgroundColorableComponents = [obj.AddButton, obj.RemoveButton, obj.Grid];
-            % obj.FontStyledComponents = [obj.DropDown];
-            obj.EnableableComponents = [obj.DropDown, obj.AddButton, obj.RenameButton, obj.RemoveButton];
+            % obj.FontStyledComponents = [obj.DropDown, obj.EditField];
             % obj.ButtonColorableComponents = [obj.AddButton, obj.RemoveButton];
-            % obj.FieldColorableComponents = [obj.DropDown];
+            % obj.FieldColorableComponents = [obj.DropDown, obj.EditField];
 
         end %function
 
 
         function update(obj)
 
-            disp('update start')
-
+            % Toggle between dropdown and edit field
             isEditMode = obj.IsAddingNewItem || obj.IsRenamingItem;
             obj.EditField.Visible = isEditMode;
             obj.DropDown.Visible = ~isEditMode;
 
-            % obj.AddButton.Value = obj.IsAddingNewItem;
-            % obj.RenameButton.Value = obj.IsRenamingItem;
-            % Update the list
-            % obj.DropDown.Items = obj.Items;
-            % obj.DropDown.ItemsData = 1:numel(obj.Items);
-
             % Update button enable states
-            obj.updateButtonEnables();
-
-            disp('update end');
+            obj.updateEnableableComponents();
 
         end %function
 
-
-        % function updateEnables(obj)
-        %
-        %     % Toggle button enables
-        %     hasEntries = obj.Enable && ~isempty(obj.Items);
-        %     obj.AddButton.Enable = hasEntries;
-        %     obj.RemoveButton.Enable = hasEntries;
-        %
-        % end %function
 
         function onEditFieldChanged(obj,evt)
+            % Triggered when editing in edit field mode
 
-            disp(evt);
-
-        end %function
-
-
-        function onValueChanged(obj,evt)
-
-
-            % What action was taken?
-            if evt.Edited && obj.IsAddingNewItem
-
-                % Data for this event
-                action = "Added";
-                valueIndex = numel(obj.Items) + 1;
-                item = string(evt.Value);
-                value = [];
-
-                % Add the new item to the list and select it
-                obj.Items(valueIndex) = item;
-                obj.ValueIndex = valueIndex;
-
-                % Toggle new item mode OFF
-                obj.IsAddingNewItem = false;
-                obj.AddButton.Value = false;
-                obj.DropDown.Editable = false;
-
-            elseif evt.Edited && obj.IsRenamingItem
-
-                % If previous value is not an integer, a prior callback
-                % likely failed. Unable to determine what changed, so
-                % cancel the edit.
-                if ischar(evt.PreviousValue) || ...
-                        ~isscalar(evt.PreviousValue) || ...
-                        evt.PreviousValue < 1
-                    obj.IsRenamingItem = false;
-                    obj.RenameButton.Value = false;
-                    obj.DropDown.Editable = false;
-                    return
-                end
+            if obj.IsRenamingItem
 
                 % Data for this event
                 action = "Renamed";
-                valueIndex = evt.PreviousValue;
-                item = evt.Value;
-                value = obj.getItemDataByIndex(valueIndex);
+                item = string(evt.Value);
+                index = obj.Index;
+                data = obj.getItemDataByIndex(index);
 
                 % Update the list item and select it
-                obj.Items(valueIndex) = item;
-                obj.ValueIndex = valueIndex;
+                obj.Items(index) = item;
+                obj.Index = index;
 
-                % Toggle new item mode OFF
+                % Toggle mode OFF
                 obj.IsRenamingItem = false;
-                obj.RenameButton.Value = false;
-                obj.DropDown.Editable = false;
-                drawnow
 
-            elseif evt.Edited
-
-                % Some internal failure occurred, such as a prior callback
-                % erroring or debugging stopped abruptly. Cancel the edit
-                % gracefully.
-                obj.IsAddingNewItem = false;
-                obj.AddButton.Value = false;
-                obj.IsRenamingItem = false;
-                obj.RenameButton.Value = false;
-                obj.DropDown.Editable = false;
-                return
-
-            else
+            elseif obj.IsAddingNewItem
 
                 % Data for this event
-                action = "Selected";
-                valueIndex = evt.Value;
-                item = obj.Items(valueIndex);
-                value = obj.getItemDataByIndex(valueIndex);
+                action = "Added";
+                item = string(evt.Value);
+                index = numel(obj.Items) + 1;
+                data = [];
 
-            end
+                % Add the new item to the list and select it
+                obj.Items(index) = item;
+                obj.Index = index;
+
+                % Toggle mode OFF
+                obj.IsAddingNewItem = false;
+
+            else
+                % Should not get here
+
+                % Toggle mode OFF
+                obj.IsRenamingItem = false;
+                obj.IsAddingNewItem = false;
+
+                % Exit
+                return
+
+            end %if
 
             % Prepare event data
             evtOut = wt.eventdata.ListManagerEventData();
             evtOut.Action = action;
             evtOut.Item = item;
-            evtOut.Value = value;
-            evtOut.ValueIndex = valueIndex;
+            evtOut.ItemData = data;
+            evtOut.Index = index;
+
+            % Notify listeners
+            notify(obj,"ItemsChanged",evtOut);
+
+        end %function
+
+
+        function onValueChanged(obj,evt)
+            % Triggered on dropdown selection
+
+            % Prepare event data
+            evtOut = wt.eventdata.ListManagerEventData();
+            evtOut.Action = "Selected";
+            evtOut.Item = obj.Items(evt.Value);
+            evtOut.ItemData = obj.getItemDataByIndex(evt.Value);
+            evtOut.Index = evt.Value;
 
             % Notify listeners
             notify(obj,"ItemsChanged",evtOut);
 
             % Update button enable states
-            obj.updateButtonEnables();
-
-            % % Get the new and old values
-            % if isempty(obj.ItemsData)
-            %     itemsData = obj.Items;
-            % else
-            %     itemsData = obj.ItemsData;
-            % end
-            %
-            % if isempty(evt.PreviousValue)
-            %     oldValue = itemsData([]);
-            % else
-            %     oldValue = itemsData(evt.PreviousValue);
-            % end
-            %
-            % if isempty(evt.Value)
-            %     newValue = itemsData([]);
-            % else
-            %     newValue = itemsData(evt.Value);
-            % end
-            %
-            % % Update button enable states
-            % obj.updateEnables();
-            %
-            % % Trigger event
-            % evtOut = wt.eventdata.ValueChangedData(newValue, oldValue);
-            % notify(obj,"HighlightedValueChanged",evtOut);
+            obj.updateEnableableComponents();
 
         end %function
 
@@ -391,13 +322,9 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         function data = getItemDataByIndex(obj,index)
             % Retrieve the ItemsData value for a given index
 
-            items = obj.Items;
             itemsData = obj.ItemsData;
-            if ~isnumeric(index) || ~isscalar(index)
-                data = [];
-            elseif isempty(itemsData)
-                data = string(items(index));
-            elseif index <= numel(itemsData)
+            if isnumeric(index) && isscalar(index) && ...
+                    index <= numel(itemsData)
                 data = itemsData(index);
             else
                 data = [];
@@ -406,171 +333,84 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         end %function
 
 
-        % function [valueIndex, item, value, edited] = parseEventData(obj, evt)
-        %     % Extract the relevant info from eventdata
-        %
-        %     % Was an item edited?
-        %     edited = evt.Edited;
-        %
-        %     % Get existing data
-        %     items = obj.Items;
-        %     itemsData = obj.ItemsData;
-        %
-        %     % Get value index
-        %     if edited && ischar(evt.PreviousValue) && obj.IsAddingNewItem
-        %
-        %         % Assume we're adding a new one
-        %         valueIndex = numel(items) + 1;
-        %
-        %     elseif isMATLABReleaseOlderThan("R2023b")
-        %         warnState = warning('off','MATLAB:structOnObject');
-        %         s = struct(obj.ListBox);
-        %         warning(warnState);
-        %         valueIndex = s.SelectedIndex;
-        %     else
-        %         valueIndex = evt.ValueIndex;
-        %     end
-        %
-        %     if isequal(valueIndex, -1)
-        %         valueIndex = [];
-        %     end
-        %
-        %     % Get item
-        %     if edited
-        %         item = string(evt.Value);
-        %     else
-        %         item = items(valueIndex);
-        %     end
-        %
-        %     % Get value
-        %     if ~isnumeric(valueIndex) || ~isscalar(valueIndex)
-        %         value = [];
-        %     elseif isempty(itemsData)
-        %         value = items(valueIndex);
-        %     elseif valueIndex <= numel(itemsData)
-        %         value = itemsData(valueIndex);
-        %     else
-        %         value = [];
-        %     end
-        %
-        % end %function
-
-
-        function onAddButton(obj,evt)
-
-            % Confirm existing mode
-            if obj.IsAddingNewItem || ~evt.Value
-
-                % Toggle mode off
-                obj.IsAddingNewItem = false;
-                obj.DropDown.Editable = false;
-                drawnow
-
-            elseif evt.Value
+        function onAddButton(obj)
 
                 % Toggle mode ON
                 obj.IsAddingNewItem = true;
 
-                % Put the dropdown into new mode
-                obj.DropDown.Editable = true;
-                obj.DropDown.Value = obj.NewItemName;
-                obj.DropDown.focus();
+                % Configure the edit field
+                obj.EditField.Value = obj.NewItemName;
                 drawnow
-
-            end
-
-            % Update button enable states
-            obj.updateButtonEnables();
+                obj.EditField.focus();
 
         end %function
 
 
-        function onRenameButton(obj,evt)
+        function onRenameButton(obj)
 
-            % isRen = obj.IsRenamingItem
-            % evt
-            % obj.RenameButton.Value
-
-            % Confirm existing mode
-            if obj.IsRenamingItem %|| ~evt.Value
-                disp('make off');
-                % Toggle mode off
-                obj.IsRenamingItem = false;
-                obj.DropDown.Editable = false;
-                drawnow
-
-            elseif evt.Value
-                disp('make on');
                 % Toggle mode ON
                 obj.IsRenamingItem = true;
+                
+                % Get the item being edited
+                item = obj.Items(obj.Index);
 
-                item = obj.Items(obj.ValueIndex);
+                % Configure the edit field
                 obj.EditField.Value = item;
                 drawnow
                 obj.EditField.focus();
-
-                % Put the dropdown into new mode
-                % obj.DropDown.Editable = true;
-                % obj.DropDown.focus();
-                % drawnow
-
-            end
-
-            % Update button enable states
-            obj.updateButtonEnables();
 
         end %function
 
 
         function onRemoveButton(obj)
+            % Removes selcted item
 
-            disp("onRemoveButton");
+                % What is removed?
+                valIdx = obj.Index;
+                removedItem = obj.Items(valIdx);
+                removedValue = obj.Value;
 
-            % What is removed?
-            valIdx = obj.ValueIndex;
-            removedItem = obj.Items(valIdx);
-            removedValue = obj.Value;
+                % Remove the item from the list
+                obj.Items(valIdx) = [];
 
-            disp(removedItemName)
+                % Prepare event data
+                evtOut = wt.eventdata.ListManagerEventData();
+                evtOut.Action = "Removed";
+                evtOut.Item = removedItem;
+                evtOut.ItemData = removedValue;
+                evtOut.Index = valIdx;
 
-            % Remove the item from the list
-            obj.Items(valIdx) = [];
-
-            % Prepare event data
-            evtOut = wt.eventdata.ListManagerEventData();
-            evtOut.Action = "Removed";
-            evtOut.Item = removedItem;
-            evtOut.Value = removedValue;
-            evtOut.ValueIndex = valIdx;
-
-            % Notify listeners
-            notify(obj,"ItemsChanged",evtOut);
+                % Notify listeners
+                notify(obj,"ItemsChanged",evtOut);
 
         end %function
 
 
-        function updateButtonEnables(obj)
+        function updateEnableableComponents(obj)
             % Update button visibilities
 
             % What item is selected?
-            valIdx = obj.ValueIndex;
-            itemSelected = isscalar(valIdx);
+            hasEntries = ~isempty(obj.Items);
+            valIdx = obj.Index;
 
             % Can we add an item?
-            canAddItem = obj.Enable && ~obj.IsRenamingItem;
+            isEditMode = obj.IsAddingNewItem || obj.IsRenamingItem;
+            canAddItem = obj.Enable && ~isEditMode;
 
             % Can we rename or remove given the current selection?
-            canRenameItem = obj.Enable && itemSelected && ...
-                obj.AllowItemRename(valIdx) && ...
-                ~obj.IsAddingNewItem;
-            canRemoveItem = obj.Enable && itemSelected && ...
-                obj.AllowItemRemove(valIdx) && ...
-                ~obj.IsRenamingItem;
+            canRenameItem = obj.Enable && hasEntries && ...
+                obj.AllowItemRename(valIdx) && ~isEditMode;
+            canRemoveItem = obj.Enable && hasEntries && ...
+                obj.AllowItemRemove(valIdx) && ~isEditMode;
 
             % Update buttons
             obj.AddButton.Enable = canAddItem;
             obj.RenameButton.Enable = canRenameItem;
             obj.RemoveButton.Enable = canRemoveItem;
+
+            % Update fields
+            obj.EditField.Enable = obj.Enable;
+            obj.DropDown.Enable = obj.Enable && hasEntries;
 
         end %function
 
