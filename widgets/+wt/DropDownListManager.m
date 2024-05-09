@@ -13,9 +13,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
 
-        % Triggered when a button is pushed
-        % ButtonPushed
-
         % Triggered when the value of the list selection changes
         ItemsChanged
 
@@ -60,7 +57,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         AllowItemRename (1,:) logical
 
         % List of items to add to the list
-        NewItemName (1,1) string = "New Item"
+        NewItemName (1,1) string = "<New Item>"
 
     end %properties
 
@@ -159,8 +156,8 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         RenameButton matlab.ui.control.Button
         RemoveButton matlab.ui.control.Button
 
-        % Listen to button pushes in sections
-        ButtonPushedListener event.listener
+        % Listeners to enable editing to stop
+        StopEditingListeners event.listener
 
     end %properties
 
@@ -186,14 +183,14 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.DropDown = uidropdown(obj.Grid);
             obj.DropDown.Items ={'Item One','Item Two'};
             obj.DropDown.ItemsData = [1 2];
-            obj.DropDown.ValueChangedFcn = @(h,e)obj.onValueChanged(e);
+            obj.DropDown.ValueChangedFcn = @(~,evt)obj.onValueChanged(evt);
             obj.DropDown.Layout.Column = 1;
             obj.DropDown.Layout.Row = 1;
 
             % Create the EditField
             obj.EditField = uieditfield(obj.Grid);
             obj.EditField.Value = "";
-            obj.EditField.ValueChangedFcn = @(h,e)obj.onEditFieldChanged(e);
+            obj.EditField.ValueChangedFcn = @(~,evt)obj.onEditFieldChanged(evt);
             obj.EditField.Layout.Column = 1;
             obj.EditField.Layout.Row = 1;
             obj.EditField.Visible = false;
@@ -204,21 +201,21 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.AddButton.Text = "";
             obj.AddButton.Layout.Column = 2;
             obj.AddButton.Layout.Row = 1;
-            obj.AddButton.ButtonPushedFcn = @(src,evt)obj.onAddButton();
+            obj.AddButton.ButtonPushedFcn = @(~,~)obj.onAddButton();
 
             obj.RenameButton = uibutton(obj.Grid);
             obj.RenameButton.Icon = "edit_24.png";
             obj.RenameButton.Text = "";
             obj.RenameButton.Layout.Column = 3;
             obj.RenameButton.Layout.Row = 1;
-            obj.RenameButton.ButtonPushedFcn = @(src,evt)obj.onRenameButton();
+            obj.RenameButton.ButtonPushedFcn = @(~,~)obj.onRenameButton();
 
             obj.RemoveButton = uibutton(obj.Grid);
             obj.RemoveButton.Icon = "delete_24.png";
             obj.RemoveButton.Text = "";
             obj.RemoveButton.Layout.Column = 4;
             obj.RemoveButton.Layout.Row = 1;
-            obj.RemoveButton.ButtonPushedFcn = @(src,~)obj.onRemoveButton();
+            obj.RemoveButton.ButtonPushedFcn = @(~,~)obj.onRemoveButton();
 
             % Update the internal component lists
             % obj.BackgroundColorableComponents = [obj.AddButton, obj.RemoveButton, obj.Grid];
@@ -235,6 +232,11 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             isEditMode = obj.IsAddingNewItem || obj.IsRenamingItem;
             obj.EditField.Visible = isEditMode;
             obj.DropDown.Visible = ~isEditMode;
+
+            % Remove any listeners if no longer editing
+            if ~isEditMode
+                obj.StopEditingListeners(:) = [];
+            end
 
             % Update button enable states
             obj.updateEnableableComponents();
@@ -253,6 +255,9 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 index = obj.Index;
                 data = obj.getItemDataByIndex(index);
 
+                % Strip off any whitespace
+                item = strip(item);
+
                 % Update the list item and select it
                 obj.Items(index) = item;
                 obj.Index = index;
@@ -267,6 +272,9 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 item = string(evt.Value);
                 index = numel(obj.Items) + 1;
                 data = [];
+
+                % Strip off any whitespace
+                item = strip(item);
 
                 % Add the new item to the list and select it
                 obj.Items(index) = item;
@@ -343,6 +351,10 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 drawnow
                 obj.EditField.focus();
 
+                % Attach figure listeners to stop editing in special
+                % circumstances
+                obj.attachStopEditingListeners();
+
         end %function
 
 
@@ -359,29 +371,90 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 drawnow
                 obj.EditField.focus();
 
+                % Attach figure listeners to stop editing in special
+                % circumstances
+                obj.attachStopEditingListeners();
+
         end %function
 
 
         function onRemoveButton(obj)
             % Removes selcted item
 
-                % What is removed?
-                valIdx = obj.Index;
-                removedItem = obj.Items(valIdx);
-                removedValue = obj.Value;
+                % Data for this event
+                action = "Removed";
+                index = obj.Index;
+                item = obj.Items(index);
+                data = obj.getItemDataByIndex(index);
 
                 % Remove the item from the list
-                obj.Items(valIdx) = [];
+                obj.Items(index) = [];
+                if index <= numel(obj.ItemsData)
+                    obj.ItemsData(index) = [];
+                end
 
                 % Prepare event data
                 evtOut = wt.eventdata.ListManagerEventData();
-                evtOut.Action = "Removed";
-                evtOut.Item = removedItem;
-                evtOut.ItemData = removedValue;
-                evtOut.Index = valIdx;
+                evtOut.Action = action;
+                evtOut.Item = item;
+                evtOut.ItemData = data;
+                evtOut.Index = index;
 
                 % Notify listeners
                 notify(obj,"ItemsChanged",evtOut);
+
+        end %function
+
+
+        function attachStopEditingListeners(obj)
+            % Attach listeners to enable stop editing under special
+            % circumstances
+
+            % Find the figure
+            fig = ancestor(obj,'figure');
+            
+            % If no figure, just exit
+            if isempty(fig)
+                return
+            end
+
+            % Create listeners
+            obj.StopEditingListeners = [
+                listener(fig,"WindowKeyPress",@(src,evt)obj.onWindowKeyPress(evt))
+                listener(fig,"WindowMousePress",@(src,evt)obj.onWindowMousePress(evt))
+                ];
+
+        end %function
+
+
+        function onWindowKeyPress(obj,evt)
+            % Triggered on key presses while editing
+
+            % If the user pressed Escape, cancel editing
+            if strcmp(evt.Key, 'escape')
+
+                % Toggle mode OFF
+                obj.IsRenamingItem = false;
+                obj.IsAddingNewItem = false;
+
+            end
+            
+        end %function
+
+
+        function onWindowMousePress(obj,evt)
+            % Triggered on mouse presses while editing
+
+            % If the user clicked anywhere except the edit field, cancel
+            % editing. 
+            if ~isequal(evt.HitObject, obj.EditField)
+
+                % Toggle mode OFF
+                obj.IsRenamingItem = false;
+                obj.IsAddingNewItem = false;
+
+            end
+
 
         end %function
 

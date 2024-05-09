@@ -20,6 +20,17 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
     % Copyright 2016-2024 The MathWorks Inc.
 
 
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered when the Model has changed
+        ModelSet
+
+        % Triggered when a property within the model has changed
+        ModelChanged
+
+    end %events
+
 
     %% Internal Properties
     properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
@@ -36,6 +47,17 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
 
         % The array of views loaded into memory
         LoadedViews (:,1) wt.abstract.BaseViewController
+
+    end %properties
+
+
+    properties (Access = private)
+
+        % Listener for a new model being attached
+        ModelSetListener event.listener
+
+        % Listener for property changes within the model
+        ModelPropertyChangedListener event.listener
 
     end %properties
 
@@ -75,7 +97,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
     %% Public Methods
     methods
 
-        function launchView(obj, viewClass, model)
+        function varargout = launchView(obj, viewClass, model)
             % This method may be overloaded as needed
 
             arguments
@@ -98,6 +120,11 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 obj.instantiateView_Private(viewClass, model);
             else
                 obj.activateView_Private(view, model)
+            end
+
+            % Return the active view
+            if nargout
+                varargout{1} = obj.ActiveView;
             end
 
         end %function
@@ -276,6 +303,28 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             if ~isempty(model) && isvalid(model)
                 obj.attachModel_Private(view, model)
             end
+
+            % Listen to model changes
+            obj.ModelSetListener = listener(view,...
+                "ModelSet",@(~,evt)obj.onModelSet(evt));
+            obj.ModelPropertyChangedListener = listener(view,...
+                "ModelChanged",@(~,evt)obj.onModelChanged(evt));
+
+        end %function
+
+
+        function onModelSet(obj,evt)
+
+            % Notify listeners
+            obj.notify("ModelSet",evt);
+
+        end %function
+
+
+        function onModelChanged(obj,evt)
+
+            % Notify listeners
+            obj.notify("ModelChanged",evt);
 
         end %function
 

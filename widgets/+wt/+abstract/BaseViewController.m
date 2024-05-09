@@ -3,6 +3,18 @@ classdef BaseViewController < ...
     % Base class for views/controllers referencing a BaseModel class
 
 
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered when the Model has changed
+        ModelSet
+
+        % Triggered when a property within the model has changed
+        ModelChanged
+
+    end %events
+
+
     %% Public Properties
     properties (Abstract, AbortSet, SetObservable)
 
@@ -56,7 +68,7 @@ classdef BaseViewController < ...
 
             % Listen to Model property being set
             obj.ModelSetListener_BVC = listener(obj,"Model","PostSet",...
-                @(~,~)attachModelListener_BVC(obj));
+                @(~,~)onModelSet(obj));
 
         end %function
     end %methods
@@ -119,17 +131,32 @@ classdef BaseViewController < ...
         end %function
 
 
-        function requestUpdate(obj)
-            % Request update method to run during next drawnow
+        function onModelChanged(obj,evt)
+            % Triggered when a property within theModel has changed
 
+            % Request update method to run during next drawnow
             obj.Dirty = true;
+
+            % Notify listeners
+            notify(obj,"ModelChanged",evt)
 
         end %function
 
 
-        function attachModelListener_BVC(obj)
+        function onModelSet(obj)
+            % Triggered when Model has been changed
+
+            % Listen to model property changes
             obj.ModelPropertyChangedListener_BVC = listener(obj.Model,...
-                "PropertyChanged", @(~,~)requestUpdate(obj));
+                "PropertyChanged", @(~,evt)onModelChanged(obj,evt));
+
+            % Prepare event data
+            evtOut = wt.eventdata.ModelSetData();
+            evtOut.Model = obj.Model;
+
+            % Notify listeners
+            notify(obj,"ModelSet",evtOut)
+
         end
 
 

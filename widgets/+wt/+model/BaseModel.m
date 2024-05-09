@@ -193,29 +193,51 @@ classdef (Abstract) BaseModel < handle & ...
         end %function
         
         
-        function onPropChanged(obj,e)
+        function onPropChanged(obj,evt)
             
-            evt = wt.eventdata.PropertyChangedData(e.Source.Name, obj.(e.Source.Name));
-            obj.notify('PropertyChanged',evt)
-            
-        end %function
-        
-        
-        function onAggregatedPropertyChanged(obj,e)
-            
-            evt = wt.eventdata.ModelChangedData(...
-                e.Source, e.Property, e.Value, {e.Source});
-            obj.notify('ModelChanged',evt)
+            % Prepare eventdata
+            evtOut = wt.eventdata.ModelChangedData;
+            evtOut.Property = evt.Source.Name;
+            evtOut.Model = evt.AffectedObject;
+            evtOut.Value = evtOut.Model.(evtOut.Property);
+
+            % Notify listeners
+            obj.notify('PropertyChanged',evtOut)
             
         end %function
         
         
-        function onAggregatedModelChanged(obj,e)
+        function onAggregatedPropertyChanged(obj,evt)
             
-            stack = horzcat({e.Source}, e.Stack);
-            evt = wt.eventdata.ModelChangedData(...
-                e.Model, e.Property, e.Value, stack);
-            obj.notify('ModelChanged',evt)
+            % Prepare eventdata
+            evtOut = evt;
+            evtOut.Model = evt.AffectedObject;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evtOut.Model.(evtOut.Property);
+            evtOut.Stack = {evt.Source};
+
+            % Notify listeners
+            obj.notify('ModelChanged',evtOut)
+            
+        end %function
+        
+        
+        function onAggregatedModelChanged(obj,evt)
+            
+            % stack = horzcat({evt.Source}, evt.Stack);
+            % 
+            % evtOut = wt.eventdata.ModelChangedData(...
+            %     evt.Model, evt.Property, evt.Value, stack);
+            
+            % Prepare eventdata
+            evtOut = evt;
+            evtOut.Model = evt.AffectedObject;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evtOut.Model(evtOut.Property);
+            evtOut.Stack = horzcat({evt.Source}, evt.Stack);
+
+            % Notify listeners
+            obj.notify('ModelChanged',evtOut)
             
         end %function
         
