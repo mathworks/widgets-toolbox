@@ -7,6 +7,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % Copyright 2020-2023 The MathWorks Inc.
 
+    %RJ - add unit test for ValueIndex vs SelectedIndex
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -49,13 +50,21 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
-        SelectedIndex (1,:)
+        ValueIndex (1,:)
 
         % The current selection
         Value (1,:)
 
         % The current highlighted selection
         HighlightedValue (1,:)
+
+    end %properties
+
+
+    properties (AbortSet, Dependent, Hidden)
+
+        % Indices of displayed items that are currently added to the list (for backward compatibility - use ValueIndex instead)
+        SelectedIndex (1,:)
 
     end %properties
 
@@ -449,7 +458,17 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function value = get.SelectedIndex(obj)
             value = obj.ListBox.ItemsData;
         end
+
         function set.SelectedIndex(obj,value)
+            obj.ListBox.Items = obj.Items(value);
+            obj.ListBox.ItemsData = value;
+        end
+
+        function value = get.ValueIndex(obj)
+            value = obj.ListBox.ItemsData;
+        end
+
+        function set.ValueIndex(obj,value)
             obj.ListBox.Items = obj.Items(value);
             obj.ListBox.ItemsData = value;
         end
@@ -461,6 +480,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 value = obj.ItemsData(:,obj.ListBox.ItemsData);
             end
         end
+
         function set.Value(obj,value)
             if isempty(value)
                 obj.SelectedIndex = [];
@@ -490,6 +510,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 value = obj.ItemsData(:,selIdx);
             end
         end
+
         function set.HighlightedValue(obj,value)
             if isempty(obj.ItemsData)
                 [~, obj.ListBox.Value] = ismember(value, obj.Items);
@@ -501,6 +522,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function value = get.ButtonWidth(obj)
             value = obj.Grid.ColumnWidth{2};
         end
+
         function set.ButtonWidth(obj,value)
             obj.Grid.ColumnWidth{2} = value;
         end

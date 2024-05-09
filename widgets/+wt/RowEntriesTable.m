@@ -63,7 +63,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function setup(obj)
 
             % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
+            obj.Grid = uigridlayout(obj,[5,2]);
             obj.Grid.ColumnWidth = {'1x',30};
             obj.Grid.RowHeight = {30,30,30,30,'1x'};
             obj.Grid.Padding = 0;
@@ -120,8 +120,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % obj.EnableableComponents = [obj.Table, obj.AddButton, ...
             %     obj.RemoveButton, obj.UpButton, obj.DownButton];
             obj.TooltipableComponents = obj.Table;
-            obj.BackgroundColorableComponents = [obj.Grid, obj.AddButton, ...
-                obj.RemoveButton, obj.UpButton, obj.DownButton];
+            obj.BackgroundColorableComponents = [obj.Grid, ...
+                obj.AddButton, obj.RemoveButton, obj.UpButton, obj.DownButton];
 
         end %function
 
