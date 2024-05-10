@@ -2,6 +2,8 @@ classdef BaseViewController < ...
         matlab.ui.componentcontainer.ComponentContainer
     % Base class for views/controllers referencing a BaseModel class
 
+    % Copyright 2024 The MathWorks Inc.
+
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -35,11 +37,6 @@ classdef BaseViewController < ...
 
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
-
-    end %properties
-
-
-    properties (Access = private)
 
         % Listener for a new model being attached
         ModelSetListener_BVC event.listener
@@ -179,6 +176,40 @@ classdef BaseViewController < ...
                 newValue = newValue(index);
             end
             obj.Model.(fieldName)(index) = newValue;
+
+        end %function
+
+
+        function className = getModelClassName(obj)
+            % Returns the class name of the Model property contents
+
+            arguments (Input)
+                obj (1,1) wt.abstract.BaseViewController
+            end
+
+            arguments (Output)
+                className (1,1) string
+            end
+
+            % Get the class of the Model array
+            className = class( obj.Model );
+
+        end %function
+
+
+        function newModel = constructDefaultModel(obj)
+            % Generates a scalar object instance of the class name used in
+            % the Model property. The model must be instantiated with no
+            % input arguments
+
+            arguments
+                obj (1,1) wt.abstract.BaseViewController
+            end
+
+            % Construct a new object
+            className = getModelClassName(obj);
+            fcnConstruct = str2func(className);
+            newModel = fcnConstruct();
 
         end %function
 

@@ -17,7 +17,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
     %   matlab.ui.componentcontainer.ComponentContainer
     %   wt.mixin.ContextualView (if auto-populating Model property)
 
-    % Copyright 2016-2024 The MathWorks Inc.
+    % Copyright 2024 The MathWorks Inc.
 
 
     %% Events
@@ -38,7 +38,14 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
 
+        % Listener for a new model being attached
+        ModelSetListener event.listener
+
+        % Listener for property changes within the model
+        ModelPropertyChangedListener event.listener
+
     end %properties
+
 
     properties (SetAccess=private)
 
@@ -47,17 +54,6 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
 
         % The array of views loaded into memory
         LoadedViews (:,1) wt.abstract.BaseViewController
-
-    end %properties
-
-
-    properties (Access = private)
-
-        % Listener for a new model being attached
-        ModelSetListener event.listener
-
-        % Listener for property changes within the model
-        ModelPropertyChangedListener event.listener
 
     end %properties
 
@@ -106,12 +102,6 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
 
-            % Check for empty input, indicating to clear the view
-            if ismissing(viewClass) || ~strlength(viewClass)
-                obj.deactivateView_Private();
-                return
-            end %if
-
             % Validate view class
             view = validateViewClass(obj, viewClass);
 
@@ -130,8 +120,29 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
+        function clearView(obj)
+            % This method may be overloaded as needed
+
+            arguments
+                obj (1,1) wt.ContextualViewPane
+            end
+
+            % Remove listeners
+            obj.ModelSetListener(:) = [];
+            obj.ModelPropertyChangedListener(:) = [];
+
+            % Clear the view
+            obj.deactivateView_Private();
+
+        end %function
+
+
         function reset(obj)
             % Reset the control by deactivating current view and delete loaded views
+
+            % Remove listeners
+            obj.ModelSetListener(:) = [];
+            obj.ModelPropertyChangedListener(:) = [];
 
             % Deactivate any active view
             obj.deactivateView_Private();
@@ -300,11 +311,19 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             end
 
             % Attach model
-            if ~isempty(model) && isvalid(model)
-                obj.attachModel_Private(view, model)
-            end
+            if ~isempty(model) && all(isvalid(model(:)))
 
-            % Listen to model changes
+                % Attach the model
+                obj.attachModel_Private(view, model)
+
+            end %if
+
+            % Remove listeners
+            % obj.ModelSetListener(:) = [];
+            % obj.ModelPropertyChangedListener(:) = [];
+
+            % Listen to the active view indicating that its model has been
+            % set or changed
             obj.ModelSetListener = listener(view,...
                 "ModelSet",@(~,evt)obj.onModelSet(evt));
             obj.ModelPropertyChangedListener = listener(view,...
@@ -313,20 +332,14 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
-        function onModelSet(obj,evt)
-
-            % Notify listeners
-            obj.notify("ModelSet",evt);
-
-        end %function
-
-
-        function onModelChanged(obj,evt)
-
-            % Notify listeners
-            obj.notify("ModelChanged",evt);
-
-        end %function
+        % function attachModelPropertyChangedListener(obj)
+        % 
+        %     % Listen to the active view indicating model changes
+        %     model = obj.ActiveView.Model;
+        %     obj.ModelPropertyChangedListener = listener(model,...
+        %         "ModelChanged",@(~,evt)obj.onModelChanged(evt));
+        % 
+        % end %function
 
 
         function deactivateView_Private(obj, view)
@@ -345,6 +358,12 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % "flashing" effects during the change
             drawnow
 
+            % Remove any listeners on the view
+            obj.ModelSetListener = obj.deleteListenersForSource(...
+                obj.ModelSetListener, view);
+            obj.ModelPropertyChangedListener = obj.deleteListenersForSource(...
+                obj.ModelPropertyChangedListener, view);
+
             % Deactivate the view, removing model and parent
             view.Model(:) = [];
             view.Parent(:) = [];
@@ -353,6 +372,25 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             if isequal(obj.ActiveView, view)
                 obj.ActiveView(:) = [];
             end
+            
+        end %function
+
+
+        function modelListener = deleteListenersForSource(~, modelListener, source)
+            % Deletes listeners with the given source
+            
+            deleteListener = false(size(modelListener));
+            for idx = numel(modelListener) : -1 : 1
+                thisListener = modelListener(idx);
+                for sIdx = 1:numel(thisListener.Source)
+                    thisSrc = thisListener.Source{sIdx};
+                    if thisSrc == source
+                        deleteListener(idx) = true;
+                    end
+                end
+            end
+            delete(modelListener(deleteListener))
+            modelListener(deleteListener) = [];
 
         end %function
 
@@ -367,17 +405,44 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             end
 
             % Trap errors during model assignment
-            if ~isempty(model) && isvalid(model)
+            if ~isempty(model) && all(isvalid(model(:)))
+
                 try
                     % Assign model
                     view.Model = model;
+
+                    % Listen to model changes
+                    % obj.attachModelPropertyChangedListener();
+
                 catch err
+
                     message = sprintf("Unable to assign model (%s) " + ...
                         "to view/controller (%s).\n\n%s",...
                         class(model), class(view), err.message);
                     obj.throwError(message);
-                end
-            end
+
+                end %try
+
+            end %if
+
+        end %function
+
+
+        function onModelSet(obj,evt)
+
+            % Notify listeners
+            obj.notify("ModelSet",evt);
+
+            % Listen to model changes
+            % obj.attachModelPropertyChangedListener();
+
+        end %function
+
+
+        function onModelChanged(obj,evt)
+
+            % Notify listeners
+            obj.notify("ModelChanged",evt);
 
         end %function
 
