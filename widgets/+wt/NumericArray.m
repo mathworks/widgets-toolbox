@@ -1,8 +1,9 @@
 classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled &...
-        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.PropertyViewable & wt.mixin.Tooltipable
-
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % Set of N numeric edit fields for small numeric arrays
 
     % Copyright 2024 The MathWorks Inc.
@@ -172,15 +173,6 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.FieldColorableComponents = obj.EditField;
             obj.EnableableComponents = obj.EditField;
             obj.TooltipableComponents = obj.EditField;
-
-        end %function
-
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
 
         end %function
 

@@ -1,12 +1,12 @@
 classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled &...
-        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.PropertyViewable & wt.mixin.Tooltipable
-
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % Pair of numeric edit fields for range selection
 
     % Copyright 2024 The MathWorks Inc.
-
 
     %RJ - Need unit tests
     %RJ - Improve error if a restriction needs enforcement. Like display a
@@ -88,11 +88,11 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             set(obj.EditField,"ValueChangedFcn",@(h,e)obj.onValueChanged(e));
 
             % Update the internal component lists
-            obj.FontStyledComponents = obj.EditField;
-            obj.FieldColorableComponents = obj.EditField;
-            obj.EnableableComponents = obj.EditField;
-            obj.TooltipableComponents = obj.EditField;
             obj.BackgroundColorableComponents = obj.Grid;
+            obj.EnableableComponents = obj.EditField;
+            obj.FieldColorableComponents = obj.EditField;
+            obj.FontStyledComponents = obj.EditField;
+            obj.TooltipableComponents = obj.EditField;
 
         end %function
 
@@ -111,16 +111,6 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.EditField(2).Value = obj.Value(2);
 
         end %function
-
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end %function
-
 
 
         function onValueChanged(obj,evt)

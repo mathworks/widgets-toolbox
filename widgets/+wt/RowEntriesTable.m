@@ -1,9 +1,10 @@
 classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-        wt.mixin.ButtonColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.FieldColorable & wt.mixin.PropertyViewable
-        % wt.mixin.Enableable & 
-
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % A table showing status of multiple tasks
 
     % Copyright 2024 The MathWorks Inc.
@@ -111,17 +112,15 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.DownButton.Layout.Row = 4;
             obj.DownButton.ButtonPushedFcn = @(src,evt)obj.onDownButton(evt);
 
-            %RJ - Temporarily hide up/down buttons
-
-
             % Update the internal component lists
-            obj.FontStyledComponents = obj.Table;
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.ButtonColorableComponents = [obj.AddButton, ...
+                obj.RemoveButton, obj.UpButton, obj.DownButton];
+            obj.EnableableComponents = [obj.Table, obj.AddButton, ...
+                obj.RemoveButton, obj.UpButton, obj.DownButton];
             obj.FieldColorableComponents = obj.Table;
-            % obj.EnableableComponents = [obj.Table, obj.AddButton, ...
-            %     obj.RemoveButton, obj.UpButton, obj.DownButton];
+            obj.FontStyledComponents = obj.Table;
             obj.TooltipableComponents = obj.Table;
-            obj.BackgroundColorableComponents = [obj.Grid, ...
-                obj.AddButton, obj.RemoveButton, obj.UpButton, obj.DownButton];
 
         end %function
 
@@ -129,7 +128,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function update(obj)
 
             % Get the data
-            data = obj.Data; 
+            data = obj.Data;
 
             % If empty and no vars, use variable names from NewRowFormat
             if width(data) == 0
@@ -143,29 +142,24 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.UpButton.Visible = obj.Sortable;
             obj.DownButton.Visible = obj.Sortable;
 
-            % Update button enables
-            obj.updateButtonEnables();
-
         end %function
 
 
-        function updateButtonEnables(obj)
+        function updateEnableableComponents(obj)
+            % Handle changes to Enable flag
 
+            % Which rows are selected?
             numRows = height(obj.Data);
             selRows = obj.Table.Selection;
 
-            obj.RemoveButton.Enable = ~isempty(selRows);
-            obj.UpButton.Enable = ~any(selRows == 1);
-            obj.DownButton.Enable = ~any(selRows == numRows);
-            
-        end %function
+            % Update buttons
+            obj.AddButton.Enable = obj.Enable;
+            obj.RemoveButton.Enable = obj.Enable && ~isempty(selRows);
+            obj.UpButton.Enable = obj.Enable && ~any(selRows == 1);
+            obj.DownButton.Enable = obj.Enable && ~any(selRows == numRows);
 
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+            % Update fields
+            obj.Table.Enable = string(obj.Enable);
 
         end %function
 
@@ -186,7 +180,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             selRows = obj.Table.Selection;
             numSelRows = numel(selRows);
             numRows = height(obj.Data);
-            
+
             % Remove the rows
             obj.Data(selRows,:) = [];
 
@@ -207,6 +201,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             numRows = height(obj.Data);
             selRows = obj.Table.Selection;
 
+            %RJ - needs implementation
+            
         end %function
 
 
@@ -216,14 +212,16 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             numRows = height(obj.Data);
             selRows = obj.Table.Selection;
 
+            %RJ - needs implementation
+
         end %function
 
 
         function onSelectionChanged(obj,evt)
             % Triggered on table selection changed
-            
+
             % Update button enables
-            obj.updateButtonEnables();
+            obj.updateEnableableComponents();
 
         end %function
 

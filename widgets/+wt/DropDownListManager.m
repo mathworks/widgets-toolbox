@@ -1,8 +1,10 @@
 classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable & wt.mixin.PropertyViewable
-    % wt.mixin.FieldColorable & wt.mixin.ButtonColorable &...
-    % wt.mixin.FontStyled & wt.mixin.BackgroundColorable &
-
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % Manage a list of text entries using a dropdown control
 
     % Copyright 2024 The MathWorks Inc.
@@ -218,10 +220,14 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             obj.RemoveButton.ButtonPushedFcn = @(~,~)obj.onRemoveButton();
 
             % Update the internal component lists
-            % obj.BackgroundColorableComponents = [obj.AddButton, obj.RemoveButton, obj.Grid];
-            % obj.FontStyledComponents = [obj.DropDown, obj.EditField];
-            % obj.ButtonColorableComponents = [obj.AddButton, obj.RemoveButton];
-            % obj.FieldColorableComponents = [obj.DropDown, obj.EditField];
+            obj.BackgroundColorableComponents = obj.Grid;
+            obj.ButtonColorableComponents = [obj.AddButton, ...
+                obj.RenameButton, obj.RemoveButton];
+            obj.EnableableComponents = [obj.DropDown, obj.EditField, ...
+                obj.AddButton, obj.RenameButton, obj.RemoveButton];
+            obj.FieldColorableComponents = [obj.DropDown, obj.EditField];
+            obj.FontStyledComponents = [obj.DropDown, obj.EditField];
+            obj.TooltipableComponents = [obj.DropDown];
 
         end %function
 
@@ -460,7 +466,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
 
         function updateEnableableComponents(obj)
-            % Update button visibilities
+            % Handle changes to Enable flag
 
             % What item is selected?
             hasEntries = ~isempty(obj.Items);
@@ -531,15 +537,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 obj.Grid.ColumnWidth = {'1x',30};
 
             end
-
-        end %function
-
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
 
         end %function
 
