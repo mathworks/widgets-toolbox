@@ -30,12 +30,10 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
         UpperLimitInclusive (1,1) matlab.lang.OnOffSwitchState = true
 
         % Restriction on array order
-        Restriction (1,1) wt.enum.ArrayRestriction = ...
-            wt.enum.ArrayRestriction.none
+        Restriction (1,1) wt.enum.ArrayRestriction = "none"
 
         % Orientation of the fields
-        Orientation (1,1) wt.enum.HorizontalVerticalState = ...
-            wt.enum.HorizontalVerticalState.horizontal
+        Orientation (1,1) wt.enum.HorizontalVerticalState = "horizontal"
 
     end %properties
 
@@ -99,10 +97,7 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
             % Loop on each edit field to update it
             for idx = 1:numElements
 
-                % Update the edit fields values
-                obj.EditField(idx).Value = obj.Value(idx);
-
-                % Caculate limits
+                % Calculate limits
                 lowerLimit = obj.Limits(1);
                 upperLimit = obj.Limits(2);
                 lowerLimitInclusive = obj.LowerLimitInclusive;
@@ -140,6 +135,9 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj.EditField(idx).Limits = [lowerLimit upperLimit];
                 obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
                 obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
+
+                % Update the edit fields values
+                obj.EditField(idx).Value = obj.Value(idx);
 
             end %for
 
