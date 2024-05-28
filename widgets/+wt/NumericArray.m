@@ -132,9 +132,9 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
                 end %switch
 
                 % Apply restrictions
-                obj.EditField(idx).Limits = [lowerLimit upperLimit];
-                obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
-                obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
+                % obj.EditField(idx).Limits = [lowerLimit upperLimit];
+                % obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
+                % obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
 
                 % Update the edit fields values
                 obj.EditField(idx).Value = obj.Value(idx);

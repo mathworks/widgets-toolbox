@@ -76,6 +76,14 @@ classdef ErrorHandling < handle
         function dlg = showIndeterminateProgress(obj,title,message,cancelOn)
             % Places an indeterminate progress dialog in the widget's figure
             
+            % Validate arguments
+            arguments
+                obj (1,1) wt.mixin.ErrorHandling
+                title (1,1) string = "Please Wait"
+                message (1,1) string = ""
+                cancelOn (1,1) logical = false
+            end
+            
             dlg = showProgress(obj,title,message,cancelOn);
             dlg.Indeterminate = true;
             

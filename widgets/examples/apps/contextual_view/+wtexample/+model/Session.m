@@ -15,12 +15,12 @@ classdef Session < wt.model.BaseSession
 
 
     % Accessors
-    methods
-        function set.Exhibit(obj,value)
-            obj.Exhibit = value;
-            obj.attachModelListeners("Exhibit");
-        end
-    end %methods
+    % methods
+    %     function set.Exhibit(obj,value)
+    %         obj.Exhibit = value;
+    %         obj.attachModelListeners("Exhibit");
+    %     end
+    % end %methods
 
 
 

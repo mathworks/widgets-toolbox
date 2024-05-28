@@ -18,11 +18,11 @@ classdef Exhibit < wt.model.BaseModel
 
 
     % Accessors
-    methods
-        function set.Enclosure(obj,value)
-            obj.Enclosure = value;
-            obj.attachModelListeners("Enclosure");
-        end
-    end %methods
+    % methods
+    %     function set.Enclosure(obj,value)
+    %         obj.Enclosure = value;
+    %         obj.attachModelListeners("Enclosure");
+    %     end
+    % end %methods
 
 end %classdef

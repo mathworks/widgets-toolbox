@@ -6,6 +6,7 @@ classdef ModelSetData < event.EventData
     %% Properties
     properties (SetAccess = ?wt.abstract.BaseViewController)
         Model
+        Controller
     end %properties
 
 end % classdef

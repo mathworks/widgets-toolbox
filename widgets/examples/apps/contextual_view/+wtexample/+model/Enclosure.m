@@ -18,11 +18,11 @@ classdef Enclosure < wt.model.BaseModel
 
 
     % Accessors
-    methods
-        function set.Animal(obj,value)
-            obj.Animal = value;
-            obj.attachModelListeners("Animal");
-        end
-    end %methods
+    % methods
+    %     function set.Animal(obj,value)
+    %         obj.Animal = value;
+    %         obj.attachModelListeners("Animal");
+    %     end
+    % end %methods
 
 end %classdef

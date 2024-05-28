@@ -8,6 +8,18 @@ classdef BaseSession < wt.model.BaseModel
     
     % Copyright 2020-2024 The MathWorks, Inc.
     
+
+    %% Events
+    events
+        
+        % Triggered when dirty flag toggles
+        SessionMarkedDirty 
+
+        % Triggered when dirty flag toggles
+        SessionMarkedClean 
+        
+    end %events
+
     
     %% Properties
     properties (Dependent, SetAccess = immutable)
@@ -35,6 +47,19 @@ classdef BaseSession < wt.model.BaseModel
         Description (1,1) string
         
     end %properties
+
+    
+    % Accessors
+    methods
+        function set.Dirty(obj,value)
+            obj.Dirty = value;
+            if value
+                obj.notify("SessionMarkedDirty")
+            else
+                obj.notify("SessionMarkedClean")
+            end
+        end
+    end
     
     
     %% Public methods (subclass may override these)
@@ -70,15 +95,32 @@ classdef BaseSession < wt.model.BaseModel
     %% Protected methods (subclass may override these)
     methods (Access = protected)
 
-
         function onPropChanged(obj,e)
             % Triggered when SetObservable properties have changed
             
+            disp("wt.model.BaseSession.onPropChanged");
+            disp(evt);
+
             % Mark the session dirty
             obj.Dirty = true;
             
             % Call superclass method to notify PropertyChanged event
             obj.onPropChanged@wt.model.BaseModel(e);
+            
+        end %function
+
+
+        function onAggregatedModelChanged(obj,e)
+            % Triggered when nested models' SetObservable properties have changed
+            
+            disp("wt.model.BaseSession.onAggregatedPropertyChanged");
+            disp(evt);
+
+            % Mark the session dirty
+            obj.Dirty = true;
+            
+            % Call superclass method to notify PropertyChanged event
+            obj.onAggregatedModelChanged@wt.model.BaseModel(e);
             
         end %function
         

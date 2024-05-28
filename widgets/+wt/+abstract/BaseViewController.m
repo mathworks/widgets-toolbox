@@ -150,6 +150,7 @@ classdef BaseViewController < ...
             % Prepare event data
             evtOut = wt.eventdata.ModelSetData();
             evtOut.Model = obj.Model;
+            evtOut.Controller = obj;
 
             % Notify listeners
             notify(obj,"ModelSet",evtOut)
@@ -158,7 +159,7 @@ classdef BaseViewController < ...
 
 
         function onFieldEdited(obj,evt,fieldName,index)
-            % This is a generic callback that simple controls may use For
+            % This is a generic callback that simple controls may use. For
             % example, the ValueChangedFcn for an edit field may call this
             % directly with the Model's property name that should be
             % updated. Use this for callbacks of simple controls that can
@@ -216,6 +217,23 @@ classdef BaseViewController < ...
             className = getModelClassName(obj);
             fcnConstruct = str2func(className);
             newModel = fcnConstruct();
+
+        end %function
+
+
+        function [model, validToDisplay] = getScalarModelToDisplay(obj)
+            
+            % Get a single instance of the correct model type and indicate
+            % if it's found and valid. This is useful in case obj.Model is
+            % empty, it will still return a scalar instance to show default
+            % values and the modelValid flag will be false, indicating to
+            % disable the fields.
+            model = obj.Model;
+            validToDisplay = isscalar(model) && isvalid(model);
+            if ~validToDisplay
+                model = obj.constructDefaultModel();
+            end
+            validToDisplay = matlab.lang.OnOffSwitchState(validToDisplay);
 
         end %function
 

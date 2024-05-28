@@ -137,6 +137,34 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         end %function
 
 
+        function relaunchActiveView(obj)
+            % Delete and reload the active view
+
+            % Is there an active view? If no, return early
+            activeView = obj.ActiveView;
+            if isempty(activeView)
+                warning("wt:ContextualView:noActiveView",...
+                    "No active view is present.")
+                return
+            end
+
+            % Get the current view and model
+            viewClass = class(activeView);
+            model = activeView.Model;
+
+            % Deactivate the active view
+            obj.clearView();
+
+            % Delete the previously active view
+            delete(activeView);
+            obj.LoadedViews(obj.LoadedViews == activeView) = [];
+
+            % Launch the same view again
+            obj.launchView(viewClass, model);
+
+        end %function
+
+
         function reset(obj)
             % Reset the control by deactivating current view and delete loaded views
 
