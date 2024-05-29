@@ -1,6 +1,7 @@
 %% Create animal
 a = wtexample.model.Animal("Debug",true);
 a.Name = "Giraffe X";
+a.BirthDate = datetime("today") - years(7.5);
 a.Species = "giraffe";
 
 %% Create enclosure, add animal to it
@@ -17,6 +18,7 @@ x.Enclosure = n;
 a2 = wtexample.model.Animal("Debug",true);
 a2.Name = "Giraffe Y";
 a2.Species = "giraffe";
+a2.BirthDate = datetime("today") - years(4);
 a2.Sex = "male";
 n.Animal(end+1) = a2;
 

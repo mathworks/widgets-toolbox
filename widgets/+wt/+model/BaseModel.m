@@ -42,8 +42,7 @@ classdef (Abstract) BaseModel < handle & ...
 
     end %properties
 
-    %RJ  properties (Transient, NonCopyable, Hidden, SetAccess = private)
-    properties (Transient, NonCopyable, SetAccess = private)
+    properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
         % Listeners to public properties
         PropListeners
@@ -95,7 +94,6 @@ classdef (Abstract) BaseModel < handle & ...
 
     %% Protected Methods
     methods (Access = protected)
-
 
         % This method is similar to
         % matlab.io.internal.mixin.HasPropertiesAsNVPairs, but this one
@@ -227,7 +225,7 @@ classdef (Abstract) BaseModel < handle & ...
 
                 % Create listener to property changes within the model(s)
                 newPropListeners{idx} = event.listener(aggregatedObjects,...
-                    'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
+                    'ModelChanged',@(src,evt)onModelChanged(obj,evt));
 
             end %for
 
@@ -258,6 +256,7 @@ classdef (Abstract) BaseModel < handle & ...
             evtOut.Property = evt.Source.Name;
             evtOut.Model = evt.AffectedObject;
             evtOut.Value = evtOut.Model.(evtOut.Property);
+            evtOut.Stack = {evt.Source};
 
             % Revise listeners for model changes given the new value
             if isa(evtOut.Value, "wt.model.BaseModel")
@@ -266,12 +265,31 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Notify listeners
             obj.notify('PropertyChanged',evtOut)
-            obj.notify('ModelChanged',evtOut)
+
+            % Call onModelChanged method
+            obj.onModelChanged(evtOut);
 
         end %function
 
 
-        function onAggregatedModelChanged(obj,evt)
+        % function onModelChanged(obj,evt) %#ok<INUSD>
+        %     % Runs on any property or aggregated BaseModel change
+        % 
+        %     if obj.Debug
+        %         disp("wt.model.BaseModel.onModelChanged " + ...
+        %             class(obj) + "  Model: " + class(evt.Model) + ...
+        %             " Prop: " + evt.Property);
+        %     end
+        % 
+        %     % Do nothing here - subclass may override this for custom
+        %     % functionalities
+        % 
+        % end %function
+
+
+        function onModelChanged(obj,evt)
+        % Runs on property changes to this class or an aggregated BaseModel
+        % class
 
             arguments
                 obj (1,1) wt.model.BaseModel
@@ -280,14 +298,14 @@ classdef (Abstract) BaseModel < handle & ...
 
             if ~isa(evt, "wt.eventdata.ModelChangedData")
                 if obj.Debug()
-                    disp("wt.model.BaseModel.onAggregatedPropertyChanged " + ...
+                    disp("wt.model.BaseModel.onModelChanged " + ...
                         class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
                 end
                 return
             end
 
             if obj.Debug
-                disp("wt.model.BaseModel.onAggregatedPropertyChanged " + ...
+                disp("wt.model.BaseModel.onModelChanged " + ...
                     class(obj) + "  Model: " + class(evt.Model) + " Prop: " + evt.Property);
             end
 
@@ -309,7 +327,8 @@ classdef (Abstract) BaseModel < handle & ...
 
 
     %% Private methods
-    methods (Access=private)
+    methods (Access = private)
+
 
         function thisParser = getParser(obj,keepUnmatched)
 

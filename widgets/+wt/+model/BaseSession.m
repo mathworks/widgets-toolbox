@@ -97,38 +97,40 @@ classdef BaseSession < wt.model.BaseModel
     %% Protected methods (subclass may override these)
     methods (Access = protected)
 
-        function onPropChanged(obj,evt)
-            % Triggered when SetObservable properties have changed
+        % function onPropChanged(obj,evt)
+        %     % Triggered when SetObservable properties have changed
+        % 
+        %     if obj.Debug
+        %         disp("wt.model.BaseSession.onPropChanged " + ...
+        %             class(obj) + "  Model: " + class(evt.AffectedObject) + ...
+        %             " Prop: " + evt.Source.Name);
+        %     end
+        % 
+        %     % Mark the session dirty
+        %     obj.Dirty = true;
+        % 
+        %     % Call superclass method to notify PropertyChanged event
+        %     obj.onPropChanged@wt.model.BaseModel(evt);
+        % 
+        % end %function
+
+
+        function onModelChanged(obj,evt)
+            % Triggered when the Session or any aggregated BaseModel
+            % classes have triggered a ModelChanged event (typically when
+            % SetObservable properties have changed)
 
             if obj.Debug
-                disp("wt.model.BaseSession.onPropChanged " + ...
-                    class(obj) + "  Model: " + class(evt.AffectedObject) + ...
-                    " Prop: " + evt.Source.Name);
-            end
-
-            % Mark the session dirty
-            obj.Dirty = true;
-            
-            % Call superclass method to notify PropertyChanged event
-            obj.onPropChanged@wt.model.BaseModel(evt);
-            
-        end %function
-
-
-        function onAggregatedModelChanged(obj,evt)
-            % Triggered when nested models' SetObservable properties have changed
-
-            if obj.Debug
-                disp("wt.model.BaseSession.onAggregatedPropertyChanged " + ...
+                disp("wt.model.BaseSession.onModelChanged " + ...
                     class(obj) + "  Model: " + class(evt.Model) + ...
                     " Prop: " + evt.Property);
             end
+            
+            % Call superclass method to notify PropertyChanged event
+            obj.onModelChanged@wt.model.BaseModel(evt);
 
             % Mark the session dirty
             obj.Dirty = true;
-            
-            % Call superclass method to notify PropertyChanged event
-            obj.onAggregatedModelChanged@wt.model.BaseModel(evt);
             
         end %function
 
