@@ -115,7 +115,7 @@ classdef BaseSession < wt.model.BaseModel
         end %function
 
 
-        function onAggregatedPropertyChanged(obj,evt)
+        function onAggregatedModelChanged(obj,evt)
             % Triggered when nested models' SetObservable properties have changed
 
             if obj.Debug
@@ -128,28 +128,10 @@ classdef BaseSession < wt.model.BaseModel
             obj.Dirty = true;
             
             % Call superclass method to notify PropertyChanged event
-            obj.onAggregatedPropertyChanged@wt.model.BaseModel(evt);
+            obj.onAggregatedModelChanged@wt.model.BaseModel(evt);
             
         end %function
 
-
-        % function onAggregatedModelChanged(obj,evt)
-        %     % Triggered when nested models' SetObservable properties have changed
-        % 
-        %     if obj.Debug
-        %         disp("wt.model.BaseSession.onAggregatedModelChanged " + ...
-        %             class(obj) + "  Model: " + class(evt.Model) + ...
-        %             " Prop: " + evt.Property);
-        %     end
-        % 
-        %     % Mark the session dirty
-        %     obj.Dirty = true;
-        % 
-        %     % Call superclass method to notify PropertyChanged event
-        %     obj.onAggregatedModelChanged@wt.model.BaseModel(evt);
-        % 
-        % end %function
-        % 
     end %methods
     
     

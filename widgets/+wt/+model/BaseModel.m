@@ -3,9 +3,14 @@ classdef (Abstract) BaseModel < handle & ...
         wt.mixin.DisplayNonScalarObjectAsTable
     % Base model class for apps that provides:
     %   PV pairs assignment on construction
+    %
     %   Display nonscalar arrays in table format
+    %
     %   Public PropertyChanged event for properties tagged as SetObservable
     %     to enable apps/widgets to listen to model changes
+    %
+    %   Public ModelChanged event for recursive property change
+    %   notifications in a hierarchy of BaseWidget classes
     %
 
     % Copyright 2020-2024 The MathWorks, Inc.
@@ -26,10 +31,14 @@ classdef (Abstract) BaseModel < handle & ...
 
 
     %% Internal Properties
-    properties %(Transient, NonCopyable, Hidden)
+    properties (Transient, NonCopyable, Hidden)
 
         % Toggle true in each instance to enable debugging display
         Debug (1,1) logical = false
+
+        % Listing of properties containing aggregated BaseModel classes to
+        % listen for hierarchical ModelChanged events
+        AggregatedModelProperties (1,:) string
 
     end %properties
 
@@ -39,7 +48,6 @@ classdef (Abstract) BaseModel < handle & ...
         % Listeners to public properties
         PropListeners
 
-        AggregatedModelProperties (1,:) string
 
         % Listeners to any aggregated / nested handle class models
         % AggregatedModelListeners
@@ -219,7 +227,7 @@ classdef (Abstract) BaseModel < handle & ...
 
                 % Create listener to property changes within the model(s)
                 newPropListeners{idx} = event.listener(aggregatedObjects,...
-                    'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
+                    'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
 
             end %for
 
@@ -258,11 +266,12 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Notify listeners
             obj.notify('PropertyChanged',evtOut)
+            obj.notify('ModelChanged',evtOut)
 
         end %function
 
 
-        function onAggregatedPropertyChanged(obj,evt)
+        function onAggregatedModelChanged(obj,evt)
 
             arguments
                 obj (1,1) wt.model.BaseModel
@@ -291,40 +300,9 @@ classdef (Abstract) BaseModel < handle & ...
             evtOut.Stack = horzcat({evt.Source}, evt.Stack);
 
             % Notify listeners
-            % obj.notify('ModelChanged',evtOut)
-            obj.notify('PropertyChanged',evtOut)
+            obj.notify('ModelChanged',evtOut)
 
         end %function
-
-
-        % function onAggregatedModelChanged(obj,evt)
-        % 
-        %     if obj.Debug
-        %         disp("wt.model.BaseModel.onAggregatedModelChanged " + ...
-        %             class(obj) + "  Model: " + class(evt.Model) + ...
-        %             " Prop: " + evt.Property);
-        %     end
-        % 
-        %     % disp("wt.model.BaseModel.onAggregatedPropertyChanged");
-        %     % disp(evt);
-        % 
-        %     % stack = horzcat({evt.Source}, evt.Stack);
-        %     %
-        %     % evtOut = wt.eventdata.ModelChangedData(...
-        %     %     evt.Model, evt.Property, evt.Value, stack);
-        % 
-        %     % Prepare eventdata
-        %     evtOut = wt.eventdata.ModelChangedData;
-        %     evtOut.Model = evt.AffectedObject;
-        %     evtOut.Property = evt.Property;
-        %     evtOut.Value = evtOut.Model(evtOut.Property);
-        %     evtOut.Stack = horzcat({evt.Source}, evt.Stack);
-        % 
-        %     % Notify listeners
-        %     % obj.notify('ModelChanged',evtOut)
-        %     obj.notify('PropertyChanged',evtOut)
-        % 
-        % end %function
 
     end %methods
 
@@ -381,61 +359,3 @@ classdef (Abstract) BaseModel < handle & ...
 
 
 end %classdef
-
-
-% % Preallocate array of listeners
-%            numProps = numel(propNames);
-%            newModelListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
-%            newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
-%
-%            % Loop on each property requested, in case of multiple
-%            % properties having aggregated handle objects
-%            for idx = 1:numProps
-%
-%                % Get the current property
-%                thisProp = propNames(idx);
-%
-%                % Get the model(s) to listen to
-%                aggregatedObjects = obj.(thisProp);
-%
-%                % Skip this property if empty
-%                if isempty(aggregatedObjects)
-%                    continue
-%                end
-%
-%                % These objects must be handle!
-%                allAreHandle = all(isa(aggregatedObjects,'handle'));
-%                assert(allAreHandle,...
-%                    "Expected %s to contain a handle class object.",...
-%                    thisProp);
-%
-%                % Clear any invalid objects
-%                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
-%
-%                % Create listener to property changes within the model(s)
-%                newPropListeners{idx} = event.listener(aggregatedObjects,...
-%                'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
-%
-%                % newPropListeners = listener(aggregatedObjects,...
-%                % 'PropertyChanged',@(src,evt)notify(obj,"PropertyChanged",evt));
-%
-%                % Create listener to nested/aggregated models inside the
-%                % model(s)
-%                newModelListeners{idx} = event.listener(aggregatedObjects,...
-%                'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
-%
-%                % newModelListeners = listener(aggregatedObjects,...
-%                % 'ModelChanged',@(src,evt)notify(obj,"ModelChanged",evt));
-%
-%                % Gather the new listeners together
-%                % newListeners{} = vertcat(newPropListeners(:), newModelListeners(:));
-%
-%            end %for
-%
-%            % Flatten the lists
-%            newPropListeners = vertcat(newPropListeners{:});
-%            newModelListeners = vertcat(newModelListeners{:});
-%
-%            % Store the results
-%            obj.AggregatedModelListeners = newModelListeners;
-%            obj.AggregatedModelPropListeners = newPropListeners;
