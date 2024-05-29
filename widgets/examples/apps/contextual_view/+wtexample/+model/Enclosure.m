@@ -25,4 +25,19 @@ classdef Enclosure < wt.model.BaseModel
     %     end
     % end %methods
 
+
+    %% Constructor
+    methods
+        function obj = Enclosure(varargin)
+            % Constructor
+
+            % Call superclass method
+            % obj@wt.model.BaseModel(varargin{:});
+
+            % Debug instead
+            obj@wt.model.BaseModel(varargin{:},"Debug",true);
+
+        end %function
+    end %methods
+
 end %classdef

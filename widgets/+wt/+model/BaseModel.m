@@ -6,29 +6,36 @@ classdef (Abstract) BaseModel < handle & ...
     %   Display nonscalar arrays in table format
     %   Public PropertyChanged event for properties tagged as SetObservable
     %     to enable apps/widgets to listen to model changes
-    %    
+    %
 
     % Copyright 2020-2024 The MathWorks, Inc.
-    
 
-    
+
+
     %% Events
     events
-        
+
         % Triggered when SetObservable properties are changed
-        PropertyChanged 
+        PropertyChanged
 
         % Triggered when an aggregated / nested model has changed
         ModelChanged
-        
+
     end %events
-    
-    
-    
+
+
+
     %% Internal Properties
-   %RJ  properties (Transient, NonCopyable, Hidden, SetAccess = private)
+    properties %(Transient, NonCopyable, Hidden)
+
+        % Toggle true in each instance to enable debugging display
+        Debug (1,1) logical = false
+
+    end %properties
+
+    %RJ  properties (Transient, NonCopyable, Hidden, SetAccess = private)
     properties (Transient, NonCopyable, SetAccess = private)
-        
+
         % Listeners to public properties
         PropListeners
 
@@ -40,44 +47,44 @@ classdef (Abstract) BaseModel < handle & ...
 
     end %properties
 
-    
+
     %% Constructor
     methods
         function obj = BaseModel(varargin)
             % Constructor
-            
+
             % Populate public properties from P-V input pairs
             if nargin
                 obj.assignPVPairs(varargin{:});
             end
-            
+
             % Create listeners to public properties
             obj.createPropListeners();
-            
+
         end %function
     end %methods
-    
-    
-    
+
+
+
     %% Static methods
     methods (Static)
-        
+
         function obj = loadobj(obj)
             % Customize loading from file
-            
+
             if isstruct(obj)
                 error('Unable to load object.');
             end
-            
+
             % Need to recreate listeners
             obj.createPropListeners();
-            
+
         end %function
-        
+
     end %methods
-    
-    
-    
+
+
+
     %% Protected Methods
     methods (Access = protected)
 
@@ -85,23 +92,23 @@ classdef (Abstract) BaseModel < handle & ...
         % This method is similar to
         % matlab.io.internal.mixin.HasPropertiesAsNVPairs, but this one
         % generally performs faster.
-        
+
         function varargout = assignPVPairs(obj,varargin)
             % Assign the specified property-value pairs
-            
+
             if nargin > 1
-                
+
                 % Get a singleton parser for this class
                 keepUnmatched = nargout > 0;
                 p = getParser(obj, keepUnmatched);
-                
+
                 % Parse the P-V pairs
                 p.parse(varargin{:});
-                
+
                 % Set just the parameters the user passed in
-                ParamNamesToSet = varargin(1:2:end);
+                ParamNamesToSet = p.Parameters;
                 ParamsInResults = fieldnames(p.Results);
-                
+
                 % Assign properties
                 for ThisName = ParamNamesToSet
                     isSettable = any(strcmpi(ThisName,ParamsInResults));
@@ -109,25 +116,27 @@ classdef (Abstract) BaseModel < handle & ...
                         obj.(ThisName{1}) = p.Results.(ThisName{1});
                     end
                 end
-                
+
                 % Return unmatched pairs
                 if nargout
                     varargout{1} = p.Unmatched;
                 end
-                
+
             elseif nargout
-                
+
                 varargout{1} = struct;
-                
+
             end %if nargin > 1
-            
+
         end %function
-        
-        
+
+
         function createPropListeners(obj)
             % Create listeners to SetObservable properties in this class
-            
-            disp("wt.model.BaseModel.createPropListeners " + class(obj));
+
+            if obj.Debug
+                disp("wt.model.BaseModel.createPropListeners " + class(obj));
+            end
 
             % Loop on each instance (typically scalar though)
             for idx = 1:numel(obj)
@@ -157,7 +166,7 @@ classdef (Abstract) BaseModel < handle & ...
                 thisObj.attachModelListeners();
 
             end %for
-            
+
         end %function
 
 
@@ -169,15 +178,16 @@ classdef (Abstract) BaseModel < handle & ...
                 propNames (1,:) string = obj.AggregatedModelProperties
             end
 
-            if isempty(propNames)
-                propDisp = "<none>";
-            else
-                propDisp = join(propNames, ", ");
+            if obj.Debug
+                if isempty(propNames)
+                    propDisp = "<none>";
+                else
+                    propDisp = join(propNames, ", ");
+                end
+                disp("wt.model.BaseModel.attachModelListeners " + ...
+                    class(obj) + "  Prop: " + propDisp);
             end
-            disp("wt.model.BaseModel.attachModelListeners " + ...
-                class(obj) + "  Prop: " + propDisp);
-            
-                
+
             % Preallocate array of listeners
             numProps = numel(propNames);
             % newModelListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
@@ -209,7 +219,7 @@ classdef (Abstract) BaseModel < handle & ...
 
                 % Create listener to property changes within the model(s)
                 newPropListeners{idx} = event.listener(aggregatedObjects,...
-                'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
+                    'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
 
             end %for
 
@@ -220,8 +230,8 @@ classdef (Abstract) BaseModel < handle & ...
             obj.AggregatedModelListeners = newPropListeners;
 
         end %function
-        
-        
+
+
         function onPropChanged(obj,evt)
 
             arguments
@@ -229,11 +239,12 @@ classdef (Abstract) BaseModel < handle & ...
                 evt (1,1) event.PropertyEvent
             end
 
-            disp("wt.model.BaseModel.onPropChanged " + ...
-                class(obj) + "  Model: " + class(evt.AffectedObject) + ...
-                " Prop: " + evt.Source.Name); 
-            
-           
+            if obj.Debug
+                disp("wt.model.BaseModel.onPropChanged " + ...
+                    class(obj) + "  Model: " + class(evt.AffectedObject) + ...
+                    " Prop: " + evt.Source.Name);
+            end
+
             % Prepare eventdata
             evtOut = wt.eventdata.ModelChangedData;
             evtOut.Property = evt.Source.Name;
@@ -241,89 +252,105 @@ classdef (Abstract) BaseModel < handle & ...
             evtOut.Value = evtOut.Model.(evtOut.Property);
 
             % Revise listeners for model changes given the new value
-            % if isa(evtOut.Value, "wt.model.BaseModel")
-            %     evtOut.Model.attachModelListeners();
-            % end
-            obj.attachModelListeners();
+            if isa(evtOut.Value, "wt.model.BaseModel")
+                evtOut.Model.attachModelListeners();
+            end
 
             % Notify listeners
             obj.notify('PropertyChanged',evtOut)
-            
+
         end %function
-        
-        
+
+
         function onAggregatedPropertyChanged(obj,evt)
 
             arguments
                 obj (1,1) wt.model.BaseModel
-                evt (1,1) wt.eventdata.ModelChangedData
+                evt (1,1) event.EventData
             end
 
-            disp("wt.model.BaseModel.onAggregatedPropertyChanged " + ...
-                class(obj) + "  Model" + class(evt.Model) + " Prop: " + evt.Property); 
-            
-            % Prepare eventdata
-            evtOut = evt;
-            evtOut.Stack = {evt.Source};
+            if ~isa(evt, "wt.eventdata.ModelChangedData")
+                if obj.Debug()
+                    disp("wt.model.BaseModel.onAggregatedPropertyChanged " + ...
+                        class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
+                end
+                return
+            end
 
-            % Notify listeners
-            % obj.notify('ModelChanged',evtOut)
-            obj.notify('PropertyChanged',evtOut)
-            
-        end %function
-        
-        
-        function onAggregatedModelChanged(obj,evt)
+            if obj.Debug
+                disp("wt.model.BaseModel.onAggregatedPropertyChanged " + ...
+                    class(obj) + "  Model: " + class(evt.Model) + " Prop: " + evt.Property);
+            end
 
-            disp("wt.model.BaseModel.onAggregatedModelChanged " + ...
-                class(obj) + "  Model" + class(evt.Model) + " Prop: " + evt.Property);
-            
-            % disp("wt.model.BaseModel.onAggregatedPropertyChanged");
-            % disp(evt);
-            
-            % stack = horzcat({evt.Source}, evt.Stack);
-            % 
-            % evtOut = wt.eventdata.ModelChangedData(...
-            %     evt.Model, evt.Property, evt.Value, stack);
-            
             % Prepare eventdata
             evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Model = evt.AffectedObject;
+            evtOut.Model = evt.Model;
+            % evtOut.Model = evt.AffectedObject;
             evtOut.Property = evt.Property;
-            evtOut.Value = evtOut.Model(evtOut.Property);
+            evtOut.Value = evt.Value;
             evtOut.Stack = horzcat({evt.Source}, evt.Stack);
 
             % Notify listeners
             % obj.notify('ModelChanged',evtOut)
             obj.notify('PropertyChanged',evtOut)
-            
+
         end %function
-        
+
+
+        % function onAggregatedModelChanged(obj,evt)
+        % 
+        %     if obj.Debug
+        %         disp("wt.model.BaseModel.onAggregatedModelChanged " + ...
+        %             class(obj) + "  Model: " + class(evt.Model) + ...
+        %             " Prop: " + evt.Property);
+        %     end
+        % 
+        %     % disp("wt.model.BaseModel.onAggregatedPropertyChanged");
+        %     % disp(evt);
+        % 
+        %     % stack = horzcat({evt.Source}, evt.Stack);
+        %     %
+        %     % evtOut = wt.eventdata.ModelChangedData(...
+        %     %     evt.Model, evt.Property, evt.Value, stack);
+        % 
+        %     % Prepare eventdata
+        %     evtOut = wt.eventdata.ModelChangedData;
+        %     evtOut.Model = evt.AffectedObject;
+        %     evtOut.Property = evt.Property;
+        %     evtOut.Value = evtOut.Model(evtOut.Property);
+        %     evtOut.Stack = horzcat({evt.Source}, evt.Stack);
+        % 
+        %     % Notify listeners
+        %     % obj.notify('ModelChanged',evtOut)
+        %     obj.notify('PropertyChanged',evtOut)
+        % 
+        % end %function
+
     end %methods
-    
-    
-    
+
+
+
     %% Private methods
     methods (Access=private)
-        
+
         function thisParser = getParser(obj,keepUnmatched)
-            
+
             % What class is this?
             className = class(obj);
-            
+
             % Keep a list of reusable parsers for each class
             persistent allParsers
             if isempty(allParsers)
                 allParsers = containers.Map('KeyType','char','ValueType','any');
             end
-            
+
             % Get or make a custom parser for this class
             try
-                
+
                 thisParser = allParsers(className);
-                
+
             catch
-                
+
                 % Get a list of public properties
                 metaObj = metaclass(obj);
                 isSettableProp = strcmp({metaObj.PropertyList.SetAccess}','public');
@@ -332,83 +359,83 @@ classdef (Abstract) BaseModel < handle & ...
                 hasDefault = [settableProps.HasDefault]';
                 defaultValues = repmat({[]},size(hasDefault));
                 defaultValues(hasDefault) = {settableProps(hasDefault).DefaultValue};
-                
+
                 % Create custom parser for this class
                 thisParser = inputParser;
                 thisParser.KeepUnmatched = keepUnmatched;
                 thisParser.FunctionName = className;
-                
+
                 % Add each public property to the parser
                 for pIdx = 1:numel(publicPropNames)
                     thisParser.addParameter(publicPropNames{pIdx}, defaultValues{pIdx});
                 end
-                
+
                 % Add this parser to the map
                 allParsers(className) = thisParser;
-                
+
             end %if allParsers.isKey(className)
-            
+
         end %function
-        
+
     end %methods
-        
-    
+
+
 end %classdef
 
 
- % % Preallocate array of listeners
- %            numProps = numel(propNames);
- %            newModelListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
- %            newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
- % 
- %            % Loop on each property requested, in case of multiple
- %            % properties having aggregated handle objects
- %            for idx = 1:numProps
- % 
- %                % Get the current property
- %                thisProp = propNames(idx);
- % 
- %                % Get the model(s) to listen to
- %                aggregatedObjects = obj.(thisProp);
- % 
- %                % Skip this property if empty
- %                if isempty(aggregatedObjects)
- %                    continue
- %                end
- % 
- %                % These objects must be handle!
- %                allAreHandle = all(isa(aggregatedObjects,'handle'));
- %                assert(allAreHandle,...
- %                    "Expected %s to contain a handle class object.",...
- %                    thisProp);
- % 
- %                % Clear any invalid objects
- %                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
- % 
- %                % Create listener to property changes within the model(s)
- %                newPropListeners{idx} = event.listener(aggregatedObjects,...
- %                'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
- % 
- %                % newPropListeners = listener(aggregatedObjects,...
- %                % 'PropertyChanged',@(src,evt)notify(obj,"PropertyChanged",evt));
- % 
- %                % Create listener to nested/aggregated models inside the
- %                % model(s)
- %                newModelListeners{idx} = event.listener(aggregatedObjects,...
- %                'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
- % 
- %                % newModelListeners = listener(aggregatedObjects,...
- %                % 'ModelChanged',@(src,evt)notify(obj,"ModelChanged",evt));
- % 
- %                % Gather the new listeners together
- %                % newListeners{} = vertcat(newPropListeners(:), newModelListeners(:));
- % 
- %            end %for
- % 
- %            % Flatten the lists
- %            newPropListeners = vertcat(newPropListeners{:});
- %            newModelListeners = vertcat(newModelListeners{:});
- % 
- %            % Store the results
- %            obj.AggregatedModelListeners = newModelListeners;
- %            obj.AggregatedModelPropListeners = newPropListeners;
+% % Preallocate array of listeners
+%            numProps = numel(propNames);
+%            newModelListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
+%            newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
+%
+%            % Loop on each property requested, in case of multiple
+%            % properties having aggregated handle objects
+%            for idx = 1:numProps
+%
+%                % Get the current property
+%                thisProp = propNames(idx);
+%
+%                % Get the model(s) to listen to
+%                aggregatedObjects = obj.(thisProp);
+%
+%                % Skip this property if empty
+%                if isempty(aggregatedObjects)
+%                    continue
+%                end
+%
+%                % These objects must be handle!
+%                allAreHandle = all(isa(aggregatedObjects,'handle'));
+%                assert(allAreHandle,...
+%                    "Expected %s to contain a handle class object.",...
+%                    thisProp);
+%
+%                % Clear any invalid objects
+%                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
+%
+%                % Create listener to property changes within the model(s)
+%                newPropListeners{idx} = event.listener(aggregatedObjects,...
+%                'PropertyChanged',@(src,evt)onAggregatedPropertyChanged(obj,evt));
+%
+%                % newPropListeners = listener(aggregatedObjects,...
+%                % 'PropertyChanged',@(src,evt)notify(obj,"PropertyChanged",evt));
+%
+%                % Create listener to nested/aggregated models inside the
+%                % model(s)
+%                newModelListeners{idx} = event.listener(aggregatedObjects,...
+%                'ModelChanged',@(src,evt)onAggregatedModelChanged(obj,evt));
+%
+%                % newModelListeners = listener(aggregatedObjects,...
+%                % 'ModelChanged',@(src,evt)notify(obj,"ModelChanged",evt));
+%
+%                % Gather the new listeners together
+%                % newListeners{} = vertcat(newPropListeners(:), newModelListeners(:));
+%
+%            end %for
+%
+%            % Flatten the lists
+%            newPropListeners = vertcat(newPropListeners{:});
+%            newModelListeners = vertcat(newModelListeners{:});
+%
+%            % Store the results
+%            obj.AggregatedModelListeners = newModelListeners;
+%            obj.AggregatedModelPropListeners = newPropListeners;

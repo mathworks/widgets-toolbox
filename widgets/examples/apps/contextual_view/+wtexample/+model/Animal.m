@@ -38,4 +38,19 @@ classdef Animal < wt.model.BaseModel
 
     end %methods
 
+
+    %% Constructor
+    methods
+        function obj = Animal(varargin)
+            % Constructor
+
+            % Call superclass method
+            % obj@wt.model.BaseModel(varargin{:});
+
+            % Debug instead
+            obj@wt.model.BaseModel(varargin{:},"Debug",true);
+
+        end %function
+    end %methods
+
 end %classdef
