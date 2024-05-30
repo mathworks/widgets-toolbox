@@ -272,37 +272,22 @@ classdef (Abstract) BaseModel < handle & ...
         end %function
 
 
-        % function onModelChanged(obj,evt) %#ok<INUSD>
-        %     % Runs on any property or aggregated BaseModel change
-        % 
-        %     if obj.Debug
-        %         disp("wt.model.BaseModel.onModelChanged " + ...
-        %             class(obj) + "  Model: " + class(evt.Model) + ...
-        %             " Prop: " + evt.Property);
-        %     end
-        % 
-        %     % Do nothing here - subclass may override this for custom
-        %     % functionalities
-        % 
-        % end %function
-
-
         function onModelChanged(obj,evt)
         % Runs on property changes to this class or an aggregated BaseModel
         % class
 
             arguments
                 obj (1,1) wt.model.BaseModel
-                evt (1,1) event.EventData
+                evt (1,1) wt.eventdata.ModelChangedData
             end
 
-            if ~isa(evt, "wt.eventdata.ModelChangedData")
-                if obj.Debug()
-                    disp("wt.model.BaseModel.onModelChanged " + ...
-                        class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
-                end
-                return
-            end
+            % if ~isa(evt, "wt.eventdata.ModelChangedData")
+            %     if obj.Debug()
+            %         disp("wt.model.BaseModel.onModelChanged " + ...
+            %             class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
+            %     end
+            %     return
+            % end
 
             if obj.Debug
                 disp("wt.model.BaseModel.onModelChanged " + ...
@@ -312,7 +297,6 @@ classdef (Abstract) BaseModel < handle & ...
             % Prepare eventdata
             evtOut = wt.eventdata.ModelChangedData;
             evtOut.Model = evt.Model;
-            % evtOut.Model = evt.AffectedObject;
             evtOut.Property = evt.Property;
             evtOut.Value = evt.Value;
             evtOut.Stack = horzcat({evt.Source}, evt.Stack);

@@ -38,11 +38,16 @@ classdef BaseViewController < ...
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
 
+    end %properties
+
+
+    properties (SetAccess = protected)
+
         % Listener for a new model being attached
-        ModelSetListener_BVC event.listener
+        ModelSetListener event.listener
 
         % Listener for property changes within the model
-        ModelPropertyChangedListener_BVC event.listener
+        ModelChangedListener event.listener
 
     end %properties
 
@@ -50,7 +55,9 @@ classdef BaseViewController < ...
     properties (Transient, UsedInUpdate, Access = private)
 
         % Internal flag to trigger an update call
-        Dirty (1,1) logical = false
+        Dirty_BVC (1,1) logical = false
+        % It never gets set false again, just setting true each time
+        % internally will trigger the update to happen
 
     end %properties
 
@@ -64,8 +71,10 @@ classdef BaseViewController < ...
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(varargin{:});
 
             % Listen to Model property being set
-            obj.ModelSetListener_BVC = listener(obj,"Model","PostSet",...
-                @(~,~)onModelSet(obj));
+            obj.ModelSetListener = listener(obj,"Model","PostSet",@(~,~)onModelSet(obj));
+
+            % Listen to model changes
+            obj.attachModelListeners();
 
         end %function
     end %methods
@@ -77,7 +86,6 @@ classdef BaseViewController < ...
         function forceUpdate(obj)
             % Forces update to run (For debugging only!)
 
-            disp("DEBUG: Forcing update for " + class(obj));
             obj.update();
 
         end %function
@@ -128,24 +136,19 @@ classdef BaseViewController < ...
         end %function
 
 
-        function onModelChanged(obj,evt)
-            % Triggered when a property within theModel has changed
+        function requestUpdate(obj)
+            % Request update to occur at next drawnow cycle
 
-            % Request update method to run during next drawnow
-            obj.Dirty = true;
-
-            % Notify listeners
-            notify(obj,"ModelChanged",evt)
+            obj.Dirty_BVC = true;
 
         end %function
-
+        
 
         function onModelSet(obj)
             % Triggered when Model has been changed
 
             % Listen to model property changes
-            obj.ModelPropertyChangedListener_BVC = listener(obj.Model,...
-                "PropertyChanged", @(~,evt)onModelChanged(obj,evt));
+            obj.attachModelListeners();
 
             % Prepare event data
             evtOut = wt.eventdata.ModelSetData();
@@ -155,7 +158,29 @@ classdef BaseViewController < ...
             % Notify listeners
             notify(obj,"ModelSet",evtOut)
 
-        end
+        end %function
+
+
+        function attachModelListeners(obj)
+            % Triggered when Model has been changed
+
+            % Listen to model property changes
+            obj.ModelChangedListener = listener(obj.Model,...
+                "ModelChanged", @(~,evt)onModelChanged(obj,evt));
+
+        end %function
+
+
+        function onModelChanged(obj,evt)
+            % Triggered when a property within theModel has changed
+
+            % Request update method to run
+            obj.requestUpdate();
+
+            % Notify listeners
+            notify(obj,"ModelChanged",evt)
+
+        end %function
 
 
         function onFieldEdited(obj,evt,fieldName,index)

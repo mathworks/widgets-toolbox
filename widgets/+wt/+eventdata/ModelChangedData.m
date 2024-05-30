@@ -11,33 +11,4 @@ classdef ModelChangedData < event.EventData
         Stack (1,:) cell
     end %properties
 
-
-    % %% Properties
-    % properties (SetAccess = protected)
-    %     Model 
-    %     Value
-    %     Property string {mustBeScalarOrEmpty}
-    %     Stack (1,:) cell
-    % end %properties
-    % 
-    % 
-    % %% Constructor
-    % methods
-    %     function obj = ModelChangedData(model, property, value, stack)
-    % 
-    %         arguments
-    %             model (1,1) wt.model.BaseModel
-    %             property char
-    %             value = [];
-    %             stack (1,:) cell = cell(1,0);
-    %         end
-    % 
-    %         obj.Model = model;
-    %         obj.Property = property;
-    %         obj.Value = value;
-    %         obj.Stack = stack;
-    % 
-    %     end %constructor
-    % end %methods
-
 end % classdef
