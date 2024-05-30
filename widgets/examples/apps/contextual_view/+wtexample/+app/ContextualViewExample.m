@@ -28,6 +28,10 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function setup(app)
 
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.setup");
+            end
+
             % Set the name
             app.Name = "Contextual View Example";
 
@@ -43,6 +47,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
             fileSection.addButton("new_24.png","New");
             fileSection.addButton("open_24.png","Open");
             fileSection.addButton("saveClean_24.png","Save");
+            fileSection.addButton("saveClean_24.png","Save As");
             fileSection.addButton("import_24.png","Import");
             fileSection.ButtonPushedFcn = @(~,evt)onFileButtonPushed(app,evt);
 
@@ -75,7 +80,11 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
         end %function
 
 
-        function sessionObj = createNewSession(~)
+        function sessionObj = createNewSession(app)
+
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.createNewSession");
+            end
 
             sessionObj = wtexample.model.Session;
 
@@ -89,7 +98,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function update(app)
 
-            disp("Updating app: ContextualViewExample");
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.update");
+            end
 
             % Populate tree
             delete(app.Tree.Children);
@@ -139,14 +150,6 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         end %function
 
-
-        function onModelChanged(app,evt)
-
-            disp("app.onModelChanged called with event data:");
-            disp(evt);
-
-        end %function
-
     end %methods
 
 
@@ -155,6 +158,10 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function onTreeSelection(app,evt)
             % On selected tree node changed
+
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.onTreeSelection");
+            end
 
             selNode = evt.SelectedNodes;
             if isscalar(selNode)
@@ -181,17 +188,25 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         function onFileButtonPushed(app,evt)
 
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.onFileButtonPushed");
+            end
+
             switch evt.Text
 
                 case 'New'
 
-                    app.Session = app.createNewSession();
+                    app.newSession();
 
                 case 'Open'
 
                     app.loadSession()
 
                 case 'Save'
+
+                    app.saveSession(false);
+
+                case 'Save As'
 
                     app.saveSession(true);
 
@@ -219,6 +234,10 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
 
         function onExhibitButtonPushed(app,evt)
+
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.onExhibitButtonPushed");
+            end
 
             switch evt.Text
 

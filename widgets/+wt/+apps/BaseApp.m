@@ -76,7 +76,15 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     
     
     
-    %% Debugging Methods
+    %% Debugging
+    properties (Transient)
+
+        % Toggle true to enable debugging display
+        Debug (1,1) logical = false
+
+    end %methods
+
+
     methods
         
         function forceUpdate(app)
@@ -135,6 +143,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
             if ~isempty(varargin)
                 set(app, varargin{:});
             end
+
+            if app.Debug
+                disp("wt.apps.BaseApp.BaseApp (constructor) " + class(app));
+            end
             
             % Register the app with App Designer
             registerApp(app, app.Figure)
@@ -162,6 +174,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function delete(app)
             % Destructor
+
+            if app.Debug
+                disp("wt.apps.BaseApp.delete (destructor) " + class(app));
+            end
             
             % Store last position in preferences
             if isscalar(app.Figure) && isvalid(app.Figure)
@@ -185,6 +201,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function close(app)
             % Triggered on figure closed
+
+            if app.Debug
+                disp("wt.apps.BaseApp.close " + class(app));
+            end
             
             app.delete();
             
@@ -201,6 +221,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 title (1,1) string = ""
                 default (1,1) string = "Cancel"
                 icon (1,1) string = "question"
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseApp.promptYesNoCancel " + class(app));
             end
             
             % Launch the prompt
@@ -222,6 +246,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 filePath (1,1) string = pwd
                 filter = ["*.mat","MATLAB MAT File"];
                 title (1,1) string = "Save as"
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseApp.promptToSaveAs " + class(app));
             end
             
             % Prompt for the file
@@ -246,6 +274,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 app (1,1) wt.apps.BaseApp
                 filter = ["*.mat","MATLAB MAT File"];
                 title (1,1) string = "Open"
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseApp.promptToLoad " + class(app));
             end
             
             % Prompt for the file
@@ -295,6 +327,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function moveOnScreen(app)
             % Ensure the figure is placed on screen
+
+            if app.Debug
+                disp("wt.apps.BaseApp.moveOnScreen " + class(app));
+            end
             
             if strcmp(app.Figure.Units,'pixels')
                 
@@ -379,8 +415,12 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     %% Protected Methods
     methods (Access = protected)
         
-        function setup_internal(~)
+        function setup_internal(app)
             % Preform internal pre-setup necessary
+
+            if app.Debug
+                disp("wt.apps.BaseApp.setup_internal " + class(app));
+            end
             
             % This is used for session managed apps
             
@@ -389,6 +429,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function loadPreferences(app)
             % Load stored preferences
+
+            if app.Debug
+                disp("wt.apps.BaseApp.loadPreferences " + class(app));
+            end
             
             app.Preferences.load(app.PreferenceGroup);
             
@@ -397,6 +441,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function savePreferences(app)
             % Save preferences
+
+            if app.Debug
+                disp("wt.apps.BaseApp.savePreferences " + class(app));
+            end
             
             app.Preferences.save(app.PreferenceGroup);
             
@@ -405,6 +453,10 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         
         function updateTitle(app)
             % Update the figure title
+
+            if app.Debug
+                disp("wt.apps.BaseApp.updateTitle " + class(app));
+            end
             
             app.Figure.Name = app.Name;
             

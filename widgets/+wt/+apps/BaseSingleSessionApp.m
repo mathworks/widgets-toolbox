@@ -9,10 +9,24 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     properties (AbortSet)
         
         % Session data for the app (must be subclass of wt.model.BaseSession)
-        Session (1,1) wt.model.BaseSession {mustBeScalarOrEmpty} ...
-            = wt.model.BaseSession;
+        Session (1,:) wt.model.BaseSession {mustBeScalarOrEmpty}
         
     end %properties
+
+
+    % Accessors
+    methods
+        
+        function set.Session(app,value)
+            app.Session = value;
+            if app.SetupComplete
+                app.update();
+                app.updateTitle();
+            end
+            app.attachSessionListeners();
+        end
+
+    end %methods
     
     
     
@@ -28,10 +42,27 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     end %properties
     
     
+    % Accessors
+    methods
+        
+        function value = get.Dirty(app)
+            value = app.HasValidSession && app.Session.Dirty;
+        end
+        
+        function value = get.HasValidSession(app)
+            value = ~isempty(app.Session) && isvalid(app.Session);
+        end
+        
+    end %methods
+    
+    
     properties (Transient, NonCopyable, Access = private)
         
         % Listener to changes within Session object
         SessionChangedListener event.listener
+
+        % Listeners to session marked clean/dirty
+        SessionDirtyListener event.listener
         
     end %properties
     
@@ -53,6 +84,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function newSession(app)
             % Start a new session
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.newSession " + class(app));
+            end
             
             % If an existing session is dirty, give the user a chance to
             % save before loading another session
@@ -72,7 +107,6 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             % Instantiate the new session
             sessionObj = app.createNewSession();
             app.Session = sessionObj;
-            app.updateTitle();
             
             % Force an update prior to the progress dialog closing
             drawnow
@@ -87,6 +121,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             arguments
                 app (1,1) wt.apps.BaseApp
                 useSaveAs (1,1) logical = false
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.saveSession " + class(app));
             end
             
             % We must have a session to save!
@@ -129,7 +167,6 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 app.Session.save();
                 app.Session.FilePath = sessionPath;
                 app.Session.Dirty = false;
-                app.updateTitle();
                 
                 % Force an update prior to the progress dialog closing
                 drawnow
@@ -146,6 +183,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             arguments
                 app (1,1) wt.apps.BaseApp
                 sessionPath (1,1) string = ""
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.loadSession " + class(app));
             end
             
             % If an existing session is dirty, give the user a chance to
@@ -179,9 +220,6 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 % Store the session - triggers app.update()
                 app.Session = sessionObj;
                 
-                % Update the title
-                app.updateTitle();
-                
                 % Force an update prior to the progress dialog closing
                 drawnow
                 
@@ -192,6 +230,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function isCancelled = promptToSaveFirst(app)
             % Prompt the user to save a file
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.promptToSaveFirst " + class(app));
+            end
             
             % Default output
             isCancelled = false;
@@ -216,6 +258,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function close(app)
             % Triggered on figure closed
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.close " + class(app));
+            end
             
             % If an existing session is dirty, give the user a chance to
             % save before loading another session
@@ -246,6 +292,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function setup_internal(app)
             % Preform internal pre-setup necessary
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.setup_internal " + class(app));
+            end
             
             % Instantiate initial session
             app.Session = app.createNewSession();
@@ -255,6 +305,10 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         
         function updateTitle(app)
             % Update the app title, showing the session name and dirty flag
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.updateTitle " + class(app));
+            end
             
             if ~app.HasValidSession
                 app.Figure.Name = app.Name;
@@ -271,17 +325,39 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             % Triggered when a SetObservable property in the session has
             % changed. May be overridden for custom behavior using incoming
             % event data.
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.onSessionChanged " + class(app));
+            end
             
             % Trigger an update
             app.update();
             
         end %function
+
         
+        function onSessionDirty(app)
+            % Triggered when the session's MarkedDirty event fires
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.onSessionDirty " + class(app));
+            end
+            
+            % Update the title
+            app.updateTitle();
+            
+        end %function
+
         
-        function onModelChanged(~,~)
-            % Triggered when a ModelChanged event occurs in the session.
-            % May be overridden for custom behavior using incoming event
-            % data. Format: onModelChanged(app,evt)
+        function onSessionClean(app)
+            % Triggered when the session's MarkedClean event fires
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.onSessionClean " + class(app));
+            end
+            
+            % Update the title
+            app.updateTitle();
             
         end %function
         
@@ -292,63 +368,37 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     %% Private Methods
     methods (Access = private)
         
-        
-        function onModelChanged_private(app,e)
-            % Triggered when a ModelChanged event occurs in the session.
-        
-            % Update the app title
-            app.updateTitle();
-            
-            % Call the app's model changed method
-            app.onModelChanged(e);
-            
-        end %function
-        
-        
-        function onSessionChanged_private(app,e)
+        function onSessionChanged_private(app,evt)
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.onSessionChanged_private " + class(app));
+            end
         
             % Update the app title
-            app.updateTitle();
+            % app.updateTitle();
             
             % Call the app's session changed method
-            app.onSessionChanged(e);
+            app.onSessionChanged(evt);
             
         end %function
         
         
         function attachSessionListeners(app)
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.attachSessionListeners " + class(app));
+            end
             
-            app.SessionChangedListener = [
-                listener(app.Session,'PropertyChanged',@(h,e)onSessionChanged_private(app,e));
-                listener(app.Session,'ModelChanged',@(h,e)onModelChanged_private(app,e));
+            app.SessionChangedListener = listener(app.Session,...
+                'ModelChanged',@(h,e)onSessionChanged_private(app,e));
+
+            app.SessionDirtyListener = [
+                listener(app.Session,'MarkedDirty',@(~,~)app.onSessionDirty())
+                listener(app.Session,'MarkedClean',@(~,~)app.onSessionClean())
                 ];
 
         end %function
         
     end %methods
-    
-    
-    
-    %% Accessors
-    methods
-        
-        function set.Session(app,value)
-            app.Session = value;
-            if app.SetupComplete
-                app.update();
-            end
-            app.attachSessionListeners();
-        end
-        
-        function value = get.HasValidSession(app)
-            value = ~isempty(app.Session) && isvalid(app.Session);
-        end
-        
-        function value = get.Dirty(app)
-            value = app.HasValidSession && app.Session.Dirty;
-        end
-        
-    end %methods
-    
-    
+   
 end %classdef

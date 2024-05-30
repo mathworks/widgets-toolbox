@@ -13,10 +13,10 @@ classdef BaseSession < wt.model.BaseModel
     events
         
         % Triggered when dirty flag toggles
-        SessionMarkedDirty 
+        MarkedDirty 
 
         % Triggered when dirty flag toggles
-        SessionMarkedClean 
+        MarkedClean 
         
     end %events
 
@@ -53,12 +53,16 @@ classdef BaseSession < wt.model.BaseModel
     % Accessors
     methods
         function set.Dirty(obj,value)
-            disp("BaseSession set.Dirty = " + string(value));
+
+            if obj.Debug
+                disp("wt.model.BaseSession.set.Dirty = " + string(value));
+            end
+
             obj.Dirty = value;
             if value
-                obj.notify("SessionMarkedDirty")
+                obj.notify("MarkedDirty")
             else
-                obj.notify("SessionMarkedClean")
+                obj.notify("MarkedClean")
             end
         end
     end
@@ -69,10 +73,15 @@ classdef BaseSession < wt.model.BaseModel
                
         function save(session)
             % Save a session object into a MAT file
+
+            if obj.Debug
+                disp("wt.model.BaseSession.save");
+            end
             
             if ~strlength(session.FilePath)
                 error('Session FilePath is empty.');
             end
+
             save(session.FilePath,'session');
             
         end %function
@@ -97,24 +106,6 @@ classdef BaseSession < wt.model.BaseModel
     %% Protected methods (subclass may override these)
     methods (Access = protected)
 
-        % function onPropChanged(obj,evt)
-        %     % Triggered when SetObservable properties have changed
-        % 
-        %     if obj.Debug
-        %         disp("wt.model.BaseSession.onPropChanged " + ...
-        %             class(obj) + "  Model: " + class(evt.AffectedObject) + ...
-        %             " Prop: " + evt.Source.Name);
-        %     end
-        % 
-        %     % Mark the session dirty
-        %     obj.Dirty = true;
-        % 
-        %     % Call superclass method to notify PropertyChanged event
-        %     obj.onPropChanged@wt.model.BaseModel(evt);
-        % 
-        % end %function
-
-
         function onModelChanged(obj,evt)
             % Triggered when the Session or any aggregated BaseModel
             % classes have triggered a ModelChanged event (typically when
@@ -125,12 +116,12 @@ classdef BaseSession < wt.model.BaseModel
                     class(obj) + "  Model: " + class(evt.Model) + ...
                     " Prop: " + evt.Property);
             end
-            
-            % Call superclass method to notify PropertyChanged event
-            obj.onModelChanged@wt.model.BaseModel(evt);
 
             % Mark the session dirty
             obj.Dirty = true;
+            
+            % Call superclass method to notify PropertyChanged event
+            obj.onModelChanged@wt.model.BaseModel(evt);
             
         end %function
 
