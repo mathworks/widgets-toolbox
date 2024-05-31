@@ -1,4 +1,4 @@
-classdef ModelChangedData < event.EventData & matlab.mixin.Copyable
+classdef ModelChangedData < wt.abstract.BaseEventData
     % Event data for model changes
 
     % Copyright 2024 The MathWorks, Inc.

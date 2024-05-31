@@ -1,4 +1,4 @@
-classdef ModelSetData < event.EventData & matlab.mixin.Copyable
+classdef ModelSetData < wt.abstract.BaseEventData
     % Event data for model set
 
     % Copyright 2024 The MathWorks, Inc.

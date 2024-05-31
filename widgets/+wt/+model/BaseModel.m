@@ -278,20 +278,13 @@ classdef (Abstract) BaseModel < handle & ...
 
             arguments
                 obj (1,1) wt.model.BaseModel
-                evt
-                %evt (1,1) wt.eventdata.ModelChangedData
-            end
-
-            if ~isa(evt, "wt.eventdata.ModelChangedData")
-                disp("wt.model.BaseModel.onModelChanged " + ...
-                    class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
-                keyboard
-                return
+                evt (1,1) wt.eventdata.ModelChangedData
             end
 
             if obj.Debug
                 disp("wt.model.BaseModel.onModelChanged " + ...
-                    class(obj) + "  Model: " + class(evt.Model) + " Prop: " + evt.Property);
+                    class(obj) + "  Model: " + class(evt.Model) + ...
+                    " Prop: " + evt.Property);
             end
 
             % Prepare eventdata

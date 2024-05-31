@@ -1,11 +1,11 @@
-classdef SliderCheckboxChangedData < event.EventData & dynamicprops & matlab.mixin.Copyable
+classdef SliderCheckboxChangedData < wt.abstract.BaseEventData & dynamicprops
     % Event data for widget property value changes
     %
     % Syntax:
     %           obj = wt.eventdata.SliderCheckboxChangedData(name,index,prop,state,value)
     %
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+    % Copyright 2020-2024 The MathWorks, Inc.
 
     %% Properties
     properties (SetAccess = protected)

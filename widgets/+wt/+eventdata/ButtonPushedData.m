@@ -1,4 +1,4 @@
-classdef ButtonPushedData < event.EventData & dynamicprops & matlab.mixin.Copyable
+classdef ButtonPushedData < wt.abstract.BaseEventData & dynamicprops
     % Event data for widget button push
     %
     % Syntax:
