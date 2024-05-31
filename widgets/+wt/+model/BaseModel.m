@@ -47,7 +47,6 @@ classdef (Abstract) BaseModel < handle & ...
         % Listeners to public properties
         PropListeners
 
-
         % Listeners to any aggregated / nested handle class models
         % AggregatedModelListeners
         AggregatedModelListeners
@@ -224,8 +223,9 @@ classdef (Abstract) BaseModel < handle & ...
                 aggregatedObjects(~isvalid(aggregatedObjects)) = [];
 
                 % Create listener to property changes within the model(s)
-                newPropListeners{idx} = event.listener(aggregatedObjects,...
-                    'ModelChanged',@(src,evt)onModelChanged(obj,evt));
+                fcnModelChange = @(src,evt)onModelChanged(obj,evt);
+                newPropListeners{idx} = listener(aggregatedObjects,...
+                    'ModelChanged',fcnModelChange);
 
             end %for
 
@@ -264,7 +264,7 @@ classdef (Abstract) BaseModel < handle & ...
             end
 
             % Notify listeners
-            obj.notify('PropertyChanged',evtOut)
+            obj.notify("PropertyChanged",evtOut)
 
             % Call onModelChanged method
             obj.onModelChanged(evtOut);
@@ -278,16 +278,16 @@ classdef (Abstract) BaseModel < handle & ...
 
             arguments
                 obj (1,1) wt.model.BaseModel
-                evt (1,1) wt.eventdata.ModelChangedData
+                evt
+                %evt (1,1) wt.eventdata.ModelChangedData
             end
 
-            % if ~isa(evt, "wt.eventdata.ModelChangedData")
-            %     if obj.Debug()
-            %         disp("wt.model.BaseModel.onModelChanged " + ...
-            %             class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
-            %     end
-            %     return
-            % end
+            if ~isa(evt, "wt.eventdata.ModelChangedData")
+                disp("wt.model.BaseModel.onModelChanged " + ...
+                    class(obj) + "  evt is not of type 'wt.eventdata.ModelChangedData'. Skipping...");
+                keyboard
+                return
+            end
 
             if obj.Debug
                 disp("wt.model.BaseModel.onModelChanged " + ...
@@ -302,7 +302,7 @@ classdef (Abstract) BaseModel < handle & ...
             evtOut.Stack = horzcat({evt.Source}, evt.Stack);
 
             % Notify listeners
-            obj.notify('ModelChanged',evtOut)
+            obj.notify("ModelChanged",evtOut)
 
         end %function
 

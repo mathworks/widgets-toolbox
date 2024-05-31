@@ -1,10 +1,10 @@
-classdef ModelChangedData < event.EventData
+classdef ModelChangedData < event.EventData & matlab.mixin.Copyable
     % Event data for model changes
 
     % Copyright 2024 The MathWorks, Inc.
 
     %% Properties
-    properties (SetAccess = ?wt.model.BaseModel)
+    properties %(SetAccess = ?wt.model.BaseModel)
         Model
         Property string {mustBeScalarOrEmpty}
         Value

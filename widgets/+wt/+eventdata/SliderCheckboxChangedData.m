@@ -1,4 +1,4 @@
-classdef SliderCheckboxChangedData < event.EventData & dynamicprops
+classdef SliderCheckboxChangedData < event.EventData & dynamicprops & matlab.mixin.Copyable
     % Event data for widget property value changes
     %
     % Syntax:

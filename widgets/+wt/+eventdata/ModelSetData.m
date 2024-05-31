@@ -1,10 +1,10 @@
-classdef ModelSetData < event.EventData
+classdef ModelSetData < event.EventData & matlab.mixin.Copyable
     % Event data for model set
 
     % Copyright 2024 The MathWorks, Inc.
 
     %% Properties
-    properties (SetAccess = ?wt.abstract.BaseViewController)
+    properties
         Model
         Controller
     end %properties

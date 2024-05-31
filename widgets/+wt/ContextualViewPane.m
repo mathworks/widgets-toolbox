@@ -458,8 +458,11 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
 
         function onModelSet(obj,evt)
 
+            % Prepare eventdata
+            evtOut = copy(evt);
+
             % Notify listeners
-            obj.notify("ModelSet",evt);
+            obj.notify("ModelSet",evtOut);
 
             % Listen to model changes
             % obj.attachModelPropertyChangedListener();
@@ -469,8 +472,11 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
 
         function onModelChanged(obj,evt)
 
+            % Prepare eventdata
+            evtOut = copy(evt);
+
             % Notify listeners
-            obj.notify("ModelChanged",evt);
+            obj.notify("ModelChanged",evtOut);
 
         end %function
 

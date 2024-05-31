@@ -182,8 +182,8 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
             drawnow
 
             % Trigger event
-            evt = wt.eventdata.ButtonPushedData(obj.CancelButton, "Cancel");
-            notify(obj,"CancelPressed",evt);
+            evtOut = wt.eventdata.ButtonPushedData(obj.CancelButton, "Cancel");
+            notify(obj,"CancelPressed",evtOut);
 
         end %function
 

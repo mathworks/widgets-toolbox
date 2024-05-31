@@ -6,7 +6,8 @@ classdef BaseViewController < ...
 
 
     %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
+    % events (HasCallbackProperty, NotifyAccess = protected)
+    events (NotifyAccess = protected)
 
         % Triggered when the Model has changed
         ModelSet
@@ -177,8 +178,11 @@ classdef BaseViewController < ...
             % Request update method to run
             obj.requestUpdate();
 
+            % Create eventdata
+            evtOut = copy(evt);
+
             % Notify listeners
-            notify(obj,"ModelChanged",evt)
+            notify(obj,"ModelChanged",evtOut)
 
         end %function
 

@@ -1,4 +1,4 @@
-classdef ValueChangedData < event.EventData & dynamicprops
+classdef ValueChangedData < event.EventData & dynamicprops & matlab.mixin.Copyable
     % Event data for widget value changes
     %
     % Syntax:

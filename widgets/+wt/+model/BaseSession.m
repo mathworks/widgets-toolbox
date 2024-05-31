@@ -74,7 +74,7 @@ classdef BaseSession < wt.model.BaseModel
         function save(session)
             % Save a session object into a MAT file
 
-            if obj.Debug
+            if session.Debug
                 disp("wt.model.BaseSession.save");
             end
             
