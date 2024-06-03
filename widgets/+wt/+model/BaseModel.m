@@ -195,7 +195,6 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Preallocate array of listeners
             numProps = numel(propNames);
-            % newModelListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
             newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
 
             % Loop on each property requested, in case of multiple
@@ -224,7 +223,7 @@ classdef (Abstract) BaseModel < handle & ...
 
                 % Create listener to property changes within the model(s)
                 fcnModelChange = @(src,evt)onModelChanged(obj,evt);
-                newPropListeners{idx} = listener(aggregatedObjects,...
+                newPropListeners{idx} = event.listener(aggregatedObjects,...
                     'ModelChanged',fcnModelChange);
 
             end %for
