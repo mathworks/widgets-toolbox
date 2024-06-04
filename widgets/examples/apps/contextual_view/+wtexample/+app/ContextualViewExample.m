@@ -12,7 +12,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
         Tree matlab.ui.container.Tree
 
         % Contextual pane to show view/controller for selected tree node
-        ContextualPane wt.ContextualViewPane
+        ContextualView wt.ContextualView
 
         ExhibitAddButton
         ExhibitDeleteButton
@@ -73,9 +73,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
             app.Tree.Layout.Column = 1;
 
             % Create contextual view pane
-            app.ContextualPane = wt.ContextualViewPane(app.Grid);
-            app.ContextualPane.Layout.Row = 2;
-            app.ContextualPane.Layout.Column = 2;
+            app.ContextualView = wt.ContextualView(app.Grid);
+            app.ContextualView.Layout.Row = 2;
+            app.ContextualView.Layout.Column = 2;
 
         end %function
 
@@ -174,12 +174,12 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                 viewClass = replace(modelClass,".model.",".viewcontroller.");
 
                 % Launch the contextual pane for the selected data type
-                app.ContextualPane.launchView(viewClass, model);
+                app.ContextualView.launchView(viewClass, model);
 
             else
 
                 % Clear the contextual pane
-                app.ContextualPane.launchView("");
+                app.ContextualView.launchView("");
 
             end %if
 

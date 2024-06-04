@@ -1,4 +1,4 @@
-classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & ...
+classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.ErrorHandling
     % wt.mixin.BackgroundColorable & ...
     % wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
@@ -12,7 +12,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
     % left and on the right a contextual view that displays different
     % content determined by the selected tree node.
     %
-    % Content views that are placed in this ContextualViewPane should
+    % Content views that are placed in this ContextualView should
     % inherit the following classes:
     %   matlab.ui.componentcontainer.ComponentContainer
     %   wt.mixin.ContextualView (if auto-populating Model property)
@@ -97,7 +97,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % This method may be overloaded as needed
 
             arguments
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
@@ -124,7 +124,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % This method may be overloaded as needed
 
             arguments
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
             end
 
             % Remove listeners
@@ -224,7 +224,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Otherwise, an empty view is returned
 
             arguments (Input)
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 viewClass (1,1) string
             end
 
@@ -236,7 +236,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             if ~exist(viewClass,"class")
 
                 % Throw an error and return
-                id = "wt:ContextualViewPane:InvalidPaneType";
+                id = "wt:ContextualView:InvalidPaneType";
                 message = "Invalid view type (%s). The viewClass " + ...
                     "must be a valid class path.";
                 error(id, message, viewClass);
@@ -266,7 +266,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Launch a view based on the class path
 
             arguments (Input)
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
@@ -318,7 +318,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Activate a view, placing it in view and attaching a model
 
             arguments
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 view (1,1) wt.abstract.BaseViewController
                 model wt.model.BaseModel
             end
@@ -373,7 +373,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
         function deactivateView_Private(obj, view)
             % Deactivate a view, removing from view and removing model
             arguments
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 view wt.abstract.BaseViewController = obj.ActiveView
             end
 
@@ -427,7 +427,7 @@ classdef ContextualViewPane < matlab.ui.componentcontainer.ComponentContainer & 
             % Attach model to the active view
 
             arguments
-                obj (1,1) wt.ContextualViewPane
+                obj (1,1) wt.ContextualView
                 view (1,1) wt.abstract.BaseViewController
                 model wt.model.BaseModel
             end
