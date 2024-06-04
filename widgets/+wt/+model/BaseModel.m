@@ -1,5 +1,6 @@
 classdef (Abstract) BaseModel < handle & ...
         matlab.mixin.SetGetExactNames & ...
+        matlab.mixin.Copyable & ...
         wt.mixin.DisplayNonScalarObjectAsTable
     % Base model class for apps that provides:
     %   PV pairs assignment on construction
@@ -31,7 +32,7 @@ classdef (Abstract) BaseModel < handle & ...
 
 
     %% Internal Properties
-    properties (Transient, NonCopyable, Hidden)
+    properties (Transient, Hidden)
 
         % Toggle true in each instance to enable debugging display
         Debug (1,1) logical = false
@@ -134,12 +135,29 @@ classdef (Abstract) BaseModel < handle & ...
     %% Protected Methods
     methods (Access = protected)
 
-        % This method is similar to
-        % matlab.io.internal.mixin.HasPropertiesAsNVPairs, but this one
-        % generally performs faster.
+        % Override copyElement method:
+        function cpObj = copyElement(obj)
+
+            if obj.Debug
+                disp("wt.model.BaseModel.copyElement " + class(obj));
+            end
+
+            % Call superclass method
+            cpObj = copyElement@matlab.mixin.Copyable(obj);
+
+            % Create listeners
+            cpObj.createPropListeners();
+            cpObj.attachModelListeners();
+
+        end %function
+
 
         function varargout = assignPVPairs(obj,varargin)
             % Assign the specified property-value pairs
+
+            % This method is similar to
+            % matlab.io.internal.mixin.HasPropertiesAsNVPairs, but this one
+            % generally performs faster.
 
             if nargin > 1
 
@@ -249,8 +267,8 @@ classdef (Abstract) BaseModel < handle & ...
 
 
         function onModelChanged(obj,evt)
-        % Runs on property changes to this class or an aggregated BaseModel
-        % class
+            % Runs on property changes to this class or an aggregated BaseModel
+            % class
 
             arguments
                 obj (1,1) wt.model.BaseModel
