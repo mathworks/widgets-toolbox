@@ -42,16 +42,42 @@ classdef (Abstract) BaseModel < handle & ...
 
     end %properties
 
+
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
         % Listeners to public properties
         PropListeners
 
+    end %properties
+
+
+    properties (Transient, NonCopyable, Access = private)
+
         % Listeners to any aggregated / nested handle class models
-        % AggregatedModelListeners
         AggregatedModelListeners
 
     end %properties
+
+
+    properties (Hidden, AbortSet)
+
+        % Enables nested model listeners to trigger onModelChanged event
+        EnableAggregatedModelListeners (1,1) logical = true
+
+    end %properties
+
+
+    % Accessors
+    methods
+        function set.EnableAggregatedModelListeners(obj,value)
+            obj.EnableAggregatedModelListeners = value;
+            if value
+                obj.attachModelListeners()
+            else
+                obj.clearModelListeners()
+            end
+        end
+    end %methods
 
 
     %% Constructor
@@ -66,6 +92,14 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Create listeners to public properties
             obj.createPropListeners();
+
+            % Create listeners to aggregated model classes that may have
+            % property change events
+            for idx = 1:numel(obj)
+                if obj(idx).EnableAggregatedModelListeners
+                    obj(idx).attachModelListeners();
+                end
+            end
 
         end %function
     end %methods
@@ -84,6 +118,12 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Need to recreate listeners
             obj.createPropListeners();
+
+            for idx = 1:numel(obj)
+                if obj(idx).EnableAggregatedModelListeners
+                    obj(idx).attachModelListeners();
+                end
+            end
 
         end %function
 
@@ -158,6 +198,9 @@ classdef (Abstract) BaseModel < handle & ...
                 thisObj.PropListeners = event.proplistener(thisObj, propInfo,...
                     'PostSet',@(~,e)onPropChanged(thisObj,e) );
 
+
+                %RJ - Move this somewhere for efficiency - only needed if
+                %we're using these!
                 % Which properties are aggregated BaseModel classes?
                 if isempty(thisObj.AggregatedModelProperties)
                     propNames = string({propInfo.Name});
@@ -166,73 +209,7 @@ classdef (Abstract) BaseModel < handle & ...
                     thisObj.AggregatedModelProperties = propNames(isAggModel);
                 end
 
-                % Create listeners to aggregated model classes that may have
-                % property change events
-                thisObj.attachModelListeners();
-
             end %for
-
-        end %function
-
-
-        function attachModelListeners(obj,propNames)
-            % Attach listeners to aggregated BaseModel changes
-
-            arguments
-                obj (1,1) wt.model.BaseModel
-                propNames (1,:) string = obj.AggregatedModelProperties
-            end
-
-            if obj.Debug
-                if isempty(propNames)
-                    propDisp = "<none>";
-                else
-                    propDisp = join(propNames, ", ");
-                end
-                disp("wt.model.BaseModel.attachModelListeners " + ...
-                    class(obj) + "  Prop: " + propDisp);
-            end
-
-            % Preallocate array of listeners
-            numProps = numel(propNames);
-            newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
-
-            % Loop on each property requested, in case of multiple
-            % properties having aggregated handle objects
-            for idx = 1:numProps
-
-                % Get the current property
-                thisProp = propNames(idx);
-
-                % Get the model(s) to listen to
-                aggregatedObjects = obj.(thisProp);
-
-                % Skip this property if empty
-                if isempty(aggregatedObjects)
-                    continue
-                end
-
-                % These objects must be handle!
-                allAreHandle = all(isa(aggregatedObjects, "wt.model.BaseModel"));
-                assert(allAreHandle,...
-                    "Expected %s to contain a handle class object.",...
-                    thisProp);
-
-                % Clear any invalid objects
-                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
-
-                % Create listener to property changes within the model(s)
-                fcnModelChange = @(src,evt)onModelChanged(obj,evt);
-                newPropListeners{idx} = event.listener(aggregatedObjects,...
-                    'ModelChanged',fcnModelChange);
-
-            end %for
-
-            % Flatten the lists
-            newPropListeners = vertcat(newPropListeners{:});
-
-            % Store the results
-            obj.AggregatedModelListeners = newPropListeners;
 
         end %function
 
@@ -304,6 +281,76 @@ classdef (Abstract) BaseModel < handle & ...
 
     %% Private methods
     methods (Access = private)
+
+        function attachModelListeners(obj,propNames)
+            % Attach listeners to aggregated BaseModel changes
+
+            arguments
+                obj (1,1) wt.model.BaseModel
+                propNames (1,:) string = obj.AggregatedModelProperties
+            end
+
+            if obj.Debug
+                if isempty(propNames)
+                    propDisp = "<none>";
+                else
+                    propDisp = join(propNames, ", ");
+                end
+                disp("wt.model.BaseModel.attachModelListeners " + ...
+                    class(obj) + "  Prop: " + propDisp);
+            end
+
+            % Preallocate array of listeners
+            numProps = numel(propNames);
+            newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
+
+            % Loop on each property requested, in case of multiple
+            % properties having aggregated handle objects
+            for idx = 1:numProps
+
+                % Get the current property
+                thisProp = propNames(idx);
+
+                % Get the model(s) to listen to
+                aggregatedObjects = obj.(thisProp);
+
+                % Skip this property if empty
+                if isempty(aggregatedObjects)
+                    continue
+                end
+
+                % These objects must be handle!
+                allAreHandle = all(isa(aggregatedObjects, "wt.model.BaseModel"));
+                assert(allAreHandle,...
+                    "Expected %s to contain a handle class object.",...
+                    thisProp);
+
+                % Clear any invalid objects
+                aggregatedObjects(~isvalid(aggregatedObjects)) = [];
+
+                % Create listener to property changes within the model(s)
+                fcnModelChange = @(src,evt)onModelChanged(obj,evt);
+                newPropListeners{idx} = event.listener(aggregatedObjects,...
+                    'ModelChanged',fcnModelChange);
+
+            end %for
+
+            % Flatten the lists
+            newPropListeners = vertcat(newPropListeners{:});
+
+            % Store the results
+            obj.AggregatedModelListeners = newPropListeners;
+
+        end %function
+
+
+        function clearModelListeners(obj)
+            % Removes aggregated model listeners
+
+            delete(obj.AggregatedModelListeners);
+            obj.AggregatedModelListeners(:) = [];
+
+        end %function
 
 
         function thisParser = getParser(obj,keepUnmatched)
