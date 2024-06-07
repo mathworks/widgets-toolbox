@@ -314,17 +314,12 @@ classdef (Abstract) BaseModel < handle & ...
             end
 
             % Prepare eventdata
-            % evtOut = wt.eventdata.ModelChangedData;
-            % evtOut.Model = evt.Model;
-            % evtOut.Property = evt.Property;
-            % evtOut.Value = evt.Value;
-            % evtOut.Stack = [{evt.Source}, evt.Stack];
-            % evtOut.ClassStack = [class(obj), evt.ClassStack];
-            
-            % Prepare event data
-            evtOut = copy(evt);            
-            evtOut.Stack = [{obj}, evtOut.Stack];
-            evtOut.ClassStack = [class(obj), evtOut.ClassStack];
+            evtOut = wt.eventdata.ModelChangedData;
+            evtOut.Model = evt.Model;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evt.Value;
+            evtOut.Stack = [{obj}, evt.Stack];
+            evtOut.ClassStack = [class(obj), evt.ClassStack];
 
             if obj.Debug
                 disp("wt.model.BaseModel.onModelChanged   " + ...

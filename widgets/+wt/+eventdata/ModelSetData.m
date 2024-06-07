@@ -1,4 +1,4 @@
-classdef ModelSetData < wt.abstract.BaseEventData
+classdef ModelSetData < event.EventData
     % Event data for model set
 
     % Copyright 2024 The MathWorks, Inc.

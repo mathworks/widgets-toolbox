@@ -1,4 +1,4 @@
-classdef SliderCheckboxChangedData < wt.abstract.BaseEventData & dynamicprops
+classdef SliderCheckboxChangedData < event.EventData & dynamicprops
     % Event data for widget property value changes
     %
     % Syntax:

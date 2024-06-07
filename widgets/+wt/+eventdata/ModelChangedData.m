@@ -1,4 +1,4 @@
-classdef ModelChangedData < wt.abstract.BaseEventData
+classdef ModelChangedData < event.EventData
     % Event data for model changes
 
     % Copyright 2024 The MathWorks, Inc.

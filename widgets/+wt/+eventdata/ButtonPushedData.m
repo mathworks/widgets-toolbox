@@ -1,4 +1,4 @@
-classdef ButtonPushedData < wt.abstract.BaseEventData & dynamicprops
+classdef ButtonPushedData < event.EventData & dynamicprops
     % Event data for widget button push
     %
     % Syntax:

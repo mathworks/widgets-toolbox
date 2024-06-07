@@ -173,13 +173,23 @@ classdef BaseViewController < ...
 
 
         function onModelChanged(obj,evt)
-            % Triggered when a property within theModel has changed
+            % Triggered when a property within the model has changed
+
+            arguments
+                obj (1,1) wt.model.BaseModel
+                evt (1,1) wt.eventdata.ModelChangedData
+            end
 
             % Request update method to run
             obj.requestUpdate();
 
-            % Create eventdata
-            evtOut = copy(evt);
+            % Prepare eventdata
+            evtOut = wt.eventdata.ModelChangedData;
+            evtOut.Model = evt.Model;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evt.Value;
+            evtOut.Stack = [{obj}, evt.Stack];
+            evtOut.ClassStack = [class(obj), evt.ClassStack];
 
             % Notify listeners
             notify(obj,"ModelChanged",evtOut)

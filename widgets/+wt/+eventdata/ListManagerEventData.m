@@ -1,4 +1,4 @@
-classdef ListManagerEventData < wt.abstract.BaseEventData & matlab.mixin.Copyable
+classdef ListManagerEventData < event.EventData
     % Event data for list manager change events
 
     % Copyright 2024 The MathWorks, Inc.

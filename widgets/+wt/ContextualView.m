@@ -459,13 +459,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function onModelSet(obj,evt)
 
             % Prepare eventdata
-            evtOut = copy(evt);
+            evtOut = wt.eventdata.ModelSetData;
+            evtOut.Model = evt.Model;
+            evtOut.Controller = evt.Controller;
 
             % Notify listeners
             obj.notify("ModelSet",evtOut);
-
-            % Listen to model changes
-            % obj.attachModelPropertyChangedListener();
 
         end %function
 
@@ -473,7 +472,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function onModelChanged(obj,evt)
 
             % Prepare eventdata
-            evtOut = copy(evt);
+            evtOut = wt.eventdata.ModelChangedData;
+            evtOut.Model = evt.Model;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evt.Value;
+            evtOut.Stack = [{obj}, evt.Stack];
+            evtOut.ClassStack = [class(obj), evt.ClassStack];
 
             % Notify listeners
             obj.notify("ModelChanged",evtOut);
