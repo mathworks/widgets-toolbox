@@ -37,8 +37,11 @@ classdef (Abstract) BaseModel < handle & ...
         % Toggle true in each instance to enable debugging display
         Debug (1,1) logical = false
 
-        % Listing of properties containing aggregated BaseModel classes to
-        % listen for hierarchical ModelChanged events
+        % List of properties containing aggregated BaseModel classes to
+        % listen for hierarchical ModelChanged events. Use this cautiously
+        % if model class references are used repeatedly. The intended
+        % purpose is to pass notifications up the hierarchy to the top
+        % level, so the session can be marked dirty.
         AggregatedModelProperties (1,:) string
 
     end %properties
@@ -123,6 +126,37 @@ classdef (Abstract) BaseModel < handle & ...
             for idx = 1:numel(obj)
                 if obj(idx).EnableAggregatedModelListeners
                     obj(idx).attachModelListeners();
+                end
+            end
+
+        end %function
+
+    end %methods
+
+
+
+    %% Public methods
+    methods
+
+        function debugAggregatedModels(obj, value)
+            % Recursively set debug on AggregatedModelProperties models in the hierarchy
+
+            arguments
+                obj (1,1) wt.model.BaseModel
+                value (1,1) logical = true;
+            end
+
+            % Debug this model
+            obj.Debug = value;
+
+            % Loop on aggregated models and set debug
+            for thisProp = obj.AggregatedModelProperties
+                thisModel = obj.(thisProp);
+                if ~isempty(thisModel) && all(isa(thisModel,"handle"))
+                    thisModel(~isvalid(thisModel)) = [];
+                    for idx = 1:numel(thisModel)
+                        thisModel(idx).debugAggregatedModels(value);
+                    end
                 end
             end
 
@@ -241,27 +275,31 @@ classdef (Abstract) BaseModel < handle & ...
 
             if obj.Debug
                 disp("wt.model.BaseModel.onPropChanged " + ...
-                    class(obj) + "  Model: " + class(evt.AffectedObject) + ...
-                    " Prop: " + evt.Source.Name);
-            end
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Property = evt.Source.Name;
-            evtOut.Model = evt.AffectedObject;
-            evtOut.Value = evtOut.Model.(evtOut.Property);
-            evtOut.Stack = {evt.Source};
-
-            % Revise listeners for model changes given the new value
-            if isa(evtOut.Value, "wt.model.BaseModel")
-                evtOut.Model.attachModelListeners();
+                    "    Model: " + class(evt.AffectedObject) + ...
+                    "    Prop: " + evt.Source.Name + ...
+                    "    Class: " + class(obj));
             end
 
             % Notify listeners
-            obj.notify("PropertyChanged",evtOut)
+            evtOutP = wt.eventdata.PropertyChangedData(...
+                evt.Source.Name, obj.(evt.Source.Name));
+            obj.notify("PropertyChanged",evtOutP)
+
+            % Prepare model change eventdata
+            evtOutM = wt.eventdata.ModelChangedData;
+            evtOutM.Property = evt.Source.Name;
+            evtOutM.Model = evt.AffectedObject;
+            evtOutM.Value = evtOutM.Model.(evtOutM.Property);
+            % evtOutM.Stack = {obj};
+            % evtOutM.ClassStack = class(obj);
+
+            % Revise listeners for model changes given the new value
+            if isa(evtOutM.Value, "wt.model.BaseModel")
+                evtOutM.Model.attachModelListeners();
+            end
 
             % Call onModelChanged method
-            obj.onModelChanged(evtOut);
+            obj.onModelChanged(evtOutM);
 
         end %function
 
@@ -275,18 +313,25 @@ classdef (Abstract) BaseModel < handle & ...
                 evt (1,1) wt.eventdata.ModelChangedData
             end
 
-            if obj.Debug
-                disp("wt.model.BaseModel.onModelChanged " + ...
-                    class(obj) + "  Model: " + class(evt.Model) + ...
-                    " Prop: " + evt.Property);
-            end
-
             % Prepare eventdata
-            evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Model = evt.Model;
-            evtOut.Property = evt.Property;
-            evtOut.Value = evt.Value;
-            evtOut.Stack = horzcat({evt.Source}, evt.Stack);
+            % evtOut = wt.eventdata.ModelChangedData;
+            % evtOut.Model = evt.Model;
+            % evtOut.Property = evt.Property;
+            % evtOut.Value = evt.Value;
+            % evtOut.Stack = [{evt.Source}, evt.Stack];
+            % evtOut.ClassStack = [class(obj), evt.ClassStack];
+            
+            % Prepare event data
+            evtOut = copy(evt);            
+            evtOut.Stack = [{obj}, evtOut.Stack];
+            evtOut.ClassStack = [class(obj), evtOut.ClassStack];
+
+            if obj.Debug
+                disp("wt.model.BaseModel.onModelChanged   " + ...
+                    "    Model: " + evtOut.ClassStack(end) + ...
+                    "    Prop: " + evtOut.Property + ...
+                    "    ClassStack: " + join(evtOut.ClassStack, " <- ") );
+            end
 
             % Notify listeners
             obj.notify("ModelChanged",evtOut)

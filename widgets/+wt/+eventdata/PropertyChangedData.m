@@ -1,4 +1,4 @@
-classdef PropertyChangedData < ewt.abstract.BaseEventData & dynamicprops
+classdef PropertyChangedData < wt.abstract.BaseEventData & dynamicprops
     % Event data for widget property value changes
     %
     % Syntax:

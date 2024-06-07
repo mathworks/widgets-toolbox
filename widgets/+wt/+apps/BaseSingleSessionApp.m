@@ -372,6 +372,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
 
             if app.Debug
                 disp("wt.apps.BaseSingleSessionApp.onSessionChanged_private " + class(app));
+                disp(evt);
             end
         
             % Update the app title

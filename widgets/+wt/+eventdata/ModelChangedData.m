@@ -9,6 +9,7 @@ classdef ModelChangedData < wt.abstract.BaseEventData
         Property string {mustBeScalarOrEmpty}
         Value
         Stack (1,:) cell
+        ClassStack (1,:) string
     end %properties
 
 end % classdef
