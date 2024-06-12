@@ -1,5 +1,5 @@
-classdef Session < pdt.viewcontroller.BaseViewController
-    % View for pdt.model.Session
+classdef Session < wt.abstract.BaseViewController
+    % View for wtexample.model.Session
 
     %% Properties
     properties (SetObservable)
@@ -28,7 +28,7 @@ classdef Session < pdt.viewcontroller.BaseViewController
         function setup(obj)
 
             % Call superclass setup first
-            obj.setup@pdt.viewcontroller.BaseViewController();
+            obj.setup@wt.abstract.BaseViewController();
 
             % Configure grid
             obj.Grid.ColumnWidth = {'fit','1x'};
@@ -83,7 +83,7 @@ classdef Session < pdt.viewcontroller.BaseViewController
         function update(obj)
 
             % Call superclass method first
-            obj.update@pdt.viewcontroller.BaseViewController();
+            obj.update@wt.abstract.BaseViewController();
             
             % Get the model to display
             [model, validToDisplay] = obj.getScalarModelToDisplay();

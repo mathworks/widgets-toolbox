@@ -99,7 +99,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
-                model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
+                model wt.model.BaseModel = wt.model.BaseModel.empty(0)
             end
 
             % Validate view class

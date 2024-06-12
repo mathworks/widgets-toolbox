@@ -1,5 +1,7 @@
-classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
+classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
     % Example app showing a tree with contextual views
+
+    % Copyright 2024 The MathWorks Inc.
 
 
     %% Internal properties
@@ -7,7 +9,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         % Toolbar at top of the app window
         Toolbar wt.Toolbar
-        
+
         % Navigation tree on the left of the app
         Tree matlab.ui.container.Tree
 
@@ -23,8 +25,12 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
     end %properties
 
 
-    %% Setup
+    %% Protected Methods
     methods  (Access = protected)
+
+        % Defined in separate file:
+        updateTreeHierarchy(app)
+
 
         function setup(app)
 
@@ -80,24 +86,15 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
         end %function
 
 
-        function sessionObj = createNewSession(app)
+        function session = createNewSession(app)
 
             if app.Debug
                 disp("wtexample.app.ContextualViewExample.createNewSession");
             end
 
-            sessionObj = wtexample.model.Session;
+            session = wtexample.model.Session;
 
         end %function
-
-    end %methods
-
-
-    %% Update
-    methods  (Access = protected)
-
-        % Defined in separate file:
-        updateTreeHierarchy(app)
 
 
         function update(app)
@@ -109,12 +106,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
             % Update the tree hierarchy
             app.updateTreeHierarchy()
 
-            % Expand the top level
-            % expand(app.Tree)
-
             % If a new selection is requested, change it now
             % if isscalar(app.NewSelection) && isvalid(app.NewSelection)
-            % 
+            %
             % end
 
             % Select the new node
@@ -124,11 +118,40 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
         end %function
 
-    end %methods
 
+        function session = getSessionFromTreeNode(app,node)
+            % Determines the session of the selected tree node
 
-    %% Callbacks
-    methods
+            arguments
+                app (1,1) wt.apps.BaseApp
+                node (1,1) matlab.ui.container.TreeNode
+            end
+
+            nodeData = node.NodeData;
+            if ~isscalar(nodeData)
+
+                % Shouldn't happen, but return empty
+                session = wtexample.model.Session.empty(1,0);
+
+            elseif isa(nodeData, "wtexample.model.Session")
+
+                % Found it!
+                session = nodeData;
+
+            elseif isa(nodeData, "wt.model.BaseModel") && ~isempty(node.Parent)
+
+                % Look to parent
+                session = app.getSessionFromTreeNode(node.Parent);
+
+            else
+
+                % Can't find, return empty
+                session = wtexample.model.Session.empty(1,0);
+
+            end %if
+
+        end %function
+
 
         function onTreeSelection(app,evt)
             % On selected tree node changed
@@ -137,8 +160,15 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                 disp("wtexample.app.ContextualViewExample.onTreeSelection");
             end
 
+            % What node(s) are selected?
             selNode = evt.SelectedNodes;
+
+            % Is it a scalar selection?
             if isscalar(selNode)
+
+                % Set the selected session
+                session = app.getSessionFromTreeNode(selNode);
+                app.selectSession(session);
 
                 % Get the data model, which is attached to this node
                 model = selNode.NodeData;
@@ -166,6 +196,9 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                 disp("wtexample.app.ContextualViewExample.onFileButtonPushed");
             end
 
+            % Get the selected session
+            session = app.SelectedSession;
+
             switch evt.Text
 
                 case 'New'
@@ -178,11 +211,11 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
                 case 'Save'
 
-                    app.saveSession(false);
+                    app.saveSession(false, session);
 
                 case 'Save As'
 
-                    app.saveSession(true);
+                    app.saveSession(true, session);
 
                 case 'Import'
 
@@ -192,7 +225,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
 
                     if isfile(filePath)
                         try
-                            app.Session.importManifest(filePath);
+                            session.importManifest(filePath);
                         catch err
                             message = sprintf("Unable to load " + ...
                                 "manifest: %s\n\n%s",filePath,err.message);
@@ -213,6 +246,10 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                 disp("wtexample.app.ContextualViewExample.onExhibitButtonPushed");
             end
 
+            % Get the selected session
+            session = app.SelectedSession;
+
+            % Which button was pressed?
             switch evt.Text
 
                 case 'New'
@@ -222,7 +259,7 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                     newItem.Name = "New Exhibit";
 
                     % Add the new exhibit
-                    app.Session.Exhibit(end+1) = newItem;
+                    session.Exhibit(end+1) = newItem;
 
                     % Indicate the new exhibit should be selected at the next update
                     % app.NewSelection = newItem;
@@ -251,8 +288,8 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
                         if matches(response,"yes","IgnoreCase",true)
 
                             % Delete the exhibit
-                            isMatch = app.Session.Exhibit == model;
-                            app.Session.Exhibit(isMatch) = [];
+                            isMatch = session.Exhibit == model;
+                            session.Exhibit(isMatch) = [];
 
                         end %if
 

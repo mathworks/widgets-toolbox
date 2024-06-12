@@ -1,16 +1,61 @@
 function updateTreeHierarchy(app)
-% Creates/updates the tree hierarchy
+% Creates/updates the tree hierarchy by synchronizing each level
+
+% Copyright 2024 The MathWorks Inc.
+
 
 if app.Debug
     disp("wtexample.apps.ContextualViewExample.updateTreeHierarchy");
 end
 
-% Capture existing session nodes
-oldSessionNodes = app.Tree.Children;
+% Sync session nodes
+syncSessionNodes(app.Tree, app.Session)
 
-% Get the inputs
-parentNode = app.Tree;
-model = app.Session;
+% % Capture existing session nodes
+% oldSessionNodes = app.Tree.Children;
+% 
+% % Get the inputs
+% parentNode = app.Tree;
+% model = app.Session;
+
+% % Sync nodes at this level
+% sessionNodes = syncNodes(parentNode, model);
+% 
+% % Loop on each model
+% for idx = 1:numel(model)
+% 
+%     % Get current node/model pair
+%     thisNode = sessionNodes(idx);
+%     thisModel = model(idx);
+% 
+%     % Update the node's text and icon
+%     nodeText = "Session: " + thisModel.FileName;
+%     if thisModel.Dirty
+%         nodeText = nodeText +  " *";
+%     end
+%     thisNode.Text = nodeText;
+%     thisNode.Icon = "document2_24.png";
+% 
+%     % Sync children of node
+%     syncExhibitNodes(thisNode, thisModel.Exhibit)
+% 
+% end %for
+
+
+end %function
+
+
+%% Sync Session Nodes
+function syncSessionNodes(parentNode,model)
+% Synchronizes child nodes to a model array
+
+arguments
+    parentNode (1,1) matlab.ui.container.Tree
+    model (1,:) wtexample.model.Session
+end
+
+% Capture existing session nodes
+oldSessionNodes = parentNode.Children;
 
 % Sync nodes at this level
 sessionNodes = syncNodes(parentNode, model);
@@ -66,13 +111,6 @@ for idx = 1:numel(model)
     % Update the node's text and icon
     thisNode.Text = "Exhibit: " + thisModel.Name;
     thisNode.Icon = "exhibit.png";
-    % nodeText = "Exhibit: " + thisModel.Name;
-    % if thisNode.Text ~= nodeText
-    %     thisNode.Text = nodeText;
-    % end
-    % if thisNode.Icon ~= "exhibit.png"
-    %     thisNode.Icon = "exhibit.png";
-    % end
 
     % Sync children of node
     syncEnclosureNodes(thisNode, thisModel.Enclosure)
