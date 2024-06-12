@@ -5,64 +5,41 @@ if app.Debug
     disp("wtexample.apps.ContextualViewExample.updateTreeHierarchy");
 end
 
-% Get the loaded sessions
-session = app.Session;
+% Capture existing session nodes
+oldSessionNodes = app.Tree.Children;
 
-% Get existing session nodes
-rootNode = app.Tree;
-sessionNodes = rootNode.Children;
+% Get the inputs
+parentNode = app.Tree;
+model = app.Session;
 
-% Get the sessions they reference
-if isempty(sessionNodes)
-    % Empty of same type as input
-    sessionNodeData = session([]);
-else
-    sessionNodeData = horzcat(sessionNodes.NodeData);
-end
+% Sync nodes at this level
+sessionNodes = syncNodes(parentNode, model);
 
-% Track which existing child nodes are updated so we can
-% remove old ones later
-childNodeUpdated = false(size(sessionNodes));
+% Loop on each model
+for idx = 1:numel(model)
 
-% Loop on each session
-for sIdx = 1:numel(session)
+    % Get current node/model pair
+    thisNode = sessionNodes(idx);
+    thisModel = model(idx);
 
-    % The session to update
-    thisSession = session(sIdx);
-
-    % Does it already have a session node?
-    idxMatch = find(thisSession == sessionNodeData, 1);
-    if isempty(idxMatch)
-        % NO - Create a new session hierarchy
-        sessionNode = uitreenode(rootNode);
-        sessionNode.NodeData = thisSession;
-
-        % Expand the session node after first creation
-        expand(sessionNode)
-    else
-        % YES - Use existing node
-        sessionNode = sessionNodes(idxMatch);
-        childNodeUpdated(idxMatch) = true;
+    % Update the node's text and icon
+    nodeText = "Session: " + thisModel.FileName;
+    if thisModel.Dirty
+        nodeText = nodeText +  " *";
     end
+    thisNode.Text = nodeText;
+    thisNode.Icon = "document2_24.png";
 
-    % Update the session node's text
-    % Add "*" if dirty (indicating unsaved changes)
-    if thisSession.Dirty
-        sessionNode.Text = append(thisSession.FileName, " *");
-    else
-        sessionNode.Text = thisSession.FileName;
-    end
-
-    % Update the session node's child hierarchy
-    syncExhibitNodes(sessionNode, thisSession.Exhibit)
+    % Sync children of node
+    syncExhibitNodes(thisNode, thisModel.Exhibit)
 
 end %for
 
-% Remove any unused session nodes
-unusedSessionNodes = sessionNodes(~childNodeUpdated);
-delete(unusedSessionNodes)
-
-% expand(app.Tree)
+% Expand any new session nodes
+isNew = ~ismember(sessionNodes, oldSessionNodes);
+if any(isNew)
+    expand(sessionNodes(isNew))
+end
 
 end %function
 
@@ -87,9 +64,9 @@ for idx = 1:numel(model)
     thisModel = model(idx);
 
     % Update the node's text and icon
-    thisNode.Text = "Exhibit: " + model(idx).Name;
+    thisNode.Text = "Exhibit: " + thisModel.Name;
     thisNode.Icon = "exhibit.png";
-    % nodeText = "Exhibit: " + model(idx).Name;
+    % nodeText = "Exhibit: " + thisModel.Name;
     % if thisNode.Text ~= nodeText
     %     thisNode.Text = nodeText;
     % end
@@ -125,7 +102,7 @@ for idx = 1:numel(model)
     thisModel = model(idx);
 
     % Update the node's text and icon
-    thisNode.Text = "Enclosure: " + model(idx).Name;
+    thisNode.Text = "Enclosure: " + thisModel.Name;
     thisNode.Icon = "enclosure.png";
 
     % Sync children of node
@@ -156,7 +133,7 @@ for idx = 1:numel(model)
     thisModel = model(idx);
 
     % Update the node's text and icon
-    thisNode.Text = "Animal: " + model(idx).Name;
+    thisNode.Text = "Animal: " + thisModel.Name;
     thisNode.Icon = "animal.png";
 
     % This is the lowest level - no children to sync
@@ -172,7 +149,7 @@ function newNodeList = syncNodes(parentNode, model)
 % Synchronizes nodes for one level of hierarchy
 
 arguments
-    parentNode (1,1) matlab.ui.container.TreeNode
+    parentNode % matlab.ui.container.TreeNode or matlab.ui.container.Tree
     model (1,:) wt.model.BaseModel
 end
 
@@ -194,8 +171,6 @@ if isempty(dummyNode)
     emptyNodeList = matlab.ui.container.TreeNode.empty(1,0);
 end
 numModels = numel(model);
-% newNodeList = repmat(matlab.ui.container.TreeNode, 1, numModels);
-% newNodeCell = cell(1, numModels);
 if numModels > 0
     newNodeList(1, numModels) = dummyNode;
 else
@@ -208,7 +183,6 @@ childNodeUpdated = false(size(childNodes));
 
 % Loop on each model
 for idx = 1:numModels
-% for idx = numModels:-1:1
 
     % Does this model already have a node?
     isMatch = model(idx) == childNodeData;
@@ -225,11 +199,8 @@ for idx = 1:numModels
 
     % Store tne new node
     newNodeList(idx) = newNode;
-    % newNodeCell{idx} = newNode;
 
 end %for
-
-% newNodeList = [newNodeCell{:}];
 
 % Remove any unused nodes
 unusedNodes = childNodes(~childNodeUpdated);
