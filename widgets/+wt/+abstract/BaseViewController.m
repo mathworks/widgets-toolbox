@@ -176,7 +176,7 @@ classdef BaseViewController < ...
             % Triggered when a property within the model has changed
 
             arguments
-                obj (1,1) wt.model.BaseModel
+                obj (1,1) wt.abstract.BaseViewController
                 evt (1,1) wt.eventdata.ModelChangedData
             end
 

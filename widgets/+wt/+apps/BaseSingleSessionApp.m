@@ -1,15 +1,14 @@
-classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
+classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
     % Base class for Widgets Toolbox app with a managed single session
     
     % Copyright 2020-2024 The MathWorks Inc.
     
     
     %% Properties
-    
-    properties (AbortSet)
+    properties (AbortSet, SetObservable)
         
         % Session data for the app (must be subclass of wt.model.BaseSession)
-        Session (1,:) wt.model.BaseSession {mustBeScalarOrEmpty}
+        Session
         
     end %properties
 
@@ -18,70 +17,40 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
     methods
         
         function set.Session(app,value)
+            mustBeScalarOrEmpty(value); % Single Session only
             app.Session = value;
-            if app.SetupComplete
-                app.update();
-                app.updateTitle();
-            end
-            app.attachSessionListeners();
         end
 
     end %methods
     
     
-    
-    %% Internal properties
-    properties (Dependent, SetAccess = immutable)
-        
-        % Indicates if any session is dirty
-        Dirty (1,1) logical
-        
-        % Last used folder (for file operations)
-        HasValidSession (1,1) logical
-        
-    end %properties
-    
-    
-    % Accessors
-    methods
-        
-        function value = get.Dirty(app)
-            value = app.HasValidSession && app.Session.Dirty;
-        end
-        
-        function value = get.HasValidSession(app)
-            value = ~isempty(app.Session) && isvalid(app.Session);
-        end
-        
-    end %methods
-    
-    
-    properties (Transient, NonCopyable, Access = private)
-        
-        % Listener to changes within Session object
-        SessionChangedListener event.listener
-
-        % Listeners to session marked clean/dirty
-        SessionDirtyListener event.listener
-        
-    end %properties
-    
-    
-    
-    %% Abstract Methods (subclass must implement these)
-    methods (Abstract, Access = protected)
-        
-        % Creates a new session object for the app. It must return a
-        % subclass of wt.model.BaseSession
-        sessionObj = createNewSession(app)
-        
-    end %methods
-    
-    
-    
-    %% Public methods
+    %% Sealed Public methods
     methods (Sealed)
         
+        function close(app)
+            % Close the app
+
+            % Define arguments
+            arguments
+                app (1,1) wt.apps.BaseApp
+            end
+
+            if app.Debug
+                disp("wt.apps.BaseSingleSessionApp.close " + class(app));
+            end
+            
+            % Prompt to save existing session
+            isCancelled = promptToSaveSession(app, app.Session);
+            if isCancelled
+                return
+            end %if
+
+            % Close the app
+            app.close_Internal();
+
+        end %function
+
+
         function newSession(app)
             % Start a new session
 
@@ -89,19 +58,14 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 disp("wt.apps.BaseSingleSessionApp.newSession " + class(app));
             end
             
-            % If an existing session is dirty, give the user a chance to
-            % save before loading another session
-            if app.Dirty
-                isCancelled = promptToSaveFirst(app);
-                if isCancelled
-                    return;
-                end
-            end %if app.Dirty
+            % Prompt to save existing session
+            isCancelled = promptToSaveSession(app, app.Session);
+            if isCancelled
+                return
+            end %if
             
             % Freeze the figure with a progress dialog
-            dlg = uiprogressdlg(app.Figure);
-            dlg.Title = "New Session";
-            dlg.Indeterminate = true;
+            dlg = app.showIndeterminateProgress();
             cleanupObj = onCleanup(@()delete(dlg));
             
             % Instantiate the new session
@@ -114,71 +78,32 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
         end %function
         
         
-        function sessionPath = saveSession(app, useSaveAs)
+        function sessionPath = saveSession(app, useSaveAs, session)
             % Save the session to a file
             
             % Define arguments
             arguments
                 app (1,1) wt.apps.BaseApp
                 useSaveAs (1,1) logical = false
+                session wt.model.BaseSession = app.Session
             end
 
             if app.Debug
                 disp("wt.apps.BaseSingleSessionApp.saveSession " + class(app));
             end
-            
-            % We must have a session to save!
-            if ~app.HasValidSession
-                error("Session does not exist.");
-            end
-            
-            % Get the session info
-            sessionPath = app.Session.FilePath;
-            sessionName = app.Session.FileName;
-            lastFolder  = app.LastFolder;
-            
-            % Does the session file already exist?
-            fileExists = exist(sessionPath,"file");
-            if ~fileExists
-                % It doesn't exist - prompt with a default path
-                useSaveAs = true;
-                sessionPath = fullfile(lastFolder,sessionName);
-            end
-            
-            % Prompt for "save as" if needed
-            if useSaveAs
-                sessionPath = app.promptToSaveAs(sessionPath);
-                if ~isempty( sessionPath )
-                    app.Session.FilePath = sessionPath;
-                end
-            end
-            
-            % Save the file
-            if strlength(sessionPath)
-                
-                % Freeze the figure with a progress dialog
-                dlg = uiprogressdlg(app.Figure);
-                dlg.Title = "Save Session";
-                dlg.Message = sessionPath;
-                dlg.Indeterminate = true;
-                cleanupObj = onCleanup(@()delete(dlg));
-                
-                % Save the session
-                app.Session.save();
-                app.Session.FilePath = sessionPath;
-                app.Session.Dirty = false;
-                
-                % Force an update prior to the progress dialog closing
-                drawnow
-                
-            end %if strlength(sessionPath)
-            
+
+            % Call superclass internal save method
+            app.saveSession_Internal(useSaveAs, session);
+
+            % Populate output
+            sessionPath = session.FilePath;
+
         end %function
-        
-        
+
+
         function loadSession(app, sessionPath)
             % Load a session from a file
-            
+
             % Define arguments
             arguments
                 app (1,1) wt.apps.BaseApp
@@ -188,99 +113,20 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
             if app.Debug
                 disp("wt.apps.BaseSingleSessionApp.loadSession " + class(app));
             end
-            
-            % If an existing session is dirty, give the user a chance to
-            % save before loading another session
-            if app.Dirty
-                isCancelled = promptToSaveFirst(app);
-                if isCancelled
-                    return;
-                end
-            end %if app.Dirty
-            
-            % Unless a file was already specified, prompt to load
-            if ~exist(sessionPath,"file")
-                sessionPath = app.promptToLoad();
-            end
-            
-            % Load the file
-            if strlength(sessionPath)
-                
-                % Freeze the figure with a progress dialog
-                dlg = uiprogressdlg(app.Figure);
-                dlg.Title = "Load Session";
-                dlg.Message = sessionPath;
-                dlg.Indeterminate = true;
-                cleanupObj = onCleanup(@()delete(dlg));
-                
-                % Load the session
-                sessionObj = wt.model.BaseSession.open(sessionPath);
-                sessionObj.FilePath = sessionPath;
-                
-                % Store the session - triggers app.update()
-                app.Session = sessionObj;
-                
-                % Force an update prior to the progress dialog closing
-                drawnow
-                
-            end %if strlength(sessionPath)
-            
-        end %function
-        
-        
-        function isCancelled = promptToSaveFirst(app)
-            % Prompt the user to save a file
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.promptToSaveFirst " + class(app));
-            end
-            
-            % Default output
-            isCancelled = false;
-            
-            % Prompt whether to save
-            message = sprintf("Save changes to '%s'?",app.Session.FileName);
-            title = "Load Session";
-            selection = app.promptYesNoCancel(message, title);
-            
-            % If Yes, prompt to save the existing session first
-            if selection == "Yes"
-                sessionSavePath = app.saveSession();
-                if ~strlength(sessionSavePath)
-                    isCancelled = true;
-                end
-            elseif selection == "Cancel"
-                isCancelled = true;
-            end
-            
-        end %function
-        
-        
-        function close(app)
-            % Triggered on figure closed
+            % Prompt to save existing session
+            isCancelled = promptToSaveSession(app, app.Session);
+            if isCancelled
+                return
+            end %if
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.close " + class(app));
-            end
-            
-            % If an existing session is dirty, give the user a chance to
-            % save before loading another session
-            if app.Dirty
-                isCancelled = promptToSaveFirst(app);
-                if isCancelled
-                    return;
-                end
-            end %if app.Dirty
-            
-            
-            % Freeze the figure with a progress dialog
-            dlg = uiprogressdlg(app.Figure);
-            dlg.Message = "Closing";
-            dlg.Indeterminate = true;
-            
-            % Delete the app
-            app.delete();
-            
+            % Call superclass internal load method
+            session = app.loadSession_Internal(sessionPath);
+
+            % Store the session
+            % This also triggers app.update(), app.updateTitle()
+            app.Session = session;
+
         end %function
         
     end %methods
@@ -310,6 +156,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 disp("wt.apps.BaseSingleSessionApp.updateTitle " + class(app));
             end
             
+            % Decide on the figure title
             if ~app.HasValidSession
                 app.Figure.Name = app.Name;
             elseif app.Session.Dirty
@@ -318,86 +165,6 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.BaseApp
                 app.Figure.Name = app.Name + " - " + app.Session.FileName;
             end
             
-        end %function
-
-        
-        function onSessionChanged(app,~)
-            % Triggered when a SetObservable property in the session has
-            % changed. May be overridden for custom behavior using incoming
-            % event data.
-
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.onSessionChanged " + class(app));
-            end
-            
-            % Trigger an update
-            app.update();
-            
-        end %function
-
-        
-        function onSessionDirty(app)
-            % Triggered when the session's MarkedDirty event fires
-
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.onSessionDirty " + class(app));
-            end
-            
-            % Update the title
-            app.updateTitle();
-            
-        end %function
-
-        
-        function onSessionClean(app)
-            % Triggered when the session's MarkedClean event fires
-
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.onSessionClean " + class(app));
-            end
-            
-            % Update the title
-            app.updateTitle();
-            
-        end %function
-        
-    end %methods
-    
-    
-    
-    %% Private Methods
-    methods (Access = private)
-        
-        function onSessionChanged_private(app,evt)
-
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.onSessionChanged_private " + class(app));
-                disp(evt);
-            end
-        
-            % Update the app title
-            % app.updateTitle();
-            
-            % Call the app's session changed method
-            app.onSessionChanged(evt);
-            
-        end %function
-        
-        
-        function attachSessionListeners(app)
-
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.attachSessionListeners " + class(app));
-            end
-            
-            app.SessionChangedListener = listener(app.Session,...
-                'ModelChanged',@(h,e)onSessionChanged_private(app,e));
-
-            app.SessionDirtyListener = [
-                listener(app.Session,'MarkedDirty',@(~,~)app.onSessionDirty())
-                listener(app.Session,'MarkedClean',@(~,~)app.onSessionClean())
-                ];
-
         end %function
         
     end %methods

@@ -96,44 +96,18 @@ classdef ContextualViewExample < wt.apps.BaseSingleSessionApp
     %% Update
     methods  (Access = protected)
 
+        % Defined in separate file:
+        updateTreeHierarchy(app)
+
+
         function update(app)
 
             if app.Debug
                 disp("wtexample.app.ContextualViewExample.update");
             end
 
-            % Populate tree
-            delete(app.Tree.Children);
-
-            % Add exhibit nodes within the zoo
-            for exhibit = app.Session.Exhibit
-
-                exhNode = uitreenode(app.Tree,...
-                    "Text","Exhibit: " + exhibit.Name,...
-                    "Icon","exhibit.png",...
-                    "NodeData",exhibit);
-
-                % Add enclosure nodes within this exhibit
-                for enclosure = exhibit.Enclosure
-
-                    encNode = uitreenode(exhNode,...
-                        "Text","Enclosure: " + enclosure.Name,...
-                        "Icon","enclosure.png",...
-                        "NodeData",enclosure);
-
-                    % Add animal nodes within this enclosure
-                    for animal = enclosure.Animal
-
-                        uitreenode(encNode,...
-                            "Text","Animal: " + animal.Name,...
-                            "Icon","animal.png",...
-                            "NodeData",animal);
-
-                    end %for
-
-                end %for
-
-            end %for
+            % Update the tree hierarchy
+            app.updateTreeHierarchy()
 
             % Expand the top level
             % expand(app.Tree)
