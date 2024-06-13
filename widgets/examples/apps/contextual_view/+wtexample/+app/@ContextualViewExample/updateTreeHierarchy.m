@@ -11,36 +11,6 @@ end
 % Sync session nodes
 syncSessionNodes(app.Tree, app.Session)
 
-% % Capture existing session nodes
-% oldSessionNodes = app.Tree.Children;
-% 
-% % Get the inputs
-% parentNode = app.Tree;
-% model = app.Session;
-
-% % Sync nodes at this level
-% sessionNodes = syncNodes(parentNode, model);
-% 
-% % Loop on each model
-% for idx = 1:numel(model)
-% 
-%     % Get current node/model pair
-%     thisNode = sessionNodes(idx);
-%     thisModel = model(idx);
-% 
-%     % Update the node's text and icon
-%     nodeText = "Session: " + thisModel.FileName;
-%     if thisModel.Dirty
-%         nodeText = nodeText +  " *";
-%     end
-%     thisNode.Text = nodeText;
-%     thisNode.Icon = "document2_24.png";
-% 
-%     % Sync children of node
-%     syncExhibitNodes(thisNode, thisModel.Exhibit)
-% 
-% end %for
-
 
 end %function
 
