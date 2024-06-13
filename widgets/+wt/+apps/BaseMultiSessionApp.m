@@ -111,7 +111,7 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         end %function
 
 
-        function newSession(app)
+        function session = newSession(app)
             % Start a new session
 
             if app.Debug
@@ -129,12 +129,11 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
             % This also triggers app.update(), app.updateTitle()
             if isempty(app.Session)
                 app.Session = session;
+                app.selectSession(session);
             else
                 app.Session(end+1) = session;
+                % Don't select by default, but concrete app may do this
             end
-
-            % Select the new session
-            app.selectSession(session);
 
         end %function
 
@@ -162,7 +161,7 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         end %function
 
 
-        function loadSession(app, sessionPath)
+        function session = loadSession(app, sessionPath)
             % Load a session from a file
 
             % Define arguments
@@ -182,12 +181,11 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
             % This also triggers app.update(), app.updateTitle()
             if isempty(app.Session)
                 app.Session = session;
+                app.selectSession(session);
             else
                 app.Session(end+1) = session;
+                % Don't select by default, but concrete app may do this
             end
-
-            % Select the new session
-            app.selectSession(session);
 
         end %function
 
@@ -201,11 +199,21 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                 session wt.model.BaseSession
             end
 
-            % Which index is the session?
-            selIdx = find(session == app.Session, 1);
+            % Was a scalar session given?
+            if isscalar(session)
 
-            % Select it
-            app.SelectedSessionIndex = selIdx;
+                % Which index is the session?
+                selIdx = find(session == app.Session, 1);
+
+                % Select it
+                app.SelectedSessionIndex = selIdx;
+
+            else
+
+                % Empty selection
+                app.SelectedSessionIndex = [];
+
+            end
 
             % Update the title
             app.updateTitle()

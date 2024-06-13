@@ -51,7 +51,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         end %function
 
 
-        function newSession(app)
+        function session = newSession(app)
             % Start a new session
 
             if app.Debug
@@ -61,6 +61,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
             if isCancelled
+                session = app.getEmptySession();
                 return
             end %if
             
@@ -69,11 +70,11 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             cleanupObj = onCleanup(@()delete(dlg));
             
             % Instantiate the new session
-            sessionObj = app.createNewSession();
-            app.Session = sessionObj;
-            
-            % Force an update prior to the progress dialog closing
-            drawnow
+            session = app.createNewSession();
+
+            % Store the session
+            % This also triggers app.update(), app.updateTitle()
+            app.Session = session;
             
         end %function
         
@@ -101,7 +102,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         end %function
 
 
-        function loadSession(app, sessionPath)
+        function session = loadSession(app, sessionPath)
             % Load a session from a file
 
             % Define arguments
@@ -117,6 +118,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
             if isCancelled
+                session = app.getEmptySession();
                 return
             end %if
 

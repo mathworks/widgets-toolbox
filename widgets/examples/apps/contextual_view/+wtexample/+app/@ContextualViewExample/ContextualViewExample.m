@@ -28,11 +28,23 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
     %% Protected Methods
     methods  (Access = protected)
 
-        % Defined in separate file:
+        % Declarations for methods in separate files
         updateTreeHierarchy(app)
 
 
+        function session = createNewSession(app)
+
+            if app.Debug
+                disp("wtexample.app.ContextualViewExample.createNewSession");
+            end
+
+            session = wtexample.model.Session;
+
+        end %function
+
+
         function setup(app)
+            % Initial setup / creation of the app
 
             if app.Debug
                 disp("wtexample.app.ContextualViewExample.setup");
@@ -86,17 +98,6 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
         end %function
 
 
-        function session = createNewSession(app)
-
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.createNewSession");
-            end
-
-            session = wtexample.model.Session;
-
-        end %function
-
-
         function update(app)
 
             if app.Debug
@@ -133,7 +134,7 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
                 % Shouldn't happen, but return empty
                 session = wtexample.model.Session.empty(1,0);
 
-            elseif isa(nodeData, "wtexample.model.Session")
+            elseif isa(nodeData, "wt.model.BaseSession")
 
                 % Found it!
                 session = nodeData;
@@ -146,7 +147,7 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
             else
 
                 % Can't find, return empty
-                session = wtexample.model.Session.empty(1,0);
+                session = getEmptySession();
 
             end %if
 
@@ -183,7 +184,7 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
             else
 
                 % Clear the contextual pane
-                app.ContextualView.launchView("");
+                app.ContextualView.clearView();
 
             end %if
 
@@ -203,18 +204,32 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
                 case 'New'
 
-                    app.newSession();
+                    % Add a new session
+                    session = app.newSession();
+
+                    % Select the new session
+                    if ~isempty(session)
+                        app.selectSession(session);
+                    end
 
                 case 'Open'
 
-                    app.loadSession()
+                    % Prompt and load a session
+                    session = app.loadSession();
+
+                    % Select the new session
+                    if ~isempty(session)
+                        app.selectSession(session);
+                    end
 
                 case 'Save'
 
+                    % Save the session
                     app.saveSession(false, session);
 
                 case 'Save As'
 
+                    % Save the session as different file
                     app.saveSession(true, session);
 
                 case 'Import'
@@ -235,6 +250,7 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
             end %switch
 
+            % Update the app
             app.update()
 
         end %function
