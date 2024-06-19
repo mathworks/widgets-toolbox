@@ -213,14 +213,26 @@ classdef BaseViewController < ...
 
             if ~isscalar(obj.Model)
                 warning("wt:BaseViewController:onFieldEdited:NonScalarModel",...
-                    "The onFieldEdited method is unable to set new value to an empty or nonscalar model.")
+                    "The onFieldEdited method is unable to set new " + ...
+                    "value to an empty or nonscalar model.")
                 return
             end
 
+            % Get the new value
             newValue = evt.Value;
+
+            % Treat char as string
+            if ischar(newValue)
+                newValue = string(newValue);
+            end
+
+            % Handle array values with the index input indicating what
+            % index of the newValue was changed
             if ~isscalar(newValue) && isscalar(obj.Model.(fieldName)(index))
                 newValue = newValue(index);
             end
+
+            % Set the new value
             obj.Model.(fieldName)(index) = newValue;
 
         end %function
