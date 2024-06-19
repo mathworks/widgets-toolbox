@@ -39,6 +39,9 @@ classdef BaseViewController < ...
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
 
+        % The default panel name prefix to display
+        PanelNamePrefix (1,1) string
+
     end %properties
 
 
@@ -114,9 +117,9 @@ classdef BaseViewController < ...
             obj.OuterPanel = uipanel(obj.OuterGrid);
 
             % Name the panel with the view's class name by default
-            className = string(class(obj));
-            panelName = extract(className,alphanumericsPattern + textBoundary);
-            obj.OuterPanel.Title = panelName;
+            obj.PanelNamePrefix = extract(string(class(obj)), ...
+                alphanumericsPattern + textBoundary);
+            obj.OuterPanel.Title = obj.PanelNamePrefix;
 
             % Grid Layout to manage contents
             obj.Grid = uigridlayout(obj.OuterPanel,[5 2]);
@@ -130,9 +133,20 @@ classdef BaseViewController < ...
         end %function
 
 
-        function update(~)
+        function update(obj)
 
-            % Do nothing - required for ComponentContainer
+            % Get the model to display
+            [model, validToDisplay] = obj.getScalarModelToDisplay();
+
+            % Prepare default name of the panel
+            if validToDisplay && strlength(model.Name)
+                panelTitle = obj.PanelNamePrefix + ": " + model.Name;
+            else
+                panelTitle = obj.PanelNamePrefix;
+            end
+
+            % Update the panel name
+            obj.OuterPanel.Title = panelTitle;
 
         end %function
 
