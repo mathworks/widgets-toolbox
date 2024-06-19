@@ -1,4 +1,4 @@
-classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
+classdef (Abstract) BaseModel < handle & ...
         matlab.mixin.SetGetExactNames & ...
         matlab.mixin.Copyable & ...
         wt.mixin.DisplayNonScalarObjectAsTable
@@ -36,13 +36,6 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
 
         % Toggle true in each instance to enable debugging display
         Debug (1,1) logical = false
-
-        % List of properties containing aggregated BaseModel classes to
-        % listen for hierarchical ModelChanged events. Use this cautiously
-        % if model class references are used repeatedly. The intended
-        % purpose is to pass notifications up the hierarchy to the top
-        % level, so the session can be marked dirty.
-        AggregatedModelProperties (1,:) string
 
     end %properties
 
@@ -139,7 +132,7 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
     methods
 
         function debugAggregatedModels(obj, value)
-            % Recursively set debug on AggregatedModelProperties models in the hierarchy
+            % Recursively set debug on aggregated models in the hierarchy
 
             arguments
                 obj (1,1) wt.model.BaseModel
@@ -150,7 +143,8 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
             obj.Debug = value;
 
             % Loop on aggregated models and set debug
-            for thisProp = obj.AggregatedModelProperties
+            aggProps = obj.getAggregatedModelProperties();
+            for thisProp = aggProps
                 thisModel = obj.(thisProp);
                 if ~isempty(thisModel) && all(isa(thisModel,"handle"))
                     thisModel(~isvalid(thisModel)) = [];
@@ -168,6 +162,24 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
 
     %% Protected Methods
     methods (Access = protected)
+
+        function props = getAggregatedModelProperties(~)
+            % Returns a list of aggregated model property names
+            %
+            % This overridable method lists properties containing
+            % aggregated BaseModel classes to listen for hierarchical
+            % ModelChanged events. Use this cautiously if model class
+            % references are used repeatedly. The intended purpose is to
+            % pass notifications up the hierarchy to the top level, so the
+            % session can be marked dirty.
+
+            arguments(Output)
+                props (1,:) string
+            end
+
+            props = string.empty(1,0);
+        
+        end %function
 
         % Override copyElement method:
         function cpObj = copyElement(obj)
@@ -329,13 +341,15 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
     %% Private methods
     methods (Access = private)
 
-        function attachModelListeners(obj,propNames)
+        function attachModelListeners(obj)
             % Attach listeners to aggregated BaseModel changes
 
             arguments
                 obj (1,1) wt.model.BaseModel
-                propNames (1,:) string = obj.AggregatedModelProperties
             end
+
+            % Get the properties to listen for
+            propNames = obj.getAggregatedModelProperties();
 
             if obj.Debug
                 if isempty(propNames)
