@@ -250,17 +250,6 @@ classdef (Abstract, ConstructOnLoad) BaseModel < handle & ...
                 thisObj.PropListeners = event.proplistener(thisObj, propInfo,...
                     'PostSet',@(~,e)onPropChanged(thisObj,e) );
 
-
-                %RJ - Move this somewhere for efficiency - only needed if
-                %we're using these!
-                % Which properties are aggregated BaseModel classes?
-                if isempty(thisObj.AggregatedModelProperties)
-                    propNames = string({propInfo.Name});
-                    fcn = @(p)isa(thisObj.(p),"wt.model.BaseModel");
-                    isAggModel = arrayfun(fcn, propNames);
-                    thisObj.AggregatedModelProperties = propNames(isAggModel);
-                end
-
             end %for
 
         end %function
