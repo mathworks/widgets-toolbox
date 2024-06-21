@@ -56,12 +56,11 @@ classdef BaseViewController < ...
     end %properties
 
 
-    properties (Transient, UsedInUpdate, Access = private)
+    properties (Transient, NonCopyable, UsedInUpdate = true, ...
+            GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
-        Dirty_BVC (1,1) logical = false
-        % It never gets set false again, just setting true each time
-        % internally will trigger the update to happen
+        TriggerUpdate_BVC (1,1) logical = false
 
     end %properties
 
@@ -154,7 +153,7 @@ classdef BaseViewController < ...
         function requestUpdate(obj)
             % Request update to occur at next drawnow cycle
 
-            obj.Dirty_BVC = true;
+            obj.TriggerUpdate_BVC = ~obj.TriggerUpdate_BVC;
 
         end %function
         

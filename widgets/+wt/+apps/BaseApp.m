@@ -149,9 +149,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 set(app, varargin{:});
             end
 
-            if app.Debug
-                disp("wt.apps.BaseApp.BaseApp (constructor) " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Register the app with App Designer
             registerApp(app, app.Figure)
@@ -180,9 +179,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         function delete(app)
             % Destructor
 
-            if app.Debug
-                disp("wt.apps.BaseApp.delete (destructor) " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Store last position in preferences
             if isscalar(app.Figure) && isvalid(app.Figure)
@@ -216,9 +214,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 icon (1,1) string = "question"
             end
 
-            if app.Debug
-                disp("wt.apps.BaseApp.promptYesNoCancel " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Launch the prompt
             selection = uiconfirm(app.Figure, message, title,...
@@ -241,9 +238,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 title (1,1) string = "Save as"
             end
 
-            if app.Debug
-                disp("wt.apps.BaseApp.promptToSaveAs " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Prompt for the file
             [fileName,pathName] = uiputfile(filter, title, filePath);
@@ -269,9 +265,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
                 title (1,1) string = "Open"
             end
 
-            if app.Debug
-                disp("wt.apps.BaseApp.promptToLoad " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Prompt for the file
             [fileName,pathName] = uigetfile(filter, title, app.LastFolder);
@@ -321,9 +316,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         function moveOnScreen(app)
             % Ensure the figure is placed on screen
 
-            if app.Debug
-                disp("wt.apps.BaseApp.moveOnScreen " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             if strcmp(app.Figure.Units,'pixels')
 
@@ -407,13 +401,39 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
 
     %% Protected Methods
     methods (Access = protected)
+        
+        function displayDebugText(app, evt)
+            % Display the path to the caller function in the command window
+
+            if app.Debug
+
+                stackInfo = dbstack(1,'-completenames');
+                fcnName = string(stackInfo(1).name);
+                filePath = string( stackInfo(1).file );
+                namespaces = extractBetween(filePath, "+", "\");
+                classname = extractBetween(filePath, "@", "\");
+                pathParts = vertcat(namespaces, classname, fcnName);
+                dispPath = join(pathParts, ".");
+                appClass = class(app);
+
+                formatStr = '  [%s]  <a href="matlab: edit(''%s'');">%s</a>\n';
+                fprintf(formatStr, appClass, filePath, dispPath);
+
+                if nargin >= 2
+                    fprintf('    --------------------\n    Event Data:\n\n');
+                    disp(evt);
+                    fprintf('    --------------------\n')
+                end
+
+            end %if
+
+        end %function
 
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
-            if app.Debug
-                disp("wt.apps.BaseApp.setup_internal " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % This is used for session managed apps
 
@@ -423,9 +443,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         function loadPreferences(app)
             % Load stored preferences
 
-            if app.Debug
-                disp("wt.apps.BaseApp.loadPreferences " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             app.Preferences.load(app.PreferenceGroup);
 
@@ -435,9 +454,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         function savePreferences(app)
             % Save preferences
 
-            if app.Debug
-                disp("wt.apps.BaseApp.savePreferences " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             app.Preferences.save(app.PreferenceGroup);
 
@@ -447,9 +465,8 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         function updateTitle(app)
             % Update the figure title
 
-            if app.Debug
-                disp("wt.apps.BaseApp.updateTitle " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             app.Figure.Name = app.Name;
 

@@ -93,9 +93,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                 app (1,1) wt.apps.BaseApp
             end
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.close " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Prompt to save existing sessions
             for session = app.Session
@@ -114,9 +113,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         function session = newSession(app)
             % Start a new session
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.newSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Freeze the figure with a progress dialog
             dlg = app.showIndeterminateProgress();
@@ -148,9 +146,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                 session wt.model.BaseSession = app.SelectedSession
             end
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.saveSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Call superclass method
             app.saveSession_Internal(useSaveAs, session);
@@ -170,16 +167,18 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                 sessionPath (1,1) string = ""
             end
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.loadSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Call superclass internal load method
             session = app.loadSession_Internal(sessionPath);
 
             % Store the session
             % This also triggers app.update(), app.updateTitle()
-            if isempty(app.Session)
+            if ~isscalar(session)
+                % User cancelled
+                return
+            elseif isempty(app.Session)
                 app.Session = session;
                 app.selectSession(session);
             else
@@ -229,9 +228,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.setup_internal " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Instantiate empty session to start
             session = app.createNewSession();
@@ -243,9 +241,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         function updateTitle(app)
             % Update the app title, showing the session name and dirty flag
 
-            if app.Debug
-                disp("wt.apps.BaseMultiSessionApp.updateTitle " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Decide on the figure title
             session = app.SelectedSession;

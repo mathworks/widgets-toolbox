@@ -34,9 +34,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
         function session = createNewSession(app)
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.createNewSession");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             session = wtexample.model.Session;
 
@@ -46,9 +45,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
         function setup(app)
             % Initial setup / creation of the app
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.setup");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Set the name
             app.Name = "Contextual View Example";
@@ -100,9 +98,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
         function update(app)
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.update");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Update the tree hierarchy
             app.updateTreeHierarchy()
@@ -157,9 +154,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
         function onTreeSelection(app,evt)
             % On selected tree node changed
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.onTreeSelection");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % What node(s) are selected?
             selNode = evt.SelectedNodes;
@@ -193,9 +189,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
         function onFileButtonPushed(app,evt)
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.onFileButtonPushed");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Get the selected session
             session = app.SelectedSession;
@@ -258,9 +253,8 @@ classdef ContextualViewExample < wt.apps.BaseMultiSessionApp
 
         function onExhibitButtonPushed(app,evt)
 
-            if app.Debug
-                disp("wtexample.app.ContextualViewExample.onExhibitButtonPushed");
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Get the selected session
             session = app.SelectedSession;

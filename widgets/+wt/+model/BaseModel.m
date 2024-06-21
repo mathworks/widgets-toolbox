@@ -181,8 +181,9 @@ classdef (Abstract) BaseModel < handle & ...
         
         end %function
 
-        % Override copyElement method:
+
         function cpObj = copyElement(obj)
+        % Override copyElement method
 
             if obj.Debug
                 disp("wt.model.BaseModel.copyElement " + class(obj));
@@ -190,6 +191,12 @@ classdef (Abstract) BaseModel < handle & ...
 
             % Call superclass method
             cpObj = copyElement@matlab.mixin.Copyable(obj);
+
+            % Perform deep copy of any aggregated handle properties
+            props = obj.getAggregatedModelProperties();
+            for thisProp = props
+                cpObj.(thisProp) = copy( obj.(thisProp) );
+            end
 
             % Create listeners
             cpObj.createPropListeners();

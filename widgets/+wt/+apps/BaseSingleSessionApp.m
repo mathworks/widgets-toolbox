@@ -35,9 +35,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
                 app (1,1) wt.apps.BaseApp
             end
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.close " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
             
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
@@ -54,9 +53,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         function session = newSession(app)
             % Start a new session
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.newSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
             
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
@@ -89,9 +87,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
                 session wt.model.BaseSession = app.Session
             end
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.saveSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Call superclass internal save method
             app.saveSession_Internal(useSaveAs, session);
@@ -111,9 +108,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
                 sessionPath (1,1) string = ""
             end
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.loadSession " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
 
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
@@ -141,9 +137,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.setup_internal " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
             
             % Instantiate initial session
             app.Session = app.createNewSession();
@@ -154,9 +149,8 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         function updateTitle(app)
             % Update the app title, showing the session name and dirty flag
 
-            if app.Debug
-                disp("wt.apps.BaseSingleSessionApp.updateTitle " + class(app));
-            end
+            % Show output if Debug is on
+            app.displayDebugText();
             
             % Decide on the figure title
             if ~app.HasValidSession

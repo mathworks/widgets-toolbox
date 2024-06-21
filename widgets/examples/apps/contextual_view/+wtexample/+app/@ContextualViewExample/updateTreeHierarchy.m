@@ -3,10 +3,8 @@ function updateTreeHierarchy(app)
 
 % Copyright 2024 The MathWorks Inc.
 
-
-if app.Debug
-    disp("wtexample.apps.ContextualViewExample.updateTreeHierarchy");
-end
+% Show output if Debug is on
+app.displayDebugText();
 
 % Sync session nodes
 syncSessionNodes(app.Tree, app.Session)
