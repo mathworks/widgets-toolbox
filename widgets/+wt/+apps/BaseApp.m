@@ -40,6 +40,52 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     end %properties
 
 
+    % Accessors
+    methods
+
+        function set.Name(app,value)
+            app.Name = value;
+            app.updateTitle();
+        end
+
+
+        function value = get.PreferenceGroup(app)
+            value = app.PreferenceGroup;
+            if ~strlength(value)
+                value = class(app);
+            end
+            value = matlab.lang.makeValidName(value);
+        end
+
+
+        function value = get.Position(app)
+            value = app.Figure.Position;
+        end
+
+        function set.Position(app,value)
+            app.Figure.Position = value;
+        end
+
+
+        function value = get.Visible(app)
+            value = app.Figure.Visible;
+        end
+
+        function set.Visible(app,value)
+            app.Figure.Visible = value;
+        end
+
+
+        function value = get.WindowState(app)
+            value = app.Figure.WindowState;
+        end
+
+        function set.WindowState(app,value)
+            app.Figure.WindowState = value;
+        end
+
+    end %methods
+
 
     %% Internal properties
     properties (Hidden, Transient, NonCopyable, SetAccess = immutable)
@@ -473,55 +519,6 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
         end %function
 
     end %methods
-
-
-
-    %% Accessors
-    methods
-
-        function set.Name(app,value)
-            app.Name = value;
-            app.updateTitle();
-        end
-
-
-        function value = get.PreferenceGroup(app)
-            value = app.PreferenceGroup;
-            if ~strlength(value)
-                value = class(app);
-            end
-            value = matlab.lang.makeValidName(value);
-        end
-
-
-        function value = get.Position(app)
-            value = app.Figure.Position;
-        end
-
-        function set.Position(app,value)
-            app.Figure.Position = value;
-        end
-
-
-        function value = get.Visible(app)
-            value = app.Figure.Visible;
-        end
-
-        function set.Visible(app,value)
-            app.Figure.Visible = value;
-        end
-
-
-        function value = get.WindowState(app)
-            value = app.Figure.WindowState;
-        end
-
-        function set.WindowState(app,value)
-            app.Figure.WindowState = value;
-        end
-
-    end %methods
-
 
 end % classdef
 
