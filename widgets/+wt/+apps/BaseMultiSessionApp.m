@@ -213,7 +213,7 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                     emptySession = app.getEmptySession();
                     app.selectSession(emptySession)
                 end
-            end            
+            end
 
         end %function
 
@@ -286,5 +286,45 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         end %function
 
     end %methods
+
+
+    %% Display Customization
+    methods (Access = protected)
+
+        function propGroups = getPropertyGroups(app)
+            % Customize how the properties are displayed
+
+            import matlab.mixin.util.PropertyGroup
+
+            persistent pGroups
+            if isempty(pGroups)
+
+                baseAppTitle = "        ------ BaseApp Properties ------";
+                baseAppProperties = properties("wt.apps.BaseApp");
+                usedProps = baseAppProperties;
+
+                sessionTitle = "        ------ BaseMultiSessionApp Properties ------";
+                sessionProperties = setdiff(...
+                    properties("wt.apps.BaseMultiSessionApp"), usedProps);
+                usedProps = [baseAppProperties; sessionProperties];
+
+                appTitle = "        ------ " + app.Name + " Properties ------";
+                appProperties = setdiff(...
+                    properties(app), usedProps);
+
+                pGroups = [
+                    PropertyGroup(appProperties, appTitle)
+                    PropertyGroup(sessionProperties, sessionTitle)
+                    PropertyGroup(baseAppProperties, baseAppTitle)
+                    ];
+
+            end %if
+
+            propGroups = pGroups;
+
+        end %function
+
+    end %methods
+
 
 end %classdef

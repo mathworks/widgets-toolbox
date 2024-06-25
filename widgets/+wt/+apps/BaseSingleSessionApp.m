@@ -165,4 +165,45 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
         
     end %methods
    
+
+
+    %% Display Customization
+    methods (Access = protected)
+
+        function propGroups = getPropertyGroups(app)
+            % Customize how the properties are displayed
+
+            import matlab.mixin.util.PropertyGroup
+
+            persistent pGroups
+            if isempty(pGroups)
+
+                baseAppTitle = "        ------ BaseApp Properties ------";
+                baseAppProperties = properties("wt.apps.BaseApp");
+                usedProps = baseAppProperties;
+
+                sessionTitle = "        ------ BaseSingleSessionApp Properties ------";
+                sessionProperties = setdiff(...
+                    properties("wt.apps.BaseSingleSessionApp"), usedProps);
+                usedProps = [baseAppProperties; sessionProperties];
+
+                appTitle = "        ------ " + app.Name + " Properties ------";
+                appProperties = setdiff(...
+                    properties(app), usedProps);
+
+                pGroups = [
+                    PropertyGroup(appProperties, appTitle)
+                    PropertyGroup(sessionProperties, sessionTitle)
+                    PropertyGroup(baseAppProperties, baseAppTitle)
+                    ];
+
+            end %if
+
+            propGroups = pGroups;
+
+        end %function
+
+    end %methods
+
+
 end %classdef

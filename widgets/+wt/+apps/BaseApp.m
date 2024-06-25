@@ -1,4 +1,6 @@
-classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
+classdef BaseApp < matlab.apps.AppBase & ...
+        matlab.mixin.SetGetExactNames & ...
+        matlab.mixin.CustomDisplay & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
 
@@ -476,7 +478,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
 
         end %function
 
-        
+
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
@@ -522,5 +524,39 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
 
     end %methods
 
-end % classdef
 
+
+    %% Display Customization
+    methods (Access = protected)
+
+        function propGroups = getPropertyGroups(app)
+            % Customize how the properties are displayed
+
+            import matlab.mixin.util.PropertyGroup
+
+            persistent pGroups
+            if isempty(pGroups)
+
+                baseAppTitle = "        ------ BaseApp Properties ------";
+                baseAppProperties = properties("wt.apps.BaseApp");
+                usedProps = baseAppProperties;
+
+                appTitle = "        ------ " + app.Name + " Properties ------";
+                appProperties = setdiff(...
+                    properties(app), usedProps);
+
+                pGroups = [
+                    PropertyGroup(appProperties, appTitle)
+                    PropertyGroup(baseAppProperties, baseAppTitle)
+                    ];
+
+            end %if
+
+            propGroups = pGroups;
+
+        end %function
+
+    end %methods
+
+
+end % classdef
