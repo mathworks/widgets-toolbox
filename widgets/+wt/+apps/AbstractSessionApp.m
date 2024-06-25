@@ -225,8 +225,27 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 sessionPath = app.promptToLoad();
             end
 
-            % Load the file
-            if isfile(sessionPath)
+            % Check the file name of this session
+            [~,sessionFileName,sessionFileExt] = fileparts(sessionPath);
+            sessionFileName = sessionFileName + sessionFileExt;
+            existingSessionFiles = vertcat( app.Session.FileName );
+            isAlreadyOpen = any( matches(sessionFileName, ...
+                existingSessionFiles, "IgnoreCase", true) );
+
+            % How should we proceed?
+            if isAlreadyOpen
+                
+                % Return an empty session of correct type
+                session = app.getEmptySession();
+
+                % Throw an error
+                title = "Load Session";
+                message = sprintf("""%s"" is already open.", ...
+                    sessionFileName);
+                app.throwError(message, title);
+
+            elseif isfile(sessionPath)
+                % Load the file
 
                 % Freeze the figure with a progress dialog
                 dlg = app.showIndeterminateProgress("Loading Session");

@@ -324,7 +324,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
             if isequal(fileName,0)
                 filePath = string.empty(0);
             else
-                filePath = fullfile(pathName,fileName);
+                filePath = string( fullfile(pathName,fileName) );
                 app.LastFolder = pathName;
             end %if isequal(fileName,0)
 
