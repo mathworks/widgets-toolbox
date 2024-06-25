@@ -148,11 +148,25 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
             % Show output if Debug is on
             app.displayDebugText();
 
-            % Call superclass method
-            app.saveSession_Internal(useSaveAs, session);
+            % Confirm scalar session
+            if isscalar(session)
 
-            % Populate output
-            sessionPath = session.FilePath;
+                % Call superclass method
+                app.saveSession_Internal(useSaveAs, session);
+
+                % Populate output
+                sessionPath = session.FilePath;
+
+            else
+
+                % Throw an error
+                title = "Save Session";
+                message = "No session was selected.";
+                app.throwError(message, title);
+
+                sessionPath = "";
+
+            end %if
 
         end %function
 
