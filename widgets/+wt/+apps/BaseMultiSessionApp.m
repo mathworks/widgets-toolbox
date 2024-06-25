@@ -127,7 +127,6 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
             % This also triggers app.update(), app.updateTitle()
             if isempty(app.Session)
                 app.Session = session;
-                app.selectSession(session);
             else
                 app.Session(end+1) = session;
                 % Don't select by default, but concrete app may do this
@@ -180,11 +179,41 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
                 return
             elseif isempty(app.Session)
                 app.Session = session;
-                app.selectSession(session);
             else
                 app.Session(end+1) = session;
                 % Don't select by default, but concrete app may do this
             end
+
+        end %function
+
+
+        function closeSession(app, session)
+            % Close the specified session
+
+            % Define arguments
+            arguments
+                app (1,1) wt.apps.BaseApp
+                session wt.model.BaseSession = app.SelectedSession
+            end
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Exit if session is empty
+            if isempty(session) || ~isvalid(session)
+                return
+            end
+
+            % Call superclass internal close method
+            isCancelled = app.closeSession_Internal(session);
+
+            % Deselect the closed session
+            if ~isCancelled
+                if isequal(app.SelectedSession, session)
+                    emptySession = app.getEmptySession();
+                    app.selectSession(emptySession)
+                end
+            end            
 
         end %function
 
