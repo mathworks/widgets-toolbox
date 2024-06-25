@@ -87,6 +87,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
     end %methods
 
 
+
     %% Internal properties
     properties (Hidden, Transient, NonCopyable, SetAccess = immutable)
 
@@ -475,6 +476,7 @@ classdef BaseApp < matlab.apps.AppBase & matlab.mixin.SetGetExactNames & ...
 
         end %function
 
+        
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
