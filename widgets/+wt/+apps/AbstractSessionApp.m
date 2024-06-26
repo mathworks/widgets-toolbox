@@ -228,9 +228,13 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Check the file name of this session
             [~,sessionFileName,sessionFileExt] = fileparts(sessionPath);
             sessionFileName = sessionFileName + sessionFileExt;
-            existingSessionFiles = vertcat( app.Session.FileName );
-            isAlreadyOpen = any( matches(sessionFileName, ...
-                existingSessionFiles, "IgnoreCase", true) );
+            if isempty(app.Session)
+                isAlreadyOpen = false;
+            else
+                existingSessionFiles = vertcat( app.Session.FileName );
+                isAlreadyOpen = any( matches(sessionFileName, ...
+                    existingSessionFiles, "IgnoreCase", true) );
+            end
 
             % How should we proceed?
             if isAlreadyOpen
