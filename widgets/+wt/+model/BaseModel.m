@@ -57,6 +57,11 @@ classdef (Abstract) BaseModel < handle & ...
 
 
     properties (Hidden, AbortSet)
+        % These are used internally and functionality may change in the
+        % future
+
+        % Enables change listeners 
+        EnableChangeListeners (1,1) logical = true
 
         % Enables nested model listeners to trigger onModelChanged event
         EnableAggregatedModelListeners (1,1) logical = true
@@ -288,6 +293,11 @@ classdef (Abstract) BaseModel < handle & ...
                     "    Class: " + class(obj));
             end
 
+            % Return now if disabled
+            if ~obj.EnableChangeListeners
+                return
+            end
+
             % Notify listeners
             evtOutP = wt.eventdata.PropertyChangedData(...
                 evt.Source.Name, obj.(evt.Source.Name));
@@ -321,6 +331,11 @@ classdef (Abstract) BaseModel < handle & ...
                 evt (1,1) wt.eventdata.ModelChangedData
             end
 
+            % Return now if disabled
+            if ~obj.EnableChangeListeners
+                return
+            end
+
             % Prepare eventdata
             evtOut = wt.eventdata.ModelChangedData;
             evtOut.Model = evt.Model;
@@ -339,10 +354,10 @@ classdef (Abstract) BaseModel < handle & ...
             % Notify listeners
             obj.notify("ModelChanged",evtOut)
 
+
         end %function
 
     end %methods
-
 
 
     %% Private methods

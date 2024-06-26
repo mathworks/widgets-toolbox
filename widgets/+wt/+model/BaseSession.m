@@ -5,51 +5,50 @@ classdef BaseSession < wt.model.BaseModel
     % data. Any properties tagged with the "SetObservable" attribute will
     % trigger a public event "PropertyChanged" when value is set. The app
     % will listen for these changes.
-    
+
     % Copyright 2020-2024 The MathWorks, Inc.
-    
+
 
     %% Events
     events
-        
-        % Triggered when dirty flag toggles
-        MarkedDirty 
 
         % Triggered when dirty flag toggles
-        MarkedClean 
-        
+        MarkedDirty
+
+        % Triggered when dirty flag toggles
+        MarkedClean
+
     end %events
 
-    
+
     %% Properties
     properties (Dependent, SetAccess = immutable)
-        
+
         % FileName of the session (dependent on FileName)
         FileName (1,1) string
-        
-    end %properties
-    
-    
-    % properties (AbortSet, Transient, SetObservable)
-    properties (AbortSet, Transient)
-        
-        % Path to store the session file
-        FilePath (1,1) string
-        
-        % Indicates modifications have not been saved
-        Dirty (1,1) logical = false
-        
-    end %properties
-    
-    
-    properties (AbortSet, SetObservable)
-        
-        % Description of the session (optional)
-        Description (1,1) string
-        
+
     end %properties
 
-    
+
+    properties (AbortSet, SetObservable)
+
+        % Path to store the session file
+        FilePath (1,1) string
+
+        % Description of the session (optional)
+        Description (1,1) string
+
+    end %properties
+
+
+    properties (AbortSet, Transient)
+
+        % Indicates modifications have not been saved
+        Dirty (1,1) logical = false
+
+    end %properties
+
+
     % Accessors
     methods
         function set.Dirty(obj,value)
@@ -66,42 +65,100 @@ classdef BaseSession < wt.model.BaseModel
             end
         end
     end
-    
-    
+
+
     %% Public methods (subclass may override these)
     methods
-               
-        function save(session)
+
+        function save(session, filePath)
             % Save a session object into a MAT file
+
+            % Define arguments
+            arguments
+                session (1,1) wt.model.BaseSession
+                filePath (1,1) string = session.FilePath
+            end
 
             if session.Debug
                 disp("wt.model.BaseSession.save");
             end
-            
-            if ~strlength(session.FilePath)
-                error('Session FilePath is empty.');
+
+            if ~strlength(filePath)
+                error("Session FilePath is empty.");
             end
 
-            save(session.FilePath,'session');
-            
+            session.FilePath = filePath;
+            session.Dirty = false;
+            save(filePath,'session');
+
         end %function
-        
+
     end %methods
-    
-    
+
+
     %% Public static methods
     methods (Static, Sealed)
-        
-        function sessionObj = open(sessionPath)
+
+        function session = open(sessionPath)
             % Load a session object from a MAT file - subclass may override
-            
-            contents = load(sessionPath,"session");
-            sessionObj = contents.session;
-            
+
+            % Attempt to load
+            try
+                contents = load(sessionPath,"session");
+            catch
+                % Throw an error
+                id = "wt:BaseSession:InvalidSessionFile";
+                msg = "Invalid session file: %s";
+                error(id, msg, sessionPath);
+            end
+
+            % Is it a valid file?
+            if isfield(contents,'session') ...
+                    && isa(contents.session, "wt.model.BaseSession") ...
+                    && isscalar(contents.session)
+
+                % Get the session
+                session = contents.session;
+
+                % Update file path if changed
+                session.FilePath = sessionPath;
+                session.Dirty = false;
+
+            else
+
+                % Throw an error
+                id = "wt:BaseSession:InvalidSessionFile";
+                msg = "Invalid session file: %s";
+                error(id, msg, sessionPath);
+
+            end
+
         end %function
-        
+
     end %methods
-    
+
+
+    % %% Hidden methods
+    % methods (Hidden)
+    % 
+    %     function setFilePathSilently(obj, filePath)
+    %         % Set FilePath without triggering change notifications
+    % 
+    %         % Define arguments
+    %         arguments
+    %             obj (1,1) wt.model.BaseModel
+    %             filePath (1,1) string
+    %         end
+    % 
+    %         oldValue = obj.EnableChangeListeners;
+    %         obj.EnableChangeListeners = false;
+    %         obj.FilePath = filePath;
+    %         obj.EnableChangeListeners = oldValue;
+    % 
+    %     end %function
+    % 
+    % end %methods
+
 
     %% Protected methods (subclass may override these)
     methods (Access = protected)
@@ -122,18 +179,18 @@ classdef BaseSession < wt.model.BaseModel
 
             % Mark the session dirty
             obj.Dirty = true;
-            
+
             % Call superclass method to notify PropertyChanged event
             obj.onModelChanged@wt.model.BaseModel(evt);
-            
+
         end %function
 
     end %methods
-    
-    
+
+
     %% Accessors
     methods
-        
+
         function value = get.FileName(obj)
             if strlength(obj.FilePath)
                 [~,name,ext] = fileparts(obj.FilePath);
@@ -142,8 +199,8 @@ classdef BaseSession < wt.model.BaseModel
                 value = "untitled";
             end
         end %function
-        
+
     end %methods
-    
-    
+
+
 end % classdef

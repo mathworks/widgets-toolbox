@@ -156,10 +156,6 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Prompt for "save as" if needed
             if useSaveAs || ~isfile(sessionPath)
                 sessionPath = app.promptToSaveAs(sessionPath);
-                %RJ - review this code carefully!
-                if ~isempty( sessionPath )
-                    session.FilePath = sessionPath;
-                end
             end
 
             % Save the file (unless path is empty indicating cancel)
@@ -170,10 +166,12 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 cleanupObj = onCleanup(@()delete(dlg));
 
                 % Save the session
-                session.save();
-                session.FilePath = sessionPath;
-                session.Dirty = false;
+                session.save(sessionPath);
 
+                % Update the app in case filepath changed
+                app.updateTitle()
+                app.update()
+                
             end %if strlength(sessionPath)
 
         end %function
@@ -256,8 +254,12 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 cleanupObj = onCleanup(@()delete(dlg));
 
                 % Load the session
-                session = wt.model.BaseSession.open(sessionPath);
-                session.FilePath = sessionPath;
+                try
+                    session = wt.model.BaseSession.open(sessionPath);
+                catch err
+                    session = app.getEmptySession();
+                    app.throwError(err)
+                end
 
             else
 
@@ -349,9 +351,10 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Show output if Debug is on
             app.displayDebugText();
 
-            % Trigger updates
+            % Update the app
             if app.SetupComplete
                 app.update();
+                app.updateTitle();
             end
 
         end %function
@@ -363,8 +366,11 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Show output if Debug is on
             app.displayDebugText();
 
-            % Update the title
-            app.updateTitle();
+            % Update the title only 
+            % (prop change should have triggered update already)
+            if app.SetupComplete
+                app.updateTitle();
+            end
 
         end %function
 
@@ -375,8 +381,11 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Show output if Debug is on
             app.displayDebugText();
 
-            % Update the title
-            app.updateTitle();
+            % Update the app
+            if app.SetupComplete
+                app.update();
+                app.updateTitle();
+            end
 
         end %function
 
