@@ -27,6 +27,14 @@ classdef BaseViewController < ...
     end %properties
 
 
+    properties (AbortSet)
+
+        % The default panel name prefix to display
+        PanelNamePrefix (1,1) string
+
+    end %properties
+
+
     %% Internal Properties
     properties (Hidden, SetAccess = protected)
 
@@ -38,9 +46,6 @@ classdef BaseViewController < ...
 
         % The internal grid to manage contents
         Grid matlab.ui.container.GridLayout
-
-        % The default panel name prefix to display
-        PanelNamePrefix (1,1) string
 
     end %properties
 
