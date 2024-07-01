@@ -167,8 +167,31 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function onAddButton(obj,~)
             % Triggered on button pushed
 
-            % Append a new row to the data
-            obj.Data = vertcat(obj.Data, obj.NewRowFormat);
+            % Prepare new data
+            selRow = obj.Table.Selection;
+            newRow = selRow + 1;
+            newData = [
+                obj.Data(1:selRow,:)
+                obj.NewRowFormat
+                obj.Data(newRow:end,:)
+                ];
+
+            % Prepare event data
+            evtOut = wt.eventdata.RowEntriesTableChangedData();
+            evtOut.Action = "RowAdded";
+            evtOut.Row = newRow;
+            evtOut.Column = 1:size(newData,2);
+            evtOut.Value = obj.NewRowFormat;
+            evtOut.PreviousValue = zeros(0,size(newData,2));
+            evtOut.TableData = newData;
+            evtOut.PreviousTableData = obj.Data;
+
+            % Store new result and select it
+            obj.Data = newData;
+            obj.Selection = newRow;
+
+            % Trigger event
+            notify(obj,"ValueChanged",evtOut);
 
         end %function
 
@@ -181,16 +204,36 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             numSelRows = numel(selRows);
             numRows = height(obj.Data);
 
-            % Remove the rows
-            obj.Data(selRows,:) = [];
+            % Prepare the new data
+            oldData = obj.Data;
+            removedData = oldData(selRows,:);
+            newData = oldData;
+            newData(selRows,:) = [];
 
-            % Update table selection
+            % Calculate new row selection
+            newSelRows = selRows;
             newNumRows = numRows - numSelRows;
-            isOver = selRows > newNumRows;
-            selRows(isOver) = selRows(isOver) - numSelRows;
-            selRows(selRows < 1 | selRows > newNumRows) = [];
-            selRows = unique(selRows);
-            obj.Table.Selection = selRows;
+            isOver = newSelRows > newNumRows;
+            newSelRows(isOver) = newSelRows(isOver) - numSelRows;
+            newSelRows(newSelRows < 1 | newSelRows > newNumRows) = [];
+            newSelRows = unique(newSelRows);
+           
+            % Prepare event data
+            evtOut = wt.eventdata.RowEntriesTableChangedData();
+            evtOut.Action = "RowRemoved";
+            evtOut.Row = selRows;
+            evtOut.Column = 1:size(oldData,2);
+            evtOut.Value = zeros(0,size(removedData,2));
+            evtOut.PreviousValue = removedData;
+            evtOut.TableData = newData;
+            evtOut.PreviousTableData = oldData;
+
+            % Store new result and update selection
+            obj.Data = newData;
+            obj.Table.Selection = newSelRows;
+
+            % Trigger event
+            notify(obj,"ValueChanged",evtOut);
 
         end %function
 
@@ -229,17 +272,22 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function onCellEdited(obj,evt)
             % Triggered on cell edited
 
-            % Get prior value
-            oldValue = obj.Data;
-
-            % Get new value
-            newValue = [obj.Table.Data];
+            % Prepare event data
+            evtOut = wt.eventdata.RowEntriesTableChangedData();
+            evtOut.Action = "CellEdited";
+            evtOut.Row = evt.Indices(1);
+            evtOut.Column = evt.Indices(2);
+            evtOut.Value = evt.NewData;
+            evtOut.PreviousValue = evt.PreviousData;
+            evtOut.EditValue = evt.EditData;
+            evtOut.TableData = [obj.Table.Data];
+            evtOut.PreviousTableData = obj.Data;
+            evtOut.Error = evt.Error;
 
             % Store new result
-            obj.Data = newValue;
+            obj.Data = [obj.Table.Data];
 
             % Trigger event
-            evtOut = wt.eventdata.ValueChangedData(newValue, oldValue);
             notify(obj,"ValueChanged",evtOut);
 
         end %function
