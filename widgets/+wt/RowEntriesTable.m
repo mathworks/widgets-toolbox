@@ -169,6 +169,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Prepare new data
             selRow = obj.Table.Selection;
+            if isempty(selRow)
+                selRow = height(obj.Table);
+            end
             newRow = selRow + 1;
             newData = [
                 obj.Data(1:selRow,:)
@@ -187,8 +190,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut.PreviousTableData = obj.Data;
 
             % Store new result and select it
+            obj.Table.Data = newData;
+            obj.Table.Selection = newRow;
             obj.Data = newData;
-            obj.Selection = newRow;
 
             % Trigger event
             notify(obj,"ValueChanged",evtOut);
@@ -201,6 +205,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Get the selection and total rows
             selRows = obj.Table.Selection;
+            if isempty(selRows)
+                return
+            end
             numSelRows = numel(selRows);
             numRows = height(obj.Data);
 
@@ -229,8 +236,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut.PreviousTableData = oldData;
 
             % Store new result and update selection
-            obj.Data = newData;
+            obj.Table.Data = newData;
             obj.Table.Selection = newSelRows;
+            obj.Data = newData;
 
             % Trigger event
             notify(obj,"ValueChanged",evtOut);
