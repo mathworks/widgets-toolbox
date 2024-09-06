@@ -119,14 +119,14 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         end %function
         
 
-        function onModelChanged(obj)
+        function onModelChanged(obj,evt)
             % Triggered when Model has been changed
 
             % Request an update
             obj.requestUpdate();
 
             % Call superclass method
-            obj.onModelChanged@wt.mixin.ModelObserver()
+            obj.onModelChanged@wt.mixin.ModelObserver(evt)
 
         end %function
 
