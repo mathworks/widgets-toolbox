@@ -166,32 +166,51 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function onAddButton(obj,~)
             % Triggered on button pushed
 
-            % Prepare new data
+            % Get old/new data
             oldData = obj.Data;
-            selRow = obj.Table.Selection;
-            if isempty(selRow)
-                selRow = height(oldData);
+            newRowData = obj.NewRowFormat;
+            numOldRows = height(oldData);
+            numNewRows = numOldRows + 1;
+            numOldCols = width(oldData);
+
+            % Determine placement
+            selRowIdx = obj.Table.Selection;
+            if isempty(selRowIdx)
+                selRowIdx = numOldRows;
             end
-            newRow = selRow + 1;
+            newRowIdx = selRowIdx + 1;
+            
+            % Does table already have columns?
+            if numOldCols > 0
+
+                % New row must be same width as table
+                newRowData = resize(newRowData, [1 numOldCols]);
+
+                % Add content to table
+                newData = paddata(oldData,numNewRows,"FillValue",newRowData);
+
+            end
+               
+            % Order new data
             newData = [
-                oldData(1:selRow,:)
-                obj.NewRowFormat
-                oldData(newRow:end,:)
+                newData(1:selRowIdx,:)
+                newData(end,:)
+                newData(newRowIdx:numOldRows,:)
                 ];
 
             % Prepare event data
             evtOut = wt.eventdata.RowEntriesTableChangedData();
             evtOut.Action = "RowAdded";
-            evtOut.Row = newRow;
+            evtOut.Row = newRowIdx;
             evtOut.Column = 1:size(newData,2);
-            evtOut.Value = newData(newRow,:);
+            evtOut.Value = newData(newRowIdx,:);
             evtOut.PreviousValue = oldData([],:);
             evtOut.TableData = newData;
             evtOut.PreviousTableData = oldData;
 
             % Store new result and select it
             obj.Table.Data = newData;
-            obj.Table.Selection = newRow;
+            obj.Table.Selection = newRowIdx;
             obj.Data = newData;
 
             % Trigger event
