@@ -22,8 +22,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         Data table
 
         % Format for new table row
-        NewRowFormat (1,:) table = ...
-            cell2table({"NewRow",0},"VariableNames",["Name","Value"])
+        NewRowFormat (1,:) cell = {"NewRow",0}
 
     end %properties
 
@@ -130,9 +129,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % Get the data
             data = obj.Data;
 
-            % If empty and no vars, use variable names from NewRowFormat
+            % If empty and no vars, use NewRowFormat
             if width(data) == 0
-                data = obj.NewRowFormat([],:);
+                data = cell(0, numel(obj.NewRowFormat));
             end
 
             % Update the table content
@@ -168,15 +167,16 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % Triggered on button pushed
 
             % Prepare new data
+            oldData = obj.Data;
             selRow = obj.Table.Selection;
             if isempty(selRow)
-                selRow = height(obj.Table);
+                selRow = height(oldData);
             end
             newRow = selRow + 1;
             newData = [
-                obj.Data(1:selRow,:)
+                oldData(1:selRow,:)
                 obj.NewRowFormat
-                obj.Data(newRow:end,:)
+                oldData(newRow:end,:)
                 ];
 
             % Prepare event data
@@ -184,10 +184,10 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut.Action = "RowAdded";
             evtOut.Row = newRow;
             evtOut.Column = 1:size(newData,2);
-            evtOut.Value = obj.NewRowFormat;
-            evtOut.PreviousValue = zeros(0,size(newData,2));
+            evtOut.Value = newData(newRow,:);
+            evtOut.PreviousValue = oldData([],:);
             evtOut.TableData = newData;
-            evtOut.PreviousTableData = obj.Data;
+            evtOut.PreviousTableData = oldData;
 
             % Store new result and select it
             obj.Table.Data = newData;
@@ -230,7 +230,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut.Action = "RowRemoved";
             evtOut.Row = selRows;
             evtOut.Column = 1:size(oldData,2);
-            evtOut.Value = zeros(0,size(removedData,2));
+            evtOut.Value = removedData([],:);
             evtOut.PreviousValue = removedData;
             evtOut.TableData = newData;
             evtOut.PreviousTableData = oldData;
