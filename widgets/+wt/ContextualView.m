@@ -102,6 +102,10 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 model wt.model.BaseModel = wt.model.BaseModel.empty(0)
             end
 
+            % Prevent interaction during launch
+            % dlg = obj.showIndeterminateProgress("Loading...","",true);
+            % cleanupObj = onCleanup(@()delete(dlg));
+
             % Validate view class
             view = validateViewClass(obj, viewClass);
 
@@ -384,7 +388,8 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Enable any prior view changes to finish, avoiding any
             % "flashing" effects during the change
-            drawnow
+            % drawnow
+            % drawnow('nocallbacks','limitrate')
 
             % Remove any listeners on the view
             obj.ModelSetListener = obj.deleteListenersForSource(...
