@@ -217,7 +217,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
             app.updateTitle();
 
             % Force drawing to finish
-            drawnow
+            drawnow('limitrate')
 
             % Now, make it visible
             app.Figure.Visible = 'on';
