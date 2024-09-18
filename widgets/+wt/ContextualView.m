@@ -50,10 +50,14 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (SetAccess=private)
 
         % The currently active view, or empty if none
-        ActiveView (:,1) wt.abstract.BaseViewController {mustBeScalarOrEmpty}
+        ActiveView (:,1) matlab.graphics.Graphics ...
+            {mustBeScalarOrEmpty, mustBeValidView(ActiveView)} = ...
+            wt.abstract.BaseViewController.empty(0,1)
 
         % The array of views loaded into memory
-        LoadedViews (:,1) wt.abstract.BaseViewController
+        LoadedViews (:,1) matlab.graphics.Graphics ...
+            {mustBeValidView(LoadedViews)} = ...
+            wt.abstract.BaseViewController.empty(0,1)
 
     end %properties
 
@@ -205,7 +209,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % Grid Layout to place the contents
             obj.Grid = uigridlayout(obj,[1 1]);
             obj.Grid.Padding = [0 0 0 0];
-            obj.Grid.BackgroundColor = [.7 .7 .9];
+            % obj.Grid.BackgroundColor = [.7 .7 .9];
 
         end %function
 
@@ -233,7 +237,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             end
 
             arguments (Output)
-                view (:,1) wt.abstract.BaseViewController {mustBeScalarOrEmpty}
+                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
             end
 
             % Try to locate a valid view
@@ -276,7 +280,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             end
 
             arguments (Output)
-                view (:,1) wt.abstract.BaseViewController {mustBeScalarOrEmpty}
+                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
             end
 
             % Trap errors
@@ -323,7 +327,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             arguments
                 obj (1,1) wt.ContextualView
-                view (1,1) wt.abstract.BaseViewController
+                view (1,1) {mustBeValidView(view)}
                 model wt.model.BaseModel
             end
 
@@ -378,7 +382,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % Deactivate a view, removing from view and removing model
             arguments
                 obj (1,1) wt.ContextualView
-                view wt.abstract.BaseViewController = obj.ActiveView
+                view {mustBeValidView(view)} = obj.ActiveView
             end
 
             % Return now if view provided is empty
@@ -433,7 +437,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             arguments
                 obj (1,1) wt.ContextualView
-                view (1,1) wt.abstract.BaseViewController
+                view (1,1) {mustBeValidView(view)}
                 model wt.model.BaseModel
             end
 
@@ -492,3 +496,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %methods
 
 end %classdef
+
+
+% Validation function 
+function mustBeValidView(view)
+
+mustBeA(view, "wt.mixin.ModelObserver")
+mustBeA(view, ["wt.abstract.BaseViewController", "wt.abstract.BaseViewChart"])
+
+end %function

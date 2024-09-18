@@ -1,4 +1,6 @@
-classdef (Abstract) ModelObserver < handle
+classdef (Abstract, AllowedSubclasses = ...
+        {?wt.abstract.BaseViewController, ?wt.abstract.BaseViewChart})...
+        ModelObserver < handle
     % Mixin for components using a model that observe changes
 
     
@@ -107,8 +109,12 @@ classdef (Abstract) ModelObserver < handle
         function className = getModelClassName(obj)
             % Returns the class name of the Model property contents
 
-            arguments
+            arguments (Input)
                 obj (1,1) wt.mixin.ModelObserver
+            end
+
+            arguments (Output)
+                className (1,1) string
             end
 
             % Get the class of the Model array

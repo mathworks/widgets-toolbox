@@ -1,9 +1,11 @@
-classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
-        wt.mixin.ModelObserver
+classdef BaseViewChart < wt.mixin.ModelObserver & ...
+        matlab.graphics.chartcontainer.ChartContainer
     % Base class for view charts referencing a BaseModel class
 
     % Copyright 2024 The MathWorks Inc.
 
+
+    %% Public Properties
     properties (AbortSet)
 
         % The default title prefix to display
@@ -120,7 +122,7 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         
 
         function onModelChanged(obj,evt)
-            % Triggered when Model has been changed
+            % Triggered when a property within the model has changed
 
             % Request an update
             obj.requestUpdate();
