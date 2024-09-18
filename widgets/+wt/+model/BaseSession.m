@@ -163,6 +163,15 @@ classdef BaseSession < wt.model.BaseModel
     %% Protected methods (subclass may override these)
     methods (Access = protected)
 
+        function name = getDefaultName(obj)
+            % Defines what the default name should be. A subclass may
+            % override this to customize the default name.
+
+            [~,name,~] = fileparts(obj.FileName);
+
+        end %function
+        
+
         function onModelChanged(obj,evt)
             % Triggered when the Session or any aggregated BaseModel
             % classes have triggered a ModelChanged event (typically when

@@ -5,9 +5,6 @@ classdef Exhibit < wt.model.BaseModel
     %% Public Properties
     properties (AbortSet, SetObservable)
 
-        % Name of the exhibit
-        Name (1,1) string
-
         % Point location of the exhibit on the map
         Location (1,2) double
 

@@ -5,9 +5,6 @@ classdef Animal < wt.model.BaseModel
     %% Public Properties
     properties (AbortSet, SetObservable)
 
-        % Name of the animal
-        Name (1,1) string
-
         % Species of the animal
         Species (1,1) string
 

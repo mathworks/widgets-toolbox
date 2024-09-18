@@ -30,6 +30,31 @@ classdef (Abstract) BaseModel < handle & ...
     end %events
 
 
+    %% Inputs - Public Properties
+    properties (AbortSet, SetObservable)
+
+        % Name of this item
+        Name (1,1) string = ""
+
+    end %properties
+
+
+    % Accessors
+    methods
+
+        function value = get.Name(obj)
+            % If a name has been specified, use it. Else, the concrete
+            % class may customize what the default name should be.
+            if strlength(obj.Name) > 0
+                value = obj.Name;
+            else
+                value = obj.getDefaultName();
+            end
+        end %function
+        
+    end %methods
+
+
 
     %% Internal Properties
     properties (Transient, Hidden)
@@ -167,6 +192,15 @@ classdef (Abstract) BaseModel < handle & ...
 
     %% Protected Methods
     methods (Access = protected)
+
+        function name = getDefaultName(~)
+            % Defines what the default name should be. A subclass may
+            % override this to customize the default name.
+
+            name = "";
+
+        end %function
+        
 
         function props = getAggregatedModelProperties(~)
             % Returns a list of aggregated model property names
