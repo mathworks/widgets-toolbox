@@ -4,6 +4,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
+        wt.mixin.Orderable & ...
         wt.mixin.Tooltipable
     % A table showing status of multiple tasks
 
@@ -11,7 +12,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
     %RJ - Need unit tests
-    %RJ - Connect ordering buttons and make them optoinal
+    %RJ - Connect ordering buttons and make them optional
     %RJ - Table enable didn't work
 
 
@@ -24,7 +25,49 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         % Format for new table row
         NewRowFormat (1,:) cell = {"NewRow",0}
 
+        % Indicates whether to allow sort controls
+        Sortable  (1,1) matlab.lang.OnOffSwitchState = false
+
     end %properties
+
+
+    %% Dependent properties
+    properties (Dependent, SetAccess = private)
+
+        StyleConfigurations 
+
+    end %properties
+
+    properties (Dependent)
+
+        TableWidth
+
+        TableHeight
+
+    end %properties
+
+
+    methods
+
+        function value = get.TableWidth(obj)
+            value = obj.Grid.ColumnWidth{1};
+        end
+        function set.TableWidth(obj, value)
+            obj.Grid.ColumnWidth{1} = value;
+        end
+
+        function value = get.TableHeight(obj)
+            value = obj.Grid.RowHeight{end};
+        end
+        function set.TableHeight(obj, value)
+            obj.Grid.RowHeight{end} = value;
+        end
+
+        function value = get.StyleConfigurations(obj)
+            value = obj.Table.StyleConfigurations;
+        end
+
+    end %methods
 
 
     %% Events
@@ -39,9 +82,6 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
-        % Indicates whether to allow sort controls
-        Sortable  (1,1) matlab.lang.OnOffSwitchState = false
-
         % Grid
         Grid matlab.ui.container.GridLayout
 
@@ -55,6 +95,46 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         DownButton matlab.ui.control.Button
 
     end %properties
+
+
+    %% Public methods
+    methods
+
+        function addStyle(obj,s,tableTarget,tableIndex)
+            % Add a style to the table
+
+            arguments (Input)
+                obj (1,1) wt.RowEntriesTable
+                s (1,1) matlab.ui.style.Style
+                tableTarget (1,1) string {mustBeMember(tableTarget,...
+                    ["table","row","column","cell"])} = "table"
+                tableIndex = ""
+            end
+
+            % Add the style to the internal table
+            addStyle(obj.Table, s, tableTarget, tableIndex)
+
+        end %function
+
+
+        function removeStyle(obj,orderNum)
+            % Add a style to the table
+
+            arguments (Input)
+                obj (1,1) wt.RowEntriesTable
+                orderNum = []
+            end
+
+            % Remove the style from the internal table
+            if isempty(orderNum)
+                removeStyle(obj.Table)
+            else
+                removeStyle(obj.Table, orderNum)
+            end
+
+        end %function
+
+    end %methods
 
 
     %% Protected methods
@@ -137,9 +217,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % Update the table content
             obj.Table.Data = data;
 
-            % Toggle sorting button visibility
-            obj.UpButton.Visible = obj.Sortable;
-            obj.DownButton.Visible = obj.Sortable;
+            % Update sort buttons
+            obj.updateSortButtons();
 
         end %function
 
@@ -148,17 +227,37 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % Handle changes to Enable flag
 
             % Which rows are selected?
-            numRows = height(obj.Data);
             selRows = obj.Table.Selection;
 
             % Update buttons
             obj.AddButton.Enable = obj.Enable;
             obj.RemoveButton.Enable = obj.Enable && ~isempty(selRows);
-            obj.UpButton.Enable = obj.Enable && ~any(selRows == 1);
-            obj.DownButton.Enable = obj.Enable && ~any(selRows == numRows);
+
+            % Update sort buttons
+            obj.updateSortButtons();
 
             % Update fields
             obj.Table.Enable = string(obj.Enable);
+
+        end %function
+
+
+        function updateSortButtons(obj)
+
+            % Which rows are selected?
+            numItems = height(obj.Data);
+            idxSel = obj.Table.Selection;
+
+            % Toggle sorting button visibility
+            obj.UpButton.Visible = obj.Sortable;
+            obj.DownButton.Visible = obj.Sortable;
+
+            % Update button enables
+            if obj.Sortable
+                [backEnabled, fwdEnabled] = obj.areOrderButtonsEnabled(numItems, idxSel);
+                obj.UpButton.Enable = backEnabled;
+                obj.DownButton.Enable = fwdEnabled;
+            end
 
         end %function
 
@@ -179,7 +278,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
                 selRowIdx = numOldRows;
             end
             newRowIdx = selRowIdx + 1;
-            
+
             % Does table already have columns?
             if numOldCols > 0
 
@@ -190,7 +289,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
                 newData = paddata(oldData,numNewRows,"FillValue",newRowData);
 
             end
-               
+
             % Order new data
             newData = [
                 newData(1:selRowIdx,:)
@@ -243,7 +342,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             newSelRows(isOver) = newSelRows(isOver) - numSelRows;
             newSelRows(newSelRows < 1 | newSelRows > newNumRows) = [];
             newSelRows = unique(newSelRows);
-           
+
             % Prepare event data
             evtOut = wt.eventdata.RowEntriesTableChangedData();
             evtOut.Action = "RowRemoved";
@@ -268,26 +367,59 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function onUpButton(obj,~)
             % Triggered on button pushed
 
-            numRows = height(obj.Data);
-            selRows = obj.Table.Selection;
+            obj.shiftSelectedRows(-1);
 
-            %RJ - needs implementation
-            
         end %function
 
 
         function onDownButton(obj,~)
             % Triggered on button pushed
 
-            numRows = height(obj.Data);
-            selRows = obj.Table.Selection;
-
-            %RJ - needs implementation
+            obj.shiftSelectedRows(1);
 
         end %function
 
 
-        function onSelectionChanged(obj,evt)
+        function shiftSelectedRows(obj,shift)
+            % Shift the selected rows up/down
+
+            numItems = height(obj.Data);
+            idxSel = obj.Table.Selection;
+
+            % Shift the list indices
+            [idxNew, idxSelAfter] = obj.shiftListIndices(shift, numItems, idxSel);
+
+            % Get the original value
+            oldData = obj.Table.Data;
+
+            % Make the shift
+            newData = oldData(idxNew,:);
+
+            % Prepare event data
+            evtOut = wt.eventdata.RowEntriesTableChangedData();
+            evtOut.Action = "RowsOrdered";
+            % evtOut.Row =
+            % evtOut.Column =
+            evtOut.Value = idxNew;
+            % evtOut.PreviousValue =
+            evtOut.TableData = newData;
+            evtOut.PreviousTableData = oldData;
+
+            % Update the table
+            obj.Data = newData;
+            obj.Table.Selection = idxSelAfter;
+
+            % Trigger event
+            evtOut = wt.eventdata.ValueChangedData(newData, oldData);
+            notify(obj,"ValueChanged",evtOut);
+
+            % Update buttons
+            obj.updateSortButtons()
+
+        end %function
+
+
+        function onSelectionChanged(obj,~)
             % Triggered on table selection changed
 
             % Update button enables
