@@ -92,7 +92,7 @@ classdef (HandleCompatible) Orderable
         end %function
 
 
-        function [backEnabled, fwdEnabled] = areOrderButtonsEnabled(numItems, idxSel)
+        function [backEnabled, fwdEnabled] = areOrderButtonsEnabled(numItems, idxSel, allowSortItem)
             % Determine whether back/forward (down/up) buttons should be
             % enabled or not given the selection index
 
@@ -103,6 +103,9 @@ classdef (HandleCompatible) Orderable
 
                 % Selected indices
                 idxSel (1,:) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(idxSel,numItems)}
+
+                % Indicates whether each individual item may be sorted
+                allowSortItem (1,:) logical = true(1, numItems);
             end
 
             arguments (Output)
@@ -116,11 +119,16 @@ classdef (HandleCompatible) Orderable
             % How many items selected?
             numSel = numel(idxSel);
 
+            % Only sortable items selected
+            selIsSortable = (numSel > 0) && all( allowSortItem(idxSel) );
+
             % Enable back (up)?
-            backEnabled = (numSel > 0) && (max(idxSel) > numSel);
+            idxMinSortable = find(allowSortItem,1,"first");
+            backEnabled = selIsSortable && (max(idxSel) > (numSel + idxMinSortable - 1) );
 
             % Enable forward (down)?
-            fwdEnabled  = (numSel > 0) && (min(idxSel) <= (numItems - numSel));
+            idxMaxSortable = find(allowSortItem,1,"last");
+            fwdEnabled  = selIsSortable && (min(idxSel) <= (idxMaxSortable - numSel));
 
         end %function
 
