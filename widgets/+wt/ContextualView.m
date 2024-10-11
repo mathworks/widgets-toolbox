@@ -142,6 +142,9 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % Clear the view
             obj.deactivateView_Private();
 
+            % Delete any orphaned children
+            delete(obj.Grid.Children);
+
         end %function
 
 
@@ -291,6 +294,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
                 % Launch the view
                 view = viewConstructorFcn(obj.Grid);
+                % view = viewConstructorFcn("Parent",obj.Grid);
 
                 % Position the view in the single grid cell
                 view.Layout.Row = 1;
@@ -305,9 +309,11 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 delete(obj.Grid.Children(2:end))
 
                 % Throw an error
-                message = sprintf("Error launching view (%s).\n\n%s",...
-                    viewClass, err.message);
-                obj.throwError(message);
+                % message = sprintf("Error launching view (%s).\n\n%s",...
+                %     viewClass, err.message);
+                % obj.throwError(message);
+
+                rethrow(err)
 
                 % Deactivate current pane
                 obj.deactivateView_Private();
@@ -369,12 +375,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
         % function attachModelPropertyChangedListener(obj)
-        % 
+        %
         %     % Listen to the active view indicating model changes
         %     model = obj.ActiveView.Model;
         %     obj.ModelPropertyChangedListener = listener(model,...
         %         "ModelChanged",@(~,evt)obj.onModelChanged(evt));
-        % 
+        %
         % end %function
 
 
@@ -409,13 +415,16 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             if isequal(obj.ActiveView, view)
                 obj.ActiveView(:) = [];
             end
-            
+
+            % Clean up partially loaded children
+            delete(obj.Grid.Children(2:end))
+
         end %function
 
 
         function modelListener = deleteListenersForSource(~, modelListener, source)
             % Deletes listeners with the given source
-            
+
             deleteListener = false(size(modelListener));
             for idx = numel(modelListener) : -1 : 1
                 thisListener = modelListener(idx);
@@ -498,7 +507,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 end %classdef
 
 
-% Validation function 
+% Validation function
 function mustBeValidView(view)
 
 mustBeA(view, "wt.mixin.ModelObserver")
