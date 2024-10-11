@@ -91,7 +91,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
 
     %% Internal properties
-    properties (Hidden, Transient, NonCopyable, SetAccess = immutable)
+    properties (Transient, NonCopyable, SetAccess = immutable)
 
         % Figure window of the app
         Figure matlab.ui.Figure
@@ -102,7 +102,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
     end %properties
 
 
-    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+    properties (Transient, NonCopyable, SetAccess = protected)
 
         % Last used folder (for file operations)
         LastFolder (1,1) string = pwd
@@ -145,6 +145,8 @@ classdef BaseApp < matlab.apps.AppBase & ...
             % Forces update to run (For debugging only!)
 
             app.update();
+
+            drawnow
 
         end %function
 
@@ -537,16 +539,34 @@ classdef BaseApp < matlab.apps.AppBase & ...
             persistent pGroups
             if isempty(pGroups)
 
+                % BaseApp properties
                 baseAppTitle = "        ------ BaseApp Properties ------";
                 baseAppProperties = properties("wt.apps.BaseApp");
                 usedProps = baseAppProperties;
 
-                appTitle = "        ------ " + app.Name + " Properties ------";
-                appProperties = setdiff(...
-                    properties(app), usedProps);
+                % Get properties for concrete class
+                mc = metaclass(app);
+                propInfo = mc.PropertyList;
+
+                % Filter out used properties
+                [~,idxA] = setdiff({propInfo.Name}, usedProps, "stable");
+                propInfo = propInfo(idxA);
+
+                % Split out read-only properties
+                getInfo = {propInfo.GetAccess};
+                setInfo = {propInfo.SetAccess};
+                isPublicGet = cellfun(@(x)isequal(x,'public'), getInfo);
+                isPublicSet = cellfun(@(x)isequal(x,'public'), setInfo);
+                concPublicSetProps = {propInfo(isPublicGet & isPublicSet).Name};
+                concProtectedSetProps = {propInfo(isPublicGet & ~isPublicSet).Name};
+
+                % Set titles
+                concPublicTitle = "        ------ " + app.Name + " Public Properties ------";
+                concProtectedTitle = "        ------ " + app.Name + " Read-Only Properties ------";
 
                 pGroups = [
-                    PropertyGroup(appProperties, appTitle)
+                    PropertyGroup(concProtectedSetProps, concProtectedTitle)
+                    PropertyGroup(concPublicSetProps, concPublicTitle)
                     PropertyGroup(baseAppProperties, baseAppTitle)
                     ];
 

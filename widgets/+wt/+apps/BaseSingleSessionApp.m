@@ -178,23 +178,42 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             persistent pGroups
             if isempty(pGroups)
 
+                % BaseApp properties
                 baseAppTitle = "        ------ BaseApp Properties ------";
                 baseAppProperties = properties("wt.apps.BaseApp");
                 usedProps = baseAppProperties;
 
+                % BaseSingleSessionApp Properties
                 sessionTitle = "        ------ BaseSingleSessionApp Properties ------";
                 sessionProperties = setdiff(...
                     properties("wt.apps.BaseSingleSessionApp"), usedProps);
                 usedProps = [baseAppProperties; sessionProperties];
 
-                appTitle = "        ------ " + app.Name + " Properties ------";
-                appProperties = setdiff(...
-                    properties(app), usedProps);
+                % Get properties for concrete class
+                mc = metaclass(app);
+                propInfo = mc.PropertyList;
+
+                % Filter out used properties
+                [~,idxA] = setdiff({propInfo.Name}, usedProps, "stable");
+                propInfo = propInfo(idxA);
+
+                % Split out read-only properties
+                getInfo = {propInfo.GetAccess};
+                setInfo = {propInfo.SetAccess};
+                isPublicGet = cellfun(@(x)isequal(x,'public'), getInfo);
+                isPublicSet = cellfun(@(x)isequal(x,'public'), setInfo);
+                concPublicSetProps = {propInfo(isPublicGet & isPublicSet).Name};
+                concProtectedSetProps = {propInfo(isPublicGet & ~isPublicSet).Name};
+
+                % Set titles
+                concPublicTitle = "        ------ " + app.Name + " Public Properties ------";
+                concProtectedTitle = "        ------ " + app.Name + " Read-Only Properties ------";
 
                 pGroups = [
-                    PropertyGroup(appProperties, appTitle)
-                    PropertyGroup(sessionProperties, sessionTitle)
+                    PropertyGroup(concProtectedSetProps, concProtectedTitle)
+                    PropertyGroup(concPublicSetProps, concPublicTitle)
                     PropertyGroup(baseAppProperties, baseAppTitle)
+                    PropertyGroup(sessionProperties, sessionTitle)
                     ];
 
             end %if

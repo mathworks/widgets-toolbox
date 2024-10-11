@@ -1,5 +1,5 @@
-classdef BaseViewChart < wt.mixin.ModelObserver & ...
-        matlab.graphics.chartcontainer.ChartContainer
+classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
+        wt.mixin.ModelObserver
     % Base class for view charts referencing a BaseModel class
 
     % Copyright 2024 The MathWorks Inc.
@@ -40,11 +40,16 @@ classdef BaseViewChart < wt.mixin.ModelObserver & ...
 
     %% Constructor
     methods
-        function obj = BaseViewChart(varargin)
+        function obj = BaseViewChart(parent, varargin)
             % Constructor
 
+            if nargin < 1
+                fig = uifigure();
+                parent = uigridlayout(fig,[1,1]);
+            end
+
             % Call superclass constructors
-            obj = obj@matlab.graphics.chartcontainer.ChartContainer(varargin{:});
+            obj = obj@matlab.graphics.chartcontainer.ChartContainer(parent, varargin{:});
             obj@wt.mixin.ModelObserver();
 
         end %function
