@@ -34,7 +34,7 @@ classdef ColorSelector < wt.test.BaseWidgetTest
             
             % Test an invalid color
             newColor = [-1 0 1];
-            errorID = 'wt:validators:mustBeBetween';
+            errorID = 'MATLAB:validators:mustBeInRange';
             testCase.verifySetPropertyError("Value", newColor, errorID);
             
             % Test an invalid color

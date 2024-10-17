@@ -8,7 +8,7 @@ classdef TitleColorable < handle
     properties (AbortSet)
         
         % Title color
-        TitleColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 0 0]
+        TitleColor (1,3) double {mustBeInRange(TitleColor,0,1)} = [0 0 0]
         
     end %properties
     

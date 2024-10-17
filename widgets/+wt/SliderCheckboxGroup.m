@@ -175,42 +175,42 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         end %function
         
         
-        function onSliderChanged(obj,e)
+        function onSliderChanged(obj,evt)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
-            idx = find(e.Source == obj.Slider, 1);
+            newValue = evt.Value;
+            idx = find(evt.Source == obj.Slider, 1);
             
             % Update the state
             obj.Value(idx) = newValue;
             
             % Create event data
-            evt = wt.eventdata.SliderCheckboxChangedData(...
+            evtOut = wt.eventdata.SliderCheckboxChangedData(...
                 obj.Name(idx), idx, "Value", obj.State(idx), obj.Value(idx) );
             
             % Trigger event
-            notify(obj,"ValueChanged",evt);
+            notify(obj,"ValueChanged",evtOut);
             
         end %function
         
         
-        function onCheckboxChanged(obj,e)
+        function onCheckboxChanged(obj,evtOut)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
-            idx = find(e.Source == obj.Checkbox, 1);
+            newValue = evtOut.Value;
+            idx = find(evtOut.Source == obj.Checkbox, 1);
             
             % Update the state
             obj.State(idx) = newValue;
             
             % Create event data
-            evt = wt.eventdata.SliderCheckboxChangedData(...
+            evtOut = wt.eventdata.SliderCheckboxChangedData(...
                 obj.Name(idx), idx, "State", obj.State(idx), obj.Value(idx) );
             
             % Trigger event
-            notify(obj,"ValueChanged",evt);
+            notify(obj,"ValueChanged",evtOut);
             
         end %function
         

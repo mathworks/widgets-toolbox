@@ -8,7 +8,7 @@ classdef FieldColorable < handle
     properties (AbortSet)
 
         % Field Color
-        FieldColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [1 1 1]
+        FieldColor (1,3) double {mustBeInRange(FieldColor,0,1)} = [1 1 1]
 
     end %properties
 

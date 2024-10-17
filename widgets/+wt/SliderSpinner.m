@@ -155,11 +155,11 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
         end %function
         
         
-        function onSliderChanged(obj,e)
+        function onSliderChanged(obj,evt)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
+            newValue = evt.Value;
             oldValue = obj.Spinner.Value;
             
             % Round?
@@ -178,16 +178,16 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
             end
             
             % Trigger event ("ValueChanged" or "ValueChanging")
-            notify(obj, e.EventName, evtOut);
+            notify(obj, evt.EventName, evtOut);
             
         end %function
         
         
-        function onSliderChanging(obj,e)
+        function onSliderChanging(obj,evt)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
+            newValue = evt.Value;
             oldValue = obj.Spinner.Value;
             
             % Round?
@@ -203,7 +203,7 @@ classdef SliderSpinner < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Spinner.Value = newValue;
             
             % Trigger event ("ValueChanging")
-            notify(obj, e.EventName, evtOut);
+            notify(obj, evt.EventName, evtOut);
             
         end %function
         
