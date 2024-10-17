@@ -160,7 +160,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
                 obj (1,1) wt.abstract.BaseViewController
                 evt
                 fieldName (1,1) string
-                index (1,:) double {mustBeInteger,mustBePositive} = 1
+                index (1,:) double {mustBeInteger,mustBePositive} = zeros(1,0)
             end
 
             if ~isscalar(obj.Model)
@@ -180,12 +180,20 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
 
             % Handle array values with the index input indicating what
             % index of the newValue was changed
-            if ~isscalar(newValue) && isscalar(obj.Model.(fieldName)(index))
-                newValue = newValue(index);
+            if ~isscalar(newValue) && ~isempty(index) && ...
+                    isscalar(obj.Model.(fieldName)(index))
+
+                % We have one index of an array being set
+                obj.Model.(fieldName)(index) = newValue(index);
+
+            else
+
+                % We are setting the entire array
+                obj.Model.(fieldName) = newValue;
+
             end
 
             % Set the new value
-            obj.Model.(fieldName)(index) = newValue;
 
         end %function
 
