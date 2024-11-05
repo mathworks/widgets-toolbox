@@ -1,4 +1,4 @@
-classdef TreeModelSelectedData < event.EventData
+classdef TreeModelSingleSelectionData < event.EventData
     % Event data for tree model selection for a single-node selection tree
 
     % Copyright 2024 The MathWorks, Inc.
@@ -6,13 +6,18 @@ classdef TreeModelSelectedData < event.EventData
     
     %% Properties
     properties
-        Model
-        Session
-        Node (:,1) matlab.ui.container.TreeNode
+        Node matlab.ui.container.TreeNode {mustBeScalarOrEmpty}
     end %properties
 
     properties (SetAccess = protected)
-        SelectionPath (:,1) matlab.ui.container.TreeNode
+        NodeTag (1,1) string = ""
+        SelectionPath (1,:) matlab.ui.container.TreeNode
+        SelectionPathTag (1,:) string
+    end %properties
+
+    properties
+        Model wt.model.BaseModel {mustBeScalarOrEmpty}
+        Session wt.model.BaseSession {mustBeScalarOrEmpty}
     end %properties
 
 
@@ -20,6 +25,7 @@ classdef TreeModelSelectedData < event.EventData
     methods
         function set.Node(obj, value)
             obj.Node = value;
+            obj.findNodeTag(value);
             obj.findSelectionPath(value);
         end
     end
@@ -45,22 +51,39 @@ classdef TreeModelSelectedData < event.EventData
     %% Methods
     methods (Access = private)
 
+        function findNodeTag(obj, node)
+            % Populates the tag of selected node(s)
+
+            if isempty(node)
+                obj.NodeTag = "";
+            else
+                obj.NodeTag = string(node.Tag);
+            end
+
+        end %function
+
+
         function pathOut = findSelectionPath(obj, pathIn)
             % Find the full selection path from a given node
 
             if isempty(pathIn) || ~isa(pathIn, "matlab.ui.container.TreeNode")
                 pathOut = matlab.ui.container.TreeNode.empty(1,0);
             elseif isa(pathIn.Parent, "matlab.ui.container.TreeNode")
-                pathOut = vertcat(obj.findSelectionPath(pathIn.Parent), pathIn);
+                pathOut = horzcat(obj.findSelectionPath(pathIn.Parent), pathIn);
             else
                 pathOut = pathIn;
             end
 
             if ~nargout
                 obj.SelectionPath = pathOut;
+                if isempty(pathOut)
+                    obj.SelectionPathTag = string.empty(1,0);
+                else
+                    obj.SelectionPathTag = string({pathOut.Tag}');
+                end
             end
 
-        end
+        end %function
 
     end %methods
 
