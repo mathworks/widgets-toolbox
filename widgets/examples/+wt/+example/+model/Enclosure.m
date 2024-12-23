@@ -14,35 +14,20 @@ classdef Enclosure < wt.model.BaseModel
     end %properties
 
 
-    % Accessors
-    % methods
-    %     function set.Animal(obj,value)
-    %         obj.Animal = value;
-    %         obj.attachModelListeners("Animal");
-    %     end
-    % end %methods
+    %% Protected methods
+    methods (Access = protected)
 
+        function props = getAggregatedModelProperties(~)
+            % Returns a list of aggregated model property names
 
-    %% Constructor
-    methods
-        function obj = Enclosure(varargin)
-            % Constructor
+            % If a listed property is also a wt.model.BaseModel, property
+            % changes that trigger the ModelChanged event will be passed up
+            % the hierarchy to this object.
 
-            
+            props = "Animal";
 
-            % Call superclass method
-            % obj@wt.model.BaseModel(varargin{:});
-
-            % Debug instead
-            obj@wt.model.BaseModel(...
-                "Debug",true,...
-                varargin{:});
-
-            % obj@wt.model.BaseModel(...
-            %     "AggregatedModelProperties","Animal",...
-            %     "Debug",true,...
-            %     varargin{:});
         end %function
+
     end %methods
 
 end %classdef

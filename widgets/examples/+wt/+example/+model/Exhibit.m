@@ -14,27 +14,19 @@ classdef Exhibit < wt.model.BaseModel
     end %properties
 
 
-    % Accessors
-    % methods
-    %     function set.Enclosure(obj,value)
-    %         obj.Enclosure = value;
-    %         obj.attachModelListeners("Enclosure");
-    %     end
-    % end %methods
+    %% Protected methods
+    methods (Access = protected)
 
+        function props = getAggregatedModelProperties(~)
+            % Returns a list of aggregated model property names
 
-    %% Constructor
-    methods
-        function obj = Exhibit(varargin)
-            % Constructor
+            % If a listed property is also a wt.model.BaseModel, property
+            % changes that trigger the ModelChanged event will be passed up
+            % the hierarchy to this object.
 
-            % Call superclass method
-            % obj@wt.model.BaseModel(varargin{:});
-
-            % Debug instead
-            obj@wt.model.BaseModel(varargin{:},"Debug",true);
+            props = "Enclosure";
 
         end %function
-    end %methods
 
+    end %methods
 end %classdef

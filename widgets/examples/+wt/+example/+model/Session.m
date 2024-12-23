@@ -14,17 +14,24 @@ classdef Session < wt.model.BaseSession
     end %properties
 
 
-    % Accessors
-    % methods
-    %     function set.Exhibit(obj,value)
-    %         obj.Exhibit = value;
-    %         obj.attachModelListeners("Exhibit");
-    %     end
-    % end %methods
+    %% Protected methods
+    methods (Access = protected)
+
+        function props = getAggregatedModelProperties(~)
+            % Returns a list of aggregated model property names
+
+            % If a listed property is also a wt.model.BaseModel, property
+            % changes that trigger the ModelChanged event will be passed up
+            % the hierarchy to this object.
+
+            props = "Exhibit";
+
+        end %function
+
+    end %methods
 
 
-
-    %% Methods
+    %% Public Methods
     methods
 
         function importManifest(session, filePath)

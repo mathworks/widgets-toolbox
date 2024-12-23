@@ -204,13 +204,17 @@ classdef BaseModel < handle & ...
 
         function props = getAggregatedModelProperties(~)
             % Returns a list of aggregated model property names
-            %
+            
             % This overridable method lists properties containing
             % aggregated BaseModel classes to listen for hierarchical
             % ModelChanged events. Use this cautiously if model class
             % references are used repeatedly. The intended purpose is to
             % pass notifications up the hierarchy to the top level, so the
             % session can be marked dirty.
+
+            % If a listed property is also a wt.model.BaseModel, property
+            % changes that trigger the ModelChanged event will be passed up
+            % the hierarchy to this object.
 
             arguments(Output)
                 props (1,:) string
