@@ -19,18 +19,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     % Copyright 2024 The MathWorks Inc.
 
 
-    %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
-
-        % Triggered when the Model has changed
-        ModelSet
-
-        % Triggered when a property within the model has changed
-        ModelChanged
-
-    end %events
-
-
     %% Public Properties
     properties (AbortSet, Access = public)
 
@@ -56,15 +44,10 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         % Image to show when loading a pane
         LoadingImage matlab.ui.control.Image
 
-        % Listener for a new model being attached
-        ModelSetListener event.listener
-
-        % Listener for property changes within the model
-        ModelPropertyChangedListener event.listener
-
     end %properties
 
 
+    %% Read-Only Properties
     properties (SetAccess = private, UsedInUpdate = false)
 
         % The currently active view, or empty if none
@@ -209,11 +192,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj (1,1) wt.ContextualView
             end
 
-            % Remove listeners
-            obj.ModelSetListener(:) = [];
-            obj.ModelPropertyChangedListener(:) = [];
-
-            % Clear the view
+            % Deactivate the view
             obj.deactivateView_Private();
 
             % Delete any orphaned children
@@ -252,10 +231,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function reset(obj)
             % Reset the control by deactivating current view and delete loaded views
-
-            % Remove listeners
-            obj.ModelSetListener(:) = [];
-            obj.ModelPropertyChangedListener(:) = [];
 
             % Deactivate any active view
             obj.deactivateView_Private();
@@ -453,30 +428,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             end %if
 
-            % Did this view need to be made active?
-            if needToMarkActive
-
-                % Listen to the active view indicating that its model has been
-                % set or changed
-                obj.ModelSetListener = listener(view,...
-                    "ModelSet",@(~,evt)obj.onModelSet(evt));
-
-                obj.ModelPropertyChangedListener = listener(view,...
-                    "ModelChanged",@(~,evt)obj.onModelChanged(evt));
-
-            end %if
-
         end %function
-
-
-        % function attachModelPropertyChangedListener(obj)
-        %
-        %     % Listen to the active view indicating model changes
-        %     model = obj.ActiveView.Model;
-        %     obj.ModelPropertyChangedListener = listener(model,...
-        %         "ModelChanged",@(~,evt)obj.onModelChanged(evt));
-        %
-        % end %function
 
 
         function deactivateView_Private(obj, view)
@@ -496,13 +448,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % drawnow
             % drawnow('nocallbacks','limitrate')
 
-            % Remove any listeners on the view
-            obj.ModelSetListener = obj.deleteListenersForSource(...
-                obj.ModelSetListener, view);
-            obj.ModelPropertyChangedListener = obj.deleteListenersForSource(...
-                obj.ModelPropertyChangedListener, view);
-
-            % Deactivate the view, removing model and parent
+            % Remove the view's model and unparent it
             view.Model(:) = [];
             view.Parent(:) = [];
 
@@ -513,25 +459,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Clean up partially loaded children
             delete(obj.ContentGrid.Children(2:end))
-
-        end %function
-
-
-        function modelListener = deleteListenersForSource(~, modelListener, source)
-            % Deletes listeners with the given source
-
-            deleteListener = false(size(modelListener));
-            for idx = numel(modelListener) : -1 : 1
-                thisListener = modelListener(idx);
-                for sIdx = 1:numel(thisListener.Source)
-                    thisSrc = thisListener.Source{sIdx};
-                    if thisSrc == source
-                        deleteListener(idx) = true;
-                    end
-                end
-            end
-            delete(modelListener(deleteListener))
-            modelListener(deleteListener) = [];
 
         end %function
 
@@ -565,35 +492,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 end %try
 
             end %if
-
-        end %function
-
-
-        function onModelSet(obj,evt)
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelSetData;
-            evtOut.Model = evt.Model;
-            evtOut.Controller = evt.Controller;
-
-            % Notify listeners
-            obj.notify("ModelSet",evtOut);
-
-        end %function
-
-
-        function onModelChanged(obj,evt)
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Model = evt.Model;
-            evtOut.Property = evt.Property;
-            evtOut.Value = evt.Value;
-            evtOut.Stack = [{obj}, evt.Stack];
-            evtOut.ClassStack = [class(obj), evt.ClassStack];
-
-            % Notify listeners
-            obj.notify("ModelChanged",evtOut);
 
         end %function
 
