@@ -31,22 +31,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
-    %% Internal Properties
-    properties (AbortSet, Transient, NonCopyable, Hidden, ...
-            SetAccess = protected, UsedInUpdate = false)
-
-        % Top-level grid to manage content vs. loading
-        MainGrid matlab.ui.container.GridLayout
-
-        % The internal grid to manage contents
-        ContentGrid matlab.ui.container.GridLayout
-
-        % Image to show when loading a pane
-        LoadingImage matlab.ui.control.Image
-
-    end %properties
-
-
     %% Read-Only Properties
     properties (SetAccess = private, UsedInUpdate = false)
 
@@ -251,6 +235,22 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %methods
 
 
+    %% Internal Properties
+    properties (AbortSet, Transient, NonCopyable, Hidden, ...
+            SetAccess = protected, UsedInUpdate = false)
+
+        % Top-level grid to manage content vs. loading
+        MainGrid matlab.ui.container.GridLayout
+
+        % The internal grid to manage contents
+        ContentGrid matlab.ui.container.GridLayout
+
+        % Image to show when loading a pane
+        LoadingImage matlab.ui.control.Image
+
+    end %properties
+
+
     %% Protected Methods
     methods (Access=protected)
 
@@ -352,39 +352,37 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             end
 
             % Trap errors
-            % try
+            try
 
-            % Get function handle to the view's constructor
-            viewConstructorFcn = str2func(viewClass);
+                % Get function handle to the view's constructor
+                viewConstructorFcn = str2func(viewClass);
 
-            % Launch the view
-            view = viewConstructorFcn(obj.ContentGrid);
-            % view = viewConstructorFcn("Parent",obj.Grid);
+                % Launch the view
+                view = viewConstructorFcn(obj.ContentGrid);
 
-            % Position the view in the single grid cell
-            view.Layout.Row = 1;
-            view.Layout.Column = 1;
+                % Position the view in the single grid cell
+                view.Layout.Row = 1;
+                view.Layout.Column = 1;
 
-            % Add the new view to the list
-            obj.LoadedViews = vertcat(obj.LoadedViews, view);
+                % Add the new view to the list
+                obj.LoadedViews = vertcat(obj.LoadedViews, view);
 
-            % catch err
-            %
-            %     % Clean up partially loaded children
-            %     delete(obj.Grid.Children(2:end))
-            %
-            %     % Throw an error
-            %     message = sprintf("Error launching view (%s).\n\n%s",...
-            %         viewClass, err.message);
-            %     obj.throwError(message);
-            %
-            %     % Deactivate current pane
-            %     obj.deactivateView_Private();
-            %
-            %     % Rethrow the error to the command window
-            %     rethrow(err)
-            %
-            % end %try
+            catch err
+
+                % Clean up partially loaded children
+                delete(obj.Grid.Children(2:end))
+
+                % Throw an error
+                title = "Error launching view: " + viewClass;
+                obj.throwError(err.message, title);
+
+                % Deactivate current pane
+                obj.deactivateView_Private();
+
+                % Rethrow the error to the command window
+                rethrow(err)
+
+            end %try
 
             % Activate the view
             obj.activateView_Private(view, model)
@@ -442,11 +440,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             if isempty(view) || ~isvalid(view)
                 return
             end
-
-            % Enable any prior view changes to finish, avoiding any
-            % "flashing" effects during the change
-            % drawnow
-            % drawnow('nocallbacks','limitrate')
 
             % Remove the view's model and unparent it
             view.Model(:) = [];
