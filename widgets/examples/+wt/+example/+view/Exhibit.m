@@ -20,6 +20,12 @@ classdef Exhibit < wt.abstract.BaseViewController
         LocationFieldX matlab.ui.control.NumericEditField
         LocationFieldY matlab.ui.control.NumericEditField
 
+        NumEnclosuresLabel matlab.ui.control.Label
+        NumEnclosuresField matlab.ui.control.Label
+
+        NumAnimalsLabel matlab.ui.control.Label
+        NumAnimalsField matlab.ui.control.Label
+
     end %properties
 
 
@@ -33,7 +39,7 @@ classdef Exhibit < wt.abstract.BaseViewController
 
             % Configure grid
             obj.Grid.ColumnWidth = {'fit','1x','1x'};
-            obj.Grid.RowHeight = {'fit','fit'};
+            obj.Grid.RowHeight = {'fit','fit','fit','fit'};
 
 
             % Name field
@@ -76,6 +82,42 @@ classdef Exhibit < wt.abstract.BaseViewController
             obj.LocationFieldY.Layout.Row = 2;
             obj.LocationFieldY.Layout.Column = 3;
 
+
+            % Number of Enclosures field
+            tooltip = "The total number of enclosures in this exhibit";
+
+            obj.NumEnclosuresLabel = uilabel(obj.Grid,...
+                "Text","Enclosures:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+            obj.NumEnclosuresLabel.Layout.Row = 3;
+            obj.NumEnclosuresLabel.Layout.Column = 1;
+
+            obj.NumEnclosuresField = uilabel(obj.Grid,...
+                "Text","",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","left");
+            obj.NumEnclosuresField.Layout.Row = 3;
+            obj.NumEnclosuresField.Layout.Column = [2 3];
+
+
+            % Number of Animals field
+            tooltip = "The total number of animals in this exhibit";
+
+            obj.NumAnimalsLabel = uilabel(obj.Grid,...
+                "Text","Animals:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+            obj.NumAnimalsLabel.Layout.Row = 4;
+            obj.NumAnimalsLabel.Layout.Column = 1;
+
+            obj.NumAnimalsField = uilabel(obj.Grid,...
+                "Text","",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","left");
+            obj.NumAnimalsField.Layout.Row = 4;
+            obj.NumAnimalsField.Layout.Column = [2 3];
+
         end %function
 
 
@@ -95,11 +137,12 @@ classdef Exhibit < wt.abstract.BaseViewController
                 model = wt.example.model.Exhibit;
             end
 
-            % Update the fields
+            % Update the name field
             name = model.Name;
             obj.NameField.Value = name;
             obj.NameField.Enable = enable;
 
+            % Update the location fields
             locX = model.Location(1);
             obj.LocationFieldX.Value = locX;
             obj.LocationFieldX.Enable = enable;
@@ -107,6 +150,16 @@ classdef Exhibit < wt.abstract.BaseViewController
             locY = model.Location(2);
             obj.LocationFieldY.Value = locY;
             obj.LocationFieldY.Enable = enable;
+
+            % Update the number of enclosures field
+            numEnclosures = string(model.NumEnclosures);
+            obj.NumEnclosuresField.Text = numEnclosures;
+            obj.NumEnclosuresField.Enable = enable;
+
+            % Update the number of animals field
+            numAnimals = string(model.NumAnimals);
+            obj.NumAnimalsField.Text = numAnimals;
+            obj.NumAnimalsField.Enable = enable;
 
         end %function
 

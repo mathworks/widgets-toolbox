@@ -30,7 +30,7 @@ classdef Animal < wt.model.BaseModel
     methods
 
         function value = get.Age(obj)
-            value = years(datetime("now") - obj.BirthDate);
+            value = round(years(datetime("now") - obj.BirthDate), 2);
         end
 
     end %methods

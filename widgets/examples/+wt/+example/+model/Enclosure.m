@@ -9,10 +9,28 @@ classdef Enclosure < wt.model.BaseModel
         Location (1,2) double
 
         % Animals within this enclosure
-        Animal (1,:) wt.example.model.Animal
+        Animal (:,1) wt.example.model.Animal
 
     end %properties
 
+
+    %% Dependent, Read-Only Properties
+    properties (Dependent, SetAccess = private)
+
+        % Total number of animals
+        NumAnimals (1,1) double
+
+    end %properties
+
+    % Accessors
+    methods
+
+        function value = get.NumAnimals(obj)
+            value = numel(obj.Animal);
+        end
+
+    end %methods
+    
 
     %% Protected methods
     methods (Access = protected)

@@ -6,7 +6,7 @@ classdef Session < wt.model.BaseSession
     properties (SetObservable)
 
         % The array of all exhibits
-        Exhibit (1,:) wt.example.model.Exhibit
+        Exhibit (:,1) wt.example.model.Exhibit
 
         % Selected indices
         % SelectedIndices (1,3) {mustBeInteger}

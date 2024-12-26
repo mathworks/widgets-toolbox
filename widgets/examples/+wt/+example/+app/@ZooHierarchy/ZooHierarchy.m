@@ -16,6 +16,7 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
         % Contextual pane to show view/controller for selected tree node
         ContextualView wt.ContextualView
 
+        
         ExhibitAddButton
         ExhibitDeleteButton
 

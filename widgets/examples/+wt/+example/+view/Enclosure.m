@@ -1,6 +1,6 @@
 classdef Enclosure < wt.abstract.BaseViewController
     % View/Controller for Exhibit
-    
+
     %% Properties
     properties (AbortSet, SetObservable)
 
@@ -9,7 +9,7 @@ classdef Enclosure < wt.abstract.BaseViewController
 
     end %properties
 
-    
+
     %% Internal Components
     properties (Transient, Hidden, SetAccess = protected)
 
@@ -19,6 +19,9 @@ classdef Enclosure < wt.abstract.BaseViewController
         LocationLabel matlab.ui.control.Label
         LocationFieldX matlab.ui.control.NumericEditField
         LocationFieldY matlab.ui.control.NumericEditField
+
+        NumAnimalsLabel matlab.ui.control.Label
+        NumAnimalsField matlab.ui.control.Label
 
     end %properties
 
@@ -33,7 +36,7 @@ classdef Enclosure < wt.abstract.BaseViewController
 
             % Configure grid
             obj.Grid.ColumnWidth = {'fit','1x','1x'};
-            obj.Grid.RowHeight = {'fit','fit'};
+            obj.Grid.RowHeight = {'fit','fit','fit'};
 
 
             % Name field
@@ -76,6 +79,24 @@ classdef Enclosure < wt.abstract.BaseViewController
             obj.LocationFieldY.Layout.Row = 2;
             obj.LocationFieldY.Layout.Column = 3;
 
+
+            % Number of Animals field
+            tooltip = "The total number of animals in this exhibit";
+
+            obj.NumAnimalsLabel = uilabel(obj.Grid,...
+                "Text","Animals:",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","right");
+            obj.NumAnimalsLabel.Layout.Row = 3;
+            obj.NumAnimalsLabel.Layout.Column = 1;
+
+            obj.NumAnimalsField = uilabel(obj.Grid,...
+                "Text","",...
+                "Tooltip",tooltip,...
+                "HorizontalAlignment","left");
+            obj.NumAnimalsField.Layout.Row = 3;
+            obj.NumAnimalsField.Layout.Column = [2 3];
+
         end %function
 
 
@@ -95,11 +116,12 @@ classdef Enclosure < wt.abstract.BaseViewController
                 model = wt.example.model.Enclosure;
             end
 
-            % Update the fields
+            % Update the name field
             name = model.Name;
             obj.NameField.Value = name;
             obj.NameField.Enable = enable;
 
+            % Update the location fields
             locX = model.Location(1);
             obj.LocationFieldX.Value = locX;
             obj.LocationFieldX.Enable = enable;
@@ -108,9 +130,13 @@ classdef Enclosure < wt.abstract.BaseViewController
             obj.LocationFieldY.Value = locY;
             obj.LocationFieldY.Enable = enable;
 
+            % Update the number of animals field
+            numAnimals = string(model.NumAnimals);
+            obj.NumAnimalsField.Text = numAnimals;
+            obj.NumAnimalsField.Enable = enable;
+
         end %function
 
     end %methods
 
 end %classdef
-
