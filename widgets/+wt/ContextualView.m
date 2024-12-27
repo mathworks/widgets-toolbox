@@ -257,6 +257,13 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function setup(obj)
             % Configure the widget
 
+            % Children order of the widget
+            % - widget itself
+            %   - MainGrid
+            %       - ContentGrid (views go here)
+            %       - LoadingImage (visible gets toggled to cover view)
+
+
             obj.MainGrid = uigridlayout(obj,[1 1]);
             obj.MainGrid.Padding = [0 0 0 0];
 
@@ -283,9 +290,8 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function update(obj)
 
             % Configure the loading image
-            obj.LoadingImage.Visible = "off";
             obj.LoadingImage.ImageSource = obj.LoadingImageSource;
-
+            
         end %function
 
     end %methods
