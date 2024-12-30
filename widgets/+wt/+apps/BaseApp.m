@@ -4,7 +4,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
 
-    % Copyright 2020-2024 The MathWorks, Inc.
+    % Copyright 2020-2025 The MathWorks, Inc.
 
 
     %% Properties
@@ -339,7 +339,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
     %% Sealed Public methods
     methods (Sealed)
 
-        function value = getPreference(app,propName,defaultValue)
+        function value = getPreference(app, propName, defaultValue)
             % Get an app preference from the Preferences object
 
             if isprop(app.Preferences, propName)
@@ -353,7 +353,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         end %function
 
 
-        function setPreference(app,propName,value)
+        function setPreference(app, propName, value)
             % Set an app preference in the Preferences object
 
             if ~isprop(app.Preferences,propName)
