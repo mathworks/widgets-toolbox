@@ -14,34 +14,8 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
     end %properties
 
 
-
-    %% Abstract Methods (subclass must implement these)
-    methods (Abstract, Access = protected)
-
-        % Creates a new session object for the app. It must return a
-        % subclass of wt.model.BaseSession
-        sessionObj = createNewSession(app)
-
-    end %methods
-
-
-
-    %% Internal properties
-    properties (Transient, NonCopyable, Access = private)
-
-        % Listener to Session property being set
-        SessionSetListener event.listener
-
-        % Listener to changes within Session object
-        SessionChangedListener event.listener
-
-        % Listeners to session marked clean/dirty
-        SessionDirtyListener event.listener
-
-    end %properties
-
-
-    properties (Dependent, SetAccess = immutable)
+    %% Read-Only properties 
+    properties (Dependent, SetAccess = private)
 
         % Indicates a valid session is present
         HasValidSession (1,1) logical
@@ -68,6 +42,40 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
 
 
+    %% Internal properties
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener to Session property being set
+        SessionSetListener event.listener
+
+        % Listener to changes within Session object
+        SessionChangedListener event.listener
+
+        % Listeners to session marked clean/dirty
+        SessionDirtyListener event.listener
+
+    end %properties
+
+
+
+    %% Abstract Methods (subclass must implement these)
+    methods (Abstract, Access = protected)
+
+        % Creates a new session object for the app. It must return a
+        % subclass of wt.model.BaseSession
+        sessionObj = createNewSession(app)
+
+        % Saves a session to a file, prompting the user if necessary
+        sessionPath = saveSession(app, useSaveAs, session)
+
+        % Loads a session from a file, prompting the user if necessary
+        session = loadSession(app, sessionPath)
+
+    end %methods
+
+
+
+
     %% Constructor
     methods (Access = public)
 
@@ -86,7 +94,76 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
     end %methods
 
 
-    %% Internal Protected Methods
+    %% Protected Methods
+    methods (Access = protected)
+
+        function onSessionSet(app)
+            % This method is called when the Session property has changed,
+            % such as a session being added or removed from the app. The
+            % method may be overridden by the app's concrete class if
+            % custom functionality is needed.
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Trigger updates
+            if app.SetupComplete
+                app.update();
+                app.updateTitle();
+            end
+
+        end %function
+
+        function onSessionChanged(app,~)
+            % Triggered when a SetObservable property in the session has
+            % changed. May be overridden for custom behavior using incoming
+            % event data.
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Update the app
+            if app.SetupComplete
+                app.update();
+                app.updateTitle();
+            end
+
+        end %function
+
+
+        function onSessionDirty(app,~)
+            % Triggered when the session's MarkedDirty event fires
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Update the title only 
+            % (prop change should have triggered update already)
+            if app.SetupComplete
+                app.updateTitle();
+            end
+
+        end %function
+
+
+        function onSessionClean(app,~)
+            % Triggered when the session's MarkedClean event fires
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Update the app
+            if app.SetupComplete
+                app.update();
+                app.updateTitle();
+            end
+
+        end %function
+
+    end %methods
+
+
+    %% Protected Methods - Only for BaseSingleSessionApp & BaseMultiSessionApp
     methods (Access = {?wt.apps.BaseSingleSessionApp, ?wt.apps.BaseMultiSessionApp})
 
         function close_Internal(app)
@@ -293,7 +370,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
             % Prompt whether to save
             message = sprintf("Save changes to '%s'?",session.FileName);
-            title = "Load Session";
+            title = "Save Session";
             selection = app.promptYesNoCancel(message, title);
 
             % If Yes, prompt to save the existing session first
@@ -318,74 +395,6 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Returns an empty session of the same type as Session property
 
             session = app.Session(1,[]);
-
-        end %function
-
-    end %methods
-
-
-    %% Protected Methods
-    methods (Access = protected)
-
-        function onSessionSet(app)
-            % Triggered when a SetObservable property in the session has
-            % changed. May be overridden for custom behavior using incoming
-            % event data.
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Trigger updates
-            if app.SetupComplete
-                app.update();
-                app.updateTitle();
-            end
-
-        end %function
-
-        function onSessionChanged(app,~)
-            % Triggered when a SetObservable property in the session has
-            % changed. May be overridden for custom behavior using incoming
-            % event data.
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Update the app
-            if app.SetupComplete
-                app.update();
-                app.updateTitle();
-            end
-
-        end %function
-
-
-        function onSessionDirty(app,~)
-            % Triggered when the session's MarkedDirty event fires
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Update the title only 
-            % (prop change should have triggered update already)
-            if app.SetupComplete
-                app.updateTitle();
-            end
-
-        end %function
-
-
-        function onSessionClean(app,~)
-            % Triggered when the session's MarkedClean event fires
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Update the app
-            if app.SetupComplete
-                app.update();
-                app.updateTitle();
-            end
 
         end %function
 
