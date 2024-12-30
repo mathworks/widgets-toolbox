@@ -2,7 +2,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         matlab.ui.componentcontainer.ComponentContainer
     % Base class for views/controllers referencing a BaseModel class
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties
@@ -15,7 +15,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
 
 
     %% Internal Properties
-    properties (Hidden, SetAccess = protected)
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Internal grid to place outer panel contents
         OuterGrid matlab.ui.container.GridLayout
@@ -137,6 +137,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
 
         end %function
 
+        
         function onModelChanged(obj,evt)
             % Triggered when a property within the model has changed
 

@@ -2,7 +2,7 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         wt.mixin.ModelObserver
     % Base class for view charts referencing a BaseModel class
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties

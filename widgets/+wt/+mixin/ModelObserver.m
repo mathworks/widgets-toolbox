@@ -3,6 +3,8 @@ classdef (Abstract, AllowedSubclasses = ...
         ModelObserver < handle
     % Mixin for components using a model that observe changes
 
+    % Copyright 2025 The MathWorks Inc.
+
     
     %% Abstract Properties
     % Subclass must define these
@@ -145,7 +147,7 @@ classdef (Abstract, AllowedSubclasses = ...
             % Get a single instance of the correct model type and indicate
             % if it's found and valid. This is useful in case obj.Model is
             % empty, it will still return a scalar instance to show default
-            % values and the modelValid flag will be false, indicating to
+            % values and the validToDisplay flag will be false, indicating to
             % disable the fields.
             model = obj.Model;
             validToDisplay = isscalar(model) && isvalid(model);
