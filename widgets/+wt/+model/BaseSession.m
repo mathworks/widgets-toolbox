@@ -175,7 +175,7 @@ classdef BaseSession < wt.model.BaseModel
 
 
     %% Private methods
-    methods (Access = private)
+    methods (Access = ?wt.model.BaseSession)
         
         function onModelChanged(obj,evt)
             % Triggered when the Session or any aggregated BaseModel

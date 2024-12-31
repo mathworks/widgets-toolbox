@@ -30,6 +30,18 @@ classdef Enclosure < wt.model.BaseModel
         end
 
     end %methods
+
+
+    %% Destructor
+    methods
+        function delete(obj)
+
+            % Because we are using composition, any Animal objects will
+            % be deleted when this object is deleted
+            delete(obj.Animal);
+
+        end %function
+    end %methods
     
 
     %% Protected methods

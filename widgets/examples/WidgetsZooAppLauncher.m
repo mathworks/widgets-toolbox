@@ -28,7 +28,6 @@ app.newSession();
 dataPath = fullfile(wt.utility.widgetsRoot, "examples", "data", ...
     "ExampleZooManifest.xlsx");
 
-
 %RJ - this should be a public app method instead! If possible expand the
 %tree also!
 app.Session.importManifest(dataPath)

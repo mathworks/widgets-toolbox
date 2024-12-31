@@ -50,6 +50,18 @@ classdef Exhibit < wt.model.BaseModel
     end %methods
 
 
+    %% Destructor
+    methods
+        function delete(obj)
+
+            % Because we are using composition, any Enclosure objects will
+            % be deleted when this object is deleted
+            delete(obj.Enclosure);
+
+        end %function
+    end %methods
+
+
     %% Protected methods
     methods (Access = protected)
 
@@ -65,4 +77,5 @@ classdef Exhibit < wt.model.BaseModel
         end %function
 
     end %methods
+
 end %classdef

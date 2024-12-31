@@ -5,7 +5,7 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
 
 
     %% Internal properties
-    properties (Hidden, Transient, SetAccess = private)
+    properties (SetAccess = private)
 
         % Toolbar at top of the app window
         Toolbar wt.Toolbar

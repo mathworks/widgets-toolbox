@@ -31,6 +31,18 @@ classdef Session < wt.model.BaseSession
     end %methods
 
 
+    %% Destructor
+    methods
+        function delete(obj)
+
+            % Because we are using composition, any Exhibit objects will
+            % be deleted when this object is deleted
+            delete(obj.Exhibit);
+
+        end %function
+    end %methods
+
+
     %% Public Methods
     methods
 

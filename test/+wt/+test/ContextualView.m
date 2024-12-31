@@ -37,7 +37,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
     end %methods
     
     
-    %% Unit Tests
+    %% Test methods
     methods (Test)
         
         function testLaunchViewWithModel(testCase)

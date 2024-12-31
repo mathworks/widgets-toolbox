@@ -14,7 +14,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
     end %properties
 
 
-    %% Read-Only properties 
+    %% Read-Only properties
     properties (Dependent, SetAccess = private)
 
         % Indicates a valid session is present
@@ -35,7 +35,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
         function value = get.Dirty(app)
             value = ~isempty(app.Session) && ...
-                any( app.Session(isvalid(app.Session)).Dirty );
+                any( [app.Session(isvalid(app.Session)).Dirty] );
         end
 
     end %methods
@@ -59,11 +59,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
 
     %% Abstract Methods (subclass must implement these)
-    methods (Abstract, Access = protected)
-
-        % Creates a new session object for the app. It must return a
-        % subclass of wt.model.BaseSession
-        sessionObj = createNewSession(app)
+    methods (Abstract)
 
         % Saves a session to a file, prompting the user if necessary
         sessionPath = saveSession(app, useSaveAs, session)
@@ -73,7 +69,13 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
     end %methods
 
+    methods (Abstract, Access = protected)
 
+        % Creates a new session object for the app. It must return a
+        % subclass of wt.model.BaseSession
+        sessionObj = createNewSession(app)
+
+    end %methods
 
 
     %% Constructor
@@ -137,7 +139,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Show output if Debug is on
             app.displayDebugText();
 
-            % Update the title only 
+            % Update the title only
             % (prop change should have triggered update already)
             if app.SetupComplete
                 app.updateTitle();
@@ -209,6 +211,9 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 isMatch = app.Session == session;
                 app.Session(isMatch) = [];
 
+                % Delete the session
+                delete(session);
+
             end %if
 
         end %function
@@ -248,7 +253,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 % Update the app in case filepath changed
                 app.updateTitle()
                 app.update()
-                
+
             end %if strlength(sessionPath)
 
         end %function
@@ -313,7 +318,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
             % How should we proceed?
             if isAlreadyOpen
-                
+
                 % Return an empty session of correct type
                 session = app.getEmptySession();
 

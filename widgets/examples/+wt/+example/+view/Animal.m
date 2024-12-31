@@ -11,7 +11,7 @@ classdef Animal < wt.abstract.BaseViewController
 
     
     %% Internal Components
-    properties (Transient, Hidden, SetAccess = protected)
+    properties (SetAccess = protected)
         
         SpeciesLabel matlab.ui.control.Label
         SpeciesField matlab.ui.control.Label

@@ -11,7 +11,7 @@ classdef Enclosure < wt.abstract.BaseViewController
 
 
     %% Internal Components
-    properties (Transient, Hidden, SetAccess = protected)
+    properties (SetAccess = protected)
 
         NameLabel matlab.ui.control.Label
         NameField matlab.ui.control.EditField
