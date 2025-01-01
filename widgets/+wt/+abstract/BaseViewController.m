@@ -33,7 +33,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
-        TriggerUpdate_BVC (1,1) logical = false
+        TriggerUpdate_Private (1,1) logical = false
 
     end %properties
 
@@ -121,7 +121,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         function requestUpdate(obj)
             % Request update to occur at next drawnow cycle
 
-            obj.TriggerUpdate_BVC = ~obj.TriggerUpdate_BVC;
+            obj.TriggerUpdate_Private = ~obj.TriggerUpdate_Private;
 
         end %function
         
@@ -132,20 +132,14 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             % Request an update
             obj.requestUpdate();
 
-            % Call superclass method
-            obj.onModelSet@wt.mixin.ModelObserver()
-
         end %function
 
         
-        function onModelChanged(obj,evt)
+        function onModelChanged(obj,~)
             % Triggered when a property within the model has changed
 
             % Request an update
             obj.requestUpdate();
-
-            % Call superclass method
-            obj.onModelChanged@wt.mixin.ModelObserver(evt)
 
         end %function
 

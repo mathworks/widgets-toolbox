@@ -12,8 +12,8 @@ classdef ContextualView < wt.test.BaseWidgetTest
             % Call superclass method
             testCase.createFigure@wt.test.BaseWidgetTest();
             
-            % Make the figure wider
-            testCase.Figure.Position([3 4]) = [1000 1000];
+            % Set the figure size
+            testCase.Figure.Position([3 4]) = [900 700];
             
             % Modify the grid row height
             testCase.Grid.RowHeight = {'1x','1x','1x'};
