@@ -8,7 +8,7 @@ classdef Session < wt.abstract.BaseViewController
 
 
     %% Internal Properties
-    properties (SetAccess = protected)
+    properties (SetAccess = protected, GetAccess = ?matlab.unittest.TestCase)
 
         FileNameLabel matlab.ui.control.Label
         FileNameField matlab.ui.control.Label

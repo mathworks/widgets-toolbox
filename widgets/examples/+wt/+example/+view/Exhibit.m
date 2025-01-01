@@ -11,7 +11,7 @@ classdef Exhibit < wt.abstract.BaseViewController
 
     
     %% Internal Components
-    properties (SetAccess = protected)
+    properties (SetAccess = protected, GetAccess = ?matlab.unittest.TestCase)
 
         NameLabel matlab.ui.control.Label
         NameField matlab.ui.control.EditField
