@@ -70,7 +70,7 @@ classdef (Abstract, AllowedSubclasses = ...
 
 
     %% Protected Methods
-    methods (Access = protected)
+    methods (Access = {?wt.mixin.ModelObserver, ?matlab.unittest.TestCase})
 
         function className = getModelClassName(obj)
             % Returns the class name of the Model property contents

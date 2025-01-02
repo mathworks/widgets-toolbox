@@ -1,13 +1,14 @@
 classdef ContextualView < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2024 The MathWorks, Inc.
+    % Copyright 2025 The MathWorks, Inc.
    
 
     %% Class Setup
     methods (TestClassSetup)
         
         function createFigure(testCase)
+            % Override the figure creation
             
             % Call superclass method
             testCase.createFigure@wt.test.BaseWidgetTest();

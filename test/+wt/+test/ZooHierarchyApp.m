@@ -19,9 +19,6 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
             testCase.Figure = testCase.App.Figure;
             testCase.App.Position(3:4) = [1000 600];
 
-            disp("RJ - Temp Position");
-            testCase.App.Position(1:2) = [-1200 10];
-
         end %function
 
 
