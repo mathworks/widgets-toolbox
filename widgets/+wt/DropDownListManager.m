@@ -7,7 +7,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         wt.mixin.Tooltipable
     % Manage a list of text entries using a dropdown control
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2024-2025 The MathWorks Inc.
 
     %RJ - supports R2023b and later, but test in earlier releases
 
@@ -96,11 +96,18 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         end
 
         function value = get.Value(obj)
-            value = obj.DropDown.Value;
+            value = obj.Items(obj.Index);
         end
 
         function set.Value(obj,value)
-            obj.DropDown.Value = value;
+            isMatch = matches(obj.Items, value);
+            if ~any(isMatch)
+                id = "wt:DropDownListManager:ValueMustBeInItems";
+                msg = "'Value' must be an element defined in the 'Items' property.";
+                error(id, msg);
+            else
+                obj.Index = find(isMatch,1);
+            end
         end
 
         function set.AllowRemove(obj,value)
@@ -183,7 +190,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
             % Create the DropDown
             obj.DropDown = uidropdown(obj.Grid);
-            obj.DropDown.Items ={'Item One','Item Two'};
+            obj.DropDown.Items = {'Item One','Item Two'};
             obj.DropDown.ItemsData = [1 2];
             obj.DropDown.ValueChangedFcn = @(~,evt)obj.onValueChanged(evt);
             obj.DropDown.Layout.Column = 1;

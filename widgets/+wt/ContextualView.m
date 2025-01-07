@@ -79,6 +79,22 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %methods
 
 
+    %% Internal Properties
+    properties (AbortSet, Transient, NonCopyable, Hidden, ...
+            SetAccess = protected, UsedInUpdate = false)
+
+        % Top-level grid to manage content vs. loading
+        MainGrid matlab.ui.container.GridLayout
+
+        % The internal grid to manage contents
+        ContentGrid matlab.ui.container.GridLayout
+
+        % Image to show when loading a pane
+        LoadingImage matlab.ui.control.Image
+
+    end %properties
+
+
     %% Public Methods
     methods
 
@@ -235,22 +251,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %methods
 
 
-    %% Internal Properties
-    properties (AbortSet, Transient, NonCopyable, Hidden, ...
-            SetAccess = protected, UsedInUpdate = false)
-
-        % Top-level grid to manage content vs. loading
-        MainGrid matlab.ui.container.GridLayout
-
-        % The internal grid to manage contents
-        ContentGrid matlab.ui.container.GridLayout
-
-        % Image to show when loading a pane
-        LoadingImage matlab.ui.control.Image
-
-    end %properties
-
-
     %% Protected Methods
     methods (Access=protected)
 
@@ -376,7 +376,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             catch err
 
                 % Clean up partially loaded children
-                delete(obj.Grid.Children(2:end))
+                delete(obj.ContentGrid.Children(2:end))
 
                 % Throw an error
                 title = "Error launching view: " + viewClass;

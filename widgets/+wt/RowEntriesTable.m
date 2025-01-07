@@ -25,14 +25,14 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         % Format for new table row
         NewRowFormat (1,:) cell = {"NewRow",0}
 
-        % Indicates whether to allow sort controls
-        Sortable  (1,1) matlab.lang.OnOffSwitchState = false
+        % Indicates whether to enable buttons for reordering the rows
+        Orderable  (1,1) matlab.lang.OnOffSwitchState = false
 
         % Can each item be removed?
         AllowItemRemove (1,:) logical
 
-        % Can each item be sorted/ordered?
-        AllowItemSort (1,:) logical
+        % Can each item be ordered?
+        AllowItemOrdering (1,:) logical
 
     end %properties
 
@@ -45,8 +45,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
                 "FillValue", true);
         end
 
-        function value = get.AllowItemSort(obj)
-            value = resize(obj.AllowItemSort, height(obj.Data), ...
+        function value = get.AllowItemOrdering(obj)
+            value = resize(obj.AllowItemOrdering, height(obj.Data), ...
                 "FillValue", true);
         end
 
@@ -239,8 +239,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             % Update the table content
             obj.Table.Data = data;
 
-            % Update sort buttons
-            obj.updateSortButtons();
+            % Update order buttons
+            obj.updateOrderButtons();
 
         end %function
 
@@ -248,8 +248,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function updateEnableableComponents(obj)
             % Handle changes to Enable flag
 
-            % Update sort buttons
-            obj.updateSortButtons();
+            % Update order buttons
+            obj.updateOrderButtons();
 
             % Update fields
             obj.Table.Enable = string(obj.Enable);
@@ -257,7 +257,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         end %function
 
 
-        function updateSortButtons(obj)
+        function updateOrderButtons(obj)
 
             % Which rows are selected?
             numItems = height(obj.Data);
@@ -267,20 +267,19 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             allowRemove = obj.AllowItemRemove(idxSel);
             canRemove = obj.Enable && ~isempty(idxSel) && all(allowRemove);
 
-            % Which items allow sorting
-            alloItemSort = obj.AllowItemSort;
-            % canSort = obj.Enable && obj.Sortable && all(allowSort(idxSel));
+            % Which items allow ordering
+            allItemOrdering = obj.AllowItemOrdering;
 
-            % Toggle sorting button visibility
-            obj.UpButton.Visible = obj.Sortable;
-            obj.DownButton.Visible = obj.Sortable;
+            % Toggle ordering button visibility
+            obj.UpButton.Visible = obj.Orderable;
+            obj.DownButton.Visible = obj.Orderable;
 
             % Update button enables
             obj.AddButton.Enable = obj.Enable;
             obj.RemoveButton.Enable = canRemove;
-            if obj.Sortable
+            if obj.Orderable
                 [backEnabled, fwdEnabled] = obj.areOrderButtonsEnabled(...
-                    numItems, idxSel, alloItemSort);
+                    numItems, idxSel, allItemOrdering);
                 obj.UpButton.Enable = backEnabled;
                 obj.DownButton.Enable = fwdEnabled;
             end
@@ -439,7 +438,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             notify(obj,"ValueChanged",evtOut);
 
             % Update buttons
-            obj.updateSortButtons()
+            obj.updateOrderButtons()
 
         end %function
 
