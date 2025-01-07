@@ -33,7 +33,7 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
 
     methods
         function set.Value(obj,value)
-            validateattributes(value,{'double'},{'increasing'})
+            obj.validateValue(value);
             obj.Value = value;
         end
         function set.Limits(obj,value)
@@ -130,6 +130,31 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue,...
                 "Index", index);
             notify(obj,"ValueChanged",evtOut);
+
+        end %function
+
+
+        function validateValue(obj,value)
+            % Validate the value is in range
+
+            arguments
+                obj (1,1)
+                value (1,2) double
+            end
+
+            validateattributes(value,{'double'},{'increasing'})
+
+            if obj.LowerLimitInclusive && obj.UpperLimitInclusive
+                boundFlag = "inclusive";
+            elseif obj.LowerLimitInclusive
+                boundFlag = "exclude-upper";
+            elseif obj.UpperLimitInclusive
+                boundFlag = "exclude-lower";
+            else
+                boundFlag = "exclusive";
+            end
+
+            mustBeInRange(value, obj.Limits(1), obj.Limits(2), boundFlag)
 
         end %function
 
