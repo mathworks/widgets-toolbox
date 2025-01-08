@@ -178,7 +178,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             addButton = testCase.Widget.AddButton;
 
             % Verify states
-            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsAddingItem);
             testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Push the button
@@ -189,7 +189,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.verifyNotVisible(ddField)
             
             % Verify states
-            testCase.verifyTrue(testCase.Widget.IsAddingNewItem);
+            testCase.verifyTrue(testCase.Widget.IsAddingItem);
             testCase.verifyFalse(testCase.Widget.IsRenamingItem);
             testCase.verifyMatches(editField.Value, '<New Item>');
 
@@ -204,7 +204,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.verifyNotVisible(editField)
 
             % Verify states
-            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsAddingItem);
             testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Verify number of callbacks so far
@@ -264,7 +264,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.verifyControlValue(newValue);
 
             % Verify states
-            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsAddingItem);
             testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Push the button
@@ -275,7 +275,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.verifyNotVisible(ddField)
 
             % Verify states
-            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsAddingItem);
             testCase.verifyTrue(testCase.Widget.IsRenamingItem);
 
             % Enter a new item
@@ -289,7 +289,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.verifyNotVisible(editField)
 
             % Verify states
-            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsAddingItem);
             testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Verify number of callbacks so far

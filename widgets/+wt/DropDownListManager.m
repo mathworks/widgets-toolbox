@@ -137,7 +137,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
     properties (UsedInUpdate, SetAccess = protected)
 
         % Indicates when new item is being entered
-        IsAddingNewItem (1,1) logical = false
+        IsAddingItem (1,1) logical = false
 
         % Indicates when an item is being renamed
         IsRenamingItem (1,1) logical = false
@@ -239,7 +239,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         function update(obj)
 
             % Toggle between dropdown and edit field
-            isEditMode = obj.IsAddingNewItem || obj.IsRenamingItem;
+            isEditMode = obj.IsAddingItem || obj.IsRenamingItem;
             obj.EditField.Visible = isEditMode;
             obj.DropDown.Visible = ~isEditMode;
 
@@ -275,7 +275,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 % Toggle mode OFF
                 obj.IsRenamingItem = false;
 
-            elseif obj.IsAddingNewItem
+            elseif obj.IsAddingItem
 
                 % Data for this event
                 action = "Added";
@@ -291,14 +291,14 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 obj.Index = index;
 
                 % Toggle mode OFF
-                obj.IsAddingNewItem = false;
+                obj.IsAddingItem = false;
 
             else
                 % Should not get here
 
                 % Toggle mode OFF
                 obj.IsRenamingItem = false;
-                obj.IsAddingNewItem = false;
+                obj.IsAddingItem = false;
 
                 % Exit
                 return
@@ -354,7 +354,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         function onAddButton(obj)
 
             % Toggle mode ON
-            obj.IsAddingNewItem = true;
+            obj.IsAddingItem = true;
 
             % Configure the edit field
             obj.EditField.Value = obj.NewItemName;
@@ -445,7 +445,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
                 % Toggle mode OFF
                 obj.IsRenamingItem = false;
-                obj.IsAddingNewItem = false;
+                obj.IsAddingItem = false;
 
             end
 
@@ -461,7 +461,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
                 % Toggle mode OFF
                 obj.IsRenamingItem = false;
-                obj.IsAddingNewItem = false;
+                obj.IsAddingItem = false;
 
             end
 
@@ -477,7 +477,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             valIdx = obj.Index;
 
             % Can we add an item?
-            isEditMode = obj.IsAddingNewItem || obj.IsRenamingItem;
+            isEditMode = obj.IsAddingItem || obj.IsRenamingItem;
             canAddItem = obj.Enable && ~isEditMode;
 
             % Can we rename or remove given the current selection?
