@@ -12,7 +12,7 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             testCase.createFigure@wt.test.BaseWidgetTest();
 
             % Set up a grid layout
-            numRows = 10;
+            numRows = 14;
             rowHeight = 30;
             testCase.Grid.RowHeight = repmat({rowHeight},1,numRows);
 
@@ -177,12 +177,21 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             editField = testCase.Widget.EditField;
             addButton = testCase.Widget.AddButton;
 
+            % Verify states
+            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsRenamingItem);
+
             % Push the button
             testCase.press(addButton)
 
             % Verify edit field is active
             testCase.verifyVisible(editField)
             testCase.verifyNotVisible(ddField)
+            
+            % Verify states
+            testCase.verifyTrue(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsRenamingItem);
+            testCase.verifyMatches(editField.Value, '<New Item>');
 
             % Enter a new item
             newValue = "Revision 3";
@@ -193,6 +202,10 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             % Verify dropdown is active
             testCase.verifyVisible(ddField)
             testCase.verifyNotVisible(editField)
+
+            % Verify states
+            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Verify number of callbacks so far
             testCase.verifyCallbackCount(1)
@@ -245,12 +258,25 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             editField = testCase.Widget.EditField;
             renameButton = testCase.Widget.RenameButton;
 
+            % Verify a value set
+            newValue = "Revision 2";
+            testCase.verifySetProperty("Value", newValue);
+            testCase.verifyControlValue(newValue);
+
+            % Verify states
+            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsRenamingItem);
+
             % Push the button
             testCase.press(renameButton)
 
             % Verify edit field is active
             testCase.verifyVisible(editField)
             testCase.verifyNotVisible(ddField)
+
+            % Verify states
+            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyTrue(testCase.Widget.IsRenamingItem);
 
             % Enter a new item
             newValue = "Modified - Revision 2";
@@ -261,6 +287,10 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             % Verify dropdown is active
             testCase.verifyVisible(ddField)
             testCase.verifyNotVisible(editField)
+
+            % Verify states
+            testCase.verifyFalse(testCase.Widget.IsAddingNewItem);
+            testCase.verifyFalse(testCase.Widget.IsRenamingItem);
 
             % Verify number of callbacks so far
             testCase.verifyCallbackCount(1)
@@ -277,7 +307,6 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             ddField = testCase.Widget.DropDown;
             editField = testCase.Widget.EditField;
             removeButton = testCase.Widget.RemoveButton;
-            addButton = testCase.Widget.AddButton;
 
             % Verify a value set
             newValue = "Revision 1";
@@ -325,8 +354,121 @@ classdef DropDownListManager < wt.test.BaseWidgetTest
             % Verify length of Items
             testCase.verifyNumElements(testCase.Widget.Items, 0);
 
-            % Verify dropdown not enabled
-            testCase.verifyNotEnabled(ddField)
+        end %function
+
+
+        function testAllowItemRemove(testCase)
+
+            % Get the controls
+            ddField = testCase.Widget.DropDown;
+            addButton = testCase.Widget.AddButton;
+            renameButton = testCase.Widget.RenameButton;
+            removeButton = testCase.Widget.RemoveButton;
+
+            % Disallow removing second item
+            testCase.Widget.AllowItemRemove(2) = false;
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyEnabled(renameButton)
+            testCase.verifyEnabled(removeButton)
+
+            % Choose second item
+            newValue = "Revision 1";
+            testCase.choose(ddField, newValue);
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyEnabled(renameButton)
+            testCase.verifyNotEnabled(removeButton)
+
+            % Choose third item
+            newValue = "Revision 2";
+            testCase.choose(ddField, newValue);
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyEnabled(renameButton)
+            testCase.verifyEnabled(removeButton)
+
+        end %function
+
+
+        function testAllowItemRename(testCase)
+
+            % Get the controls
+            ddField = testCase.Widget.DropDown;
+            addButton = testCase.Widget.AddButton;
+            renameButton = testCase.Widget.RenameButton;
+            removeButton = testCase.Widget.RemoveButton;
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyEnabled(renameButton)
+            testCase.verifyEnabled(removeButton)
+
+            % Disallow renaming second item
+            testCase.Widget.AllowItemRename(2) = false;
+
+            % Choose second item
+            newValue = "Revision 1";
+            testCase.choose(ddField, newValue);
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyNotEnabled(renameButton)
+            testCase.verifyEnabled(removeButton)
+
+            % Choose third item
+            newValue = "Revision 2";
+            testCase.choose(ddField, newValue);
+
+            % Verify button enables
+            testCase.verifyEnabled(addButton)
+            testCase.verifyEnabled(renameButton)
+            testCase.verifyEnabled(removeButton)
+
+        end %function
+
+
+        function testAllowRemove(testCase)
+
+            % Get the controls
+            grid = testCase.Widget.Grid;
+            renameButton = testCase.Widget.RenameButton;
+            removeButton = testCase.Widget.RemoveButton;
+
+            % Verify button parents
+            testCase.verifyEqual(renameButton.Parent, grid)
+            testCase.verifyEqual(removeButton.Parent, grid)
+
+            % Disallow renaming anything
+            testCase.Widget.AllowRemove = false;
+
+            % Verify button parents
+            testCase.verifyEqual(renameButton.Parent, grid)
+            testCase.verifyEmpty(removeButton.Parent)
+            
+        end %function
+
+
+        function testAllowRename(testCase)
+
+            % Get the controls
+            grid = testCase.Widget.Grid;
+            renameButton = testCase.Widget.RenameButton;
+            removeButton = testCase.Widget.RemoveButton;
+
+            % Verify button parents
+            testCase.verifyEqual(renameButton.Parent, grid)
+            testCase.verifyEqual(removeButton.Parent, grid)
+
+            % Disallow renaming anything
+            testCase.Widget.AllowRename = false;
+
+            % Verify button parents
+            testCase.verifyEmpty(renameButton.Parent)
+            testCase.verifyEqual(removeButton.Parent, grid)
 
         end %function
 
