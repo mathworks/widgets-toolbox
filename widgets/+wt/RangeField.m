@@ -6,11 +6,15 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Tooltipable
     % Pair of numeric edit fields for range selection
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
-    %RJ - Need unit tests
-    %RJ - Improve error if a restriction needs enforcement. Like display a
-    % message but still accept their input?
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered on value changed, has companion callback
+        ValueChanged
+
+    end %events
 
 
     %% Public properties
@@ -41,15 +45,6 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Limits = value;
         end
     end
-
-
-    %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
-
-        % Triggered on value changed, has companion callback
-        ValueChanged
-
-    end %events
 
 
     %% Internal Properties

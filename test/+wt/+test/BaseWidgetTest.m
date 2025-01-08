@@ -28,8 +28,15 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
     methods (TestClassSetup)
         
         function createFigure(testCase)
-            
-            testCase.Figure = uifigure('Position',[100 100 600 600]);
+
+            % Position it on the rightmost monitor
+            % This gets it away from the editor when writing tests
+            monitorPositions = get(0, 'MonitorPositions');
+            [~,monIdx] = max(monitorPositions(:,1));
+            xyPos = monitorPositions(monIdx, 1:2) + [100 100];
+
+            % Create the figure
+            testCase.Figure = uifigure('Position',[xyPos 600 600]);
             testCase.Figure.Name = "Unit Test - " + class(testCase);
             
             % Set up a grid layout
@@ -171,6 +178,92 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
             
         end %function
         
+        
+        function verifyCallbackCount(testCase, expValue)
+            % Verify the number of callbacks that have executed
+            
+            actValue = testCase.CallbackCount;
+            diag = sprintf("Expected %d callbacks to have executed " + ...
+                "at this point, but actual is %d.", expValue, actValue);
+            testCase.verifyEqual(actValue, expValue, diag)
+            
+        end %function
+        
+        
+        function verifyVisible(testCase, component)
+            % Verify the specified component is set to visible
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsTrue
+
+            % Verify values
+            testCase.verifyThat(...
+                @()logical(component.Visible),...
+                Eventually(IsTrue, "WithTimeoutOf", 5));
+            
+        end %function
+        
+        
+        function verifyNotVisible(testCase, component)
+            % Verify the specified component is set to not visible
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsFalse
+
+            % Verify values
+            testCase.verifyThat(...
+                @()logical(component.Visible),...
+                Eventually(IsFalse, "WithTimeoutOf", 5));
+            
+        end %function
+        
+        
+        function verifyEnabled(testCase, component)
+            % Verify the specified component is set to enabled
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsTrue
+
+            % Verify values
+            testCase.verifyThat(...
+                @()logical(component.Enable),...
+                Eventually(IsTrue, "WithTimeoutOf", 5));
+            
+        end %function
+        
+        
+        function verifyNotEnabled(testCase, component)
+            % Verify the specified component is set to not enabled
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsFalse
+
+            % Verify values
+            testCase.verifyThat(...
+                @()logical(component.Enable),...
+                Eventually(IsFalse, "WithTimeoutOf", 5));
+            
+        end %function
         
     end %methods
     

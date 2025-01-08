@@ -133,7 +133,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
     end %methods
 
 
-
     %% Internal Properties
     properties (UsedInUpdate, SetAccess = protected)
 
@@ -169,8 +168,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         StopEditingListeners event.listener
 
     end %properties
-
-
 
 
     %% Protected methods
@@ -356,37 +353,37 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
         function onAddButton(obj)
 
-                % Toggle mode ON
-                obj.IsAddingNewItem = true;
+            % Toggle mode ON
+            obj.IsAddingNewItem = true;
 
-                % Configure the edit field
-                obj.EditField.Value = obj.NewItemName;
-                drawnow
-                obj.EditField.focus();
+            % Configure the edit field
+            obj.EditField.Value = obj.NewItemName;
+            drawnow
+            obj.EditField.focus();
 
-                % Attach figure listeners to stop editing in special
-                % circumstances
-                obj.attachStopEditingListeners();
+            % Attach figure listeners to stop editing in special
+            % circumstances
+            obj.attachStopEditingListeners();
 
         end %function
 
 
         function onRenameButton(obj)
 
-                % Toggle mode ON
-                obj.IsRenamingItem = true;
-                
-                % Get the item being edited
-                item = obj.Items(obj.Index);
+            % Toggle mode ON
+            obj.IsRenamingItem = true;
 
-                % Configure the edit field
-                obj.EditField.Value = item;
-                drawnow
-                obj.EditField.focus();
+            % Get the item being edited
+            item = obj.Items(obj.Index);
 
-                % Attach figure listeners to stop editing in special
-                % circumstances
-                obj.attachStopEditingListeners();
+            % Configure the edit field
+            obj.EditField.Value = item;
+            drawnow
+            obj.EditField.focus();
+
+            % Attach figure listeners to stop editing in special
+            % circumstances
+            obj.attachStopEditingListeners();
 
         end %function
 
@@ -394,27 +391,27 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         function onRemoveButton(obj)
             % Removes selcted item
 
-                % Data for this event
-                action = "Removed";
-                index = obj.Index;
-                item = obj.Items(index);
-                data = obj.getItemDataByIndex(index);
+            % Data for this event
+            action = "Removed";
+            index = obj.Index;
+            item = obj.Items(index);
+            data = obj.getItemDataByIndex(index);
 
-                % Remove the item from the list
-                obj.Items(index) = [];
-                if index <= numel(obj.ItemsData)
-                    obj.ItemsData(index) = [];
-                end
+            % Remove the item from the list
+            obj.Items(index) = [];
+            if index <= numel(obj.ItemsData)
+                obj.ItemsData(index) = [];
+            end
 
-                % Prepare event data
-                evtOut = wt.eventdata.ListManagerEventData();
-                evtOut.Action = action;
-                evtOut.Item = item;
-                evtOut.ItemData = data;
-                evtOut.Index = index;
+            % Prepare event data
+            evtOut = wt.eventdata.ListManagerEventData();
+            evtOut.Action = action;
+            evtOut.Item = item;
+            evtOut.ItemData = data;
+            evtOut.Index = index;
 
-                % Notify listeners
-                notify(obj,"ItemsChanged",evtOut);
+            % Notify listeners
+            notify(obj,"ItemsChanged",evtOut);
 
         end %function
 
@@ -425,7 +422,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
             % Find the figure
             fig = ancestor(obj,'figure');
-            
+
             % If no figure, just exit
             if isempty(fig)
                 return
@@ -451,7 +448,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
                 obj.IsAddingNewItem = false;
 
             end
-            
+
         end %function
 
 
@@ -459,7 +456,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             % Triggered on mouse presses while editing
 
             % If the user clicked anywhere except the edit field, cancel
-            % editing. 
+            % editing.
             if ~isequal(evt.HitObject, obj.EditField)
 
                 % Toggle mode OFF
