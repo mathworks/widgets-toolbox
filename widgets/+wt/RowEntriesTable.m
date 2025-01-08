@@ -6,14 +6,9 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.FontStyled & ...
         wt.mixin.Orderable & ...
         wt.mixin.Tooltipable
-    % A table showing status of multiple tasks
+    % A table with buttons to add, remove, and order rows.
 
-    % Copyright 2024 The MathWorks Inc.
-
-
-    %RJ - Need unit tests
-    %RJ - Connect ordering buttons and make them optional
-    %RJ - Table enable didn't work
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Public properties
