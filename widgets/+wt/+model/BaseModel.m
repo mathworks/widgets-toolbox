@@ -373,8 +373,8 @@ classdef BaseModel < handle & ...
     end %methods
 
 
-    %% Private (except for BaseSession) methods
-    methods (Access = ?wt.model.BaseSession)
+    %% Protected methods - Not intended for overriding
+    methods (Access = protected)
 
         function onModelChanged(obj,evt)
             % Runs on property changes to this class or an aggregated BaseModel

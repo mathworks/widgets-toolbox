@@ -306,7 +306,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         end %function
 
 
-        function filePath = promptToLoad(app, filter, title)
+        function filePath = promptToLoad(app, filter, title, startPath)
             % Prompt the user to load a file
 
             % Define arguments
@@ -314,13 +314,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
                 app (1,1) wt.apps.BaseApp
                 filter = ["*.mat","MATLAB MAT File"];
                 title (1,1) string = "Open"
+                startPath (1,1) string = app.LastFolder
             end
 
             % Show output if Debug is on
             app.displayDebugText();
 
             % Prompt for the file
-            [fileName,pathName] = uigetfile(filter, title, app.LastFolder);
+            [fileName,pathName] = uigetfile(filter, title, startPath);
 
             % Did the user cancel?
             if isequal(fileName,0)

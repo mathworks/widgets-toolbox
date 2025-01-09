@@ -174,8 +174,8 @@ classdef BaseSession < wt.model.BaseModel
     end %methods
 
 
-    %% Private methods
-    methods (Access = ?wt.model.BaseSession)
+    %% Protected methods - Not intended for overriding
+    methods (Access = protected)
         
         function onModelChanged(obj,evt)
             % Triggered when the Session or any aggregated BaseModel
