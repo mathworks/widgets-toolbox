@@ -1,7 +1,7 @@
 classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
     % Example app showing a tree with contextual views
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Internal properties
@@ -74,34 +74,31 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
             app.SessionSaveButton = sessionSection.addButton("saveClean_24.png","Save");
             app.SessionSaveAsButton = sessionSection.addButton("saveClean_24.png","Save As");
             app.SessionCloseButton = sessionSection.addButton("close_24.png","Close");
-            sessionSection.ButtonPushedFcn = @(~,evt)onSessionButtonPushed(app,evt);
 
             % Create exhibit section
             exhibitSection = wt.toolbar.HorizontalSection();
             exhibitSection.Title = "EXHIBIT";
             app.ExhibitAddButton = exhibitSection.addButton("addGreen_24.png","New");
             app.ExhibitDeleteButton = exhibitSection.addButton("delete_24.png","Delete");
-            exhibitSection.ButtonPushedFcn = @(~,evt)onExhibitButtonPushed(app,evt);
 
             % Create enclosure section
             enclosureSection = wt.toolbar.HorizontalSection();
             enclosureSection.Title = "ENCLOSURE";
             app.EnclosureAddButton = enclosureSection.addButton("addGreen_24.png","New");
             app.EnclosureDeleteButton = enclosureSection.addButton("delete_24.png","Delete");
-            enclosureSection.ButtonPushedFcn = @(~,evt)onEnclosureButtonPushed(app,evt);
 
             % Create animal section
             animalSection = wt.toolbar.HorizontalSection();
             animalSection.Title = "ANIMAL";
             app.AnimalAddButton = animalSection.addButton("addGreen_24.png","New");
             app.AnimalDeleteButton = animalSection.addButton("delete_24.png","Delete");
-            animalSection.ButtonPushedFcn = @(~,evt)onAnimalButtonPushed(app,evt);
 
             % Add toolbar
             app.Toolbar = wt.Toolbar(app.Grid);
             app.Toolbar.DividerColor = [.8 .8 .8];
             app.Toolbar.Layout.Row = 1;
             app.Toolbar.Layout.Column = [1 2];
+            app.Toolbar.ButtonPushedFcn = @(~,evt)onToolbarButtonPushed(app,evt);
             app.Toolbar.Section = [
                 sessionSection
                 exhibitSection
@@ -210,7 +207,7 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
 
                 case 'Enclosure'
                     app.ExhibitAddButton.Enable = true;
-                    app.ExhibitDeleteButton.Enable = false;
+                    app.ExhibitDeleteButton.Enable = true;
                     app.EnclosureAddButton.Enable = true;
                     app.EnclosureDeleteButton.Enable = true;
                     app.AnimalAddButton.Enable = true;
@@ -218,9 +215,9 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
 
                 case 'Animal'
                     app.ExhibitAddButton.Enable = true;
-                    app.ExhibitDeleteButton.Enable = false;
+                    app.ExhibitDeleteButton.Enable = true;
                     app.EnclosureAddButton.Enable = true;
-                    app.EnclosureDeleteButton.Enable = false;
+                    app.EnclosureDeleteButton.Enable = true;
                     app.AnimalAddButton.Enable = true;
                     app.AnimalDeleteButton.Enable = true;
 
@@ -310,14 +307,52 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
         end %function
 
 
-        function onSessionButtonPushed(app,evt)
+        function onToolbarButtonPushed(app,evt)
 
             % Show output if Debug is on
             app.displayDebugText();
 
             % Get the selected session
-            session = app.SelectedSession;
 
+            % Get the selected model type (if single selection)
+            selNode = app.Tree.SelectedNodes;
+            if isscalar(selNode)
+                model = selNode.NodeData;
+                modelType = extractAfter(class(model),"wt.example.model.");
+            else
+                modelType = '';
+            end
+
+            % What is the selection hierarchy?
+            switch modelType
+                case 'Session'
+                    session = model;
+                    exhibit = [];
+                    enclosure = [];
+                    animal = [];
+                case 'Exhibit'
+                    session = selNode.Parent.NodeData;
+                    exhibit = model;
+                    enclosure = [];
+                    animal = [];
+                case 'Enclosure'
+                    session = selNode.Parent.Parent.NodeData;
+                    exhibit = selNode.Parent.NodeData;
+                    enclosure = model;
+                    animal = [];
+                case 'Animal'
+                    session = selNode.Parent.Parent.Parent.NodeData;
+                    exhibit = selNode.Parent.Parent.NodeData;
+                    enclosure = selNode.Parent.NodeData;
+                    animal = model;
+                otherwise
+                    session = app.SelectedSession;
+                    exhibit = [];
+                    enclosure = [];
+                    animal = [];
+            end %switch
+
+            % Which button was pressed?
             switch evt.Button
 
                 case app.SessionNewButton
@@ -386,186 +421,81 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
                     % Reset the view
                     app.resetView();
 
-            end %switch
-
-            % Update the app
-            app.update()
-
-        end %function
-
-
-        function onExhibitButtonPushed(app,evt)
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Get the selected model type (if single selection)
-            selNode = app.Tree.SelectedNodes;
-            if isscalar(selNode)
-                model = selNode.NodeData;
-                modelType = extractAfter(class(model),"wt.example.model.");
-            else
-                modelType = '';
-            end
-
-            % What is the parent model for the add/delete?
-            switch modelType
-                case 'Session'
-                    parent = model;
-                case 'Exhibit'
-                    parent = selNode.Parent.NodeData;
-                case 'Enclosure'
-                    parent = selNode.Parent.Parent.NodeData;
-                case 'Animal'
-                    parent = selNode.Parent.Parent.Parent.NodeData;
-                otherwise
-                    return
-            end
-
-            % Which button was pressed?
-            switch evt.Button
-
                 case app.ExhibitAddButton
 
                     % Add a new exhibit
                     newItem = wt.example.model.Exhibit;
                     newItem.Name = "New Exhibit";
-
-                    % Add the new exhibit
-                    parent.Exhibit(end+1) = newItem;
+                    session.Exhibit(end+1) = newItem;
 
                 case app.ExhibitDeleteButton
 
                     % Prompt user before deleting
                     message = "Are you sure you want to delete the exhibit """...
-                        + model.Name + """?";
+                        + exhibit.Name + """?";
                     response = app.promptYesNoCancel(message);
                     if matches(response,"yes","IgnoreCase",true)
 
                         % Delete the exhibit
-                        isMatch = parent.Exhibit == model;
-                        parent.Exhibit(isMatch) = [];
+                        isMatch = session.Exhibit == exhibit;
+                        session.Exhibit(isMatch) = [];
+
+                        % Clear the contextual pane
+                        app.ContextualView.clearView();
 
                     end %if
-
-            end %switch
-
-            app.update()
-
-        end %function
-
-
-        function onEnclosureButtonPushed(app,evt)
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Get the selected model type (if single selection)
-            selNode = app.Tree.SelectedNodes;
-            if isscalar(selNode)
-                model = selNode.NodeData;
-                modelType = extractAfter(class(model),"wt.example.model.");
-            else
-                modelType = '';
-            end
-
-            % What is the parent model for the add/delete?
-            switch modelType
-                case 'Exhibit'
-                    parent = model;
-                case 'Enclosure'
-                    parent = selNode.Parent.NodeData;
-                case 'Animal'
-                    parent = selNode.Parent.Parent.NodeData;
-                otherwise
-                    return
-            end
-
-            % Which button was pressed?
-            switch evt.Button
 
                 case app.EnclosureAddButton
 
                     % Add a new enclosure
                     newItem = wt.example.model.Enclosure;
                     newItem.Name = "New Enclosure";
-
-                    % Add the new enclosure
-                    parent.Enclosure(end+1) = newItem;
+                    exhibit.Enclosure(end+1) = newItem;
 
                 case app.EnclosureDeleteButton
 
                     % Prompt user before deleting
                     message = "Are you sure you want to delete the enclosure """...
-                        + model.Name + """?";
+                        + enclosure.Name + """?";
                     response = app.promptYesNoCancel(message);
                     if matches(response,"yes","IgnoreCase",true)
 
                         % Delete the enclosure
-                        isMatch = parent.Enclosure == model;
-                        parent.Enclosure(isMatch) = [];
+                        isMatch = exhibit.Enclosure == enclosure;
+                        exhibit.Enclosure(isMatch) = [];
+
+                        % Clear the contextual pane
+                        app.ContextualView.clearView();
 
                     end %if
-
-            end %switch
-
-            app.update()
-
-        end %function
-
-
-        function onAnimalButtonPushed(app,evt)
-
-            % Show output if Debug is on
-            app.displayDebugText();
-
-            % Get the selected model type (if single selection)
-            selNode = app.Tree.SelectedNodes;
-            if isscalar(selNode)
-                model = selNode.NodeData;
-                modelType = extractAfter(class(model),"wt.example.model.");
-            else
-                modelType = '';
-            end
-
-            % What is the parent model for the add/delete?
-            switch modelType
-                case 'Enclosure'
-                    parent = model;
-                case 'Animal'
-                    parent = selNode.Parent.NodeData;
-                otherwise
-                    return
-            end
-
-            % Which button was pressed?
-            switch evt.Button
 
                 case app.AnimalAddButton
 
                     % Add a new animal
                     newItem = wt.example.model.Animal;
                     newItem.Name = "New Animal";
-
-                    % Add the new animal
-                    parent.Animal(end+1) = newItem;
+                    enclosure.Animal(end+1) = newItem;
 
                 case app.AnimalDeleteButton
 
                     % Prompt user before deleting
                     message = "Are you sure you want to delete the animal """...
-                        + model.Name + """?";
+                        + animal.Name + """?";
                     response = app.promptYesNoCancel(message);
                     if matches(response,"yes","IgnoreCase",true)
 
                         % Delete the animal
-                        isMatch = parent.Animal == model;
-                        parent.Animal(isMatch) = [];
+                        isMatch = enclosure.Animal == animal;
+                        enclosure.Animal(isMatch) = [];
+
+                        % Clear the contextual pane
+                        app.ContextualView.clearView();
 
                     end %if
 
             end %switch
 
+            % Update the app
             app.update()
 
         end %function
