@@ -47,14 +47,14 @@ classdef ContextualView < wt.test.BaseWidgetTest
             %   Launching the Animal view with a different model
 
             % Create a model to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
 
             % Launch the view
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             view1 = testCase.verifyWarningFree(fcn);
 
@@ -84,14 +84,14 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Create a second model to display
-            model2 = wt.example.model.Animal;
+            model2 = zooexample.model.Animal;
             model2.Species = "Lion";
             model2.Name = "Nala";
             model2.Sex = "female";
             model2.BirthDate = "September 13, 1994";
 
             % Launch the same view with the different model
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model2);
             view1 = testCase.verifyWarningFree(fcn);
 
@@ -151,14 +151,14 @@ classdef ContextualView < wt.test.BaseWidgetTest
            
 
             % Create a model to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
 
             % Launch the view
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             view1 = testCase.assumeWarningFree(fcn);
 
@@ -170,12 +170,12 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Create a different model to display
-            model3 = wt.example.model.Enclosure;
+            model3 = zooexample.model.Enclosure;
             model3.Name = "Lions' Den";
             model3.Location = [10 20];
 
             % Launch a different view with the corresponding model
-            viewClass = "wt.example.view.Enclosure";
+            viewClass = "zooexample.view.Enclosure";
             fcn = @()testCase.Widget.launchView(viewClass, model3);
             view3 = testCase.verifyWarningFree(fcn);
 
@@ -206,7 +206,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Launch the original view again
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             view1b = testCase.verifyWarningFree(fcn);
 
@@ -246,7 +246,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             % Verify loading image shows when launching a pane
 
             % Create models to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
@@ -254,7 +254,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Prepare to launch the view (turning on the loading image)
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.prepareToLaunchView(viewClass);
             testCase.verifyWarningFree(fcn);
 
@@ -267,7 +267,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Launch the view
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             view1 = testCase.verifyWarningFree(fcn);
 
@@ -299,13 +299,13 @@ classdef ContextualView < wt.test.BaseWidgetTest
             %   Customize the loading image source
 
             % Create models to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
 
-            model3 = wt.example.model.Enclosure;
+            model3 = zooexample.model.Enclosure;
             model3.Name = "Lions' Den";
             model3.Location = [10 20];
             
@@ -314,7 +314,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             testCase.Widget.BlockWhileLoading = false;
 
             % Prepare to launch the view (loading image is OFF)
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.prepareToLaunchView(viewClass);
             testCase.verifyWarningFree(fcn);
 
@@ -325,7 +325,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             testCase.verifyEqual(actVal, expVal, diag)
 
             % Launch the view
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             testCase.verifyWarningFree(fcn);
 
@@ -340,7 +340,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             testCase.Widget.BlockWhileLoading = true;
 
             % Prepare to launch a different view (turning on the loading image)
-            viewClass = "wt.example.view.Enclosure";
+            viewClass = "zooexample.view.Enclosure";
             fcn = @()testCase.Widget.prepareToLaunchView(viewClass);
             testCase.verifyWarningFree(fcn);
 
@@ -351,7 +351,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             testCase.verifyEqual(actVal, expVal, diag)
 
             % Launch the view
-            viewClass = "wt.example.view.Enclosure";
+            viewClass = "zooexample.view.Enclosure";
             fcn = @()testCase.Widget.launchView(viewClass, model3);
             testCase.verifyWarningFree(fcn);
 
@@ -367,25 +367,25 @@ classdef ContextualView < wt.test.BaseWidgetTest
             %   image
 
             % Create models to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
 
-            model3 = wt.example.model.Enclosure;
+            model3 = zooexample.model.Enclosure;
             model3.Name = "Lions' Den";
             model3.Location = [10 20];
 
 
             % Launch the first view
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.launchView(viewClass, model1);
             testCase.verifyWarningFree(fcn);
 
 
             % Prepare to launch same view (no loading image)
-            viewClass = "wt.example.view.Animal";
+            viewClass = "zooexample.view.Animal";
             fcn = @()testCase.Widget.prepareToLaunchView(viewClass);
             testCase.verifyWarningFree(fcn);
 
@@ -397,7 +397,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
 
             % Prepare to launch different view (expect to have loading image)
-            viewClass = "wt.example.view.Enclosure";
+            viewClass = "zooexample.view.Enclosure";
             fcn = @()testCase.Widget.prepareToLaunchView(viewClass);
             testCase.verifyWarningFree(fcn);
 
@@ -408,7 +408,7 @@ classdef ContextualView < wt.test.BaseWidgetTest
             testCase.verifyEqual(actVal, expVal, diag)
 
             % Launch the view
-            viewClass = "wt.example.view.Enclosure";
+            viewClass = "zooexample.view.Enclosure";
             fcn = @()testCase.Widget.launchView(viewClass, model3);
             testCase.verifyWarningFree(fcn);
 
@@ -547,26 +547,26 @@ classdef ContextualView < wt.test.BaseWidgetTest
             % used state
 
             % Create models to display
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
 
-            model2 = wt.example.model.Animal;
+            model2 = zooexample.model.Animal;
             model2.Species = "Lion";
             model2.Name = "Nala";
             model2.Sex = "female";
             model2.BirthDate = "September 13, 1994";
 
-            model3 = wt.example.model.Enclosure;
+            model3 = zooexample.model.Enclosure;
             model3.Name = "Lions' Den";
             model3.Location = [10 20];
 
             % Launch views
-            testCase.Widget.launchView("wt.example.view.Animal", model1);
-            testCase.Widget.launchView("wt.example.view.Animal", model2);
-            testCase.Widget.launchView("wt.example.view.Enclosure", model3);
+            testCase.Widget.launchView("zooexample.view.Animal", model1);
+            testCase.Widget.launchView("zooexample.view.Animal", model2);
+            testCase.Widget.launchView("zooexample.view.Enclosure", model3);
 
         end %function
 

@@ -3,7 +3,7 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
 
     %% Properties
     properties
-        App wt.example.app.ZooHierarchy
+        App zooexample.app.ZooHierarchy
         Figure matlab.ui.Figure
         TempFolder
     end
@@ -14,7 +14,7 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
 
         function launchApp(testCase)
 
-            fcn = @()wt.example.app.ZooHierarchy();
+            fcn = @()zooexample.app.ZooHierarchy();
             testCase.App = testCase.fatalAssertWarningFree(fcn);
             testCase.Figure = testCase.App.Figure;
             testCase.App.Position(3:4) = [1000 600];
@@ -60,7 +60,7 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
             session = testCase.fatalAssertWarningFree(fcn,diag);
 
             % Assert the session is correct size and type
-            className = "wt.example.model.Session";
+            className = "zooexample.model.Session";
             diag = "Expected a scalar session object of class " + className;
             testCase.fatalAssertSize(session,[1 1],diag)
             testCase.fatalAssertClass(session,className,diag)

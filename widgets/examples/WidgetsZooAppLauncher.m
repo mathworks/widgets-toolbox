@@ -16,7 +16,7 @@ end
 
 
 %% Instantiate the application
-app = wt.example.app.ZooHierarchy(varargin{:});
+app = zooexample.app.ZooHierarchy(varargin{:});
 
 
 %% Import a dataset

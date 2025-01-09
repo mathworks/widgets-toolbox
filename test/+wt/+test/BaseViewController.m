@@ -73,7 +73,7 @@ classdef BaseViewController < matlab.uitest.TestCase
             testCase.ModelChangedEvents(:) = [];
 
             % Launch the view
-            fcn = @()wt.example.view.Animal(testCase.Grid);
+            fcn = @()zooexample.view.Animal(testCase.Grid);
             testCase.Widget = verifyWarningFree(testCase,fcn);
             drawnow
 
@@ -87,14 +87,14 @@ classdef BaseViewController < matlab.uitest.TestCase
 
             % Create models to display
 
-            model1 = wt.example.model.Animal;
+            model1 = zooexample.model.Animal;
             model1.Species = "Lion";
             model1.Name = "Simba";
             model1.Sex = "male";
             model1.BirthDate = "March 9, 1994";
             testCase.Model1 = model1;
 
-            model2 = wt.example.model.Animal;
+            model2 = zooexample.model.Animal;
             model2.Species = "Lion";
             model2.Name = "Nala";
             model2.Sex = "female";
