@@ -30,21 +30,39 @@ classdef ZooHierarchy < wt.apps.BaseMultiSessionApp
         AnimalAddButton matlab.ui.control.Button
         AnimalDeleteButton matlab.ui.control.Button
 
+        % Tree selection data
+        TreeSelectionData (1,1) wt.eventdata.TreeModelSingleSelectionData
+
     end %properties
 
 
     %% Methods implemented in separate files
-    methods  (Access = protected)
+    methods (Access = protected)
 
         setup(app)
         update(app)
-        updateToolbarEnables(app)
         updateTreeHierarchy(app)
-        resetView(app)
-        createNewSession(app)
         onTreeSelection(app,evt)
         onToolbarButtonPushed(app,evt)
-        session = getSessionFromTreeNode(app,node)
+
+    end %methods
+
+
+    %% Protected methods
+    methods (Access = protected)
+
+        function session = createNewSession(app)
+            % Called by the app when a new session must be created
+            % This is required by the superclass AbstractSessionApp and
+            % called from methods of BaseMultiSessionApp
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Create a new session
+            session = zooexample.model.Session;
+
+        end %function
 
     end %methods
 

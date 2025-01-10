@@ -6,32 +6,55 @@ function onTreeSelection(app,evt)
 % Show output if Debug is on
 app.displayDebugText();
 
-% What node(s) are selected?
-selNode = evt.SelectedNodes;
+% Prepare selection data
+selEvt = wt.eventdata.TreeModelSingleSelectionData;
 
-% Is it a scalar selection?
-if isscalar(selNode)
+% Is there a scalar node selection?
+if isscalar(evt.SelectedNodes)
+
+    % Populate the selection data
+    selEvt.Node = evt.SelectedNodes;
+    selEvt.Model = selEvt.Node.NodeData;
+    selEvt.Session = getSessionFromTreeNode(selEvt.Node);
 
     % Set the selected session
-    session = app.getSessionFromTreeNode(selNode);
-    app.selectSession(session);
-
-    % Get the data model, which is attached to this node
-    model = selNode.NodeData;
-    modelClass = class(model);
-
-    % Which view to launch?
-    viewClass = replace(modelClass,".model.",".view.");
-
-    % Launch the contextual pane for the selected data type
-    app.ContextualView.launchView(viewClass, model);
-
-else
-
-    % Clear the contextual pane
-    app.ContextualView.clearView();
+    app.selectSession(selEvt.Session);
 
 end %if
 
-% Update toolbar enables
-app.updateToolbarEnables();
+% Store information about the selection
+app.TreeSelectionData = selEvt;
+
+% Update the app display
+app.update();
+
+end %function
+
+
+function session = getSessionFromTreeNode(node)
+% Determines the session of the selected tree node
+
+nodeData = node.NodeData;
+if ~isscalar(nodeData)
+
+    % Shouldn't happen, but return empty
+    session = zooexample.model.Session.empty(1,0);
+
+elseif isa(nodeData, "wt.model.BaseSession")
+
+    % Found it!
+    session = nodeData;
+
+elseif isa(nodeData, "wt.model.BaseModel") && ~isempty(node.Parent)
+
+    % Look to parent
+    session = getSessionFromTreeNode(node.Parent);
+
+else
+
+    % Can't find, return empty
+    session = getEmptySession();
+
+end %if
+
+end %function

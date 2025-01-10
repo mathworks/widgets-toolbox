@@ -6,8 +6,6 @@ function onToolbarButtonPushed(app,evt)
 % Show output if Debug is on
 app.displayDebugText();
 
-% Get the selected session
-
 % Get the selected model type (if single selection)
 selNode = app.Tree.SelectedNodes;
 if isscalar(selNode)
@@ -59,9 +57,6 @@ switch evt.Button
             app.selectSession(session);
         end
 
-        % Reset the view
-        app.resetView();
-
     case app.SessionOpenButton
 
         % Prompt and load a session
@@ -71,9 +66,6 @@ switch evt.Button
         if ~isempty(session)
             app.selectSession(session);
         end
-
-        % Reset the view
-        app.resetView();
 
     case app.SessionImportButton
 
@@ -94,9 +86,6 @@ switch evt.Button
             end
         end
 
-        % Reset the view
-        app.resetView();
-
     case app.SessionSaveButton
 
         % Save the session
@@ -112,8 +101,9 @@ switch evt.Button
         % Close the currently selected session
         app.closeSession();
 
-        % Reset the view
-        app.resetView();
+        % Clear tree selection data
+        % This tells the app to remove any active views of the closed session
+        app.TreeSelectionData = wt.eventdata.TreeModelSingleSelectionData();
 
     case app.ExhibitAddButton
 
