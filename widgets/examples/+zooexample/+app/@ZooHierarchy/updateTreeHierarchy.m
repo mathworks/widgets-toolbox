@@ -78,7 +78,7 @@ for idx = 1:numel(model)
 
     % Update the node's text and icon
     thisNode.Text = "Exhibit: " + thisModel.Name;
-    thisNode.Icon = "exhibit.png";
+    thisNode.Icon = "exhibit_32.png";
 
     % Sync children of node
     syncEnclosureNodes(thisNode, thisModel.Enclosure)
@@ -109,7 +109,7 @@ for idx = 1:numel(model)
 
     % Update the node's text and icon
     thisNode.Text = "Enclosure: " + thisModel.Name;
-    thisNode.Icon = "enclosure.png";
+    thisNode.Icon = "enclosure_32.png";
 
     % Sync children of node
     syncAnimalNodes(thisNode, thisModel.Animal)
@@ -140,7 +140,7 @@ for idx = 1:numel(model)
 
     % Update the node's text and icon
     thisNode.Text = "Animal: " + thisModel.Name;
-    thisNode.Icon = "animal.png";
+    thisNode.Icon = "animal_32.png";
 
     % This is the lowest level - no children to sync
 

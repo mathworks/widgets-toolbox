@@ -70,7 +70,7 @@ switch evt.Button
     case app.SessionImportButton
 
         startPath = fullfile(wt.utility.widgetsRoot, ...
-            "examples", "data");
+            "examples", "data", "ExampleZooManifest.xlsx");
 
         filter = ["*.xlsx","Excel Document"];
         title = "Select spreadsheet to import";
@@ -124,8 +124,8 @@ switch evt.Button
             isMatch = session.Exhibit == exhibit;
             session.Exhibit(isMatch) = [];
 
-            % Clear the contextual pane
-            app.ContextualView.clearView();
+            % Clear tree selection data
+            app.TreeSelectionData = wt.eventdata.TreeModelSingleSelectionData();
 
         end %if
 
@@ -148,8 +148,8 @@ switch evt.Button
             isMatch = exhibit.Enclosure == enclosure;
             exhibit.Enclosure(isMatch) = [];
 
-            % Clear the contextual pane
-            app.ContextualView.clearView();
+            % Clear tree selection data
+            app.TreeSelectionData = wt.eventdata.TreeModelSingleSelectionData();
 
         end %if
 
@@ -172,8 +172,8 @@ switch evt.Button
             isMatch = enclosure.Animal == animal;
             enclosure.Animal(isMatch) = [];
 
-            % Clear the contextual pane
-            app.ContextualView.clearView();
+            % Clear tree selection data
+            app.TreeSelectionData = wt.eventdata.TreeModelSingleSelectionData();
 
         end %if
 

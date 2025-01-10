@@ -29,20 +29,20 @@ app.SessionCloseButton = sessionSection.addButton("close_24.png","Close");
 % Create exhibit section
 exhibitSection = wt.toolbar.HorizontalSection();
 exhibitSection.Title = "EXHIBIT";
-app.ExhibitAddButton = exhibitSection.addButton("addGreen_24.png","New");
-app.ExhibitDeleteButton = exhibitSection.addButton("delete_24.png","Delete");
+app.ExhibitAddButton = exhibitSection.addButton("exhibit_add_32.png","New");
+app.ExhibitDeleteButton = exhibitSection.addButton("exhibit_remove_32.png","Delete");
 
 % Create enclosure section
 enclosureSection = wt.toolbar.HorizontalSection();
 enclosureSection.Title = "ENCLOSURE";
-app.EnclosureAddButton = enclosureSection.addButton("addGreen_24.png","New");
-app.EnclosureDeleteButton = enclosureSection.addButton("delete_24.png","Delete");
+app.EnclosureAddButton = enclosureSection.addButton("enclosure_add_32.png","New");
+app.EnclosureDeleteButton = enclosureSection.addButton("enclosure_remove_32.png","Delete");
 
 % Create animal section
 animalSection = wt.toolbar.HorizontalSection();
 animalSection.Title = "ANIMAL";
-app.AnimalAddButton = animalSection.addButton("addGreen_24.png","New");
-app.AnimalDeleteButton = animalSection.addButton("delete_24.png","Delete");
+app.AnimalAddButton = animalSection.addButton("animal_add_32.png","New");
+app.AnimalDeleteButton = animalSection.addButton("animal_remove_32.png","Delete");
 
 % Add toolbar
 app.Toolbar = wt.Toolbar(app.Grid);
