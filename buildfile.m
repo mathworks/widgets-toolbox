@@ -1,5 +1,7 @@
 function plan = buildfile
+% Perform build, test, and package actions
 
+% Copyright 2025 The MathWorks, Inc.
 
 
 % These tasks require R2023b or later
@@ -17,17 +19,17 @@ plan = buildplan(localfunctions);
 % Code issues task
 plan("check") = matlab.buildtool.tasks.CodeIssuesTask;
 plan("check").SourceFiles = fullfile(plan.RootFolder,"widgets");
-% plan("check").WarningThreshold = 0;
+plan("check").WarningThreshold = 0;
 
 % Test task
-% plan("test") = matlab.buildtool.tasks.TestTask;
-% plan("test").SourceFiles = fullfile(plan.RootFolder,"test");
+plan("test") = matlab.buildtool.tasks.TestTask;
+plan("test").SourceFiles = fullfile(plan.RootFolder,"test");
 
 % Package task
-plan("archive").Dependencies = ["check"];
+plan("archive").Dependencies = ["check","test"];
 
 % Set default tasks
-plan.DefaultTasks = ["archive"];
+plan.DefaultTasks = ["check","test"];
 
 end %function
 
@@ -52,7 +54,7 @@ opts = wt.deploy.getPackageOptions(rootFolder, toolboxVersion);
 matlab.addons.toolbox.packageToolbox(opts);
 
 % Open the release folder
-releaseFolder = fullfile(projectRoot,"release");
+releaseFolder = fullfile(rootFolder,"release");
 winopen(releaseFolder);
 
 end %function
