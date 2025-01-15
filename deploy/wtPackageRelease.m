@@ -1,4 +1,3 @@
-function outputFile = packageRelease()
 % Package a Toolbox Release
 
 % Copyright 2025 The MathWorks, Inc.
@@ -12,7 +11,7 @@ projectRoot = proj.RootFolder;
 
 
 %% Run unit tests
-testResult = runTestSuite;
+[testSuite, testResult]  = runTestSuite;
 if ~all([testResult.Passed])
     error("Unit tests failed. Aborting package release.");
 end
