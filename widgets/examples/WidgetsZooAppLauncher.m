@@ -11,10 +11,6 @@ if ~exist("wt.apps.BaseApp","class")
 end
 
 
-%% Bugfixes
-
-
-
 %% Instantiate the application
 app = zooexample.app.ZooHierarchy(varargin{:});
 
@@ -24,12 +20,9 @@ app = zooexample.app.ZooHierarchy(varargin{:});
 % Create a new session
 app.newSession();
 
-% Import a data file
+% Import the sample dataset
 dataPath = fullfile(wt.utility.widgetsRoot, "examples", "data", ...
     "ExampleZooManifest.xlsx");
-
-%RJ - this should be a public app method instead! If possible expand the
-%tree also!
 app.Session.importManifest(dataPath)
 
 

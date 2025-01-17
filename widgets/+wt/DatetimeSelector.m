@@ -96,6 +96,20 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
 
 
 
+    %% Public methods
+    methods
+
+        function focusDateControl(obj)
+            % Focuses on the embedded date control
+
+            obj.DateControl.focus();
+
+        end %function
+
+    end % methods
+
+
+
     %% Protected methods
     methods (Access = protected)
 

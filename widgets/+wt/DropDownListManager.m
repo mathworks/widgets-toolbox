@@ -22,7 +22,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
 
     %% Public properties
-    properties (AbortSet, Dependent, UsedInUpdate = false)
+    properties (AbortSet, Dependent)
 
         % Index of selected list item
         Index {mustBeNonnegative, mustBeInteger, mustBeScalarOrEmpty}
