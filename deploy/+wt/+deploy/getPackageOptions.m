@@ -1,4 +1,4 @@
-function opts = wtPackageOptions(projectRoot, toolboxVersion)
+function opts = getPackageOptions(projectRoot, toolboxVersion)
 % Returns the toolbox packaging options
 
 % Copyright 2025 The MathWorks, Inc.
@@ -58,26 +58,26 @@ opts.OutputFile = fullfile(projectRoot,"release",outFileName);
 % opts.ToolboxFiles
 
 % Folders to add to the MATLAB path
-% relativePaths = [
-%     ""
-%     "doc"
-%     "examples"
-%     "icons"
-%     ];
-% opts.ToolboxMatlabPath = fullfile(toolboxFolder, relativePaths);
-opts.ToolboxMatlabPath = [
+relativePaths = [
     ""
     "doc"
     "examples"
     "icons"
     ];
+opts.ToolboxMatlabPath = fullfile(toolboxFolder, relativePaths);
+% opts.ToolboxMatlabPath = [
+%     ""
+%     "doc"
+%     "examples"
+%     "icons"
+%     ];
 
 % Java path for toolbox
 % opts.ToolboxJavaPath
 
 % Files to add to the app gallery
 opts.AppGalleryFiles = [
-    fullfile("examples","WidgetsExampleApp.mlapp")
+    fullfile(toolboxFolder, "examples","WidgetsExampleApp.mlapp")
     ];
 
 % Path to the getting started guide
@@ -123,4 +123,4 @@ opts.AuthorEmail = "";
 
 opts.AuthorCompany = "MathWorks Consulting";
 
-opts.ToolboxImageFile = "widgets_logo.png";
+opts.ToolboxImageFile = fullfile(projectRoot,"deploy","wtLogo.png");
