@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2024b"><title>Getting Started with Widgets Toolbox - MATLAB App Designer Components</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.8px; min-height: 0px; white-space: pre-wrap; color: rgb(192, 76, 11); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: 400; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S2 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 25px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: 700; text-align: left;  }
+.S3 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S4 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }
+.S5 { margin: 15px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 17px; font-weight: 700; text-align: left;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Getting Started with Widgets Toolbox - MATLAB App Designer Components</span></h1><div  class = 'S1'><span style=' font-style: italic;'>Copyright 2020-2025 The MathWorks, Inc.</span></div><h2  class = 'S2'><span>Description</span></h2><div  class = 'S1'><span>Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB and App Designer. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. </span></div><h2  class = 'S2'><span>Features</span></h2><div  class = 'S1'><span>Widgets provided in this toolbox include:</span></div><ul  class = 'S3'><li  class = 'S4'><span>Grid of buttons grouped together</span></li><li  class = 'S4'><span>List of checkboxes and labels grouped together</span></li><li  class = 'S4'><span>Color selection control</span></li><li  class = 'S4'><span>Date and time selection control</span></li><li  class = 'S4'><span>File selection control, consisting of a label, edit field, and browse button</span></li><li  class = 'S4'><span>Listbox control combined with a label and a set of buttons for managing the list composition and ordering</span></li><li  class = 'S4'><span>Password field with hidden text</span></li><li  class = 'S4'><span>Progress bar indicator with time remaining and cancel button</span></li><li  class = 'S4'><span>Slider control group with labels and enable/disable checkboxes</span></li><li  class = 'S4'><span>Slider control linked to a numeric spinner and edit field</span></li><li  class = 'S4'><span>List of tasks with icons indicating status (pass, fail, running, complete, etc.)</span></li><li  class = 'S4'><span>Toolbar with advanced layout functionality that can appear like a toolstrip</span></li></ul><h2  class = 'S2'><span>System Requirements</span></h2><ul  class = 'S3'><li  class = 'S4'><span>MATLAB R2020b or later is required to use widgets using code.</span></li><li  class = 'S4'><span>MATLAB R2021a or later is required to drag and drop widgets in App Designer.</span></li><li  class = 'S4'><span>Widgets created from this toolbox must be placed into a uifigure.</span></li></ul><h3  class = 'S5'><span>Compatibility Note for older Widgets Toolbox content</span></h3><div  class = 'S1'><span>This version of Widgets Toolbox is intended for NEW development of uifigure or App Designer apps starting from R2020b or newer releases. If you have an existing MATLAB app that used Widgets Toolbox content developed prior to R2020b, you may also need "</span><a href = "https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox"><span>Widgets Toolbox (Compatibility Support)</span></a><span>" to support the existing content in a uifigure.  </span></div><h2  class = 'S2'><span>Examples</span></h2><div  class = 'S1'><span>Learn how to create widgets here:</span></div><div  class = 'S1'><a href = "..\examples\WidgetExamples.html"><span>Widgets Toolbox - MATLAB App Building Components - Examples</span></a></div><div  class = 'S1'><span>Or open an example widgets app here:</span></div><div  class = 'S1'><a href = "..\examples\WidgetsExampleApp.mlapp"><span>Widgets Toolbox Examples App</span></a></div><h2  class = 'S2'><span>Release Notes</span></h2><div  class = 'S1'><span>Please view release notes on GitHub: </span></div><div  class = 'S1'><a href = "https://github.com/mathworks/widgets-toolbox/releases"><span>https://github.com/mathworks/widgets-toolbox/releases</span></a></div><div  class = 'S1'><span></span></div><div  class = 'S1'></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Getting Started with Widgets Toolbox - MATLAB App Designer Components
+% _Copyright 2020-2025 The MathWorks, Inc._
+%% Description
+% Widgets Toolbox helps you efficiently develop advanced user interfaces in 
+% MATLAB and App Designer. Widgets combine existing control functionalities together 
+% into larger, reusable, common functionality to accelerate development of graphical 
+% user interfaces. 
+%% Features
+% Widgets provided in this toolbox include:
+%% 
+% * Grid of buttons grouped together
+% * List of checkboxes and labels grouped together
+% * Color selection control
+% * Date and time selection control
+% * File selection control, consisting of a label, edit field, and browse button
+% * Listbox control combined with a label and a set of buttons for managing 
+% the list composition and ordering
+% * Password field with hidden text
+% * Progress bar indicator with time remaining and cancel button
+% * Slider control group with labels and enable/disable checkboxes
+% * Slider control linked to a numeric spinner and edit field
+% * List of tasks with icons indicating status (pass, fail, running, complete, 
+% etc.)
+% * Toolbar with advanced layout functionality that can appear like a toolstrip
+%% System Requirements
+%% 
+% * MATLAB R2020b or later is required to use widgets using code.
+% * MATLAB R2021a or later is required to drag and drop widgets in App Designer.
+% * Widgets created from this toolbox must be placed into a uifigure.
+% Compatibility Note for older Widgets Toolbox content
+% This version of Widgets Toolbox is intended for NEW development of uifigure 
+% or App Designer apps starting from R2020b or newer releases. If you have an 
+% existing MATLAB app that used Widgets Toolbox content developed prior to R2020b, 
+% you may also need "<https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox 
+% Widgets Toolbox (Compatibility Support)>" to support the existing content in 
+% a uifigure.  
+%% Examples
+% Learn how to create widgets here:
+% 
+% <..\examples\WidgetExamples.mlx Widgets Toolbox - MATLAB App Building Components 
+% - Examples>
+% 
+% Or open an example widgets app here:
+% 
+% <..\examples\WidgetsExampleApp.mlapp Widgets Toolbox Examples App>
+%% Release Notes
+% Please view release notes on GitHub: 
+% 
+% <https://github.com/mathworks/widgets-toolbox/releases https://github.com/mathworks/widgets-toolbox/releases>
+% 
+% 
+% 
+%
+##### SOURCE END #####
+-->
+</div></body></html>
