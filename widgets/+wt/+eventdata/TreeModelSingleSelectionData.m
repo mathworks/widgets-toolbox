@@ -16,7 +16,7 @@ classdef TreeModelSingleSelectionData < event.EventData
     end %properties
 
     properties
-        Model wt.model.BaseModel {mustBeScalarOrEmpty}
+        Model wt.model.BaseModel
         Session wt.model.BaseSession {mustBeScalarOrEmpty}
     end %properties
 
