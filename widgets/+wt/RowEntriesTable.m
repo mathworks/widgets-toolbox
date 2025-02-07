@@ -15,10 +15,10 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (AbortSet)
 
         % Table entries
-        Data table
+        Data table = cell2table(cell(0,2),"VariableNames",{'Name','Value'})
 
         % Format for new table row
-        NewRowFormat (1,:) cell = {"NewRow",0}
+        NewRowFormat (1,:) cell = {'NewRow',0}
 
         % Indicates whether to enable buttons for reordering the rows
         Orderable  (1,1) matlab.lang.OnOffSwitchState = false
@@ -36,13 +36,11 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
     methods
 
         function value = get.AllowItemRemove(obj)
-            value = resize(obj.AllowItemRemove, height(obj.Data), ...
-                "FillValue", true);
+            value = wt.utility.resizeVector(obj.AllowItemRemove, height(obj.Data), true);
         end
 
         function value = get.AllowItemOrdering(obj)
-            value = resize(obj.AllowItemOrdering, height(obj.Data), ...
-                "FillValue", true);
+            value = wt.utility.resizeVector(obj.AllowItemOrdering, height(obj.Data), true);
         end
 
     end %methods
@@ -120,7 +118,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function addStyle(obj,s,tableTarget,tableIndex)
             % Add a style to the table
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.RowEntriesTable
                 s (1,1) matlab.ui.style.Style
                 tableTarget (1,1) string {mustBeMember(tableTarget,...
@@ -137,7 +135,7 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         function removeStyle(obj,orderNum)
             % Add a style to the table
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.RowEntriesTable
                 orderNum = []
             end
@@ -177,7 +175,8 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Table.Layout.Column = 1;
             obj.Table.Layout.Row = [1 5];
             obj.Table.CellEditCallback = @(src,evt)obj.onCellEdited(evt);
-            obj.Table.SelectionChangedFcn = @(src,evt)obj.onSelectionChanged(evt);
+            % obj.Table.SelectionChangedFcn = @(src,evt)obj.onSelectionChanged(evt);
+            obj.Table.CellSelectionCallback = @(src,evt)obj.onSelectionChanged(evt);
 
             % Create the buttons
             obj.AddButton = uibutton(obj.Grid);
@@ -289,8 +288,6 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             oldData = obj.Data;
             newRowData = obj.NewRowFormat;
             numOldRows = height(oldData);
-            numNewRows = numOldRows + 1;
-            numOldCols = width(oldData);
 
             % Determine placement
             selRowIdx = obj.Table.Selection;
@@ -299,23 +296,15 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
             end
             newRowIdx = selRowIdx + 1;
 
-            % Does table already have columns?
-            if numOldCols > 0
+            % New row must be same width as table
+            msg = "NewRowFormat property must be the same width as Data property.";
+            assert(numel(newRowData) == width(oldData), msg)
 
-                % New row must be same width as table
-                newRowData = resize(newRowData, [1 numOldCols]);
-
-                % Add content to table
-                newData = paddata(oldData,numNewRows,"FillValue",newRowData);
-
-            end
-
-            % Order new data
-            newData = [
-                newData(1:selRowIdx,:)
-                newData(end,:)
-                newData(newRowIdx:numOldRows,:)
-                ];
+            % Insert new data
+            newData = vertcat(...
+                oldData(1:selRowIdx,:), ...
+                newRowData, ...
+                oldData(newRowIdx:end,:) );
 
             % Prepare event data
             evtOut = wt.eventdata.RowEntriesTableChangedData();

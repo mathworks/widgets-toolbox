@@ -1,7 +1,7 @@
 function publishLiveScriptToHtml(srcFiles,dstFolder)
 % Publish each *.mlx file from doc_input into doc as html
 
-arguments (Input)
+arguments
     srcFiles (:,1) string {mustBeFile}
     dstFolder (1,1) string {mustBeFolder} = fullfile(pwd,"html_output")
 end

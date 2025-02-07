@@ -102,7 +102,9 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
         function focusDateControl(obj)
             % Focuses on the embedded date control
 
-            obj.DateControl.focus();
+            if ~isMATLABReleaseOlderThan("R2022a")
+                obj.DateControl.focus();
+            end
 
         end %function
 

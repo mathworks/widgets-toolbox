@@ -94,15 +94,11 @@ classdef ErrorHandling < handle
             % Places an indeterminate progress dialog in the widget's figure
             
             % Validate arguments
-            arguments (Input)
+            arguments
                 obj (1,1) wt.mixin.ErrorHandling
                 message (1,1) string = "Are you sure?"
                 title (1,1) string = ""
                 buttonNames (1,2) string = ["Yes","Cancel"]
-            end
-
-            arguments (Output)
-                result (1,1) logical
             end
            
             % Locate ancestor figure

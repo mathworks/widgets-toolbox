@@ -1,7 +1,5 @@
 classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & wt.mixin.ErrorHandling
-    % wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-    % wt.mixin.FieldColorable & wt.mixin.PropertyViewable
 
     % Contextual View/Controller pane that can present varied views
     % This pane can switch its contents between multiple different
@@ -16,7 +14,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     %   matlab.ui.componentcontainer.ComponentContainer
     %   wt.mixin.ContextualView (if auto-populating Model property)
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Public Properties
@@ -92,6 +90,9 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         % Image to show when loading a pane
         LoadingImage matlab.ui.control.Image
 
+        % First load flag
+        FirstLoad (1,1) logical = true
+
     end %properties
 
 
@@ -105,6 +106,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel = wt.model.BaseModel.empty
+            end
+
+            % Remove the initial box on first load
+            if obj.FirstLoad
+                obj.MainGrid.Padding = 0;
+                obj.FirstLoad = false;
             end
 
             % After launch is complete, toggle off loading image
@@ -265,13 +272,17 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
             obj.MainGrid = uigridlayout(obj,[1 1]);
-            obj.MainGrid.Padding = [0 0 0 0];
+            obj.MainGrid.Padding = [1 1 1 1];
+            obj.MainGrid.BackgroundColor = [.5 .5 .5];
 
             % Grid Layout to place the contents
             obj.ContentGrid = uigridlayout(obj.MainGrid,[1 1]);
             obj.ContentGrid.Padding = [0 0 0 0];
             obj.ContentGrid.Layout.Row = 1;
             obj.ContentGrid.Layout.Column = 1;
+
+            % Set default size and position
+            obj.Position = [10 10 400 400];
 
             % Image to display while loading content
             obj.LoadingImage = uiimage(obj.MainGrid);
@@ -282,7 +293,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Components to apply background color
             obj.BackgroundColorableComponents = ...
-                [obj.ContentGrid, obj.MainGrid, obj.LoadingImage];
+                [obj.ContentGrid, obj.LoadingImage];
 
         end %function
 
@@ -305,13 +316,9 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % instances. If an existing instance is found, it is returned.
             % Otherwise, an empty view is returned
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
-            end
-
-            arguments (Output)
-                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
             end
 
             % Try to locate a valid view
@@ -347,14 +354,10 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function view = instantiateView_Private(obj, viewClass, model)
             % Launch a view based on the class path
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
-            end
-
-            arguments (Output)
-                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
             end
 
             % Trap errors

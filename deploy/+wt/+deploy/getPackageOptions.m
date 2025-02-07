@@ -3,14 +3,14 @@ function opts = getPackageOptions(projectRoot, toolboxVersion)
 
 % Copyright 2025 The MathWorks, Inc.
 
-arguments (Input)
+arguments %(Input)
     projectRoot (1,1) string {mustBeFolder}
     toolboxVersion (1,1) string
 end
 
-arguments (Output)
-    opts (1,1) matlab.addons.toolbox.ToolboxOptions
-end
+% arguments (Output)
+%     opts (1,1) matlab.addons.toolbox.ToolboxOptions
+% end
 
 
 %% Define paths

@@ -9,8 +9,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
     % Copyright 2024-2025 The MathWorks Inc.
 
-    %RJ - supports R2023b and later, but test in earlier releases
-
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -121,13 +119,11 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         end
 
         function value = get.AllowItemRemove(obj)
-            value = resize(obj.AllowItemRemove, numel(obj.Items), ...
-                "FillValue", true);
+            value = wt.utility.resizeVector(obj.AllowItemRemove, numel(obj.Items), true);
         end
 
         function value = get.AllowItemRename(obj)
-            value = resize(obj.AllowItemRename, numel(obj.Items), ...
-                "FillValue", true);
+            value = wt.utility.resizeVector(obj.AllowItemRename, numel(obj.Items), true);
         end
 
     end %methods
@@ -359,11 +355,17 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             % Configure the edit field
             obj.EditField.Value = obj.NewItemName;
             drawnow
-            obj.EditField.focus();
+            if ~isMATLABReleaseOlderThan("R2022a")
 
-            % Attach figure listeners to stop editing in special
-            % circumstances
-            obj.attachStopEditingListeners();
+                % Put focus on the cursor to edit the name
+                obj.EditField.focus();
+
+                % Attach figure listeners to stop editing in special
+                % circumstances
+                obj.attachStopEditingListeners();
+
+            end
+
 
         end %function
 
@@ -379,11 +381,16 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
             % Configure the edit field
             obj.EditField.Value = item;
             drawnow
-            obj.EditField.focus();
+            if ~isMATLABReleaseOlderThan("R2022a")
 
-            % Attach figure listeners to stop editing in special
-            % circumstances
-            obj.attachStopEditingListeners();
+                % Put focus on the cursor to edit the name
+                obj.EditField.focus();
+
+                % Attach figure listeners to stop editing in special
+                % circumstances
+                obj.attachStopEditingListeners();
+
+            end
 
         end %function
 

@@ -184,9 +184,9 @@ classdef BaseModel < handle & ...
             % changes that trigger the ModelChanged event will be passed up
             % the hierarchy to this object.
 
-            arguments(Output)
-                props (1,:) string
-            end
+            % arguments (Output)
+            %     props (1,:) string
+            % end
 
             props = string.empty(1,0);
         

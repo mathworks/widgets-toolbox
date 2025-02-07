@@ -75,12 +75,8 @@ classdef (Abstract, AllowedSubclasses = ...
         function className = getModelClassName(obj)
             % Returns the class name of the Model property contents
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.mixin.ModelObserver
-            end
-
-            arguments (Output)
-                className (1,1) string
             end
 
             % Get the class of the Model array
