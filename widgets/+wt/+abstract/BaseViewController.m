@@ -33,7 +33,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
-        TriggerUpdate_Private (1,1) logical = false
+        Dirty_ (1,1) logical = false
 
     end %properties
 
@@ -57,6 +57,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         function forceUpdate(obj)
             % Forces update to run (For debugging only!)
 
+            disp("DEBUG: Forcing update for " + class(obj));
             obj.update();
 
         end %function
@@ -121,7 +122,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         function requestUpdate(obj)
             % Request update to occur at next drawnow cycle
 
-            obj.TriggerUpdate_Private = ~obj.TriggerUpdate_Private;
+            obj.Dirty_ = ~obj.Dirty_;
 
         end %function
         
@@ -187,8 +188,6 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
                 obj.Model.(fieldName) = newValue;
 
             end
-
-            % Set the new value
 
         end %function
 
