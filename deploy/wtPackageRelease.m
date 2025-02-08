@@ -9,7 +9,7 @@
 proj = currentProject;
 projectRoot = proj.RootFolder;
 
-docInputPath = fullfile(projectRoot,"doc_input");
+docInputPath = fullfile(projectRoot,"doc_input","mlx");
 docOutputPath = fullfile(projectRoot,"widgets","doc");
 
 examplesInputPath = fullfile(projectRoot,"widgets","examples");
@@ -58,13 +58,6 @@ wt.deploy.publishLiveScriptToHtml(gettingStartedInputPath, gettingStartedOutputP
 builddocsearchdb(docOutputPath)
 
 
-%% Increment Version Number
-
-% Increment the last part of the version number in wtDeployVersion.txt
-% (Other changes require commenting this out and making manual edits)
-wt.deploy.incrementVersionNumber();
-
-
 %% Package the Release
 
 % Increment the last part of the version number in version.txt
@@ -82,3 +75,10 @@ matlab.addons.toolbox.packageToolbox(opts);
 
 releaseFolder = fullfile(projectRoot,"release");
 winopen(releaseFolder);
+
+
+%% Increment Version Number
+
+% Increment the last part of the version number in wtDeployVersion.txt for
+% the next release
+% wt.deploy.incrementVersionNumber();

@@ -18,7 +18,7 @@
                 List of Available Widgets
             </tocitem>
 
-            <tocitem image="HelpIcon.USER_GUIDE">
+            <tocitem target="AdvancedAppDevelopment.html" image="HelpIcon.USER_GUIDE">
                 Advanced Application Development (hand code apps)
 
                 <tocitem target="AppSuperclasses.html"  image="HelpIcon.USER_GUIDE">
