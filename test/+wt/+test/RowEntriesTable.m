@@ -53,6 +53,10 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
 
         function setup(testCase)
 
+            isUnsupported = isMATLABReleaseOlderThan("R2022a");
+            diag = "Release not supported.";
+            testCase.assumeFalse(isUnsupported, diag)
+
             fcn = @()wt.RowEntriesTable(testCase.Grid);
             testCase.Widget = verifyWarningFree(testCase,fcn);
 
@@ -75,6 +79,26 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             % Ensure it renders
             drawnow
 
+        end %function
+
+    end %methods
+
+
+    %% Protected methods
+    methods (Access = protected)
+
+        function chooseRow(testCase, comp, varargin)
+            % Make a custom choose capability to handle older releases
+
+            % If an older release and table, special treatment needed
+            if isMATLABReleaseOlderThan("R2022b") && isa(comp, "matlab.ui.control.Table") && isscalar(varargin)
+                cell = varargin{1};
+                varargin = {[cell; cell(1) 2],"SelectionMode","contiguous"};
+            end
+
+            % Call superclass method
+            testCase.choose(comp, varargin{:})
+            
         end %function
 
     end %methods
@@ -223,7 +247,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             initData = testCase.InitialData;
 
             % Select "Banana"
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
 
             % Press add button
             testCase.press(addButton)
@@ -267,7 +291,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             initData = testCase.InitialData;
 
             % Remove "Banana"
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
             testCase.press(removeButton)
 
             % Verify number of callbacks so far
@@ -278,7 +302,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.verifyDataProperty(newData);
 
             % Remove "Lime" and "Orange
-            testCase.choose(reTable,[3 1; 4 1])
+            testCase.choose(reTable,[3 1; 4 2])
             testCase.press(removeButton)
 
             % Verify the data match
@@ -302,7 +326,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             initData = testCase.InitialData;
 
             % Move "Banana" up
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
             testCase.press(upButton)
 
             % Verify number of callbacks so far
@@ -313,7 +337,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.verifyDataProperty(newData);
 
             % Move "Lemon" to the bottom
-            testCase.choose(reTable,[3 1])
+            testCase.chooseRow(reTable,[3 1])
             testCase.press(downButton)
             testCase.press(downButton)
             testCase.press(downButton)
@@ -344,7 +368,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.verifyNotEnabled(downButton)
 
             % Select first row
-            testCase.choose(reTable,[1 1])
+            testCase.chooseRow(reTable,[1 1])
 
             % Check button enables
             testCase.verifyEnabled(addButton)
@@ -353,7 +377,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.verifyEnabled(downButton)
 
             % Select a different row
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
 
             % Check button enables
             testCase.verifyEnabled(addButton)
@@ -362,7 +386,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.verifyEnabled(downButton)
 
             % Select last row
-            testCase.choose(reTable,[6 1])
+            testCase.chooseRow(reTable,[6 1])
 
             % Check button enables
             testCase.verifyEnabled(addButton)
@@ -374,7 +398,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.Widget.AllowItemOrdering(1) = false;
 
             % Select row
-            testCase.choose(reTable,[1 1])
+            testCase.chooseRow(reTable,[1 1])
 
             % Check button enables
             testCase.verifyEnabled(addButton)
@@ -387,7 +411,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             testCase.Widget.AllowItemRemove(2) = false;
 
             % Select row
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
 
             % Check button enables
             testCase.verifyEnabled(addButton)
@@ -408,7 +432,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             downButton = testCase.Widget.DownButton;
 
             % Select second row
-            testCase.choose(reTable,[2 1])
+            testCase.chooseRow(reTable,[2 1])
 
             % Check button visibilities
             testCase.verifyVisible(addButton)
