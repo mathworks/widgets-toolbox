@@ -276,7 +276,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
 
             % Instantiate empty session to start
             session = app.createNewSession();
-            app.Session = session(1,[]);
+            app.Session = session;
+            app.Session = app.Session(1,[]);
 
         end %function
 
