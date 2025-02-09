@@ -9,11 +9,17 @@
 proj = currentProject;
 projectRoot = proj.RootFolder;
 
-docInputPath = fullfile(projectRoot,"doc_input","mlx");
+% docInputPath = fullfile(projectRoot,"doc_input","mlx");
+% docOutputPath = fullfile(projectRoot,"widgets","doc");
+
+% docInputPath = fullfile(projectRoot,"widgets","doc","mlx");
+% docOutputPath = fullfile(projectRoot,"widgets","doc","html");
+
+docInputPath = fullfile(projectRoot,"widgets","doc");
 docOutputPath = fullfile(projectRoot,"widgets","doc");
 
 examplesInputPath = fullfile(projectRoot,"widgets","examples");
-examplesOutputPath = fullfile(projectRoot,"widgets","doc","exampleshtml");
+examplesOutputPath = fullfile(projectRoot,"widgets","doc");
 
 gettingStartedInputPath = fullfile(projectRoot,"widgets","doc","GettingStarted.mlx");
 gettingStartedOutputPath = fullfile(projectRoot,"widgets","doc");

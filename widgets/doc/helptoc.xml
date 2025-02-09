@@ -3,7 +3,7 @@
 <toc version="2.0">
 <!-- First tocitem specifies top level in Help browser Contents pane -->
 <!-- This can be a roadmap page, as shown below, or a content page -->
-    <tocitem target="MainPage.html">Widgets Toolbox - MATLAB App Designer Components
+    <tocitem target="MainPage.html">Widgets Toolbox - MATLAB App Designer and Advanced App Components
         
         <!-- Getting Started Guide -->
         <tocitem target="GettingStarted.html" image="HelpIcon.GETTING_STARTED">
@@ -11,7 +11,7 @@
         </tocitem>
 
         <!-- User Guide -->
-        <tocitem target="DocumentationHome.html"  image="HelpIcon.USER_GUIDE">
+        <tocitem target="UserGuide.html"  image="HelpIcon.USER_GUIDE">
             User Guide
 
             <tocitem target="WidgetsList.html"  image="HelpIcon.USER_GUIDE">
