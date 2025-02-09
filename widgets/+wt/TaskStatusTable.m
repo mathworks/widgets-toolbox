@@ -193,16 +193,14 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             numImg = numel(obj.Icon);
             for idx = 1:numNew
                 wt.utility.fastSet(obj.Label(idx),"Text",obj.Items(idx));
-                if status(idx) == "none"
-                    wt.utility.fastSet(obj.Icon(idx),"Visible","off");
-                elseif numImg >= idx
+                if idx <= numImg
+                    wt.utility.fastSet(obj.Icon(idx),"Visible","on");
                     if obj.Icon(idx).ImageSource ~= imgFile(idx)
                         if exist(imgFile(idx),'file')
                             obj.Icon(idx).ImageSource = imgFile(idx);
                         else
                             obj.Icon(idx).ImageSource = "";
                         end
-                        wt.utility.fastSet(obj.Icon(idx),"Visible","on");
                     end
                 else
                     wt.utility.fastSet(obj.Icon(idx),"Visible","off");
