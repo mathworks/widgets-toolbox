@@ -14,10 +14,84 @@
         <tocitem target="UserGuide.html"  image="HelpIcon.USER_GUIDE">
             User Guide
 
+            <!-- List of Available Widgets -->
             <tocitem target="WidgetsList.html"  image="HelpIcon.USER_GUIDE">
-                List of Available Widgets
-
+                Widgets
+    
+                    <tocitem target="ButtonGridExample.html"  image="HelpIcon.USER_GUIDE">
+                        Button Grid
+                    </tocitem>
+    
+                    <tocitem target="CheckboxListExample.html"  image="HelpIcon.USER_GUIDE">
+                        Checkbox List
+                    </tocitem>
+    
+                    <tocitem target="ColorSelectorExample.html"  image="HelpIcon.USER_GUIDE">
+                        Color Selector
+                    </tocitem>
+    
+                    <tocitem target="ContextualViewExample.html"  image="HelpIcon.USER_GUIDE">
+                        Contextual View
+                    </tocitem>
+    
+                    <tocitem target="DatetimeSelectorExample.html"  image="HelpIcon.USER_GUIDE">
+                        Datetime Selector
+                    </tocitem>
+    
+                    <tocitem target="DropDownListManagerExample.html"  image="HelpIcon.USER_GUIDE">
+                        Drop Down List Manager
+                    </tocitem>
+    
+                    <tocitem target="FileSelectorExample.html"  image="HelpIcon.USER_GUIDE">
+                        File Selector
+                    </tocitem>
+    
+                    <tocitem target="ListSelectorExample.html"  image="HelpIcon.USER_GUIDE">
+                        List Selector (single pane)
+                    </tocitem>
+    
+                    <tocitem target="ListSelectorTwoPaneExample.html"  image="HelpIcon.USER_GUIDE">
+                        List Selector (two pane)
+                    </tocitem>
+    
+                    <tocitem target="NumericArrayExample.html"  image="HelpIcon.USER_GUIDE">
+                        Numeric Array
+                    </tocitem>
+    
+                    <tocitem target="PasswordFieldExample.html"  image="HelpIcon.USER_GUIDE">
+                        Password Field
+                    </tocitem>
+    
+                    <tocitem target="ProgressBarExample.html"  image="HelpIcon.USER_GUIDE">
+                        Progress Bar
+                    </tocitem>
+    
+                    <tocitem target="RangeFieldExample.html"  image="HelpIcon.USER_GUIDE">
+                        Range Field
+                    </tocitem>
+    
+                    <tocitem target="RowEntriesTableExample.html"  image="HelpIcon.USER_GUIDE">
+                        Row Entries Table
+                    </tocitem>
+    
+                    <tocitem target="SliderCheckboxExample.html"  image="HelpIcon.USER_GUIDE">
+                        Slider Checkbox
+                    </tocitem>
+    
+                    <tocitem target="SliderSpinnerExample.html"  image="HelpIcon.USER_GUIDE">
+                        Slider Spinner
+                    </tocitem>
+    
+                    <tocitem target="TaskStatusTableExample.html"  image="HelpIcon.USER_GUIDE">
+                        Task Status Table
+                    </tocitem>
+    
+                    <tocitem target="ToolbarExample.html"  image="HelpIcon.USER_GUIDE">
+                        Toolbar 
+                    </tocitem>
+    
             </tocitem>
+
 
             <tocitem target="AdvancedAppDevelopment.html" image="HelpIcon.USER_GUIDE">
                 Advanced Application Development (hand code apps)

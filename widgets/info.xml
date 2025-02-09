@@ -11,7 +11,7 @@
     <!-- to parse the file -->
     <matlabrelease>2024b</matlabrelease>
     <!-- (Required) Title of toolbox. Appears in the Contents pane -->
-    <name>Widgets Toolbox (MATLAB App Designer and Advanced App Components)</name>
+    <name>Widgets (MATLAB App Designer and Advanced App Components)</name>
     <!-- (Required) Label for the toolbox. pick one: -->
     <!-- matlab, toolbox, simulink, blockset, links_targets  -->
     <type>toolbox</type>

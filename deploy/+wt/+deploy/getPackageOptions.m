@@ -18,6 +18,7 @@ end
 
 % Get the root folder
 toolboxFolder = fullfile(projectRoot,"widgets");
+docFolder = fullfile(toolboxFolder,"doc");
 
 % UUID for Widgets Toolbox 2.x on File Exchange
 identifier = "78895307-cc36-4970-8b66-0697da8f9352"; 
@@ -85,19 +86,18 @@ opts.ToolboxGettingStartedGuide = fullfile(toolboxFolder,...
     "doc","GettingStarted.mlx");
 
 
-%% Remove doc files
-% docFileNames = [
-%     "AdvancedAppDevelopment.mlx"
-%     "AppPreferences.mlx"
-%     "AppSuperclasses.mlx"
-%     "DocumentationHome.mlx"
-%     "MainPage.mlx"
-%     "UsingModelViewControllerClasses.mlx"
-%     "WidgetsList.mlx"
-%     ];
-% isMatch = endsWith(opts.ToolboxFiles, docFileNames);
-% 
-% opts.ToolboxFiles(isMatch) = [];
+%% Remove doc files except GettingStarted.mlx
+
+% Define patterns
+docFilePattern = docFolder + filesep + alphanumericsPattern + ".mlx";
+gsFileStr = fullfile(docFolder,"GettingStarted.mlx");
+
+% Find matches
+isMatch = matches(opts.ToolboxFiles, docFilePattern) & ...
+    ~matches(opts.ToolboxFiles, gsFileStr);
+
+% Remove the files
+opts.ToolboxFiles(isMatch) = [];
 
 
 %% Metadata
