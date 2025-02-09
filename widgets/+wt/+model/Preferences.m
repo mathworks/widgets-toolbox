@@ -16,13 +16,32 @@ classdef Preferences < wt.model.BaseModel
         Position (1,4) double = [100 100 1000 700] 
         
         % Last folder that was used when opening a file
-        LastFolder (1,1) string {mustBeFolder} = pwd 
+        LastFolder (1,1) string = pwd 
         
         % List of recent session files
-        RecentSessionPaths (:,1) string {mustBeFile}
+        RecentSessionPaths (:,1) string
         
     end %properties
-    
+
+
+    % Accessors
+    methods
+
+        function value = get.LastFolder(obj)
+            value = obj.LastFolder;
+            % Default to pwd if invalid path
+            if ~isfolder(value)
+                value = pwd;
+            end
+        end
+
+        function value = get.RecentSessionPaths(obj)
+            value = obj.RecentSessionPaths;
+            % Remove any invalid paths
+            value(~isfile(value)) = [];
+        end
+
+    end %methods    
     
     
     %% Saving and Loading Preferences
