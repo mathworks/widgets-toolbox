@@ -31,7 +31,7 @@ opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, identifier);
 
 %% Requirements
 
-opts.MinimumMatlabRelease = "R2020b";
+opts.MinimumMatlabRelease = "R2021a";
 
 opts.MaximumMatlabRelease = "";
 
@@ -101,7 +101,7 @@ opts.ToolboxFiles(isMatch) = [];
 
 
 %% Metadata
-opts.ToolboxName = "Widgets Toolbox - MATLAB App Designer Components";
+opts.ToolboxName = "Widgets Toolbox - MATLAB App Designer and Advanced App Components";
 
 opts.Summary = "Additional app building components to efficiently " + ...
     "develop advanced user interfaces in MATLAB";
@@ -124,7 +124,9 @@ opts.Description = join([
     " - List of tasks with icons indicating status (pass, fail, running, complete, etc.)"
     " - Toolbar with advanced layout functionality that can appear like a toolstrip"
     ""
-    "This version of Widgets Toolbox is intended for NEW development of uifigure or App Designer apps starting from R2020b or newer releases."
+    "Additional object-oriented code components provide enable you to work more efficiently developing advanced apps using a modular hand-code approach. You can use model-view-controller or a similar separated presentation architecture."
+    ""
+    "This version of Widgets Toolbox is intended for NEW development of uifigure or App Designer apps starting from R2021a or newer releases."
     ""
     "If you have an existing MATLAB app using Widgets Toolbox 1.x content, you may also need 'Widgets Toolbox (Compatibility Support)'."
     "https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox"
