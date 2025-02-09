@@ -13,7 +13,7 @@ docInputPath = fullfile(projectRoot,"doc_input","mlx");
 docOutputPath = fullfile(projectRoot,"widgets","doc");
 
 examplesInputPath = fullfile(projectRoot,"widgets","examples");
-examplesOutputPath = fullfile(projectRoot,"widgets","examples","html");
+examplesOutputPath = fullfile(projectRoot,"widgets","doc","exampleshtml");
 
 gettingStartedInputPath = fullfile(projectRoot,"widgets","doc","GettingStarted.mlx");
 gettingStartedOutputPath = fullfile(projectRoot,"widgets","doc");

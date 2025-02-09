@@ -85,6 +85,21 @@ opts.ToolboxGettingStartedGuide = fullfile(toolboxFolder,...
     "doc","GettingStarted.mlx");
 
 
+%% Remove doc files
+% docFileNames = [
+%     "AdvancedAppDevelopment.mlx"
+%     "AppPreferences.mlx"
+%     "AppSuperclasses.mlx"
+%     "DocumentationHome.mlx"
+%     "MainPage.mlx"
+%     "UsingModelViewControllerClasses.mlx"
+%     "WidgetsList.mlx"
+%     ];
+% isMatch = endsWith(opts.ToolboxFiles, docFileNames);
+% 
+% opts.ToolboxFiles(isMatch) = [];
+
+
 %% Metadata
 opts.ToolboxName = "Widgets Toolbox - MATLAB App Designer Components";
 
