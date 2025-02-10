@@ -6,12 +6,9 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.FontStyled & ...
         wt.mixin.Orderable & ...
         wt.mixin.PropertyViewable
-
     % Select from an array of items and add them to a list
 
-    % Copyright 2020-2023 The MathWorks Inc.
-
-    %RJ - add unit test for ValueIndex vs SelectedIndex
+    % Copyright 2020-2025 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -41,9 +38,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % Indicates whether to allow duplicate entries in the list
         AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
 
-        % Indicates whether to allow sort controls %RAJ - Future feature
-        %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
-
         % Inidicates what to do when add button is pressed (select from
         % Items or custom using ButtonPushed event or ButtonPushedFcn)
         AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
@@ -61,6 +55,14 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
         % The current highlighted selection
         HighlightedValue (1,:)
+
+    end %properties
+
+
+    properties (AbortSet, Dependent, SetAccess = private)
+
+        % Indices of the highlighted items
+        HighlightedIndex
 
     end %properties
 
@@ -381,7 +383,8 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             numItems = numel(obj.ListBox.Items);
 
             % Shift the list indices
-            [idxNew, idxSelAfter] = obj.shiftListIndices(shift, numItems, idxSel);
+            % [idxNew, idxSelAfter] = obj.shiftListIndices(shift, numItems, idxSel);
+            [idxNew, ~] = obj.shiftListIndices(shift, numItems, idxSel);
 
             % Get the original value
             oldValue = obj.Value;
@@ -468,6 +471,13 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 [~, obj.ListBox.Value] = ismember(value, obj.Items);
             else
                 [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
+            end
+        end
+
+        function value = get.HighlightedIndex(obj)
+            value = obj.ListBox.Value;
+            if isempty(value)
+                value = [];
             end
         end
 

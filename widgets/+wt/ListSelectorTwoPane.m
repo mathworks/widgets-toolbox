@@ -3,7 +3,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
         wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
         wt.mixin.PropertyViewable
-    
+
     % Dual lists where selected items are moved from left to right
 
     % Copyright 2020-2025 The MathWorks Inc.
@@ -92,7 +92,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
-        
+
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
 
@@ -500,7 +500,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             else
                 value = obj.ItemsData(:,selIdx);
             end
-        end        
+        end
         function set.HighlightedValue(obj,value)
             if isempty(value)
                 obj.RightList.Value = {};
@@ -523,7 +523,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             else
                 value = obj.ItemsData(:,selIdx);
             end
-        end         
+        end
         function set.HighlightedValueLeft(obj,value)
             if isempty(value)
                 obj.LeftList.Value = {};
@@ -534,15 +534,21 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                     [~, obj.LeftList.Value] = ismember(value, obj.ItemsData);
                 end
             end
-        end 
+        end
 
         function value = get.HighlightedIndex(obj)
             value = obj.RightList.Value;
-        end        
+            if isempty(value)
+                value = [];
+            end
+        end
 
         function value = get.HighlightedIndexLeft(obj)
             value = obj.LeftList.Value;
-        end         
+            if isempty(value)
+                value = [];
+            end
+        end
 
         function value = get.ButtonWidth(obj)
             value = obj.Grid.ColumnWidth{2};
