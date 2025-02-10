@@ -6,7 +6,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
     
     % Dual lists where selected items are moved from left to right
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -50,6 +50,20 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         % The current highlighted selection
         HighlightedValue (1,:)
+
+        % The left list current highlighted selection
+        HighlightedValueLeft
+
+    end %properties
+
+
+    properties (AbortSet, Dependent, SetAccess = private)
+
+        % Indices of the highlighted items
+        HighlightedIndex
+
+        % Indices of the highlighted items on left
+        HighlightedIndexLeft
 
     end %properties
 
@@ -489,14 +503,46 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         end        
         function set.HighlightedValue(obj,value)
             if isempty(value)
-                return;
-            end
-            if isempty(obj.ItemsData)
-                [~, obj.RightList.Value] = ismember(value, obj.Items);
+                obj.RightList.Value = {};
             else
-                [~, obj.RightList.Value] = ismember(value, obj.ItemsData);
+                if isempty(obj.ItemsData)
+                    [~, obj.RightList.Value] = ismember(value, obj.Items);
+                else
+                    [~, obj.RightList.Value] = ismember(value, obj.ItemsData);
+                end
             end
         end
+
+        function value = get.HighlightedValueLeft(obj)
+            selIdx = obj.LeftList.Value;
+            if isempty(selIdx) || ~isnumeric(selIdx)
+                selIdx = [];
+            end
+            if isempty(obj.ItemsData)
+                value = obj.Items(:,selIdx);
+            else
+                value = obj.ItemsData(:,selIdx);
+            end
+        end         
+        function set.HighlightedValueLeft(obj,value)
+            if isempty(value)
+                obj.LeftList.Value = {};
+            else
+                if isempty(obj.ItemsData)
+                    [~, obj.LeftList.Value] = ismember(value, obj.Items);
+                else
+                    [~, obj.LeftList.Value] = ismember(value, obj.ItemsData);
+                end
+            end
+        end 
+
+        function value = get.HighlightedIndex(obj)
+            value = obj.RightList.Value;
+        end        
+
+        function value = get.HighlightedIndexLeft(obj)
+            value = obj.LeftList.Value;
+        end         
 
         function value = get.ButtonWidth(obj)
             value = obj.Grid.ColumnWidth{2};
