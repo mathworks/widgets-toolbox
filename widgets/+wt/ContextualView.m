@@ -153,7 +153,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         end %function
 
 
-        function prepareToLaunchView(objArray, viewClassArray)
+        function prepareToLaunchView(viewArray, viewClassArray)
             % Puts the ContextualView in a loading state if a different
             % view is about to be launched. Use this if your app has
             % multiple ContextualView instances and you need to potentially
@@ -161,34 +161,49 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % views here to turn them to loading state together.
 
             arguments
-                objArray wt.ContextualView
+                viewArray wt.ContextualView
                 viewClassArray string
             end
 
-            for idx = 1:numel(objArray)
+            % Flag if we need to trigger a drawnow to give time to display
+            % the loading image
+            updateNeeded = false;
+            
+            % Check each ContextualView in the input array
+            for idx = 1:numel(viewArray)
 
                 % Get one at a time
-                obj = objArray(idx);
+                thisView = viewArray(idx);
                 viewClass = viewClassArray(idx);
 
                 % Is the view class going to change?
-                willLaunchView = isempty(obj.ActiveView) && strlength(viewClass);
-                willChangeView = isscalar(obj.ActiveView) && ...
-                    class(obj.ActiveView) ~= viewClass;
+                willLaunchView = isempty(thisView.ActiveView) && strlength(viewClass);
+                willChangeView = isscalar(thisView.ActiveView) && ...
+                    class(thisView.ActiveView) ~= viewClass;
+                loadingCurrentState = thisView.LoadingImage.Visible;
 
                 % If the view will change, show the loading image
-                if obj.BlockWhileLoading && (willLaunchView || willChangeView)
+                if thisView.BlockWhileLoading && ...
+                        loadingCurrentState == "off" && ...
+                        (willLaunchView || willChangeView)
 
-                    % Prevent interaction during launch
-                    obj.LoadingImage.Visible = "on";
+                    % Yes we will toggle the loading image.
+                    % This will prevent interaction during launch
+                    thisView.LoadingImage.Visible = "on";
+                    updateNeeded = true;
 
                 end %if
 
             end %for
 
-            % Enable them all to update
-            drawnow
-
+            % If a change was made, give an opportunity to update the
+            % display so the loading image will display. (This is guarded
+            % in a conditional to avoid multiple calls
+            % causing performance issues.)
+            if updateNeeded
+                drawnow("limitrate")
+            end
+            
         end %function
 
 
