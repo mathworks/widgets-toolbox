@@ -19,11 +19,13 @@ classdef ValueChangedData < event.EventData & dynamicprops
     %% Constructor / destructor
     methods
 
-        function obj = ValueChangedData(newValue, previousValue)
+        function obj = ValueChangedData(newValue,varargin)
             
             arguments
                 newValue
-                previousValue = []
+            end
+            arguments (Repeating)
+                varargin
             end
             
             % Is input a MATLAB or widget eventdata?
