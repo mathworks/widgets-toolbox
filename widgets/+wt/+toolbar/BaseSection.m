@@ -127,6 +127,14 @@ classdef (Hidden, AllowedSubclasses = ...
     methods (Access = protected)
         
         function update(obj)
+
+            % Validate components
+            if any(~isvalid(obj.Component))
+                obj.Component(~isvalid(obj.Component)) = [];
+                warnID = "wt:toolbar:BaseSection:InvalidComponents";
+                message = "Items in toolbar section Component array have been deleted. ";
+                warning(warnID, message);
+            end
             
             % Unparent removed components
             removedComponents = setdiff(obj.Grid.Children, obj.Component);

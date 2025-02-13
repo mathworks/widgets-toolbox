@@ -6,7 +6,7 @@ classdef BaseSession < wt.model.BaseModel
     % trigger a public event "PropertyChanged" when value is set. The app
     % will listen for these changes.
 
-    % Copyright 2020-2024 The MathWorks, Inc.
+    % Copyright 2020-2025 The MathWorks, Inc.
 
 
     %% Events
@@ -22,7 +22,7 @@ classdef BaseSession < wt.model.BaseModel
 
 
     %% Properties
-    properties (Dependent, SetAccess = immutable)
+    properties (Dependent, SetAccess = private)
 
         % FileName of the session (dependent on FileName)
         FileName (1,1) string
@@ -100,7 +100,7 @@ classdef BaseSession < wt.model.BaseModel
     methods (Static, Sealed)
 
         function session = open(sessionPath)
-            % Load a session object from a MAT file - subclass may override
+            % Load a session object from a MAT file
 
             % Attempt to load
             try
@@ -170,8 +170,13 @@ classdef BaseSession < wt.model.BaseModel
             [~,name,~] = fileparts(obj.FileName);
 
         end %function
-        
 
+    end %methods
+
+
+    %% Protected methods - Not intended for overriding
+    methods (Access = protected)
+        
         function onModelChanged(obj,evt)
             % Triggered when the Session or any aggregated BaseModel
             % classes have triggered a ModelChanged event (typically when

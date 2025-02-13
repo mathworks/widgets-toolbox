@@ -2,7 +2,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         matlab.ui.componentcontainer.ComponentContainer
     % Base class for views/controllers referencing a BaseModel class
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties
@@ -15,7 +15,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
 
 
     %% Internal Properties
-    properties (Hidden, SetAccess = protected)
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Internal grid to place outer panel contents
         OuterGrid matlab.ui.container.GridLayout
@@ -33,7 +33,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
-        TriggerUpdate_BVC (1,1) logical = false
+        Dirty_ (1,1) logical = false
 
     end %properties
 
@@ -57,6 +57,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         function forceUpdate(obj)
             % Forces update to run (For debugging only!)
 
+            disp("DEBUG: Forcing update for " + class(obj));
             obj.update();
 
         end %function
@@ -121,7 +122,7 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         function requestUpdate(obj)
             % Request update to occur at next drawnow cycle
 
-            obj.TriggerUpdate_BVC = ~obj.TriggerUpdate_BVC;
+            obj.Dirty_ = ~obj.Dirty_;
 
         end %function
         
@@ -132,19 +133,14 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             % Request an update
             obj.requestUpdate();
 
-            % Call superclass method
-            obj.onModelSet@wt.mixin.ModelObserver()
-
         end %function
 
-        function onModelChanged(obj,evt)
+        
+        function onModelChanged(obj,~)
             % Triggered when a property within the model has changed
 
             % Request an update
             obj.requestUpdate();
-
-            % Call superclass method
-            obj.onModelChanged@wt.mixin.ModelObserver(evt)
 
         end %function
 
@@ -192,8 +188,6 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
                 obj.Model.(fieldName) = newValue;
 
             end
-
-            % Set the new value
 
         end %function
 

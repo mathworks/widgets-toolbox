@@ -3,15 +3,26 @@ classdef (Abstract, AllowedSubclasses = ...
         ModelObserver < handle
     % Mixin for components using a model that observe changes
 
+    % Copyright 2025 The MathWorks Inc.
+
     
-    %% Abstract Properties
+    %% Abstract Properties and methods
     % Subclass must define these
+
     properties (Abstract, AbortSet, SetObservable)
 
         % Model class containing data to display in the pane
         Model wt.model.BaseModel
 
     end %properties
+
+
+    methods (Abstract, Access = protected)
+
+        onModelSet(obj)
+        onModelChanged(obj,evt)
+
+    end %methods
 
 
     %% Events
@@ -27,13 +38,16 @@ classdef (Abstract, AllowedSubclasses = ...
 
 
     %% Internal Properties
-    properties (SetAccess = protected)
+    properties (Access = private)
 
         % Listener for a new model being attached
         ModelSetListener event.listener
 
         % Listener for property changes within the model
         ModelChangedListener event.listener
+
+        % Listener for property changes within the model
+        ModelDestroyedListener event.listener
 
     end %properties
 
@@ -44,10 +58,11 @@ classdef (Abstract, AllowedSubclasses = ...
             % Constructor
 
             % Listen to Model property being set
-            obj.ModelSetListener = listener(obj,"Model","PostSet",@(~,~)onModelSet(obj));
+            obj.ModelSetListener = listener(obj,...
+                "Model","PostSet",@(~,~)onModelSet_Private(obj));
 
             % Listen to model changes
-            obj.attachModelListeners();
+            obj.attachModelListeners_Private();
 
         end %function
     end %methods
@@ -55,66 +70,13 @@ classdef (Abstract, AllowedSubclasses = ...
 
 
     %% Protected Methods
-    methods (Access = protected)
-        
-        function onModelSet(obj)
-            % Triggered when Model has been changed
-
-            % Listen to model property changes
-            obj.attachModelListeners();
-
-            % Prepare event data
-            evtOut = wt.eventdata.ModelSetData();
-            evtOut.Model = obj.Model;
-            evtOut.Controller = obj;
-
-            % Notify listeners
-            notify(obj,"ModelSet",evtOut)
-
-        end %function
-
-
-        function attachModelListeners(obj)
-            % Triggered when Model has been changed
-
-            % Listen to model property changes
-            obj.ModelChangedListener = listener(obj.Model,...
-                "ModelChanged", @(~,evt)onModelChanged(obj,evt));
-
-        end %function
-
-
-        function onModelChanged(obj,evt)
-            % Triggered when a property within the model has changed
-
-            arguments
-                obj (1,1) wt.mixin.ModelObserver
-                evt (1,1) wt.eventdata.ModelChangedData
-            end
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Model = evt.Model;
-            evtOut.Property = evt.Property;
-            evtOut.Value = evt.Value;
-            evtOut.Stack = [{obj}, evt.Stack];
-            evtOut.ClassStack = [class(obj), evt.ClassStack];
-
-            % Notify listeners
-            notify(obj,"ModelChanged",evtOut)
-
-        end %function
-
+    methods (Access = {?wt.mixin.ModelObserver, ?matlab.unittest.TestCase})
 
         function className = getModelClassName(obj)
             % Returns the class name of the Model property contents
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.mixin.ModelObserver
-            end
-
-            arguments (Output)
-                className (1,1) string
             end
 
             % Get the class of the Model array
@@ -141,11 +103,15 @@ classdef (Abstract, AllowedSubclasses = ...
 
 
         function [model, validToDisplay] = getScalarModelToDisplay(obj)
+
+            arguments
+                obj (1,1) wt.mixin.ModelObserver
+            end
             
             % Get a single instance of the correct model type and indicate
             % if it's found and valid. This is useful in case obj.Model is
             % empty, it will still return a scalar instance to show default
-            % values and the modelValid flag will be false, indicating to
+            % values and the validToDisplay flag will be false, indicating to
             % disable the fields.
             model = obj.Model;
             validToDisplay = isscalar(model) && isvalid(model);
@@ -158,5 +124,81 @@ classdef (Abstract, AllowedSubclasses = ...
 
     end %methods
 
+
+    %% Private Methods
+    methods (Access = private)
+
+        function onModelSet_Private(obj)
+            % Triggered when Model has been changed
+
+            % Listen to model property changes
+            obj.attachModelListeners_Private();
+
+            % Prepare event data
+            evtOut = wt.eventdata.ModelSetData();
+            evtOut.Model = obj.Model;
+            evtOut.Controller = obj;
+
+            % Notify listeners
+            notify(obj,"ModelSet",evtOut)
+
+            % Call subclass method
+            obj.onModelSet()
+
+        end %function
+
+
+        function attachModelListeners_Private(obj)
+            % Triggered when Model has been changed
+
+            % Listen to model property changes
+            obj.ModelChangedListener = listener(obj.Model,...
+                "ModelChanged", @(~,evt)onModelChanged_Private(obj,evt));
+
+            % Listen to model being destroyed
+            obj.ModelDestroyedListener = listener(obj.Model,...
+                "ObjectBeingDestroyed", @(~,evt)onModelDestroyed_Private(obj,evt));
+
+        end %function
+
+
+        function onModelDestroyed_Private(obj,evt)
+            % Triggered when Model is being deleted / destroyed
+
+            % Which object being destroyed?
+            srcModel = evt.Source;
+
+            % Remove the invalid model
+            isMatch = srcModel == obj.Model;
+            obj.Model(isMatch) = [];
+
+        end %function
+
+
+        function onModelChanged_Private(obj,evt)
+            % Triggered when a property within the model has changed
+
+            arguments
+                obj (1,1) wt.mixin.ModelObserver
+                evt (1,1) wt.eventdata.ModelChangedData
+            end
+
+            % Prepare eventdata
+            evtOut = wt.eventdata.ModelChangedData;
+            evtOut.Model = evt.Model;
+            evtOut.Property = evt.Property;
+            evtOut.Value = evt.Value;
+            evtOut.Stack = [{obj}, evt.Stack];
+            evtOut.ClassStack = [class(obj), evt.ClassStack];
+
+            % Notify listeners
+            notify(obj,"ModelChanged",evtOut)
+
+            % Call subclass method
+            obj.onModelChanged()
+
+        end %function
+
+    end %methods
 
 end %classdef

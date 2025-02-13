@@ -9,7 +9,7 @@ classdef (HandleCompatible) Orderable
             % Shift the selected indices up/down within a list
 
             % Define arguments
-            arguments (Input)
+            arguments %(Input)
                 % Shift amount and direction (typically 1 or -1)
                 shift (1,1) double {mustBeInteger}
 
@@ -20,13 +20,13 @@ classdef (HandleCompatible) Orderable
                 idxSel (1,:) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(idxSel,numItems)}
             end
 
-            arguments (Output)
-                % Indices of the complete list after re-ordering
-                idxNew (1,:) double {mustBeInteger, mustBePositive}
-
-                % Indices where the selected data end up after the move
-                idxSelAfter (1,:) double {mustBeInteger, mustBePositive}
-            end
+            % arguments (Output)
+            %     % Indices of the complete list after re-ordering
+            %     idxNew (1,:) double {mustBeInteger, mustBePositive}
+            %
+            %     % Indices where the selected data end up after the move
+            %     idxSelAfter (1,:) double {mustBeInteger, mustBePositive}
+            % end
 
             % Make indices to all items as they are now
             idxNew = 1:numItems;
@@ -97,7 +97,7 @@ classdef (HandleCompatible) Orderable
             % enabled or not given the selection index
 
             % Define arguments
-            arguments (Input)
+            arguments %(Input)
                 % Total number of items in the list
                 numItems (1,1) double {mustBeInteger, mustBeNonnegative}
 
@@ -108,13 +108,13 @@ classdef (HandleCompatible) Orderable
                 allowSortItem (1,:) logical = true(1, numItems);
             end
 
-            arguments (Output)
-                % Should back (up) button be enabled?
-                backEnabled (1,1) logical
-
-                % Should forward (down) button be enabled?
-                fwdEnabled (1,1) logical
-            end
+            % arguments (Output)
+            %     % Should back (up) button be enabled?
+            %     backEnabled (1,1) logical
+            %
+            %     % Should forward (down) button be enabled?
+            %     fwdEnabled (1,1) logical
+            % end
 
             % How many items selected?
             numSel = numel(idxSel);

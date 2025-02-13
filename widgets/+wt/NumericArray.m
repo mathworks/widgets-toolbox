@@ -6,13 +6,16 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Tooltipable
     % Set of N numeric edit fields for small numeric arrays
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
-    %RJ - Need unit tests
-    %RJ - need to limit max array size and incorporate pagination or
-    %similar
-    %RJ - Improve error if a restriction needs enforcement. Like display a
-    % message but still accept their input?
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered on value changed, has companion callback
+        ValueChanged
+
+    end %events
+
 
     %% Public properties
     properties (AbortSet)
@@ -38,13 +41,16 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
-    %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
-
-        % Triggered on value changed, has companion callback
-        ValueChanged
-
-    end %events
+    methods
+        function set.Value(obj,value)
+            obj.validateValue(value);
+            obj.Value = value;
+        end
+        function set.Limits(obj,value)
+            validateattributes(value,{'double'},{'increasing'})
+            obj.Limits = value;
+        end
+    end
 
 
     %% Internal Properties
@@ -132,9 +138,9 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
                 end %switch
 
                 % Apply restrictions
-                % obj.EditField(idx).Limits = [lowerLimit upperLimit];
-                % obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
-                % obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
+                obj.EditField(idx).Limits = [lowerLimit upperLimit];
+                obj.EditField(idx).LowerLimitInclusive = lowerLimitInclusive;
+                obj.EditField(idx).UpperLimitInclusive = upperLimitInclusive;
 
                 % Update the edit fields values
                 obj.EditField(idx).Value = obj.Value(idx);
@@ -190,6 +196,40 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
             % Trigger event
             evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
             notify(obj,"ValueChanged",evtOut);
+
+        end %function
+
+
+        function validateValue(obj,value)
+            % Validate the value is in range and meets restrictions
+
+            arguments
+                obj (1,1)
+                value (1,:) double
+            end
+
+            switch obj.Restriction
+                case wt.enum.ArrayRestriction.increasing
+                    restriction = {'increasing'};
+                case wt.enum.ArrayRestriction.decreasing
+                    restriction = {'decreasing'};
+                otherwise
+                    restriction = {};
+            end
+
+            validateattributes(value,{'double'},restriction)
+
+            if obj.LowerLimitInclusive && obj.UpperLimitInclusive
+                boundFlag = "inclusive";
+            elseif obj.LowerLimitInclusive
+                boundFlag = "exclude-upper";
+            elseif obj.UpperLimitInclusive
+                boundFlag = "exclude-lower";
+            else
+                boundFlag = "exclusive";
+            end
+
+            mustBeInRange(value, obj.Limits(1), obj.Limits(2), boundFlag)
 
         end %function
 

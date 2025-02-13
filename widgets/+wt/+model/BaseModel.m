@@ -14,7 +14,7 @@ classdef BaseModel < handle & ...
     %   notifications in a hierarchy of BaseWidget classes
     %
 
-    % Copyright 2020-2024 The MathWorks, Inc.
+    % Copyright 2020-2025 The MathWorks, Inc.
 
 
 
@@ -158,38 +158,6 @@ classdef BaseModel < handle & ...
 
 
 
-    %% Public methods
-    methods
-
-        function debugAggregatedModels(obj, value)
-            % Recursively set debug on aggregated models in the hierarchy
-
-            arguments
-                obj (1,1) wt.model.BaseModel
-                value (1,1) logical = true;
-            end
-
-            % Debug this model
-            obj.Debug = value;
-
-            % Loop on aggregated models and set debug
-            aggProps = obj.getAggregatedModelProperties();
-            for thisProp = aggProps
-                thisModel = obj.(thisProp);
-                if ~isempty(thisModel) && all(isa(thisModel,"handle"))
-                    thisModel(~isvalid(thisModel)) = [];
-                    for idx = 1:numel(thisModel)
-                        thisModel(idx).debugAggregatedModels(value);
-                    end
-                end
-            end
-
-        end %function
-
-    end %methods
-
-
-
     %% Protected Methods
     methods (Access = protected)
 
@@ -204,7 +172,7 @@ classdef BaseModel < handle & ...
 
         function props = getAggregatedModelProperties(~)
             % Returns a list of aggregated model property names
-            %
+            
             % This overridable method lists properties containing
             % aggregated BaseModel classes to listen for hierarchical
             % ModelChanged events. Use this cautiously if model class
@@ -212,9 +180,13 @@ classdef BaseModel < handle & ...
             % pass notifications up the hierarchy to the top level, so the
             % session can be marked dirty.
 
-            arguments(Output)
-                props (1,:) string
-            end
+            % If a listed property is also a wt.model.BaseModel, property
+            % changes that trigger the ModelChanged event will be passed up
+            % the hierarchy to this object.
+
+            % arguments (Output)
+            %     props (1,:) string
+            % end
 
             props = string.empty(1,0);
         
@@ -285,6 +257,49 @@ classdef BaseModel < handle & ...
 
         end %function
 
+    end %methods
+
+
+    %% Hidden public methods
+    % These are intended for hardcore debugging only
+    methods (Hidden)
+
+        function debugAggregatedModels(obj, value)
+            % Recursively set debug on aggregated models in the hierarchy
+
+            arguments
+                obj (1,1) wt.model.BaseModel
+                value (1,1) logical = true;
+            end
+
+            % Debug this model
+            obj.Debug = value;
+
+            % Loop on aggregated models and set debug
+            aggProps = obj.getAggregatedModelProperties();
+            for thisProp = aggProps
+                thisModel = obj.(thisProp);
+                if ~isempty(thisModel) && all(isa(thisModel,"handle"))
+                    thisModel(~isvalid(thisModel)) = [];
+                    for idx = 1:numel(thisModel)
+                        thisModel(idx).debugAggregatedModels(value);
+                    end
+                end
+            end
+
+        end %function
+
+    end %methods
+
+
+    %% Protected methods - Not intended for subclasses
+    % These methods should be private, however they had been left as
+    % protected for several years. As a result, I have left them as
+    % protected in case they had been called directly or overridden in any
+    % apps. However, please avoid calling or overriding these methods in
+    % your app. If you have previously done so, please let me know the use
+    % case.
+    methods (Access = protected)
 
         function createPropListeners(obj)
             % Create listeners to SetObservable properties in this class
@@ -355,6 +370,11 @@ classdef BaseModel < handle & ...
 
         end %function
 
+    end %methods
+
+
+    %% Protected methods - Not intended for overriding
+    methods (Access = protected)
 
         function onModelChanged(obj,evt)
             % Runs on property changes to this class or an aggregated BaseModel
@@ -387,7 +407,6 @@ classdef BaseModel < handle & ...
 
             % Notify listeners
             obj.notify("ModelChanged",evtOut)
-
 
         end %function
 

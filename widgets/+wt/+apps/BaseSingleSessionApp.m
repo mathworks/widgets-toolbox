@@ -1,32 +1,32 @@
 classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
     % Base class for Widgets Toolbox app with a managed single session
-    
+
     % Copyright 2020-2024 The MathWorks Inc.
-    
-    
+
+
     %% Properties
     properties (AbortSet, SetObservable)
-        
+
         % Session data for the app (must be subclass of wt.model.BaseSession)
         Session
-        
+
     end %properties
 
 
     % Accessors
     methods
-        
+
         function set.Session(app,value)
             mustBeScalarOrEmpty(value); % Single Session only
             app.Session = value;
         end
 
     end %methods
-    
-    
+
+
     %% Sealed Public methods
     methods (Sealed)
-        
+
         function close(app)
             % Close the app
 
@@ -37,7 +37,7 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
 
             % Show output if Debug is on
             app.displayDebugText();
-            
+
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
             if isCancelled
@@ -55,40 +55,43 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
 
             % Show output if Debug is on
             app.displayDebugText();
-            
+
             % Prompt to save existing session
             isCancelled = promptToSaveSession(app, app.Session);
             if isCancelled
                 session = app.getEmptySession();
                 return
             end %if
-            
+
             % Freeze the figure with a progress dialog
             dlg = app.showIndeterminateProgress();
             cleanupObj = onCleanup(@()delete(dlg));
-            
+
             % Instantiate the new session
             session = app.createNewSession();
 
             % Store the session
             % This also triggers app.update(), app.updateTitle()
             app.Session = session;
-            
+
         end %function
-        
-        
-        function sessionPath = saveSession(app, useSaveAs, session)
+
+
+        function sessionPath = saveSession(app, useSaveAs)
             % Save the session to a file
-            
+
             % Define arguments
             arguments
                 app (1,1) wt.apps.BaseApp
                 useSaveAs (1,1) logical = false
-                session wt.model.BaseSession = app.Session
+                %session wt.model.BaseSession = app.Session
             end
 
             % Show output if Debug is on
             app.displayDebugText();
+
+            % Use the stored sessoin
+            session = app.Session;
 
             % Call superclass internal save method
             app.saveSession_Internal(useSaveAs, session);
@@ -126,32 +129,36 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             app.Session = session;
 
         end %function
-        
+
     end %methods
-    
-    
-    
-    %% Protected Methods
-    methods (Access = protected)
-        
+
+
+    %% Sealed Protected methods
+    methods (Sealed, Access = protected)
+
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
             % Show output if Debug is on
             app.displayDebugText();
-            
+
             % Instantiate initial session
             app.Session = app.createNewSession();
-            
+
         end %function
-        
-        
+
+    end %methods
+
+
+    %% Protected Methods
+    methods (Access = protected)
+
         function updateTitle(app)
             % Update the app title, showing the session name and dirty flag
 
             % Show output if Debug is on
             app.displayDebugText();
-            
+
             % Decide on the figure title
             if ~app.HasValidSession
                 app.Figure.Name = app.Name;
@@ -160,11 +167,11 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             else
                 app.Figure.Name = app.Name + " - " + app.Session.FileName;
             end
-            
+
         end %function
-        
+
     end %methods
-   
+
 
 
     %% Display Customization

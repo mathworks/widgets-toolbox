@@ -1,7 +1,5 @@
 classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & wt.mixin.ErrorHandling
-    % wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-    % wt.mixin.FieldColorable & wt.mixin.PropertyViewable
 
     % Contextual View/Controller pane that can present varied views
     % This pane can switch its contents between multiple different
@@ -16,19 +14,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     %   matlab.ui.componentcontainer.ComponentContainer
     %   wt.mixin.ContextualView (if auto-populating Model property)
 
-    % Copyright 2024 The MathWorks Inc.
-
-
-    %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
-
-        % Triggered when the Model has changed
-        ModelSet
-
-        % Triggered when a property within the model has changed
-        ModelChanged
-
-    end %events
+    % Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Public Properties
@@ -43,28 +29,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
-    %% Internal Properties
-    properties (AbortSet, Transient, NonCopyable, Hidden, ...
-            SetAccess = protected, UsedInUpdate = false)
-
-        % Top-level grid to manage content vs. loading
-        MainGrid matlab.ui.container.GridLayout
-
-        % The internal grid to manage contents
-        ContentGrid matlab.ui.container.GridLayout
-
-        % Image to show when loading a pane
-        LoadingImage matlab.ui.control.Image
-
-        % Listener for a new model being attached
-        ModelSetListener event.listener
-
-        % Listener for property changes within the model
-        ModelPropertyChangedListener event.listener
-
-    end %properties
-
-
+    %% Read-Only Properties
     properties (SetAccess = private, UsedInUpdate = false)
 
         % The currently active view, or empty if none
@@ -112,6 +77,25 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
     end %methods
 
 
+    %% Internal Properties
+    properties (AbortSet, Transient, NonCopyable, Hidden, ...
+            SetAccess = protected, UsedInUpdate = false)
+
+        % Top-level grid to manage content vs. loading
+        MainGrid matlab.ui.container.GridLayout
+
+        % The internal grid to manage contents
+        ContentGrid matlab.ui.container.GridLayout
+
+        % Image to show when loading a pane
+        LoadingImage matlab.ui.control.Image
+
+        % First load flag
+        FirstLoad (1,1) logical = true
+
+    end %properties
+
+
     %% Public Methods
     methods
 
@@ -122,6 +106,12 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel = wt.model.BaseModel.empty
+            end
+
+            % Remove the initial box on first load
+            if obj.FirstLoad
+                obj.MainGrid.Padding = 0;
+                obj.FirstLoad = false;
             end
 
             % After launch is complete, toggle off loading image
@@ -224,11 +214,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 obj (1,1) wt.ContextualView
             end
 
-            % Remove listeners
-            obj.ModelSetListener(:) = [];
-            obj.ModelPropertyChangedListener(:) = [];
-
-            % Clear the view
+            % Deactivate the view
             obj.deactivateView_Private();
 
             % Delete any orphaned children
@@ -268,10 +254,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function reset(obj)
             % Reset the control by deactivating current view and delete loaded views
 
-            % Remove listeners
-            obj.ModelSetListener(:) = [];
-            obj.ModelPropertyChangedListener(:) = [];
-
             % Deactivate any active view
             obj.deactivateView_Private();
 
@@ -297,14 +279,25 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function setup(obj)
             % Configure the widget
 
+            % Children order of the widget
+            % - widget itself
+            %   - MainGrid
+            %       - ContentGrid (views go here)
+            %       - LoadingImage (visible gets toggled to cover view)
+
+
             obj.MainGrid = uigridlayout(obj,[1 1]);
-            obj.MainGrid.Padding = [0 0 0 0];
+            obj.MainGrid.Padding = [1 1 1 1];
+            obj.MainGrid.BackgroundColor = [.5 .5 .5];
 
             % Grid Layout to place the contents
             obj.ContentGrid = uigridlayout(obj.MainGrid,[1 1]);
             obj.ContentGrid.Padding = [0 0 0 0];
             obj.ContentGrid.Layout.Row = 1;
             obj.ContentGrid.Layout.Column = 1;
+
+            % Set default size and position
+            obj.Position = [10 10 400 400];
 
             % Image to display while loading content
             obj.LoadingImage = uiimage(obj.MainGrid);
@@ -315,7 +308,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Components to apply background color
             obj.BackgroundColorableComponents = ...
-                [obj.ContentGrid, obj.MainGrid, obj.LoadingImage];
+                [obj.ContentGrid, obj.LoadingImage];
 
         end %function
 
@@ -323,9 +316,8 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function update(obj)
 
             % Configure the loading image
-            obj.LoadingImage.Visible = "off";
             obj.LoadingImage.ImageSource = obj.LoadingImageSource;
-
+            
         end %function
 
     end %methods
@@ -339,13 +331,9 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % instances. If an existing instance is found, it is returned.
             % Otherwise, an empty view is returned
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
-            end
-
-            arguments (Output)
-                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
             end
 
             % Try to locate a valid view
@@ -381,50 +369,44 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
         function view = instantiateView_Private(obj, viewClass, model)
             % Launch a view based on the class path
 
-            arguments (Input)
+            arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
 
-            arguments (Output)
-                view (:,1) {mustBeScalarOrEmpty, mustBeValidView(view)}
-            end
-
             % Trap errors
-            % try
+            try
 
-            % Get function handle to the view's constructor
-            viewConstructorFcn = str2func(viewClass);
+                % Get function handle to the view's constructor
+                viewConstructorFcn = str2func(viewClass);
 
-            % Launch the view
-            view = viewConstructorFcn(obj.ContentGrid);
-            % view = viewConstructorFcn("Parent",obj.Grid);
+                % Launch the view
+                view = viewConstructorFcn(obj.ContentGrid);
 
-            % Position the view in the single grid cell
-            view.Layout.Row = 1;
-            view.Layout.Column = 1;
+                % Position the view in the single grid cell
+                view.Layout.Row = 1;
+                view.Layout.Column = 1;
 
-            % Add the new view to the list
-            obj.LoadedViews = vertcat(obj.LoadedViews, view);
+                % Add the new view to the list
+                obj.LoadedViews = vertcat(obj.LoadedViews, view);
 
-            % catch err
-            %
-            %     % Clean up partially loaded children
-            %     delete(obj.Grid.Children(2:end))
-            %
-            %     % Throw an error
-            %     message = sprintf("Error launching view (%s).\n\n%s",...
-            %         viewClass, err.message);
-            %     obj.throwError(message);
-            %
-            %     % Deactivate current pane
-            %     obj.deactivateView_Private();
-            %
-            %     % Rethrow the error to the command window
-            %     rethrow(err)
-            %
-            % end %try
+            catch err
+
+                % Clean up partially loaded children
+                delete(obj.ContentGrid.Children(2:end))
+
+                % Throw an error
+                title = "Error launching view: " + viewClass;
+                obj.throwError(err.message, title);
+
+                % Deactivate current pane
+                obj.deactivateView_Private();
+
+                % Rethrow the error to the command window
+                rethrow(err)
+
+            end %try
 
             % Activate the view
             obj.activateView_Private(view, model)
@@ -468,30 +450,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             end %if
 
-            % Did this view need to be made active?
-            if needToMarkActive
-
-                % Listen to the active view indicating that its model has been
-                % set or changed
-                obj.ModelSetListener = listener(view,...
-                    "ModelSet",@(~,evt)obj.onModelSet(evt));
-
-                obj.ModelPropertyChangedListener = listener(view,...
-                    "ModelChanged",@(~,evt)obj.onModelChanged(evt));
-
-            end %if
-
         end %function
-
-
-        % function attachModelPropertyChangedListener(obj)
-        %
-        %     % Listen to the active view indicating model changes
-        %     model = obj.ActiveView.Model;
-        %     obj.ModelPropertyChangedListener = listener(model,...
-        %         "ModelChanged",@(~,evt)obj.onModelChanged(evt));
-        %
-        % end %function
 
 
         function deactivateView_Private(obj, view)
@@ -506,18 +465,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 return
             end
 
-            % Enable any prior view changes to finish, avoiding any
-            % "flashing" effects during the change
-            % drawnow
-            % drawnow('nocallbacks','limitrate')
-
-            % Remove any listeners on the view
-            obj.ModelSetListener = obj.deleteListenersForSource(...
-                obj.ModelSetListener, view);
-            obj.ModelPropertyChangedListener = obj.deleteListenersForSource(...
-                obj.ModelPropertyChangedListener, view);
-
-            % Deactivate the view, removing model and parent
+            % Remove the view's model and unparent it
             view.Model(:) = [];
             view.Parent(:) = [];
 
@@ -528,25 +476,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Clean up partially loaded children
             delete(obj.ContentGrid.Children(2:end))
-
-        end %function
-
-
-        function modelListener = deleteListenersForSource(~, modelListener, source)
-            % Deletes listeners with the given source
-
-            deleteListener = false(size(modelListener));
-            for idx = numel(modelListener) : -1 : 1
-                thisListener = modelListener(idx);
-                for sIdx = 1:numel(thisListener.Source)
-                    thisSrc = thisListener.Source{sIdx};
-                    if thisSrc == source
-                        deleteListener(idx) = true;
-                    end
-                end
-            end
-            delete(modelListener(deleteListener))
-            modelListener(deleteListener) = [];
 
         end %function
 
@@ -580,35 +509,6 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
                 end %try
 
             end %if
-
-        end %function
-
-
-        function onModelSet(obj,evt)
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelSetData;
-            evtOut.Model = evt.Model;
-            evtOut.Controller = evt.Controller;
-
-            % Notify listeners
-            obj.notify("ModelSet",evtOut);
-
-        end %function
-
-
-        function onModelChanged(obj,evt)
-
-            % Prepare eventdata
-            evtOut = wt.eventdata.ModelChangedData;
-            evtOut.Model = evt.Model;
-            evtOut.Property = evt.Property;
-            evtOut.Value = evt.Value;
-            evtOut.Stack = [{obj}, evt.Stack];
-            evtOut.ClassStack = [class(obj), evt.ClassStack];
-
-            % Notify listeners
-            obj.notify("ModelChanged",evtOut);
 
         end %function
 

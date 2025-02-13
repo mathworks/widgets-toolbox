@@ -4,7 +4,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         wt.mixin.ErrorHandling
     % Base class for Widgets Toolbox apps
 
-    % Copyright 2020-2024 The MathWorks, Inc.
+    % Copyright 2020-2025 The MathWorks, Inc.
 
 
     %% Properties
@@ -306,7 +306,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         end %function
 
 
-        function filePath = promptToLoad(app, filter, title)
+        function filePath = promptToLoad(app, filter, title, startPath)
             % Prompt the user to load a file
 
             % Define arguments
@@ -314,13 +314,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
                 app (1,1) wt.apps.BaseApp
                 filter = ["*.mat","MATLAB MAT File"];
                 title (1,1) string = "Open"
+                startPath (1,1) string = app.LastFolder
             end
 
             % Show output if Debug is on
             app.displayDebugText();
 
             % Prompt for the file
-            [fileName,pathName] = uigetfile(filter, title, app.LastFolder);
+            [fileName,pathName] = uigetfile(filter, title, startPath);
 
             % Did the user cancel?
             if isequal(fileName,0)
@@ -339,7 +340,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
     %% Sealed Public methods
     methods (Sealed)
 
-        function value = getPreference(app,propName,defaultValue)
+        function value = getPreference(app, propName, defaultValue)
             % Get an app preference from the Preferences object
 
             if isprop(app.Preferences, propName)
@@ -353,7 +354,7 @@ classdef BaseApp < matlab.apps.AppBase & ...
         end %function
 
 
-        function setPreference(app,propName,value)
+        function setPreference(app, propName, value)
             % Set an app preference in the Preferences object
 
             if ~isprop(app.Preferences,propName)

@@ -265,8 +265,8 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
     end %methods
 
 
-    %% Protected Methods
-    methods (Access = protected)
+    %% Sealed Protected methods
+    methods (Sealed, Access = protected)
 
         function setup_internal(app)
             % Preform internal pre-setup necessary
@@ -276,10 +276,16 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
 
             % Instantiate empty session to start
             session = app.createNewSession();
-            app.Session = session(1,[]);
+            app.Session = session;
+            app.Session = app.Session(1,[]);
 
         end %function
 
+    end %methods
+
+
+    %% Protected Methods
+    methods (Access = protected)
 
         function updateTitle(app)
             % Update the app title, showing the session name and dirty flag

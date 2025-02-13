@@ -6,11 +6,15 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.Tooltipable
     % Pair of numeric edit fields for range selection
 
-    % Copyright 2024 The MathWorks Inc.
+    % Copyright 2025 The MathWorks Inc.
 
-    %RJ - Need unit tests
-    %RJ - Improve error if a restriction needs enforcement. Like display a
-    % message but still accept their input?
+    %% Events
+    events (HasCallbackProperty, NotifyAccess = protected)
+
+        % Triggered on value changed, has companion callback
+        ValueChanged
+
+    end %events
 
 
     %% Public properties
@@ -33,7 +37,7 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
 
     methods
         function set.Value(obj,value)
-            validateattributes(value,{'double'},{'increasing'})
+            obj.validateValue(value);
             obj.Value = value;
         end
         function set.Limits(obj,value)
@@ -41,15 +45,6 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.Limits = value;
         end
     end
-
-
-    %% Events
-    events (HasCallbackProperty, NotifyAccess = protected)
-
-        % Triggered on value changed, has companion callback
-        ValueChanged
-
-    end %events
 
 
     %% Internal Properties
@@ -130,6 +125,31 @@ classdef RangeField < matlab.ui.componentcontainer.ComponentContainer & ...
             evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue,...
                 "Index", index);
             notify(obj,"ValueChanged",evtOut);
+
+        end %function
+
+
+        function validateValue(obj,value)
+            % Validate the value is in range
+
+            arguments
+                obj (1,1)
+                value (1,2) double
+            end
+
+            validateattributes(value,{'double'},{'increasing'})
+
+            if obj.LowerLimitInclusive && obj.UpperLimitInclusive
+                boundFlag = "inclusive";
+            elseif obj.LowerLimitInclusive
+                boundFlag = "exclude-upper";
+            elseif obj.UpperLimitInclusive
+                boundFlag = "exclude-lower";
+            else
+                boundFlag = "exclusive";
+            end
+
+            mustBeInRange(value, obj.Limits(1), obj.Limits(2), boundFlag)
 
         end %function
 
