@@ -1,12 +1,14 @@
 classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & wt.mixin.Enableable &...
-        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable & wt.mixin.PropertyViewable
-    
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Orderable & ...
+        wt.mixin.PropertyViewable
     % Select from an array of items and add them to a list
 
-    % Copyright 2020-2023 The MathWorks Inc.
-
+    % Copyright 2020-2025 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -36,9 +38,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % Indicates whether to allow duplicate entries in the list
         AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
 
-        % Indicates whether to allow sort controls %RAJ - Future feature
-        %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
-
         % Inidicates what to do when add button is pressed (select from
         % Items or custom using ButtonPushed event or ButtonPushedFcn)
         AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
@@ -49,13 +48,29 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
-        SelectedIndex (1,:)
+        ValueIndex (1,:)
 
         % The current selection
         Value (1,:)
 
         % The current highlighted selection
         HighlightedValue (1,:)
+
+    end %properties
+
+
+    properties (AbortSet, Dependent, SetAccess = private)
+
+        % Indices of the highlighted items
+        HighlightedIndex
+
+    end %properties
+
+
+    properties (AbortSet, Dependent, Hidden)
+
+        % Indices of displayed items that are currently added to the list (for backward compatibility - use ValueIndex instead)
+        SelectedIndex (1,:)
 
     end %properties
 
@@ -81,7 +96,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
-        
+
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
 
@@ -187,20 +202,22 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
                 % What is selected?
                 selIdx = obj.SelectedIndex;
+                numRows = numel(selIdx);
 
                 % Highlighted selection in list?
                 hiliteIdx = obj.getListBoxSelectedIndex();
 
+                % Should the sort buttons be enabled?
+                [backEnabled, fwdEnabled] = obj.areOrderButtonsEnabled(numRows, hiliteIdx);
+
                 % How many items selected into list
-                numRows = numel(selIdx);
-                numHilite = numel(hiliteIdx);
 
                 % Toggle button enables
                 obj.ListButtons.ButtonEnable = [
                     obj.AllowDuplicates || ( numel(selIdx) < numel(obj.Items) ) %Add Button
                     ~isempty(hiliteIdx) % Delete Button
-                    numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
-                    numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
+                    backEnabled %Up Button
+                    fwdEnabled %Down Button
                     ];
 
             end %if obj.Enable
@@ -317,12 +334,16 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function selIdx = getListBoxSelectedIndex(obj)
             % Get the current selected row indices in the listbox
 
-            warnState = warning('off','MATLAB:structOnObject');
-            s = struct(obj.ListBox);
-            warning(warnState);
-            selIdx = s.SelectedIndex;
-            if isequal(selIdx, -1)
-                selIdx = [];
+            if isMATLABReleaseOlderThan("R2023b")
+                warnState = warning('off','MATLAB:structOnObject');
+                s = struct(obj.ListBox);
+                warning(warnState);
+                selIdx = s.SelectedIndex;
+                if isequal(selIdx, -1)
+                    selIdx = [];
+                end
+            else
+                selIdx = obj.ListBox.ValueIndex;
             end
 
         end %function
@@ -357,81 +378,28 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Shift selected items up/down within a listbox
             % This assumes ItemsData contains unique values
 
-            % What is the current order?
-            selIdx = obj.getListBoxSelectedIndex();
+            % What is the current order and total items?
+            idxSel = obj.getListBoxSelectedIndex();
+            numItems = numel(obj.ListBox.Items);
 
-            % Make indices to all items as they are now
-            idxNew = 1:numel(obj.ListBox.Items);
-            idxOld = idxNew;
+            % Shift the list indices
+            % [idxNew, idxSelAfter] = obj.shiftListIndices(shift, numItems, idxSel);
+            [idxNew, ~] = obj.shiftListIndices(shift, numItems, idxSel);
 
-            % Find the last stable item that doesn't move
-            [~,idxStable] = setdiff(idxNew, selIdx, 'stable');
-            if ~isempty(idxStable)
-                idxFirstStable = idxStable(1);
-                idxLastStable = idxStable(end);
-            else
-                idxFirstStable = inf;
-                idxLastStable = 0;
-            end
+            % Get the original value
+            oldValue = obj.Value;
 
-            % Which way do we loop?
-            if shift > 0 %Shift to end
+            % Make the shift
+            obj.ListBox.Items = obj.ListBox.Items(idxNew);
+            obj.ListBox.ItemsData = obj.ListBox.ItemsData(idxNew);
+            % obj.ListBox.Selection = idxSelAfter;
 
-                for idxToMove = numel(selIdx):-1:1
+            % Trigger event
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+            notify(obj,"ValueChanged",evtOut);
 
-                    % Calculate if there's room to move this item
-                    idxThisBefore = selIdx(idxToMove);
-                    thisShift = max( min(idxLastStable-idxThisBefore, shift), 0 );
-
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-
-                    % Where do other items move from/to
-                    idxOthersBefore = selIdx(idxToMove)+1:1:idxThisAfter;
-                    idxOthersAfter = idxOthersBefore - thisShift;
-
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
-                end
-
-            elseif shift < 0 %Shift to start
-
-                for idxToMove = 1:numel(selIdx)
-
-                    % Calculate if there's room to move this item
-                    idxThisBefore = selIdx(idxToMove);
-                    thisShift = min( max(idxFirstStable-idxThisBefore, shift), 0 );
-
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-
-                    % Where do other items move from/to
-                    idxOthersBefore = idxThisAfter:1:selIdx(idxToMove)-1;
-                    idxOthersAfter = idxOthersBefore - thisShift;
-
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
-                end
-
-            end %if shift > 0
-
-            % Was a change made?
-            if ~isequal(idxOld, idxNew)
-
-                % Get the original value
-                oldValue = obj.Value;
-
-                % Make the shift
-                obj.ListBox.Items = obj.ListBox.Items(idxNew);
-                obj.ListBox.ItemsData = obj.ListBox.ItemsData(idxNew);
-
-                % Trigger event
-                evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
-                notify(obj,"ValueChanged",evtOut);
-
-            end %if
+            % Update buttons
+            obj.updateEnables()
 
         end %function
 
@@ -445,7 +413,17 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function value = get.SelectedIndex(obj)
             value = obj.ListBox.ItemsData;
         end
+
         function set.SelectedIndex(obj,value)
+            obj.ListBox.Items = obj.Items(value);
+            obj.ListBox.ItemsData = value;
+        end
+
+        function value = get.ValueIndex(obj)
+            value = obj.ListBox.ItemsData;
+        end
+
+        function set.ValueIndex(obj,value)
             obj.ListBox.Items = obj.Items(value);
             obj.ListBox.ItemsData = value;
         end
@@ -457,6 +435,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 value = obj.ItemsData(:,obj.ListBox.ItemsData);
             end
         end
+
         function set.Value(obj,value)
             if isempty(value)
                 obj.SelectedIndex = [];
@@ -486,6 +465,7 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
                 value = obj.ItemsData(:,selIdx);
             end
         end
+
         function set.HighlightedValue(obj,value)
             if isempty(obj.ItemsData)
                 [~, obj.ListBox.Value] = ismember(value, obj.Items);
@@ -494,9 +474,17 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             end
         end
 
+        function value = get.HighlightedIndex(obj)
+            value = obj.ListBox.Value;
+            if isempty(value)
+                value = [];
+            end
+        end
+
         function value = get.ButtonWidth(obj)
             value = obj.Grid.ColumnWidth{2};
         end
+
         function set.ButtonWidth(obj,value)
             obj.Grid.ColumnWidth{2} = value;
         end

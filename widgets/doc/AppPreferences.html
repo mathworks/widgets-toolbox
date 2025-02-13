@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2024a"><title>Using Preferences with Advanced Application Superclasses</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.8px; min-height: 0px; white-space: pre-wrap; color: rgb(192, 76, 11); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: 400; text-align: left;  }
+.S1 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: 700; text-align: left;  }
+.S2 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S3 { margin: 10px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 15px; font-weight: 700; text-align: left;  }
+.S4 { margin: 3px; border: 1px solid rgb(191, 191, 191); border-collapse: collapse;  }
+.S5 { background-color: rgb(245, 245, 245);  }
+.S6 { border: 1px solid rgb(191, 191, 191); vertical-align: top;  }
+.S7 { margin: 2px 10px 2px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: break-spaces; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S8 { background-color: rgba(0, 0, 0, 0);  }
+.S9 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S10 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Using Preferences with Advanced Application Superclasses</span></h1><h2  class = 'S1' id = 'M_5aca' ><span>Preferences</span></h2><div  class = 'S2'><span>Programmatically implemented applications that use the </span><a href = "..\+wt\+apps\BaseApp.m"><span style=' font-family: monospace;'>wt.apps.BaseApp</span></a><span> superclass may include additional app-specific preferences. Preferences are useful to store user-specific settings that will persist between uses of the application. </span></div><div  class = 'S2'><span></span></div><h4  class = 'S3'><span>Programming Interface</span></h4><div  class = 'S2'><span>The </span><a href = "..\+wt\+apps\BaseApp.m"><span style=' font-family: monospace;'>wt.apps.BaseApp</span></a><span> superclass provides the following methods for your concrete app class to utilize preferences. While you can view preferences directly from the app's </span><span style=' font-family: monospace;'>Preferences</span><span> property, it is recommended to use the interface below to store or retrieve saved preferences in your code. Te below methods will handle the default value when the preference has not been initialized. You should utilize the </span><span style=' font-family: monospace;'>setPreference</span><span> method any time the value is updated. Preference values are saved automatically when the app is closed normally. </span></div><table  class = 'S4'><col/><col/><col style="width: 725.333251953125px;" /><tr  class = 'S5'><td  class = 'S6'><div  class = 'S7'><span style=' font-weight: bold;'>Name</span></div></td><td  class = 'S6'><div  class = 'S7'><span style=' font-weight: bold;'>Access</span></div></td><td  class = 'S6'><div  class = 'S7'><span style=' font-weight: bold;'>Description</span></div></td></tr><tr  class = 'S8'><td  class = 'S6'><div  class = 'S7'><span style=' font-family: monospace;'>getPreference</span></div></td><td  class = 'S6'><div  class = 'S7'><span>public, sealed</span></div></td><td  class = 'S6'><div  class = 'S7'><span style=' font-family: monospace;'>value = getPreference(app,propName,defaultValue)</span></div><div  class = 'S7'><span>Retrieves a preference from the </span><span style=' font-family: monospace;'>Preferences</span><span> object given a property name and a default value. (The default value is returned if the property does not exist.)</span></div></td></tr><tr  class = 'S8'><td  class = 'S6'><div  class = 'S7'><span style=' font-family: monospace;'>setPreference</span></div></td><td  class = 'S6'><div  class = 'S7'><span>public, sealed</span></div></td><td  class = 'S6'><div  class = 'S7'><span style=' font-family: monospace;'>setPreference(app,propName,value)</span></div><div  class = 'S7'><span>Sets or updates a preference into the </span><span style=' font-family: monospace;'>Preferences</span><span> object given a property name and value.</span></div></td></tr></table><div  class = 'S2'><span></span></div><h2  class = 'S1'><span>Related Content</span></h2><ul  class = 'S9'><li  class = 'S10'><a href = "./MainPage.html"><span>Widgets Toolbox - Documentation Home</span></a></li><li  class = 'S10'><a href = "./AdvancedAppDevelopment.html"><span>Advanced App Development with Widgets Toolbox</span></a></li><li  class = 'S10'><a href = "./AppSuperclasses.html"><span>App Superclasses</span></a></li></ul><div  class = 'S2'><span style=' font-style: italic;'>Copyright 2020-2025 The MathWorks, Inc.</span></div><div  class = 'S2'></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Using Preferences with Advanced Application Superclasses
+%% Preferences
+% Programmatically implemented applications that use the <..\+wt\+apps\BaseApp.m 
+% |wt.apps.BaseApp|> superclass may include additional app-specific preferences. 
+% Preferences are useful to store user-specific settings that will persist between 
+% uses of the application. 
+% 
+% 
+% Programming Interface
+% The <..\+wt\+apps\BaseApp.m |wt.apps.BaseApp|> superclass provides the following 
+% methods for your concrete app class to utilize preferences. While you can view 
+% preferences directly from the app's |Preferences| property, it is recommended 
+% to use the interface below to store or retrieve saved preferences in your code. 
+% Te below methods will handle the default value when the preference has not been 
+% initialized. You should utilize the |setPreference| method any time the value 
+% is updated. Preference values are saved automatically when the app is closed 
+% normally. 
+%% 
+% *Name*
+%% 
+% *Access*
+%% 
+% *Description*
+%% 
+% |getPreference|
+%% 
+% public, sealed
+%% 
+% |value = getPreference(app,propName,defaultValue)|
+% 
+% Retrieves a preference from the |Preferences| object given a property name 
+% and a default value. (The default value is returned if the property does not 
+% exist.)
+%% 
+% |setPreference|
+%% 
+% public, sealed
+%% 
+% |setPreference(app,propName,value)|
+% 
+% Sets or updates a preference into the |Preferences| object given a property 
+% name and value.
+%% 
+% 
+%% Related Content
+%% 
+% * <./MainPage.html Widgets Toolbox - Documentation Home>
+% * <./AdvancedAppDevelopment.html Advanced App Development with Widgets Toolbox>
+% * <./AppSuperclasses.html App Superclasses>
+%% 
+% _Copyright 2020-2025 The MathWorks, Inc._
+% 
+%
+##### SOURCE END #####
+-->
+</div></body></html>

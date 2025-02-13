@@ -33,15 +33,6 @@ classdef (Abstract) BaseWidget < ...
         
     end %properties
 
-
-    %% Special support for pre-R2021a releases (g2282435)
-    properties (Transient, Access = private)
-        
-        % Flag to indicate earlier release (to be updated during setup)
-        IsPre21a (1,1) logical = verLessThan('matlab','9.10')
-        
-    end %properties
-
     
     %% Debugging Methods
     methods
@@ -99,22 +90,10 @@ classdef (Abstract) BaseWidget < ...
         
         function requestUpdate(obj)
             % Request update method to run 
-            % (This is for backward compatibility. 
-            % Alternatively just set "obj.Dirty = true")
-
-            % Support for initial release before R2021a
-            if obj.IsPre21a && obj.SetupFinished
-
-                % g2282435 Force a call to update
-                obj.update();
-
-            else
 
                 % Trigger property to request update during next drawnow
                 % (for optimal efficiency)
                 obj.Dirty = true;
-
-            end %if
             
         end %function
         
