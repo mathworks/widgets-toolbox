@@ -8,7 +8,7 @@ classdef ButtonColorable < handle
     properties (AbortSet)
 
         % Button Color
-        ButtonColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [1 1 1] * 0.96
+        ButtonColor (1,3) double {mustBeInRange(ButtonColor,0,1)} = [1 1 1] * 0.96
 
     end %properties
 

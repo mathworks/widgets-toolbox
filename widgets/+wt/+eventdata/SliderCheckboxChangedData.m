@@ -5,7 +5,7 @@ classdef SliderCheckboxChangedData < event.EventData & dynamicprops
     %           obj = wt.eventdata.SliderCheckboxChangedData(name,index,prop,state,value)
     %
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+    % Copyright 2020-2024 The MathWorks, Inc.
 
     %% Properties
     properties (SetAccess = protected)

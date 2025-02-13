@@ -82,18 +82,18 @@ classdef (Sealed, Hidden) VerticalSection < wt.toolbar.BaseSection
             % Use custom event data
             if isa(evt,'matlab.ui.eventdata.ButtonPushedData')
                 % Push button
-                evt = wt.eventdata.ButtonPushedData(evt.Source);
+                evtOut = wt.eventdata.ButtonPushedData(evt.Source);
             elseif isa(evt,'matlab.ui.eventdata.ValueChangedData')
                 % State button
-                evt = wt.eventdata.ButtonPushedData(evt.Source, evt.Source.Value);
+                evtOut = wt.eventdata.ButtonPushedData(evt.Source, evt.Source.Value);
             end
             
             % Trigger event
-            notify(obj,"ButtonPushed",evt);
+            notify(obj,"ButtonPushed",evtOut);
             
             % Trigger callback
             if ~isempty(obj.ButtonPushedFcn)
-                feval(obj.ButtonPushedFcn, obj, evt);
+                feval(obj.ButtonPushedFcn, obj, evtOut);
             end
             
         end %function

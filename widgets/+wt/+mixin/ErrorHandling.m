@@ -12,7 +12,7 @@ classdef ErrorHandling < handle
             arguments
                 obj (1,1) wt.mixin.ErrorHandling
                 err % string or MException
-                title (1,1) string = "Error"
+                title (1,1) string = "Internal Error in " + class(obj)
             end
             
             % Prepare the message
@@ -25,7 +25,7 @@ classdef ErrorHandling < handle
             
             % Locate ancestor figure
             if isprop(obj,"Figure")
-                fig = obj.Figure;
+                fig = obj.Figure; %#ok<MCNPN>
             else
                 fig = ancestor(obj,'figure');
             end
@@ -55,7 +55,7 @@ classdef ErrorHandling < handle
             
             % Locate ancestor figure
             if isprop(obj,"Figure")
-                fig = obj.Figure;
+                fig = obj.Figure; %#ok<MCNPN>
             else
                 fig = ancestor(obj,'figure');
             end
@@ -76,12 +76,57 @@ classdef ErrorHandling < handle
         function dlg = showIndeterminateProgress(obj,title,message,cancelOn)
             % Places an indeterminate progress dialog in the widget's figure
             
+            % Validate arguments
+            arguments
+                obj (1,1) wt.mixin.ErrorHandling
+                title (1,1) string = "Please Wait"
+                message (1,1) string = ""
+                cancelOn (1,1) logical = false
+            end
+            
             dlg = showProgress(obj,title,message,cancelOn);
             dlg.Indeterminate = true;
             
         end %function
         
-    end%methods
+        
+        function result = promptForConfirmation(obj,message,title,buttonNames)
+            % Places an indeterminate progress dialog in the widget's figure
+            
+            % Validate arguments
+            arguments
+                obj (1,1) wt.mixin.ErrorHandling
+                message (1,1) string = "Are you sure?"
+                title (1,1) string = ""
+                buttonNames (1,2) string = ["Yes","Cancel"]
+            end
+           
+            % Locate ancestor figure
+            if isprop(obj,"Figure")
+                fig = obj.Figure; %#ok<MCNPN>
+            else
+                fig = ancestor(obj,'figure');
+            end
+            
+            % Place in a dialog if possible
+            if isempty(fig)
+
+                id = "wt:mixin:ErrorHandling:NoFigure";
+                msg = "No figure is present to place the dialog.";
+                warning(id,msg);
+                result = false;
+
+            else
+
+                selection = uiconfirm(fig, message, title,...
+                    "Options", buttonNames, "DefaultOption", 2);
+                result = matches(buttonNames(1), selection);
+
+            end
+
+        end %function
+        
+    end %methods
     
 end %classdef 
 

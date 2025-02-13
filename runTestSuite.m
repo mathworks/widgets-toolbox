@@ -20,6 +20,8 @@ disp(ResultTable);
 %% Did results all pass?
 if all([result.Passed])
     disp("All Tests Passed");
-else
-    warning("widgets:runTestSuite","Not all tests passed. Check results.");
+elseif any([result.Failed])
+    warning("widgets:runTestSuite:Failed","*** Failed Tests. Check Results. ***");
+elseif any([result.Incomplete])
+    warning("widgets:runTestSuite:Incomplete","*** Some Tests Incomplete. Check Results. ***");
 end

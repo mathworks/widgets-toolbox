@@ -33,6 +33,18 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         AxesGridColor (1,3) double ...
             {mustBeInRange(AxesGridColor,0,1)} = [.15 .15 .15]
 
+        % X-Axis Labels
+        XLabel (:,1) string
+
+        % Y-Axis Labels
+        YLabel (:,1) string
+
+        % Axes Titles
+        Title (:,1) string
+
+        % Overall grou title
+        GroupTitle (1,1) string
+
     end %properties
 
 
@@ -43,15 +55,6 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
         % Axes Y-Limit Mode
         YLimMode (:,1) string
-
-        % X-Axis Labels
-        XLabel (:,1) string
-
-        % Y-Axis Labels
-        YLabel (:,1) string
-
-        % Axes Titles
-        Title (:,1) string
 
     end %properties
 
@@ -81,17 +84,24 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
         function value = get.YLim(obj)
             if isempty(obj.Axes)
-                value = string.empty(0,1);
+                value = cell(0,1);
             else
                 value = {obj.Axes.YLim}';
             end
         end
 
         function set.YLim(obj, value)
-            numSet = min(numel(obj.Axes), numel(value));
-            for idx = 1:numSet
-                if ~isequal(obj.Axes(idx).YLim, value{idx,:})
-                    obj.Axes(idx).YLim = value{idx,:};
+            numAxes = numel(obj.Axes);
+            if numAxes == 0
+                id = "wt:BaseTimeAlignedChart:YLimSetLater";
+                msg = "YLim must be set after the chart has been rendered.";
+                error(id,msg)
+            else
+                numSet = min(numAxes, numel(value));
+                for idx = 1:numSet
+                    if ~isequal(obj.Axes(idx).YLim, value{idx})
+                        obj.Axes(idx).YLim = value{idx};
+                    end
                 end
             end
         end
@@ -105,58 +115,29 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         end
 
         function set.YLimMode(obj, value)
-            numSet = min(numel(obj.Axes), numel(value));
-            for idx = 1:numSet
-                obj.Axes(idx).YLimMode = value(idx);
-            end
-        end
-
-        function value = get.XLabel(obj)
-            if isempty(obj.Axes)
-                value = string.empty(0,1);
+            numAxes = numel(obj.Axes);
+            if numAxes == 0
+                id = "wt:BaseTimeAlignedChart:YLimModeSetLater";
+                msg = "YLimMode must be set after the chart has been rendered.";
+                error(id,msg)
             else
-                allXLabel = [obj.Axes.XLabel];
-                value = string({allXLabel.String}');
+                numSet = min(numAxes, numel(value));
+                for idx = 1:numSet
+                    obj.Axes(idx).YLimMode = value(idx);
+                end
             end
         end
-
-        function set.XLabel(obj, value)
-            numSet = min(numel(obj.Axes), numel(value));
-            for idx = 1:numSet
-                obj.Axes(idx).XLabel.String = value(idx);
-            end
+        
+        function value = get.XLabel(obj)
+            value = wt.utility.resizeVector(obj.XLabel, numel(obj.Axes), "");
         end
 
         function value = get.YLabel(obj)
-            if isempty(obj.Axes)
-                value = string.empty(0,1);
-            else
-                allYLabel = [obj.Axes.YLabel];
-                value = string({allYLabel.String}');
-            end
-        end
-
-        function set.YLabel(obj, value)
-            numSet = min(numel(obj.Axes), numel(value));
-            for idx = 1:numSet
-                obj.Axes(idx).YLabel.String = value(idx);
-            end
+            value = wt.utility.resizeVector(obj.YLabel, numel(obj.Axes), "");
         end
 
         function value = get.Title(obj)
-            if isempty(obj.Axes)
-                value = string.empty(0,1);
-            else
-                allTitle = [obj.Axes.Title];
-                value = string({allTitle.String}');
-            end
-        end
-
-        function set.Title(obj, value)
-            numSet = min(numel(obj.Axes), numel(value));
-            for idx = 1:numSet
-                obj.Axes(idx).Title.String = value(idx);
-            end
+            value = wt.utility.resizeVector(obj.Title, numel(obj.Axes), "");
         end
 
     end %methods
@@ -229,6 +210,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
             obj.TiledLayout = getLayout(obj);
             obj.TiledLayout.Padding = "compact";
             obj.TiledLayout.TileSpacing = "compact";
+            obj.TiledLayout.Title.FontWeight = "bold";
 
         end %function
 
@@ -245,6 +227,15 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
             if obj.EnableSelection
                 obj.updateAxesColors()
             end
+
+            % Update axes contents
+            numAxes = min(obj.NumAxes, numel(obj.Axes));
+            for idx = 1:numAxes
+                obj.Axes(idx).XLabel.String = obj.XLabel(idx);
+                obj.Axes(idx).YLabel.String = obj.YLabel(idx);
+                obj.Axes(idx).Title.String = obj.Title(idx);
+            end
+            obj.TiledLayout.Title.String = obj.GroupTitle;
 
             % Toggle legends and grids
             set(obj.Axes,"XGrid",obj.ShowGrid)
@@ -352,7 +343,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
             % All components together
             axesAndLegend = horzcat(obj.Axes, obj.Legend);
-            allComponents = horzcat(axesAndLegend, obj.Axes.Title);
+            allComponents = horzcat(axesAndLegend, obj.Axes.Title, obj.TiledLayout.Title);
 
             if nargin < 2
                 % Update all
@@ -367,6 +358,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
                 set(obj.Axes, "ZColor", obj.FontColor)
                 set(obj.Legend,"TextColor", obj.FontColor)
                 set([obj.Axes.Title],"Color", obj.FontColor)
+                set(obj.TiledLayout.Title,"Color", obj.FontColor)
 
             elseif prop == "FontColor"
 
@@ -375,6 +367,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
                 set(obj.Axes, "ZColor", obj.FontColor)
                 set(obj.Legend,"TextColor", value)
                 set([obj.Axes.Title],"Color", obj.FontColor)
+                set(obj.TiledLayout.Title,"Color", obj.FontColor)
 
             elseif prop == "FontWeight"
 

@@ -8,7 +8,7 @@ classdef FontColorable < handle
     properties (AbortSet)
 
         % Font color
-        FontColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 0 0]
+        FontColor (1,3) double {mustBeInRange(FontColor,0,1)} = [0 0 0]
 
     end %properties
 

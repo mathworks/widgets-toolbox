@@ -34,7 +34,7 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Selection color
         SelectionColor (1,3) double ...
-            {wt.validators.mustBeBetweenZeroAndOne} = [.8 .8 1];
+            {mustBeInRange(SelectionColor,0,1)} = [.8 .8 1];
         
         % Enables button and status row to display
         ShowButtonRow (1,1) matlab.lang.OnOffSwitchState = true
@@ -193,16 +193,14 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             numImg = numel(obj.Icon);
             for idx = 1:numNew
                 wt.utility.fastSet(obj.Label(idx),"Text",obj.Items(idx));
-                if status(idx) == "none"
-                    wt.utility.fastSet(obj.Icon(idx),"Visible","off");
-                elseif numImg >= idx
+                if idx <= numImg
+                    wt.utility.fastSet(obj.Icon(idx),"Visible","on");
                     if obj.Icon(idx).ImageSource ~= imgFile(idx)
                         if exist(imgFile(idx),'file')
                             obj.Icon(idx).ImageSource = imgFile(idx);
                         else
                             obj.Icon(idx).ImageSource = "";
                         end
-                        wt.utility.fastSet(obj.Icon(idx),"Visible","on");
                     end
                 else
                     wt.utility.fastSet(obj.Icon(idx),"Visible","off");

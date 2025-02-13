@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2024a"><title>Widgets Toolbox User Guide</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.8px; min-height: 0px; white-space: pre-wrap; color: rgb(192, 76, 11); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: 400; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S2 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: 700; text-align: left;  }
+.S3 { margin: 15px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 17px; font-weight: 700; text-align: left;  }
+.S4 { margin: 10px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 15px; font-weight: 700; text-align: left;  }
+.CodeBlock { background-color: #F5F5F5; margin: 10px 15px 10px 0; display: inline-block }
+.S5 { border-left: 1px solid rgb(217, 217, 217); border-right: 1px solid rgb(217, 217, 217); border-top: 1px solid rgb(217, 217, 217); border-bottom: 1px solid rgb(217, 217, 217); border-radius: 4px; padding: 6px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S6 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S7 { border-left: 1px solid rgb(217, 217, 217); border-right: 1px solid rgb(217, 217, 217); border-top: 1px solid rgb(217, 217, 217); border-bottom: 0px none rgb(33, 33, 33); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S8 { border-left: 1px solid rgb(217, 217, 217); border-right: 1px solid rgb(217, 217, 217); border-top: 0px none rgb(33, 33, 33); border-bottom: 1px solid rgb(217, 217, 217); border-radius: 0px 0px 4px 4px; padding: 0px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S9 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S10 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Widgets Toolbox User Guide</span></h1><div  class = 'S1'><span>Widgets Toolbox helps you efficiently develop advanced user interfaces in MATLAB and App Designer. Widgets combine existing control functionalities together into larger, reusable, common functionality to accelerate development of graphical user interfaces. </span></div><div  class = 'S1'><span>Widgets Toolbox also will enable you to develop efficiently if your app needs would benefit from advanced, hand-coded architecture. Reusable object-oriented content provides functionality for managing user session files, preferences, and context pane switching.</span></div><h2  class = 'S2'><span>Widgets</span></h2><div  class = 'S1'><span>Widgets are based on MATLAB's </span><a href = "https://www.mathworks.com/help/matlab/developing-custom-ui-component-classes.html"><span>Custom UI Component</span></a><span> functionality using the </span><a href = "https://www.mathworks.com/help/matlab/ref/matlab.ui.componentcontainer.componentcontainer-class.html"><span>ComponentContainer class</span></a><span>. Multiple UI controls are connected together in reusable and common "building blocks" that enable accelerated development. The widgets may be used in App Designer apps or in hand-coded apps. </span></div><div  class = 'S1'><span></span></div><h3  class = 'S3'><span>Examples</span></h3><h4  class = 'S4'><a href = "./WidgetsList.html"><span>Widgets List</span></a></h4><div  class = 'S1'><span>This document provides a description and image of each widget. You may open it in the editor:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >wtExamplesList</span></span></div></div></div><div  class = 'S6'><span></span></div><h4  class = 'S4'><span>Widgets Toolbox Examples App</span></h4><div  class = 'S1'><span>This App Designer app shows usage of many widgets. You may open it in app designer:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >edit </span><span style="color: #a709f5;">WidgetsExampleApp.mlapp</span></span></div></div></div><div  class = 'S6'><span></span></div><h2  class = 'S2'><span>Advanced Application Development Components</span></h2><div  class = 'S1'><span>If you have experience with app development and object-oriented programming, you can work more efficiently developing advanced apps if you use a modular hand-code approach. You can use </span><a href = "https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller"><span>model-view-controller</span></a><span> or a similar separated presentation architecture.</span></div><div  class = 'S1'><span>To get started, view the documentation here: </span></div><div  class = 'S1'><a href = "./AdvancedAppDevelopment.html"><span>Advanced App Development with Widgets Toolbox</span></a></div><div  class = 'S1'><span></span></div><h3  class = 'S3'><span>Examples</span></h3><h4  class = 'S4'><span>Working with Hierarchical Data: Zoo Hierarchy App</span></h4><div  class = 'S1'><span>This document describes an advanced app that enables interaction with hierarchical data. The app is implemented in hand-code and shows the use of object-oriented programming and model-view-controller.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S7'><span style="white-space: pre"><span >wtExamplesFolder</span></span></div></div><div class="inlineWrapper"><div  class = 'S8'><span style="white-space: pre"><span >edit </span><span style="color: #a709f5;">AdvancedAppZooHierarchyExample.mlx</span></span></div></div></div><div  class = 'S6'><span></span></div><h2  class = 'S2'><span>Related Content</span></h2><ul  class = 'S9'><li  class = 'S10'><a href = "./MainPage.html"><span>Widgets Toolbox - Documentation Home</span></a></li><li  class = 'S10'><a href = ".\GettingStarted.html"><span>Getting Started</span></a></li></ul><div  class = 'S1'><span style=' font-style: italic;'>Copyright 2020-2025 The MathWorks, Inc.</span></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Widgets Toolbox User Guide
+% Widgets Toolbox helps you efficiently develop advanced user interfaces in 
+% MATLAB and App Designer. Widgets combine existing control functionalities together 
+% into larger, reusable, common functionality to accelerate development of graphical 
+% user interfaces. 
+% 
+% Widgets Toolbox also will enable you to develop efficiently if your app needs 
+% would benefit from advanced, hand-coded architecture. Reusable object-oriented 
+% content provides functionality for managing user session files, preferences, 
+% and context pane switching.
+%% Widgets
+% Widgets are based on MATLAB's <https://www.mathworks.com/help/matlab/developing-custom-ui-component-classes.html 
+% Custom UI Component> functionality using the <https://www.mathworks.com/help/matlab/ref/matlab.ui.componentcontainer.componentcontainer-class.html 
+% ComponentContainer class>. Multiple UI controls are connected together in reusable 
+% and common "building blocks" that enable accelerated development. The widgets 
+% may be used in App Designer apps or in hand-coded apps. 
+% 
+% 
+% Examples
+% <./WidgetsList.html Widgets List>
+% This document provides a description and image of each widget. You may open 
+% it in the editor:
+
+wtExamplesList
+%% 
+% 
+% Widgets Toolbox Examples App
+% This App Designer app shows usage of many widgets. You may open it in app 
+% designer:
+
+edit WidgetsExampleApp.mlapp
+%% 
+% 
+%% Advanced Application Development Components
+% If you have experience with app development and object-oriented programming, 
+% you can work more efficiently developing advanced apps if you use a modular 
+% hand-code approach. You can use <https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller 
+% model-view-controller> or a similar separated presentation architecture.
+% 
+% To get started, view the documentation here: 
+% 
+% <./AdvancedAppDevelopment.html Advanced App Development with Widgets Toolbox>
+% 
+% 
+% Examples
+% Working with Hierarchical Data: Zoo Hierarchy App
+% This document describes an advanced app that enables interaction with hierarchical 
+% data. The app is implemented in hand-code and shows the use of object-oriented 
+% programming and model-view-controller.
+
+wtExamplesFolder
+edit AdvancedAppZooHierarchyExample.mlx
+%% 
+% 
+%% Related Content
+%% 
+% * <./MainPage.html Widgets Toolbox - Documentation Home>
+% * <.\GettingStarted.html Getting Started>
+%% 
+% _Copyright 2020-2025 The MathWorks, Inc._
+##### SOURCE END #####
+-->
+</div></body></html>

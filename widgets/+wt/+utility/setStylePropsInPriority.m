@@ -33,6 +33,17 @@ for thisProp = propNames
         isDone(needsSet) = true;
     end
 
+    %RJ - Tried this but still the default componentcontainer has wuite
+    %background color. Need to investigate more.
+    % Also need to change BackgroundColorableComponents (:,1) to row vector
+    % Set as needed
+    % for thisComp = comps(needsSet)
+    %     if ~isequal(thisComp.(thisProp), value)
+    %         thisComp.(thisProp) = value;
+    %     end
+    % end
+    % isDone(needsSet) = true;
+
     % Return early if complete
     if all(isDone)
         return;

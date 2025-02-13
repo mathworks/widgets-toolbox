@@ -20,7 +20,7 @@ classdef FontStyled < handle
         FontAngle (1,1) wt.enum.FontAngleState = 'normal'
 
         % Font color
-        FontColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [0 0 0]
+        FontColor (1,3) double {mustBeInRange(FontColor,0,1)} = [0 0 0]
 
     end %properties
 
