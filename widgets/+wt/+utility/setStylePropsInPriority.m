@@ -12,6 +12,9 @@ arguments
     value
 end
 
+% Convert enumerate value
+value = wt.utility.convertEnumToValue(value);
+
 % Filter any invalid components
 comps(~isvalid(comps)) = [];
 

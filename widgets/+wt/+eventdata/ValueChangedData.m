@@ -7,7 +7,7 @@ classdef ValueChangedData < event.EventData & dynamicprops
     %           obj = wt.eventdata.ValueChangedData(...,'p1',v1,...)
     %
     
-    % Copyright 2020-2024 The MathWorks, Inc.
+    % Copyright 2020-2025 The MathWorks, Inc.
 
     %% Properties
     properties (SetAccess = protected)
@@ -18,10 +18,24 @@ classdef ValueChangedData < event.EventData & dynamicprops
 
     %% Constructor / destructor
     methods
-        function obj = ValueChangedData(newValue,varargin)
 
-            % Is input a MATLAB eventdata?
-            if isa(newValue,'matlab.ui.eventdata.ValueChangedData')
+        function obj = ValueChangedData(newValue,varargin)
+            
+            arguments
+                newValue
+            end
+            arguments (Repeating)
+                varargin
+            end
+            
+            % Is input a MATLAB or widget eventdata?
+            if isa(newValue,'wt.eventdata.ValueChangedData') || ...
+                isa(newValue,'wt.eventdata.PropertyChangedData')
+                
+                obj.Value = newValue.Value;
+                obj.PreviousValue = newValue.PreviousValue;
+                
+            elseif isa(newValue,'matlab.ui.eventdata.ValueChangedData')
 
                 obj.Value = newValue.Value;
                 obj.PreviousValue = newValue.PreviousValue;
