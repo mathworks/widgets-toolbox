@@ -13,6 +13,9 @@ classdef BackgroundColorable < handle
         % Listener to background color changes
         BackgroundColorListener event.proplistener
 
+        % Listener to background color changes
+        BackgroundColorFirstUpdateListener event.listener
+
     end %properties
 
 
@@ -45,13 +48,35 @@ classdef BackgroundColorable < handle
         end %function
 
 
+        function updateBackgroundColorableComponentsOnFirstUpdate(obj)
+
+            % Remove the first update listener
+            delete(obj.BackgroundColorFirstUpdateListener);
+            obj.BackgroundColorFirstUpdateListener(:) = [];
+
+            % Run the background color update once on first update
+            obj.updateBackgroundColorableComponents();
+
+        end %function
+
+
         function listenForBackgroundChange(obj)
 
             % Establish Listener for Background Color Change
             if isempty(obj.BackgroundColorListener)
+
                 obj.BackgroundColorListener = ...
-                    addlistener(obj,'BackgroundColor','PostSet',...
+                    listener(obj,'BackgroundColor','PostSet',...
                     @(h,e)obj.updateBackgroundColorableComponents());
+
+                % This enables it to display correctly when loading into
+                % App Designer. It triggers
+                % updateBackgroundColorableComponents after the first time
+                % the update method is called.
+                obj.BackgroundColorFirstUpdateListener = ...
+                    listener(obj,'PostUpdate',...
+                    @(h,e)obj.updateBackgroundColorableComponentsOnFirstUpdate());
+                
             end
 
         end %function
