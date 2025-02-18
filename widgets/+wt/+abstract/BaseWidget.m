@@ -59,6 +59,12 @@ classdef (Abstract) BaseWidget < ...
             % Call superclass constructor
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(args{:});
 
+            % Ensure background color listener has been generated
+            % It will run once after first update call
+            if isempty(obj.BackgroundColorListener)
+                obj.listenForBackgroundChange();
+            end
+
         end %function
 
     end %methods
