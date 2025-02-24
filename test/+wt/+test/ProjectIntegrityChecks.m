@@ -16,11 +16,15 @@ classdef ProjectIntegrityChecks < matlab.unittest.TestCase
 
             proj = currentProject();
 
+            updateDependencies(proj);
             checkResults = runChecks(proj);
 
             % Verify checks with useful diagnostic
             for idx = 1:length(checkResults)
-                diagnostic = "Failed Integrity Test: '" + checkResults(idx).Description + "'" + newline + "Problem files:" + newline + sprintf("%s\n", checkResults(idx).ProblemFiles);
+                diagnostic = "Failed Integrity Test: '" + checkResults(idx).Description + "'";
+                if ~isempty(checkResults(idx).ProblemFiles)
+                    diagnostic = diagnostic + newline + "Problem file(s):" + newline + sprintf("- %s\n", checkResults(idx).ProblemFiles);
+                end
                 testCase.verifyTrue(checkResults(idx).Passed, diagnostic);
             end
 
