@@ -1,4 +1,5 @@
-classdef (Abstract) BaseWidget < ...
+%classdef (Abstract) BaseWidget < ...
+classdef BaseWidget < ...
         matlab.ui.componentcontainer.ComponentContainer & ...
         wt.mixin.BackgroundColorable & ...
         wt.mixin.PropertyViewable & ...
@@ -6,6 +7,16 @@ classdef (Abstract) BaseWidget < ...
     % Base class for a graphical widget
 
     % Copyright 2020-2023 The MathWorks Inc.
+
+    %% Events
+    events (ListenAccess = public)
+
+        % Triggered after WidgetTheme has changed
+        WidgetThemeChanged
+
+        % RobynEvent
+
+    end %event
     
 
     %% Internal properties
@@ -21,6 +32,17 @@ classdef (Abstract) BaseWidget < ...
 
         % Internal flag to confirm setup has finished
         SetupFinished (1,1) logical = false
+
+        % Widget's current theme
+        % WidgetTheme
+        
+    end %properties
+
+
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener for theme changes
+        InternalThemeChangedListener event.listener
         
     end %properties
 
@@ -43,6 +65,8 @@ classdef (Abstract) BaseWidget < ...
             disp("DEBUG: Forcing update for " + class(obj));
             obj.update();
 
+            notify(obj,"RobynEvent")
+
         end %function
         
     end %methods
@@ -58,6 +82,13 @@ classdef (Abstract) BaseWidget < ...
 
             % Call superclass constructor
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(args{:});
+
+            % Listen to theme changes (R2025a and later only)
+            if ~isMATLABReleaseOlderThan("R2025a")
+                obj.InternalThemeChangedListener = listener(obj,"ThemeChanged",...
+                    @(~,evt)onWidgetThemeChanged_I(obj));
+                % obj.WidgetTheme = obj.getTheme();
+            end
 
             % Ensure background color listener has been generated
             % It will run once after first update call
@@ -86,6 +117,11 @@ classdef (Abstract) BaseWidget < ...
             
         end %function
 
+        
+        function update(~)
+            
+        end %function
+
 
         function postSetup(~)
             % Optional post-setup method 
@@ -104,17 +140,17 @@ classdef (Abstract) BaseWidget < ...
         end %function
         
 
-        function updateBackgroundColorableComponents(obj)
-            % Update components that are affected by BackgroundColor
-            % (overrides the superclass method)
-            
-            % Update grid color
-            obj.Grid.BackgroundColor = obj.BackgroundColor;
-
-            % Call superclass method
-            obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
-            
-        end %function
+        % function updateBackgroundColorableComponents(obj)
+        %     % Update components that are affected by BackgroundColor
+        %     % (overrides the superclass method)
+        % 
+        %     % Update grid color
+        %     obj.Grid.BackgroundColor = obj.BackgroundColor;
+        % 
+        %     % Call superclass method
+        %     obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
+        % 
+        % end %function
 
 
         function groups = getPropertyGroups(obj)
@@ -126,6 +162,33 @@ classdef (Abstract) BaseWidget < ...
             
         end %function
         
+    end %methods
+
+
+    %% Hidden Methods
+    methods (Hidden, Sealed)
+
+        % function theme = getWidgetTheme(obj)
+        %     theme = obj.getTheme();
+        % end %function
+
+        function color = getThemeColor(obj, semanticColorId)
+            % Get color from theme and semantic variable
+
+            % Get the theme
+            theme = obj.getTheme();
+
+
+                %RJ - Need to verify behavior in older releases though!
+
+            % Get theme from semantic variable
+            % This is undocumented and may change. Better to call the
+            % getThemeColor method rather than reusing this directly.
+            color = matlab.graphics.internal.themes.getAttributeValue(...
+                theme, semanticColorId);
+
+        end %function
+
     end %methods
 
 
@@ -142,6 +205,32 @@ classdef (Abstract) BaseWidget < ...
             obj.postSetup();
             
         end %function
+            
+        function onWidgetThemeChanged_I(obj)
+            % Handle theme changes
+
+
+            % obj.WidgetTheme = evt.Theme();
+            % obj.WidgetTheme = obj.getTheme();
+            notify(obj,"WidgetThemeChanged")
+            
+            % notify(obj,"RobynEvent")
+            
+        end %function
+        
+        % function updateAppearance(obj)
+        %     % Update the widget's appearance based on the current theme
+        %     if obj.SetupFinished
+        %         % Example: Change background color based on theme
+        %         if strcmp(obj.CurrentTheme, 'Dark')
+        %             obj.BackgroundColor = [0.1, 0.1, 0.1]; % Dark background
+        %         else
+        %             obj.BackgroundColor = [1, 1, 1]; % Light background
+        %         end
+        %         % Request an update to reflect the changes
+        %         obj.requestUpdate();
+        %     end
+        % end %function
         
     end %methods
 
