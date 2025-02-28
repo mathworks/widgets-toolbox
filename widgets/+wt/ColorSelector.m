@@ -1,5 +1,4 @@
-classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
+classdef ColorSelector < wt.abstract.BaseWidget & ...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
@@ -7,7 +6,7 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
     % Color selection control with browse button
 
-    % Copyright 2020-2024 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Public properties
@@ -44,9 +43,6 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
         % Edit control
         EditControl (1,1) matlab.ui.control.EditField
 
@@ -58,13 +54,8 @@ classdef ColorSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
 
             % Set default size
             obj.Position(3:4) = [100 25];
