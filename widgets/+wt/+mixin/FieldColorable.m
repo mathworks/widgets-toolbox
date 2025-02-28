@@ -93,7 +93,7 @@ classdef FieldColorable < handle
     end %methods
 
 
-    %% Methods
+    %% Protected Methods
     methods (Access = protected)
 
         function updateFieldColorableComponents(obj)
@@ -111,6 +111,7 @@ classdef FieldColorable < handle
     end %methods
 
 
+    %% Abstract Methods
     methods (Abstract, Hidden)
 
         % This is supplied by wt.abstract.BaseWidget
@@ -119,6 +120,7 @@ classdef FieldColorable < handle
     end %methods
 
 
+    %% Private Methods
     methods (Access = private)
 
         function applyThemePrivate(obj)

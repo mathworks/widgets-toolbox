@@ -10,19 +10,19 @@ classdef BackgroundColorable < handle
         % List of graphics controls to apply to
         BackgroundColorableComponents (:,1) matlab.graphics.Graphics
 
-        % Listener to background color changes
-        BackgroundColorListener event.proplistener
-
-        % Listener to background color changes
-        BackgroundColorFirstUpdateListener event.listener
-
     end %properties
 
 
     properties (Transient, NonCopyable, Access = private)
 
-        % Listener for theme changes
-        % BackgroundColorableThemeChangedListener event.listener
+        % Listener to background color changes
+        BackgroundColorListener event.proplistener
+
+        % Listener to update complete
+        PostUpdateListener event.listener
+
+        % Last known color (for change detection)
+        LastColor (1,3) double = nan(1,3)
 
     end %properties
 
@@ -30,26 +30,17 @@ classdef BackgroundColorable < handle
     %% Property Accessors
     methods
 
-        % function set.FieldColorMode(obj, value)
-        %     obj.FieldColorMode = value;
-        %     obj.applyThemePrivate();
-        % end
-
-        % function set.FieldColor_I(obj,value)
-        %     obj.FieldColor_I = value;
-        %     obj.updateFieldColorableComponents()
-        % end
-
-        % function set.FieldColorableComponents(obj,value)
-        %     obj.FieldColorableComponents = value;
-        %     obj.applyThemePrivate();
-        %     obj.updateFieldColorableComponents()
-        % end
-
         function set.BackgroundColorableComponents(obj,value)
+
+            % Update the list of components
             obj.BackgroundColorableComponents = value;
-            obj.listenForBackgroundChange();
+
+            % Ensure listeners have been attached
+            obj.attachListeners();
+
+            % Update the color of each component in the list
             obj.updateBackgroundColorableComponents()
+
         end
 
     end %methods
@@ -60,12 +51,8 @@ classdef BackgroundColorable < handle
 
         function obj = BackgroundColorable()
 
-            obj.listenForBackgroundChange();
-            % Listen to theme changes
-            if ~isMATLABReleaseOlderThan("R2025a")
-                % obj.BackgroundColorableThemeChangedListener = ...
-                %     listener(obj, "WidgetThemeChanged", @(~,~)applyThemePrivate(obj));
-            end
+            % Ensure listeners have been attached
+            obj.attachListeners();
 
         end %function
 
@@ -73,7 +60,7 @@ classdef BackgroundColorable < handle
 
 
 
-    %% Methods
+    %% Protected Methods
     methods (Access = protected)
 
         function updateBackgroundColorableComponents(obj)
@@ -91,39 +78,60 @@ classdef BackgroundColorable < handle
     end %methods
 
 
+    %% Private Methods
     methods (Access = private)
 
-        function listenForBackgroundChange(obj)
+        function attachListeners(obj)
 
-            % Establish Listener for Background Color Change
+            % Establish Listeners once
             if isempty(obj.BackgroundColorListener)
 
+                % Listener for BackgroundColor changes
                 obj.BackgroundColorListener = ...
                     listener(obj,'BackgroundColor','PostSet',...
-                    @(h,e)obj.updateBackgroundColorableComponents());
+                    @(h,e)obj.onBackgroundColorChanged());
 
-                % This enables it to display correctly when loading into
-                % App Designer. It triggers
-                % updateBackgroundColorableComponents after the first time
-                % the update method is called.
-                obj.BackgroundColorFirstUpdateListener = ...
+                % Listen for completion of the update method
+                obj.PostUpdateListener = ...
                     listener(obj,'PostUpdate',...
-                    @(h,e)obj.updateBackgroundColorableComponentsOnFirstUpdate());
-                
+                    @(h,e)obj.onPostUpdate());
+
             end %if
 
         end %function
 
 
-        function updateBackgroundColorableComponentsOnFirstUpdate(obj)
+        function onBackgroundColorChanged(obj)
 
-            % Remove the first update listener
-            delete(obj.BackgroundColorFirstUpdateListener);
-            obj.BackgroundColorFirstUpdateListener(:) = [];
+            % Apply color updates
+            obj.applyColorChange();
 
-            % Run the background color update once on first update
-            obj.updateBackgroundColorableComponents();
+        end %function
 
+
+        function onPostUpdate(obj)
+            % Called after update occurs
+
+            % Was the color changed?
+            if ~all(obj.LastColor == obj.BackgroundColor_I) %#ok<MCNPN>
+
+                % Apply color updates
+                obj.applyColorChange();
+
+            end %if
+
+        end %function
+
+
+        function applyColorChange(obj)
+                % Apply color updates
+
+                % Set the last known color for change tracking
+                obj.LastColor = obj.BackgroundColor_I; %#ok<MCNPN>
+
+                % Update component colors
+                obj.updateBackgroundColorableComponents();
+            
         end %function
 
     end %methods

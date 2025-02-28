@@ -169,7 +169,7 @@ classdef BaseWidget < ...
             % Get color from theme and semantic variable
 
             % Get the theme
-            theme = obj.getTheme();
+            theme = obj.getTheme(); %R2024b and later
 
             %RJ - Need to verify behavior in older releases though!
 
@@ -177,7 +177,7 @@ classdef BaseWidget < ...
             % This is undocumented and may change. Better to call the
             % getThemeColor method rather than reusing this directly.
             color = matlab.graphics.internal.themes.getAttributeValue(...
-                theme, semanticColorId);
+                theme, semanticColorId); %R2024b and later
 
         end %function
 
