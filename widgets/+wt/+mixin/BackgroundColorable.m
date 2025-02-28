@@ -1,7 +1,7 @@
 classdef BackgroundColorable < handle
     % Mixin to add styles to a component
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Internal properties
@@ -19,14 +19,55 @@ classdef BackgroundColorable < handle
     end %properties
 
 
-    %% Accessors
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener for theme changes
+        % BackgroundColorableThemeChangedListener event.listener
+
+    end %properties
+
+
+    %% Property Accessors
     methods
+
+        % function set.FieldColorMode(obj, value)
+        %     obj.FieldColorMode = value;
+        %     obj.applyThemePrivate();
+        % end
+
+        % function set.FieldColor_I(obj,value)
+        %     obj.FieldColor_I = value;
+        %     obj.updateFieldColorableComponents()
+        % end
+
+        % function set.FieldColorableComponents(obj,value)
+        %     obj.FieldColorableComponents = value;
+        %     obj.applyThemePrivate();
+        %     obj.updateFieldColorableComponents()
+        % end
 
         function set.BackgroundColorableComponents(obj,value)
             obj.BackgroundColorableComponents = value;
-            obj.updateBackgroundColorableComponents()
             obj.listenForBackgroundChange();
+            obj.updateBackgroundColorableComponents()
         end
+
+    end %methods
+
+
+    %% Constructor
+    methods
+
+        function obj = BackgroundColorable()
+
+            obj.listenForBackgroundChange();
+            % Listen to theme changes
+            if ~isMATLABReleaseOlderThan("R2025a")
+                % obj.BackgroundColorableThemeChangedListener = ...
+                %     listener(obj, "WidgetThemeChanged", @(~,~)applyThemePrivate(obj));
+            end
+
+        end %function
 
     end %methods
 
@@ -39,26 +80,18 @@ classdef BackgroundColorable < handle
 
             % What needs to be updated?
             comps = obj.BackgroundColorableComponents;
-            newValue = obj.BackgroundColor; %#ok<MCNPN> 
             propNames = ["BackgroundColor","Color"];
+            color = obj.BackgroundColor_I; %#ok<MCNPN>
 
             % Set the subcomponent properties in prioritized order
-            wt.utility.setStylePropsInPriority(comps, propNames, newValue);
+            wt.utility.setStylePropsInPriority(comps, propNames, color);
 
         end %function
 
+    end %methods
 
-        function updateBackgroundColorableComponentsOnFirstUpdate(obj)
 
-            % Remove the first update listener
-            delete(obj.BackgroundColorFirstUpdateListener);
-            obj.BackgroundColorFirstUpdateListener(:) = [];
-
-            % Run the background color update once on first update
-            obj.updateBackgroundColorableComponents();
-
-        end %function
-
+    methods (Access = private)
 
         function listenForBackgroundChange(obj)
 
@@ -77,7 +110,19 @@ classdef BackgroundColorable < handle
                     listener(obj,'PostUpdate',...
                     @(h,e)obj.updateBackgroundColorableComponentsOnFirstUpdate());
                 
-            end
+            end %if
+
+        end %function
+
+
+        function updateBackgroundColorableComponentsOnFirstUpdate(obj)
+
+            % Remove the first update listener
+            delete(obj.BackgroundColorFirstUpdateListener);
+            obj.BackgroundColorFirstUpdateListener(:) = [];
+
+            % Run the background color update once on first update
+            obj.updateBackgroundColorableComponents();
 
         end %function
 
