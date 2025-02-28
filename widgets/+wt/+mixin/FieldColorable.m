@@ -41,7 +41,7 @@ classdef FieldColorable < handle
     properties (Transient, NonCopyable, Access = private)
 
         % Listener for theme changes
-        FieldColorThemeChangedListener event.listener
+        ThemeChangedListener event.listener
 
     end %properties
 
@@ -60,7 +60,7 @@ classdef FieldColorable < handle
 
         function set.FieldColorMode(obj, value)
             obj.FieldColorMode = value;
-            obj.applyThemePrivate();
+            obj.applyTheme();
         end
 
         function set.FieldColor_I(obj,value)
@@ -70,7 +70,7 @@ classdef FieldColorable < handle
 
         function set.FieldColorableComponents(obj,value)
             obj.FieldColorableComponents = value;
-            obj.applyThemePrivate();
+            obj.applyTheme();
             obj.updateFieldColorableComponents()
         end
 
@@ -82,11 +82,14 @@ classdef FieldColorable < handle
 
         function obj = FieldColorable()
 
-            % Listen to theme changes
+            % Confirm R2025a or newer
             if ~isMATLABReleaseOlderThan("R2025a")
-                obj.FieldColorThemeChangedListener = ...
-                    listener(obj, "WidgetThemeChanged", @(~,~)applyThemePrivate(obj));
-            end
+
+                % Listen to theme changes
+                obj.ThemeChangedListener = ...
+                    listener(obj, "WidgetThemeChanged", @(~,~)applyTheme(obj));
+
+            end %if
 
         end %function
 
@@ -123,7 +126,7 @@ classdef FieldColorable < handle
     %% Private Methods
     methods (Access = private)
 
-        function applyThemePrivate(obj)
+        function applyTheme(obj)
 
             % If color mode is auto, use standard theme color
             if obj.FieldColorMode == "auto" && ~isMATLABReleaseOlderThan("R2025a")

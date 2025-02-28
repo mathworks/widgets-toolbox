@@ -58,7 +58,7 @@ classdef FontStyled < handle
     properties (Transient, NonCopyable, Access = private)
 
         % Listener for theme changes
-        FontColorThemeChangedListener event.listener
+        ThemeChangedListener event.listener
 
     end %properties
 
@@ -98,7 +98,7 @@ classdef FontStyled < handle
 
         function set.FontColorMode(obj, value)
             obj.FontColorMode = value;
-            obj.applyThemePrivate();
+            obj.applyTheme();
         end
 
         function set.FontColor_I(obj,value)
@@ -108,7 +108,7 @@ classdef FontStyled < handle
 
         function set.FontStyledComponents(obj,value)
             obj.FontStyledComponents = value;
-            obj.applyThemePrivate();
+            obj.applyTheme();
             obj.updateFontStyledComponents()
         end
 
@@ -120,19 +120,21 @@ classdef FontStyled < handle
 
         function obj = FontStyled()
 
-            % Listen to theme changes
+            % Confirm R2025a or newer
             if ~isMATLABReleaseOlderThan("R2025a")
-                obj.FontColorThemeChangedListener = ...
-                    listener(obj, "WidgetThemeChanged", @(~,~)applyThemePrivate(obj));
-            end
+
+                % Listen to theme changes
+                obj.ThemeChangedListener = ...
+                    listener(obj, "WidgetThemeChanged", @(~,~)applyTheme(obj));
+
+            end %if
 
         end %function
 
     end %methods
 
 
-
-    %% Methods
+    %% Protected Methods
     methods (Access = protected)
 
         function updateFontStyledComponents(obj,prop,value)
@@ -171,6 +173,7 @@ classdef FontStyled < handle
     end %methods
 
 
+    %% Abstract Methods
     methods (Abstract, Hidden)
 
         % This is supplied by wt.abstract.BaseWidget
@@ -179,9 +182,10 @@ classdef FontStyled < handle
     end %methods
 
 
+    %% Private Methods
     methods (Access = private)
 
-        function applyThemePrivate(obj)
+        function applyTheme(obj)
 
             % If color mode is auto, use standard theme color
             if obj.FontColorMode == "auto" && ~isMATLABReleaseOlderThan("R2025a")
