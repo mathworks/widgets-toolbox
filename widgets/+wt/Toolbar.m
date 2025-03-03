@@ -1,6 +1,6 @@
 classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
         wt.mixin.TitleFontStyled & ...
-        wt.mixin.DividerColorable & ...
+        wt.mixin.SeparatorColorable & ...
         wt.mixin.FontStyled & ...
         wt.mixin.PropertyViewable
 
@@ -25,6 +25,27 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
         Section (:,1) wt.toolbar.HorizontalSection
 
     end %properties
+
+
+    properties (Dependent, Hidden)
+
+        % Deprecated. Use SeparatorColor instead.
+        DividerColor
+
+    end %properties
+
+
+    %% Property Accessors
+    methods
+
+        function value = get.DividerColor(obj)
+            value = obj.SeparatorColor;
+        end
+        function set.DividerColor(obj,value)
+            obj.SeparatorColor = value;
+        end
+
+    end %methods
 
 
 
@@ -167,7 +188,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
             % Update component style lists
             % obj.TitleColorableComponents = obj.SectionLabel;
             obj.TitleFontStyledComponents = [obj.SectionLabel; obj.SectionButton];
-            obj.DividerColorableComponents = [obj.DummySection obj.Grid];
+            obj.SeparatorColorableComponents = [obj.DummySection obj.Grid];
             obj.BackgroundColorableComponents = [
                 obj.Section
                 obj.SectionButton
@@ -285,7 +306,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
 
             % Has foreground or background color changed?
             if ~isempty(obj.SectionButton) && ( ...
-                    ~isequal(obj.SectionButton(1).FontColor, obj.TitleColor) || ...
+                    ~isequal(obj.SectionButton(end).FontColor, obj.TitleColor) || ...
                     ~isequal(obj.DummySection.BackgroundColor, obj.BackgroundColor) )
 
                 % Create the button icon
@@ -311,6 +332,16 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
 
             % Trigger event
             notify(obj,"ButtonPushed",evt);
+
+        end %function
+
+
+        function color = getDefaultSeparatorColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
+
+            color = obj.getThemeColor("--mw-borderColor-secondary");
 
         end %function
 

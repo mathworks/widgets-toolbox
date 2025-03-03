@@ -1,4 +1,4 @@
-classdef DividerColorable < handle
+classdef SeparatorColorable < handle
     % Mixin to add styles to a component
 
     % Copyright 2020-2025 The MathWorks Inc.
@@ -7,16 +7,16 @@ classdef DividerColorable < handle
     %% Properties
     properties (AbortSet, Dependent)
 
-        % Divider Color
-        DividerColor (1,3) double {mustBeInRange(DividerColor,0,1)}
+        % Separator Color
+        SeparatorColor (1,3) double {mustBeInRange(SeparatorColor,0,1)}
 
     end %properties
 
 
     properties (AbortSet, NeverAmbiguous)
 
-        % Divider color mode
-        DividerColorMode (1,1) wt.enum.AutoManualState = 'auto'
+        % Separator color mode
+        SeparatorColorMode (1,1) wt.enum.AutoManualState = 'auto'
 
     end %properties
 
@@ -24,8 +24,8 @@ classdef DividerColorable < handle
     %% Internal properties
     properties (AbortSet, Hidden)
 
-        % Divider Color
-        DividerColor_I (1,3) double {mustBeInRange(DividerColor_I,0,1)} = [.5 .5 .5]
+        % Separator Color
+        SeparatorColor_I (1,3) double {mustBeInRange(SeparatorColor_I,0,1)} = [.5 .5 .5]
 
     end %properties
 
@@ -33,7 +33,7 @@ classdef DividerColorable < handle
     properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % List of graphics controls to apply to
-        DividerColorableComponents (:,1) matlab.graphics.Graphics
+        SeparatorColorableComponents (:,1) matlab.graphics.Graphics
 
     end %properties
 
@@ -49,29 +49,29 @@ classdef DividerColorable < handle
     %% Property Accessors
     methods
 
-        function value = get.DividerColor(obj)
-            value = obj.DividerColor_I;
+        function value = get.SeparatorColor(obj)
+            value = obj.SeparatorColor_I;
         end
 
-        function set.DividerColor(obj, value)
-            obj.DividerColorMode = 'manual';
-            obj.DividerColor_I = value;
+        function set.SeparatorColor(obj, value)
+            obj.SeparatorColorMode = 'manual';
+            obj.SeparatorColor_I = value;
         end
 
-        function set.DividerColorMode(obj, value)
-            obj.DividerColorMode = value;
+        function set.SeparatorColorMode(obj, value)
+            obj.SeparatorColorMode = value;
             obj.applyTheme();
         end
 
-        function set.DividerColor_I(obj,value)
-            obj.DividerColor_I = value;
-            obj.updateDividerColorableComponents()
+        function set.SeparatorColor_I(obj,value)
+            obj.SeparatorColor_I = value;
+            obj.updateSeparatorColorableComponents()
         end
 
-        function set.DividerColorableComponents(obj,value)
-            obj.DividerColorableComponents = value;
+        function set.SeparatorColorableComponents(obj,value)
+            obj.SeparatorColorableComponents = value;
             obj.applyTheme();
-            obj.updateDividerColorableComponents()
+            obj.updateSeparatorColorableComponents()
         end
 
     end %methods
@@ -80,7 +80,7 @@ classdef DividerColorable < handle
     %% Constructor
     methods
 
-        function obj = DividerColorable()
+        function obj = SeparatorColorable()
 
             % Confirm BaseWidget and R2025a or newer
             if isa(obj,"wt.abstract.BaseWidget") ...
@@ -100,12 +100,12 @@ classdef DividerColorable < handle
     %% Protected Methods
     methods (Access = protected)
 
-        function updateDividerColorableComponents(obj)
+        function updateSeparatorColorableComponents(obj)
 
             % What needs to be updated?
-            comps = obj.DividerColorableComponents;
-            propNames = ["DividerColor","Color","BackgroundColor"];
-            color = obj.DividerColor_I;
+            comps = obj.SeparatorColorableComponents;
+            propNames = ["SeparatorColor","Color","BackgroundColor"];
+            color = obj.SeparatorColor_I;
 
             % Set the subcomponent properties in prioritized order
             wt.utility.setStylePropsInPriority(comps, propNames, color);
@@ -113,12 +113,12 @@ classdef DividerColorable < handle
         end %function
 
 
-        function color = getDefaultDividerColor(obj)
+        function color = getDefaultSeparatorColor(obj)
             % Returns the default color for 'auto' mode (R2025a and later)
             % The result is dependent on theme
             % Widget subclass may override this
 
-            color = obj.getThemeColor("--mw-color-secondary"); %#ok<MCNPN>
+            color = obj.getThemeColor("--mw-borderColor-primary"); %#ok<MCNPN>
 
         end %function
 
@@ -131,12 +131,12 @@ classdef DividerColorable < handle
         function applyTheme(obj)
 
             % If color mode is auto, use standard theme color
-            if obj.DividerColorMode == "auto" ...
+            if obj.SeparatorColorMode == "auto" ...
                     && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.DividerColor_I = obj.getDefaultDividerColor();                    
+                obj.SeparatorColor_I = obj.getDefaultSeparatorColor();                    
 
             end %if
 

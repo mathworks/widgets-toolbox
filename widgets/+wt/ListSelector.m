@@ -1,11 +1,9 @@
-classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
+classdef ListSelector < wt.abstract.BaseWidget & ...
         wt.mixin.ButtonColorable &...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
-        wt.mixin.Orderable & ...
-        wt.mixin.PropertyViewable
+        wt.mixin.Orderable
     % Select from an array of items and add them to a list
 
     % Copyright 2020-2025 The MathWorks Inc.
@@ -23,7 +21,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         HighlightedValueChanged
 
     end %events
-
 
 
     %% Public properties
@@ -100,9 +97,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
         % The list sorting buttons
         ListButtons wt.ButtonGrid
 
@@ -118,16 +112,11 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [120 130];
-
-            % Construct Default Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
 
             % Configure grid
             obj.Grid.Padding = 3;

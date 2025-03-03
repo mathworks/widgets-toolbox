@@ -1,5 +1,4 @@
-classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
+classdef NumericArray < wt.abstract.BaseWidget & ...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
@@ -56,9 +55,6 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
         % Edit fields
         EditField (1,:) matlab.ui.control.NumericEditField
 
@@ -70,16 +66,16 @@ classdef NumericArray < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x','1x','1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.ColumnSpacing = 5;
-            obj.Grid.RowSpacing = 5;
-            obj.Grid.Padding = 0;
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
 
             % Set default size
             obj.Position(3:4) = [100 25];
+
+            % Configure grid
+            obj.Grid.ColumnWidth = {'1x','1x','1x'};
+            obj.Grid.ColumnSpacing = 5;
+            obj.Grid.RowSpacing = 5;
 
             % Update the internal component lists
             obj.BackgroundColorableComponents = obj.Grid;

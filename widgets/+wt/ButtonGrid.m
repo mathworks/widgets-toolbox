@@ -1,7 +1,7 @@
 classdef ButtonGrid < wt.abstract.BaseWidget & ...
-        wt.mixin.Enableable & ...
+        wt.mixin.ButtonColorable & ...
         wt.mixin.FontStyled & ...
-        wt.mixin.ButtonColorable
+        wt.mixin.Enableable
 
     % Array of buttons with a single callback/event
 
@@ -80,6 +80,9 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
             % Configure Main Grid
             obj.Grid.Padding = 2;
+            
+            % Update the internal component lists
+            obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 

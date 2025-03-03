@@ -1,10 +1,9 @@
-classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.FontStyled & wt.mixin.PropertyViewable
-
+classdef ProgressBar < wt.abstract.BaseWidget & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.SelectionColorable
     % A progress bar with status and cancel button
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -24,14 +23,6 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
 
         % Indicates that progress is counting
         Indeterminate  (1,1) matlab.lang.OnOffSwitchState = false
-
-    end %properties
-
-
-    properties (Dependent, UsedInUpdate = false)
-
-        % Bar color
-        BarColor (1,3) double {mustBeInRange(BarColor,0,1)}
 
     end %properties
 
@@ -69,15 +60,43 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
+    properties (Dependent, Hidden)
+
+        % Deprecated. Use SelectionColor instead.
+        BarColor
+
+    end %properties
+
+
+    %% Property Accessors
+    methods
+
+        function value = get.ElapsedTime(obj)
+            value = datetime - obj.StartTime;
+            value = i_formatDuration(value);
+        end
+
+        function value = get.RemainingTime(obj)
+            value = (1-obj.Value)/obj.Value * obj.ElapsedTime;
+            value = i_formatDuration(value);
+        end
+
+        function value = get.BarColor(obj)
+            value = obj.SelectionColor;
+        end
+
+        function set.BarColor(obj,value)
+            obj.SelectionColor = value;
+        end
+
+    end % methods
+
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
         % Progress panel
         ProgressPanel (1,1) matlab.ui.container.Panel
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
         % Indeterminate bar
         IndeterminateBar (1,1) matlab.ui.control.Image
@@ -228,21 +247,15 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [200 30];
-
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 2;
 
             % Configure grid
             obj.Grid.Padding = 3;
             obj.Grid.ColumnWidth = {'0x','1x',25};
-            obj.Grid.RowHeight = {'1x'};
 
             % Progress panel indicator
             obj.ProgressPanel = matlab.ui.container.Panel(...
@@ -338,44 +351,25 @@ classdef ProgressBar < matlab.ui.componentcontainer.ComponentContainer & ...
             end
             wt.utility.fastSet(obj.CancelButton,"Visible",cancelVisible);
 
+            % Update the bar color
+            obj.ProgressPanel.BackgroundColor = obj.SelectionColor_I;
+
             % Update the grid
             obj.Grid.ColumnWidth = colWidths;
 
         end %function
 
         
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
+        function color = getDefaultSelectionColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
 
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+            color = obj.getThemeColor("--mw-backgroundColor-primary-info");
 
-        end % function
+        end %function
 
     end %methods
-
-
-    %% Accessors
-    methods
-
-        function value = get.ElapsedTime(obj)
-            value = datetime - obj.StartTime;
-            value = i_formatDuration(value);
-        end
-
-        function value = get.RemainingTime(obj)
-            value = (1-obj.Value)/obj.Value * obj.ElapsedTime;
-            value = i_formatDuration(value);
-        end
-
-        function value = get.BarColor(obj)
-            value = obj.ProgressPanel.BackgroundColor;
-        end
-        function set.BarColor(obj,value)
-            obj.ProgressPanel.BackgroundColor = value;
-        end
-    end % methods
-
 
 end % classdef
 

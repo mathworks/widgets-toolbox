@@ -1,11 +1,10 @@
-classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.FieldColorable & ...
-        wt.mixin.PropertyViewable
-
+classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.Enableable
     % Date and time selection control
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -36,8 +35,6 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
 
         % Show timezone
         ShowTimeZone (1,1) matlab.lang.OnOffSwitchState = 'off'
-        %         ShowTimeZone (1,1) wt.enum.TimeZoneDisplayState = ...
-        %             wt.enum.TimeZoneDisplayState.none
 
     end %properties
 
@@ -59,15 +56,45 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
     end %properties
 
 
+    %% Property Accessors
+    methods
+
+        function value = get.DateFormat(obj)
+            value = obj.DateControl.DisplayFormat;
+        end
+        function set.DateFormat(obj,value)
+            obj.DateControl.DisplayFormat = value;
+        end
+
+        function value = get.Limits(obj)
+            value = obj.DateControl.Limits;
+        end
+        function set.Limits(obj,value)
+            obj.DateControl.Limits = value;
+        end
+
+        function value = get.DisabledDaysOfWeek(obj)
+            value = obj.DateControl.DisabledDaysOfWeek;
+        end
+        function set.DisabledDaysOfWeek(obj,value)
+            obj.DateControl.DisabledDaysOfWeek = value;
+        end
+
+        function value = get.DisabledDates(obj)
+            value = obj.DateControl.DisabledDates;
+        end
+        function set.DisabledDates(obj,value)
+            obj.DateControl.DisabledDates = value;
+        end
+
+    end %methods
+
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Button
         DateControl (1,1) matlab.ui.control.DatePicker
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
         % Hour control
         HourControl (1,1) matlab.ui.control.Spinner
@@ -117,6 +144,9 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Adjust default size
             obj.Position(3:4) = [270 25];
 
@@ -124,14 +154,6 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
             obj.Value = datetime("today",...
                 "TimeZone","local",...
                 "Format","dd-MMM-uuuu hh:mm aa");
-
-            % Construct Default Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
 
             % Configure Grid
             obj.Grid.ColumnWidth = {'9x',5,'4x','4x',0,0,0};
@@ -147,14 +169,12 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
             uicontainer(obj.Grid,'Visible','off');
 
             % Create the time controls
-            % obj.HourControl = matlab.ui.control.NumericEditField(...
             obj.HourControl = uispinner(...
                 "Parent",obj.Grid,...
                 "Limits",[-1 24],...
                 "HorizontalAlignment","center",...
                 "ValueChangedFcn",@(h,e)obj.onTimeEdited(e));
 
-            %obj.MinuteControl = matlab.ui.control.NumericEditField(...
             obj.MinuteControl = uispinner(...
                 "Parent",obj.Grid,...
                 "Limits",[-1 60],...
@@ -162,7 +182,6 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
                 "HorizontalAlignment","center",...
                 "ValueChangedFcn",@(h,e)obj.onTimeEdited(e));
 
-            %obj.SecondControl = matlab.ui.control.NumericEditField(...
             obj.SecondControl = uispinner(...
                 "Parent",obj.Grid,...
                 "Limits",[-1 60],...
@@ -187,10 +206,10 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
                 obj.AmPmControl
                 obj.TimeZoneControl
                 ];
+            obj.BackgroundColorableComponents = obj.Grid;
             obj.FontStyledComponents = allFields;
             obj.FieldColorableComponents = allFields;
             obj.EnableableComponents = allFields;
-            obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 
@@ -320,15 +339,6 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
         end %function
 
 
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end %function
-
-
         function onDateEdited(obj,evt)
             % Triggered on edits
 
@@ -339,8 +349,8 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
             dt = obj.Value;
             if ismissing(dt)
                 dt = datetime("today",...
-                "TimeZone","local",...
-                "Format","dd-MMM-uuuu hh:mm aa");
+                    "TimeZone","local",...
+                    "Format","dd-MMM-uuuu hh:mm aa");
             end
 
             % Set the date
@@ -368,8 +378,8 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
             dt = obj.Value;
             if ismissing(dt)
                 dt = datetime("today",...
-                "TimeZone","local",...
-                "Format","dd-MMM-uuuu hh:mm aa");
+                    "TimeZone","local",...
+                    "Format","dd-MMM-uuuu hh:mm aa");
             end
 
             % What was changed?
@@ -428,41 +438,6 @@ classdef DatetimeSelector < matlab.ui.componentcontainer.ComponentContainer & ..
         end %function
 
     end % methods
-
-
-
-    %% Accessors
-    methods
-
-        function value = get.DateFormat(obj)
-            value = obj.DateControl.DisplayFormat;
-        end
-        function set.DateFormat(obj,value)
-            obj.DateControl.DisplayFormat = value;
-        end
-
-        function value = get.Limits(obj)
-            value = obj.DateControl.Limits;
-        end
-        function set.Limits(obj,value)
-            obj.DateControl.Limits = value;
-        end
-
-        function value = get.DisabledDaysOfWeek(obj)
-            value = obj.DateControl.DisabledDaysOfWeek;
-        end
-        function set.DisabledDaysOfWeek(obj,value)
-            obj.DateControl.DisabledDaysOfWeek = value;
-        end
-
-        function value = get.DisabledDates(obj)
-            value = obj.DateControl.DisabledDates;
-        end
-        function set.DisabledDates(obj,value)
-            obj.DateControl.DisabledDates = value;
-        end
-
-    end %methods
 
 end % classdef
 

@@ -1,9 +1,8 @@
-classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable &...
-        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.PropertyViewable
-
+classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled
     % Dual lists where selected items are moved from left to right
 
     % Copyright 2020-2025 The MathWorks Inc.
@@ -22,7 +21,6 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         HighlightedValueChanged
 
     end %events
-
 
 
     %% Public properties
@@ -96,9 +94,6 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
         % The right listbox control
         RightList (1,1) matlab.ui.control.ListBox
 
@@ -114,16 +109,11 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [200 160];
-
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
 
             % Configure grid
             obj.Grid.Padding = 3;

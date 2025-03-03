@@ -1,12 +1,12 @@
-classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & wt.mixin.ErrorHandling & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable &...
-        wt.mixin.FieldColorable & wt.mixin.ButtonColorable & ...
-        wt.mixin.PropertyViewable
-    
+classdef FileSelector < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % File or folder selection control with browse button
     
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties
@@ -79,9 +79,6 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Button
         ButtonControl (1,1) matlab.ui.control.Button
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
         
         % Edit control or dropdown
         EditControl (1,1) matlab.ui.control.EditField
@@ -98,17 +95,15 @@ classdef FileSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     methods (Access = protected)
         
         function setup(obj)
+
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
             
             % Adjust default size
             obj.Position(3:4) = [400 25];
-            
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
+
+            % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25,25,25};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;   
             
             % Create the standard edit control
             obj.EditControl = uieditfield(obj.Grid);

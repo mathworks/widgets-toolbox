@@ -1,9 +1,7 @@
-classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
-    
+classdef PasswordField <  wt.abstract.BaseWidget
     % A password entry field
     
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties
@@ -11,7 +9,6 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
         
         % The current value shown
         Value (1,1) string
-        
                 
     end %properties
     
@@ -32,9 +29,6 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-        
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
 
@@ -48,17 +42,12 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
     methods (Access = protected)
         
         function setup(obj)
+
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
             
             % Set default size
             obj.Position(3:4) = [100 25];
-            
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;   
             
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
