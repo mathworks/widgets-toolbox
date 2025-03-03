@@ -1,11 +1,11 @@
-classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable & ...
-        wt.mixin.PropertyViewable
+classdef ButtonGrid < wt.abstract.BaseWidget & ...
+        wt.mixin.Enableable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.ButtonColorable
 
     % Array of buttons with a single callback/event
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -63,9 +63,6 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
     end %properties
 
 
@@ -75,19 +72,14 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [100 30];
 
-            % Create and set Default Grid Properties
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
+            % Configure Main Grid
             obj.Grid.Padding = 2;
-
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 
@@ -172,14 +164,6 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
             notify(obj,"ButtonPushed",evtOut);
 
         end %function
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end
 
     end %methods
 

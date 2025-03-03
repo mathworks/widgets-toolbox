@@ -102,6 +102,9 @@ classdef BaseWidget < ...
             obj.Grid.ColumnSpacing = 2;
             obj.Grid.Padding = [0 0 0 0];
 
+            % Set grid to follow background color
+            obj.BackgroundColorableComponents = obj.Grid;
+
         end %function
 
 

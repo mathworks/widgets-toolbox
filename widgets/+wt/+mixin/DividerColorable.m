@@ -1,4 +1,4 @@
-classdef TitleColorable < handle
+classdef DividerColorable < handle
     % Mixin to add styles to a component
 
     % Copyright 2020-2025 The MathWorks Inc.
@@ -7,16 +7,16 @@ classdef TitleColorable < handle
     %% Properties
     properties (AbortSet, Dependent)
 
-        % Title Color
-        TitleColor (1,3) double {mustBeInRange(TitleColor,0,1)}
+        % Divider Color
+        DividerColor (1,3) double {mustBeInRange(DividerColor,0,1)}
 
     end %properties
 
 
     properties (AbortSet, NeverAmbiguous)
 
-        % Title color mode
-        TitleColorMode (1,1) wt.enum.AutoManualState = 'auto'
+        % Divider color mode
+        DividerColorMode (1,1) wt.enum.AutoManualState = 'auto'
 
     end %properties
 
@@ -24,8 +24,8 @@ classdef TitleColorable < handle
     %% Internal properties
     properties (AbortSet, Hidden)
 
-        % Title Color
-        TitleColor_I (1,3) double {mustBeInRange(TitleColor_I,0,1)} = [1 1 1]
+        % Divider Color
+        DividerColor_I (1,3) double {mustBeInRange(DividerColor_I,0,1)} = [.5 .5 .5]
 
     end %properties
 
@@ -33,7 +33,7 @@ classdef TitleColorable < handle
     properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % List of graphics controls to apply to
-        TitleColorableComponents (:,1) matlab.graphics.Graphics
+        DividerColorableComponents (:,1) matlab.graphics.Graphics
 
     end %properties
 
@@ -49,29 +49,29 @@ classdef TitleColorable < handle
     %% Property Accessors
     methods
 
-        function value = get.TitleColor(obj)
-            value = obj.TitleColor_I;
+        function value = get.DividerColor(obj)
+            value = obj.DividerColor_I;
         end
 
-        function set.TitleColor(obj, value)
-            obj.TitleColorMode = 'manual';
-            obj.TitleColor_I = value;
+        function set.DividerColor(obj, value)
+            obj.DividerColorMode = 'manual';
+            obj.DividerColor_I = value;
         end
 
-        function set.TitleColorMode(obj, value)
-            obj.TitleColorMode = value;
+        function set.DividerColorMode(obj, value)
+            obj.DividerColorMode = value;
             obj.applyTheme();
         end
 
-        function set.TitleColor_I(obj,value)
-            obj.TitleColor_I = value;
-            obj.updateTitleColorableComponents()
+        function set.DividerColor_I(obj,value)
+            obj.DividerColor_I = value;
+            obj.updateDividerColorableComponents()
         end
 
-        function set.TitleColorableComponents(obj,value)
-            obj.TitleColorableComponents = value;
+        function set.DividerColorableComponents(obj,value)
+            obj.DividerColorableComponents = value;
             obj.applyTheme();
-            obj.updateTitleColorableComponents()
+            obj.updateDividerColorableComponents()
         end
 
     end %methods
@@ -80,7 +80,7 @@ classdef TitleColorable < handle
     %% Constructor
     methods
 
-        function obj = TitleColorable()
+        function obj = DividerColorable()
 
             % Confirm BaseWidget and R2025a or newer
             if isa(obj,"wt.abstract.BaseWidget") ...
@@ -100,12 +100,12 @@ classdef TitleColorable < handle
     %% Protected Methods
     methods (Access = protected)
 
-        function updateTitleColorableComponents(obj)
+        function updateDividerColorableComponents(obj)
 
             % What needs to be updated?
-            comps = obj.TitleColorableComponents;
-            propNames = ["TitleColor","FontColor","ForegroundColor"];
-            color = obj.TitleColor_I;
+            comps = obj.DividerColorableComponents;
+            propNames = ["DividerColor","Color","BackgroundColor"];
+            color = obj.DividerColor_I;
 
             % Set the subcomponent properties in prioritized order
             wt.utility.setStylePropsInPriority(comps, propNames, color);
@@ -113,7 +113,7 @@ classdef TitleColorable < handle
         end %function
 
 
-        function color = getDefaultTitleColor(obj)
+        function color = getDefaultDividerColor(obj)
             % Returns the default color for 'auto' mode (R2025a and later)
             % The result is dependent on theme
             % Widget subclass may override this
@@ -131,12 +131,12 @@ classdef TitleColorable < handle
         function applyTheme(obj)
 
             % If color mode is auto, use standard theme color
-            if obj.TitleColorMode == "auto" ...
+            if obj.DividerColorMode == "auto" ...
                     && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.TitleColor_I = obj.getDefaultTitleColor();                    
+                obj.DividerColor_I = obj.getDefaultDividerColor();                    
 
             end %if
 

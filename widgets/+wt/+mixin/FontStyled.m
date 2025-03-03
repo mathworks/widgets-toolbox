@@ -120,8 +120,9 @@ classdef FontStyled < handle
 
         function obj = FontStyled()
 
-            % Confirm R2025a or newer
-            if ~isMATLABReleaseOlderThan("R2025a")
+            % Confirm BaseWidget and R2025a or newer
+            if isa(obj,"wt.abstract.BaseWidget") ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
                 obj.ThemeChangedListener = ...
@@ -143,7 +144,7 @@ classdef FontStyled < handle
             comps = obj.FontStyledComponents;
 
             % Font color properties in prioritized order
-            colorProps = ["FontColor","FontColor","ForegroundColor"];
+            colorProps = ["FontColor","ForegroundColor"];
 
             % Updating all or a specific property?
             if nargin < 3
@@ -173,26 +174,19 @@ classdef FontStyled < handle
     end %methods
 
 
-    %% Abstract Methods
-    methods (Abstract, Hidden)
-
-        % This is supplied by wt.abstract.BaseWidget
-        color = getThemeColor(obj, semanticColorId)
-
-    end %methods
-
-
     %% Private Methods
     methods (Access = private)
 
         function applyTheme(obj)
 
             % If color mode is auto, use standard theme color
-            if obj.FontColorMode == "auto" && ~isMATLABReleaseOlderThan("R2025a")
+            if obj.FontColorMode == "auto" ...
+                    && isa(obj,"wt.abstract.BaseWidget") ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
                 obj.FontColor_I = ...
-                    obj.getThemeColor("--mw-color-primary");
+                    obj.getThemeColor("--mw-color-primary"); %#ok<MCNPN>
 
             end %if
 

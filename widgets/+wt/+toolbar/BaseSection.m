@@ -1,14 +1,16 @@
 classdef (Hidden, AllowedSubclasses = ...
         {?wt.toolbar.VerticalSection, ?wt.toolbar.HorizontalSection} ) ...
-        BaseSection < wt.abstract.BaseWidget & wt.mixin.FontStyled
+        BaseSection < ...
+        wt.abstract.BaseWidget & ...
+        wt.mixin.FontStyled
     % Base class for a toolbar section
     
-    % Copyright 2020-2021 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Events
     %events (HasCallbackProperty, NotifyAccess = protected)
-    %RAJ - manually added callback due to g2405728
+    %RAJ - manually added callback due to g2405728 (fixed in R2021b)
     events (NotifyAccess = protected)
         
         % Event triggered when a button is pushed
@@ -143,7 +145,7 @@ classdef (Hidden, AllowedSubclasses = ...
             
             % Link styles
             obj.FontStyledComponents = obj.Component;
-            obj.BackgroundColorableComponents = obj.Component;
+            obj.BackgroundColorableComponents = [obj.Grid; obj.Component];
             
             % Set column width
             obj.Grid.ColumnWidth = {'1x'};

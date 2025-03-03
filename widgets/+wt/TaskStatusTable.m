@@ -2,8 +2,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
         wt.mixin.Enableable & ...
         wt.mixin.FontStyled & ...
         wt.mixin.Tooltipable & ...
-        wt.mixin.ButtonColorable & ...
-        wt.mixin.PropertyViewable
+        wt.mixin.ButtonColorable
 
     % A table showing status of multiple tasks
     
@@ -228,15 +227,6 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
             obj.updateEnableableComponents();
             
         end %function
-        
-        
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end
         
 
         function updateEnableableComponents(obj)
