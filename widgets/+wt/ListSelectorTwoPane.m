@@ -172,7 +172,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             if ~obj.Sortable
                 selIdx = sort(selIdx);
             end
-            
+
             % Update the list on right side
             obj.RightList.Items = obj.Items(selIdx);
             obj.RightList.ItemsData = selIdx;
@@ -209,14 +209,6 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             else
                 val = numel(obj.Items);
             end
-
-        end %function
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
 
         end %function
 
@@ -344,17 +336,17 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
 
                 % Get the original value
                 oldValue = obj.Value;
-    
+
                 % Update the selection
                 newSelIdx = [obj.SelectedIndex idxSel];
                 obj.SelectedIndex = newSelIdx;
-    
+
                 % Request update
                 obj.update();
-    
+
                 % Set selection on right side
                 obj.RightList.Value = idxSel;
-    
+
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
                 notify(obj,"ValueChanged",evtOut);
@@ -370,7 +362,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             % What's currently selected?
 
             idxSel = obj.RightList.Value;
-            
+
             % Is there something to remove?
             if ~isempty(idxSel)
 
@@ -487,19 +479,19 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
         function value = get.SelectedIndex(obj)
             value = obj.RightList.ItemsData;
             value(value > obj.getMaximumValidItemsNumber) = [];
-        end        
+        end
         function set.SelectedIndex(obj,value)
             if ~obj.Sortable
                 value = sort(value);
             end
             if any(value > numel(obj.Items))
                 error("widgets:ListSelectorTwoPane:InvalidIndex",...
-                        "'SelectedIndex' must be within the length of the 'Items' property.")
+                    "'SelectedIndex' must be within the length of the 'Items' property.")
             end
             if ~isempty(obj.ItemsData) && any(value > numel(obj.ItemsData))
                 error("widgets:ListSelectorTwoPane:InvalidIndex",...
-                        "'SelectedIndex' must be within the length of the 'ItemsData' property.")
-            end            
+                    "'SelectedIndex' must be within the length of the 'ItemsData' property.")
+            end
             obj.RightList.Items = obj.Items(value);
             obj.RightList.ItemsData = value;
         end

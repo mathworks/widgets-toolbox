@@ -1,54 +1,54 @@
 classdef PasswordField <  wt.abstract.BaseWidget
     % A password entry field
-    
+
     % Copyright 2020-2025 The MathWorks Inc.
-    
-    
+
+
     %% Public properties
     properties (AbortSet)
-        
+
         % The current value shown
         Value (1,1) string
-                
+
     end %properties
-    
-    
+
+
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
-        
+
         % Triggered on enter key pressed, has companion callback
         ValueChanged
-        
+
         % Triggered on value changing during typing, has companion callback
         ValueChanging
-        
+
     end %events
-    
-    
-    
+
+
+
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
-        
+
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
 
         % Previous value for callback
         PrevValue (1,1) string
-        
+
     end %properties
-    
-    
+
+
     %% Protected methods
     methods (Access = protected)
-        
+
         function setup(obj)
 
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
-            
+
             % Set default size
             obj.Position(3:4) = [100 25];
-            
+
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
                 '<script type="text/javascript">',...
@@ -68,7 +68,7 @@ classdef PasswordField <  wt.abstract.BaseWidget
                 '    });',...
                 '}',...
                 '</script>'];
-            
+
             % Create a html password input
             obj.PasswordControl = uihtml(...
                 'Parent',obj.Grid,...
@@ -80,30 +80,21 @@ classdef PasswordField <  wt.abstract.BaseWidget
 
         end %function
 
- 
+
         function update(obj)
-            
+
             % Update the edit control text
             obj.PasswordControl.Data = obj.Value;
-            
+
         end %function
-        
-        
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end % function
 
     end %methods
-    
-    
-    
+
+
+
     %% Private methods
     methods (Access = private)
-        
+
         function onPasswordChanged(obj,evt)
             % Triggered on interaction
 
@@ -113,7 +104,7 @@ classdef PasswordField <  wt.abstract.BaseWidget
 
             % Look at the states
             if endsWith(evt.PreviousData, newline)
-            % This is needed to ignore double events
+                % This is needed to ignore double events
 
                 % Clear the newline from the uihtml data
                 newValue = erase(newValue, newline);
@@ -142,8 +133,8 @@ classdef PasswordField <  wt.abstract.BaseWidget
             end
 
         end %function
-    
+
     end %methods
-    
+
 end % classdef
 

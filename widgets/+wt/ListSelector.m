@@ -175,15 +175,6 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end %function
-
-
         function updateEnables(obj)
 
             % Button enables
