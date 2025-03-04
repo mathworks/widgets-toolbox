@@ -82,9 +82,6 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
             obj.Grid.RowSpacing = 5;
             obj.Grid.Scrollable = true;
 
-            % Default background to Control Color
-            % obj.BackgroundColor = [1 1 1];
-
             % Create the Select All checkbox
             obj.AllCheck = matlab.ui.control.CheckBox(...
                 "Parent",obj.Grid,...
