@@ -564,13 +564,18 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             end
         end
         function set.HighlightedValueLeft(obj,value)
-            if isempty(value)
+            if isempty(value) || isempty(obj.Items)
                 obj.LeftList.Value = {};
             else
                 if isempty(obj.ItemsData)
-                    [~, obj.LeftList.Value] = ismember(value, obj.Items);
+                    if ismember(value, obj.Items)
+                        obj.LeftList.Value = value;
+                    end
                 else
                     [~, obj.LeftList.Value] = ismember(value, obj.ItemsData);
+                    if ismember(value, obj.ItemsData)
+                        obj.LeftList.Value = value;
+                    end
                 end
             end
         end
