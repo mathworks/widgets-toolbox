@@ -83,7 +83,7 @@ classdef SeparatorColorable < handle
         function obj = SeparatorColorable()
 
             % Confirm BaseWidget and R2025a or newer
-            if isa(obj,"wt.abstract.BaseWidget") ...
+            if matches("WidgetThemeChanged", events(obj)) ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
@@ -118,7 +118,18 @@ classdef SeparatorColorable < handle
             % The result is dependent on theme
             % Widget subclass may override this
 
-            color = obj.getThemeColor("--mw-borderColor-primary"); %#ok<MCNPN>
+            try
+                color = obj.getThemeColor("--mw-borderColor-primary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.SeparatorColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
 
         end %function
 
@@ -132,11 +143,10 @@ classdef SeparatorColorable < handle
 
             % If color mode is auto, use standard theme color
             if obj.SeparatorColorMode == "auto" ...
-                    && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.SeparatorColor_I = obj.getDefaultSeparatorColor();                    
+                obj.SeparatorColor_I = obj.getDefaultSeparatorColor();
 
             end %if
 

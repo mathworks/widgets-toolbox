@@ -11,10 +11,10 @@ classdef TitleFontStyled < handle
         TitleFontName char {mustBeNonempty} = 'Helvetica'
 
         % Font size in points
-        TitleFontSize (1,1) double {mustBePositive,mustBeFinite} = 12
+        TitleFontSize (1,1) double {mustBePositive,mustBeFinite} = 14
 
         % Font weight (normal/bold)
-        TitleFontWeight (1,1) wt.enum.FontWeightState = 'normal'
+        TitleFontWeight (1,1) wt.enum.FontWeightState = 'bold'
 
         % Font angle (normal/italic)
         TitleFontAngle (1,1) wt.enum.FontAngleState = 'normal'
@@ -121,7 +121,7 @@ classdef TitleFontStyled < handle
         function obj = TitleFontStyled()
 
             % Confirm BaseWidget and R2025a or newer
-            if isa(obj,"wt.abstract.BaseWidget") ...
+            if matches("WidgetThemeChanged", events(obj)) ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
@@ -177,7 +177,18 @@ classdef TitleFontStyled < handle
             % The result is dependent on theme
             % Widget subclass may override this
 
-            color = obj.getThemeColor("--mw-color-secondary"); %#ok<MCNPN>
+            try
+                color = obj.getThemeColor("--mw-color-secondary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.TitleColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
 
         end %function
 
@@ -191,7 +202,6 @@ classdef TitleFontStyled < handle
 
             % If color mode is auto, use standard theme color
             if obj.TitleColorMode == "auto" ...
-                    && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color

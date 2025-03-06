@@ -1,8 +1,21 @@
 classdef BaseViewController < wt.mixin.ModelObserver & ...
-        matlab.ui.componentcontainer.ComponentContainer
+        matlab.ui.componentcontainer.ComponentContainer & ...
+        wt.mixin.BackgroundColorable & ...
+        wt.mixin.TitleFontStyled & ...
+        wt.mixin.ErrorHandling
+
     % Base class for views/controllers referencing a BaseModel class
 
     % Copyright 2025 The MathWorks Inc.
+
+
+    %% Events
+    events (ListenAccess = public)
+
+        % Triggered after WidgetTheme has changed
+        WidgetThemeChanged
+
+    end %event
 
 
     %% Public Properties
@@ -29,6 +42,14 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
     end %properties
 
 
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener for theme changes
+        InternalThemeChangedListener event.listener
+
+    end %properties
+
+
     properties (Transient, NonCopyable, UsedInUpdate = true, ...
             GetAccess = private, SetAccess = protected)
 
@@ -46,6 +67,13 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             % Call superclass constructors
             obj = obj@matlab.ui.componentcontainer.ComponentContainer(varargin{:});
             obj@wt.mixin.ModelObserver();
+
+            % Listen to theme changes (R2025a and later only)
+            if ~isMATLABReleaseOlderThan("R2025a")
+                obj.InternalThemeChangedListener = listener(obj,"ThemeChanged",...
+                    @(~,evt)onWidgetThemeChanged_I(obj));
+                % obj.WidgetTheme = obj.getTheme();
+            end
 
         end %function
     end %methods
@@ -97,6 +125,10 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
             obj.Grid.ColumnSpacing = 5;
             obj.Grid.RowSpacing = 10;
             obj.Grid.Scrollable = true;
+
+            % Update component lists
+            obj.BackgroundColorableComponents = [obj.Grid, obj.OuterGrid, obj.OuterPanel];
+            obj.TitleFontStyledComponents = [obj.OuterPanel];
 
         end %function
 
@@ -192,5 +224,42 @@ classdef BaseViewController < wt.mixin.ModelObserver & ...
         end %function
 
     end %methods
+
+
+    %% Hidden Methods
+    methods (Hidden, Sealed)
+
+        function color = getThemeColor(obj, semanticColorId)
+            % Get color from theme and semantic variable
+
+            msg = "MATLAB R2025a or later is needed to call wt.abstract.BaseWidget.getThemeColor().";
+            assert(~isMATLABReleaseOlderThan("R2025a"), msg)
+
+            % Get the theme
+            theme = obj.getTheme();
+
+            % Get theme from semantic variable
+            % This is undocumented and may change. Better to call the
+            % getThemeColor method rather than reusing this directly.
+            color = matlab.graphics.internal.themes.getAttributeValue(...
+                theme, semanticColorId);
+
+        end %function
+
+    end %methods
+
+
+    %% Private Methods
+    methods (Access = private)
+
+        function onWidgetThemeChanged_I(obj)
+            % Handle theme changes
+
+            notify(obj,"WidgetThemeChanged")
+
+        end %function
+
+    end %methods
+
 
 end %classdef

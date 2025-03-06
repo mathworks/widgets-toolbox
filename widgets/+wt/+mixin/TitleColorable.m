@@ -83,7 +83,7 @@ classdef TitleColorable < handle
         function obj = TitleColorable()
 
             % Confirm BaseWidget and R2025a or newer
-            if isa(obj,"wt.abstract.BaseWidget") ...
+            if matches("WidgetThemeChanged", events(obj)) ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
@@ -108,7 +108,7 @@ classdef TitleColorable < handle
             color = obj.TitleColor_I;
 
             % Set the subcomponent properties in prioritized order
-            wt.utility.setStylePropsInPriority(comps, propNames, color);
+            wt.utility.setStylePropsInPriority(comps, propNames, color); 
 
         end %function
 
@@ -118,7 +118,18 @@ classdef TitleColorable < handle
             % The result is dependent on theme
             % Widget subclass may override this
 
-            color = obj.getThemeColor("--mw-color-secondary"); %#ok<MCNPN>
+            try
+                color = obj.getThemeColor("--mw-color-secondary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.TitleColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
 
         end %function
 
@@ -132,11 +143,10 @@ classdef TitleColorable < handle
 
             % If color mode is auto, use standard theme color
             if obj.TitleColorMode == "auto" ...
-                    && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.TitleColor_I = obj.getDefaultTitleColor();                    
+                obj.TitleColor_I = obj.getDefaultTitleColor();
 
             end %if
 

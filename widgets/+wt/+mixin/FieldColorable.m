@@ -83,7 +83,7 @@ classdef FieldColorable < handle
         function obj = FieldColorable()
 
             % Confirm BaseWidget and R2025a or newer
-            if isa(obj,"wt.abstract.BaseWidget") ...
+            if matches("WidgetThemeChanged", events(obj)) ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
@@ -118,7 +118,18 @@ classdef FieldColorable < handle
             % The result is dependent on theme
             % Widget subclass may override this
 
-            color = obj.getThemeColor("--mw-backgroundColor-input"); %#ok<MCNPN>
+            try
+                color = obj.getThemeColor("--mw-backgroundColor-input"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.FieldColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
 
         end %function
 
@@ -132,7 +143,6 @@ classdef FieldColorable < handle
 
             % If color mode is auto, use standard theme color
             if obj.FieldColorMode == "auto" ...
-                    && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color

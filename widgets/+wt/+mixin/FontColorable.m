@@ -84,7 +84,7 @@ classdef FontColorable < handle
         function obj = FontColorable()
 
             % Confirm BaseWidget and R2025a or newer
-            if isa(obj,"wt.abstract.BaseWidget") ...
+            if matches("WidgetThemeChanged", events(obj)) ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Listen to theme changes
@@ -114,6 +114,27 @@ classdef FontColorable < handle
 
         end %function
 
+
+        function color = getDefaultFontColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
+
+            try
+                color = obj.getThemeColor("--mw-color-primary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.FontColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
+
+        end %function
+
     end %methods
 
 
@@ -124,12 +145,10 @@ classdef FontColorable < handle
 
             % If color mode is auto, use standard theme color
             if obj.FontColorMode == "auto" ...
-                    && isa(obj,"wt.abstract.BaseWidget") ...
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.FontColor_I = ...
-                    obj.getThemeColor("--mw-color-primary"); %#ok<MCNPN>
+                obj.FontColor_I = obj.getDefaultFontColor();
 
             end %if
 

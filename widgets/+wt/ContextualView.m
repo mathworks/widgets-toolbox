@@ -79,9 +79,6 @@ classdef ContextualView < wt.abstract.BaseWidget
     properties (AbortSet, Transient, NonCopyable, Hidden, ...
             SetAccess = protected, UsedInUpdate = false)
 
-        % Top-level grid to manage content vs. loading
-        Grid matlab.ui.container.GridLayout
-
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
 
