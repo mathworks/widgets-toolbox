@@ -27,15 +27,15 @@ classdef PropertyViewable < handle
 
             % Split callbacks, fonts, and colorizations
             isCallback = endsWith(propNames, "Fcn");
-            isColor = endsWith(propNames, "Color");
-            normalProps = propNames(~isCallback);
+            isColor = contains(propNames, "Color");
+            normalProps = propNames(~isCallback & ~isColor);
             callbackProps = propNames(isCallback & ~isColor);
 
             % Define the property gorups
             groups = [
                 matlab.mixin.util.PropertyGroup(callbackProps)
                 matlab.mixin.util.PropertyGroup(normalProps)
-                matlab.mixin.util.PropertyGroup(["Position", "Units"])
+                matlab.mixin.util.PropertyGroup("Position")
                 ];
 
             % Ignore Empty Groups
