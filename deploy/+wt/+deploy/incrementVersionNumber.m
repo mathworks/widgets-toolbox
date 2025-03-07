@@ -1,5 +1,6 @@
 function versionStr = incrementVersionNumber()
 % Increments the build number in the version.txt
+%   Copyright 2025 The MathWorks Inc.
 
 % Read in the version info
 [~, versionParts, versionFile] = wt.deploy.readVersionNumber();

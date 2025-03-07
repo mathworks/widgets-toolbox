@@ -1,5 +1,6 @@
 classdef BaseViewChart < wt.test.BaseWidgetTest
     % Implements unit tests for the chart class
+%   Copyright 2025 The MathWorks Inc.
 
     
     

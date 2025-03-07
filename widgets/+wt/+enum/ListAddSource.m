@@ -2,7 +2,7 @@ classdef ListAddSource
     %LISTADDSOURCE Represent add selections for list widget
     %   Enumerates a list of choices
 
-    % Copyright 2021 The MathWorks Inc.
+%   Copyright 2021-2025 The MathWorks Inc.
     
     
     %% Enumerations

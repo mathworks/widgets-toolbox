@@ -3,7 +3,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         wt.mixin.ErrorHandling
     % Base class for a chart with time-aligned axes
 
-    % Copyright 2022-2023 The MathWorks Inc.
+%   Copyright 2022-2025 The MathWorks Inc.
 
 
     %% Public Properties

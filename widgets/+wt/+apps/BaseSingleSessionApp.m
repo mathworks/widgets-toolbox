@@ -1,7 +1,7 @@
 classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
     % Base class for Widgets Toolbox app with a managed single session
 
-    % Copyright 2020-2024 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Properties

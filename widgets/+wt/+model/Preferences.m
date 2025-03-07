@@ -5,7 +5,7 @@ classdef Preferences < wt.model.BaseModel
     %   The preferences may be set to automatically load upon creating an
     %   instance, and save upon destruction of an instance of this class.
     
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     

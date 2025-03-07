@@ -1,5 +1,6 @@
 function publishLiveScriptToHtml(srcFiles,dstFolder)
 % Publish each *.mlx file from doc_input into doc as html
+%   Copyright 2025 The MathWorks Inc.
 
 arguments
     srcFiles (:,1) string {mustBeFile}

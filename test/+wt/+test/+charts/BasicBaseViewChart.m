@@ -1,5 +1,6 @@
 classdef BasicBaseViewChart < wt.abstract.BaseViewChart
      % Implements a chart
+%   Copyright 2025 The MathWorks Inc.
     
 
     %% Properties

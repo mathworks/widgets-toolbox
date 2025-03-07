@@ -1,5 +1,6 @@
 classdef Exhibit < wt.model.BaseModel
     % Implements the model class for an exhibit
+%   Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties

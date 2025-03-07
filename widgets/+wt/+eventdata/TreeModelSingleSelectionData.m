@@ -1,7 +1,7 @@
 classdef TreeModelSingleSelectionData < event.EventData
     % Event data for tree model selection for a single-node selection tree
 
-    % Copyright 2024 The MathWorks, Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
 
     
     %% Properties

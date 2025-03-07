@@ -1,7 +1,7 @@
 classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
     % Base class for Widgets Toolbox app with multiple managed sessions
 
-    % Copyright 2024 The MathWorks Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Properties

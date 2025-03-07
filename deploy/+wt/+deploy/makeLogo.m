@@ -139,3 +139,4 @@ gridObj.ColumnWidth = {105 120 '1x'};
 
 drawnow
 exportapp(fig,'widgets_logo.png')
+%   Copyright 2025 The MathWorks Inc.

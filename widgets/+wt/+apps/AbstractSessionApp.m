@@ -2,7 +2,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
         ?wt.apps.BaseMultiSessionApp}) AbstractSessionApp < wt.apps.BaseApp
     % Abstract base class for Widgets Toolbox app with 1+ sessions
 
-    % Copyright 2024 The MathWorks Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Abstract Public Properties

@@ -2,7 +2,7 @@ function setStylePropsInPriority(comps, propNames, value)
 % For each given component, set the specified value to the first identified
 % property. Properties specified in prioritized order.
 
-% Copyright 2023 The MathWorks Inc.
+%   Copyright 2023-2025 The MathWorks Inc.
 
 
 % Define arguments

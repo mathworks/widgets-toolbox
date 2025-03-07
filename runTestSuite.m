@@ -1,7 +1,7 @@
 function [testSuite, result] = runTestSuite()
 % Run the test suite
 
-% Copyright 2019-2021 The MathWorks, Inc.
+%   Copyright 2019-2025 The MathWorks Inc.
 
 
 %% Create test suite

@@ -2,7 +2,7 @@ classdef PropertyViewable < handle
     % Mixin for component to organize the display of properties in the
     % command window.
     
-    % Copyright 2020-2023 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
     
     %% Protected Methods

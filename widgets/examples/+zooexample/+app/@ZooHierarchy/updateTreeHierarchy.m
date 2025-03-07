@@ -1,7 +1,7 @@
 function updateTreeHierarchy(app)
 % Creates/updates the tree hierarchy by synchronizing each level
 
-% Copyright 2024 The MathWorks Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
 
 % Show output if Debug is on
 app.displayDebugText();

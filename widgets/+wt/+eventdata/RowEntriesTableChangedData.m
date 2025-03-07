@@ -1,7 +1,7 @@
 classdef RowEntriesTableChangedData < event.EventData
     % Event data for table changed events
 
-    % Copyright 2024 The MathWorks, Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
 
     %% Properties
     properties

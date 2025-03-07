@@ -5,7 +5,7 @@ classdef (HandleCompatible) DisplayNonScalarObjectAsTable < matlab.mixin.CustomD
     % display an array of objects as a table.
     %
     
-    %   Copyright 2018-2024 The MathWorks, Inc.
+%   Copyright 2018-2025 The MathWorks Inc.
     
     
     %% Public Methods

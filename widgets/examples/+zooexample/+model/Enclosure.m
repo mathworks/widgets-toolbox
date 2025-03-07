@@ -1,5 +1,6 @@
 classdef Enclosure < wt.model.BaseModel
     % Implements the model class for an enclosure
+%   Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties

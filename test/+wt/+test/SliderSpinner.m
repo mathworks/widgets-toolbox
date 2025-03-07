@@ -1,7 +1,7 @@
 classdef SliderSpinner < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2024 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
     
     %% Test Method Setup

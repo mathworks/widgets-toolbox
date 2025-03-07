@@ -1,5 +1,6 @@
 classdef Session < wt.model.BaseSession
     % Implements the session class for the app
+%   Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties

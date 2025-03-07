@@ -1,5 +1,6 @@
 function [versionStr, versionParts, versionFile] = readVersionNumber()
 % Retrieves the version number
+%   Copyright 2025 The MathWorks Inc.
 
 % Version file path
 thisPath = mfilename("fullpath");

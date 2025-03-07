@@ -1,5 +1,6 @@
 classdef BaseApp < matlab.uitest.TestCase
     % Implements unit tests for the app class
+%   Copyright 2025 The MathWorks Inc.
     
     %% Properties
     properties

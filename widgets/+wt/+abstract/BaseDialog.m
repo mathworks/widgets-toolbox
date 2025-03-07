@@ -4,7 +4,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
         wt.mixin.FieldColorable
     % Base class for a dialog panel
 
-    % Copyright 2022-2023 The MathWorks Inc.
+%   Copyright 2022-2025 The MathWorks Inc.
     
 
     %% Public Properties
