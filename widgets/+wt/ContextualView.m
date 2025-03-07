@@ -279,14 +279,23 @@ classdef ContextualView < wt.abstract.BaseWidget
 
             % Children order of the widget
             % - widget itself
-            %   - MainGrid
+            %   - Grid
             %       - ContentGrid (views go here)
             %       - LoadingImage (visible gets toggled to cover view)
 
-            obj.Grid.Padding = [1 1 1 1];
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+            
+             % Set default size and position
+            obj.Position = [10 10 400 400];
+
+            % Configure grid
             % Show an temporary border around the edge. This makes the
             % component more obvious in App Designer
+            obj.Grid.Padding = [1 1 1 1];
+
+            % Default to theme color
             if isMATLABReleaseOlderThan("R2025a")
                 color = [.5 .5 .5];
             else
