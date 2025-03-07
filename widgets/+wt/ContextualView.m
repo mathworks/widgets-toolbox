@@ -79,6 +79,9 @@ classdef ContextualView < wt.abstract.BaseWidget
     properties (AbortSet, Transient, NonCopyable, Hidden, ...
             SetAccess = protected, UsedInUpdate = false)
 
+        % Top-level grid to manage content vs. loading
+        % Grid matlab.ui.container.GridLayout
+
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
 
@@ -296,9 +299,6 @@ classdef ContextualView < wt.abstract.BaseWidget
             obj.ContentGrid.Padding = [0 0 0 0];
             obj.ContentGrid.Layout.Row = 1;
             obj.ContentGrid.Layout.Column = 1;
-
-            % Set default size and position
-            obj.Position = [10 10 400 400];
 
             % Image to display while loading content
             obj.LoadingImage = uiimage(obj.Grid);
