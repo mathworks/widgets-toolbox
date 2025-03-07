@@ -117,13 +117,13 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
             % Verify MainGrid's parent the widget
             diag = "MainGrid's parent should be the ContextualView widget";
-            actVal = testCase.Widget.MainGrid.Parent;
+            actVal = testCase.Widget.Grid.Parent;
             expVal = testCase.Widget;
             testCase.verifyEqual(actVal, expVal, diag)
 
             % Verify MainGrid's children order
             diag = "MainGrid's children should be the ContentGrid and LoadingImage in order";
-            actVal = testCase.Widget.MainGrid.Children;
+            actVal = testCase.Widget.Grid.Children;
             expVal = [
                 testCase.Widget.ContentGrid
                 testCase.Widget.LoadingImage

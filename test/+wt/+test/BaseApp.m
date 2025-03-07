@@ -57,7 +57,7 @@ classdef BaseApp < matlab.uitest.TestCase
             diag = "Expected BasicBaseAppSubclass figure to be populated.";
             testCase.verifyNotEmpty(testCase.App.Figure, diag)
 
-            diag = "Expected BasicBaseAppSubclass intenral Label to be populated.";
+            diag = "Expected BasicBaseAppSubclass internal Label to be populated.";
             testCase.verifyNotEmpty(testCase.App.Label, diag)
 
             % Verify update was run

@@ -1,5 +1,4 @@
-classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
+classdef RowEntriesTable < wt.abstract.BaseWidget & ...
         wt.mixin.ButtonColorable &...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
@@ -97,9 +96,6 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
         
-        % Grid
-        Grid matlab.ui.container.GridLayout
-        
         % Table for entries
         Table matlab.ui.control.Table
         
@@ -157,22 +153,24 @@ classdef RowEntriesTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
             
+            % Verify compatibility - R2022a and later only
             if isMATLABReleaseOlderThan("R2022a")
                 id = "wt:RowEntriesTable:ReleaseNotSupported";
                 msg = "RowEntriesTable supports R2022a and later.";
                 error(id,msg);
             end
-            
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj,[5,2]);
-            obj.Grid.ColumnWidth = {'1x',30};
-            obj.Grid.RowHeight = {30,30,30,30,'1x'};
-            obj.Grid.Padding = 0;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.RowSpacing = 5;
+
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
             
             % Set default size
             obj.Position(3:4) = [300 200];
+
+            % Configure grid
+            obj.Grid.ColumnWidth = {'1x',30};
+            obj.Grid.RowHeight = {30,30,30,30,'1x'};
+            obj.Grid.ColumnSpacing = 5;
+            obj.Grid.RowSpacing = 5;
             
             % Create the Table
             obj.Table = uitable(obj.Grid);

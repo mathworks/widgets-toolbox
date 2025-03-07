@@ -1,6 +1,4 @@
-classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & wt.mixin.ErrorHandling
-
+classdef ContextualView < wt.abstract.BaseWidget
     % Contextual View/Controller pane that can present varied views
     % This pane can switch its contents between multiple different
     % contextual components inside. It is much like a tabpanel, but without
@@ -82,7 +80,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             SetAccess = protected, UsedInUpdate = false)
 
         % Top-level grid to manage content vs. loading
-        MainGrid matlab.ui.container.GridLayout
+        % Grid matlab.ui.container.GridLayout
 
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
@@ -110,7 +108,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Remove the initial box on first load
             if obj.FirstLoad
-                obj.MainGrid.Padding = 0;
+                obj.Grid.Padding = 0;
                 obj.FirstLoad = false;
             end
 
@@ -168,7 +166,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             % Flag if we need to trigger a drawnow to give time to display
             % the loading image
             updateNeeded = false;
-            
+
             % Check each ContextualView in the input array
             for idx = 1:numel(viewArray)
 
@@ -203,7 +201,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
             if updateNeeded
                 drawnow("limitrate")
             end
-            
+
         end %function
 
 
@@ -281,26 +279,38 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Children order of the widget
             % - widget itself
-            %   - MainGrid
+            %   - Grid
             %       - ContentGrid (views go here)
             %       - LoadingImage (visible gets toggled to cover view)
 
 
-            obj.MainGrid = uigridlayout(obj,[1 1]);
-            obj.MainGrid.Padding = [1 1 1 1];
-            obj.MainGrid.BackgroundColor = [.5 .5 .5];
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+            
+             % Set default size and position
+            obj.Position = [10 10 400 400];
+
+            % Configure grid
+            % Show an temporary border around the edge. This makes the
+            % component more obvious in App Designer
+            obj.Grid.Padding = [1 1 1 1];
+
+            % Default to theme color
+            if isMATLABReleaseOlderThan("R2025a")
+                color = [.5 .5 .5];
+            else
+                color = obj.getThemeColor("--mw-borderColor-primary");
+            end
+            obj.Grid.BackgroundColor = color;
 
             % Grid Layout to place the contents
-            obj.ContentGrid = uigridlayout(obj.MainGrid,[1 1]);
+            obj.ContentGrid = uigridlayout(obj.Grid,[1 1]);
             obj.ContentGrid.Padding = [0 0 0 0];
             obj.ContentGrid.Layout.Row = 1;
             obj.ContentGrid.Layout.Column = 1;
 
-            % Set default size and position
-            obj.Position = [10 10 400 400];
-
             % Image to display while loading content
-            obj.LoadingImage = uiimage(obj.MainGrid);
+            obj.LoadingImage = uiimage(obj.Grid);
             obj.LoadingImage.Layout.Row = 1;
             obj.LoadingImage.Layout.Column = 1;
             obj.LoadingImage.Visible = "off";
@@ -317,7 +327,7 @@ classdef ContextualView < matlab.ui.componentcontainer.ComponentContainer & ...
 
             % Configure the loading image
             obj.LoadingImage.ImageSource = obj.LoadingImageSource;
-            
+
         end %function
 
     end %methods

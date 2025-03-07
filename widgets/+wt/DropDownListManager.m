@@ -1,5 +1,4 @@
-classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
+classdef DropDownListManager < wt.abstract.BaseWidget & ...
         wt.mixin.ButtonColorable &...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
@@ -62,7 +61,7 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
     end %properties
 
 
-    % Accessors
+    %% Property Accessors
     methods
 
         function value = get.Items(obj)
@@ -149,9 +148,6 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
         % The edit field
         EditField (1,1) matlab.ui.control.EditField
 
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-
         % The list sorting buttons
         ListButtons wt.ButtonGrid
 
@@ -171,15 +167,14 @@ classdef DropDownListManager < matlab.ui.componentcontainer.ComponentContainer &
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [250 30];
 
-            % Construct Default Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj,[1 3]);
+            % Configure Grid
             obj.Grid.ColumnWidth = {'1x',30,30,30};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
 
             % Create the DropDown
             obj.DropDown = uidropdown(obj.Grid);

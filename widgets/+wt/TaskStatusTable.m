@@ -1,11 +1,13 @@
-classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.Tooltipable & ...
-        wt.mixin.ButtonColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.PropertyViewable
+classdef TaskStatusTable < wt.abstract.BaseWidget & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.SelectionColorable & ...
+        wt.mixin.ButtonColorable & ...
+        wt.mixin.Enableable & ...
+        wt.mixin.Tooltipable
 
     % A table showing status of multiple tasks
     
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties
@@ -31,10 +33,6 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Selected task
         SelectedIndex double {mustBeScalarOrEmpty, mustBeFinite, mustBePositive} = 1
-        
-        % Selection color
-        SelectionColor (1,3) double ...
-            {mustBeInRange(SelectionColor,0,1)} = [.8 .8 1];
         
         % Enables button and status row to display
         ShowButtonRow (1,1) matlab.lang.OnOffSwitchState = true
@@ -67,9 +65,6 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         % Grid for task items
         TaskGrid (1,1) matlab.ui.container.GridLayout
-
-        % Main Grid for Layout
-        Grid (1,1) matlab.ui.container.GridLayout
         
         % Task Labels
         Label (1,:) matlab.ui.control.Label
@@ -95,16 +90,11 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
         
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [100 180];
-            
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;   
             
             % Configure Main Grid
             obj.Grid.ColumnWidth = {25,'1x',25};
@@ -234,15 +224,6 @@ classdef TaskStatusTable < matlab.ui.componentcontainer.ComponentContainer & ...
             obj.updateEnableableComponents();
             
         end %function
-        
-        
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end
         
 
         function updateEnableableComponents(obj)

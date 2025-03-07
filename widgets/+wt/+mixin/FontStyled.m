@@ -1,7 +1,7 @@
 classdef FontStyled < handle
     % Mixin for component with Font properties
 
-    % Copyright 2020-2023 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Properties
@@ -19,14 +19,34 @@ classdef FontStyled < handle
         % Font angle (normal/italic)
         FontAngle (1,1) wt.enum.FontAngleState = 'normal'
 
-        % Font color
-        FontColor (1,3) double {mustBeInRange(FontColor,0,1)} = [0 0 0]
+    end %properties
+
+
+    properties (AbortSet, Dependent)
+
+        % Font Color
+        FontColor (1,3) double {mustBeInRange(FontColor,0,1)}
 
     end %properties
 
 
+    properties (AbortSet, NeverAmbiguous)
+
+        % Font color mode
+        FontColorMode (1,1) wt.enum.AutoManualState = 'auto'
+
+    end %properties
+
 
     %% Internal properties
+    properties (AbortSet, Hidden)
+
+        % Font Color
+        FontColor_I (1,3) double {mustBeInRange(FontColor_I,0,1)} = [0 0 0]
+
+    end %properties
+
+
     properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % List of graphics controls to apply to
@@ -35,8 +55,16 @@ classdef FontStyled < handle
     end %properties
 
 
+    properties (Transient, NonCopyable, Access = private)
 
-    %% Accessors
+        % Listener for theme changes
+        ThemeChangedListener event.listener
+
+    end %properties
+
+
+    %% Property Accessors
+
     methods
 
         function set.FontName(obj,value)
@@ -59,21 +87,55 @@ classdef FontStyled < handle
             obj.updateFontStyledComponents("FontAngle",value)
         end
 
-        function set.FontColor(obj,value)
-            obj.FontColor = value;
-            obj.updateFontStyledComponents("FontColor",value)
+        function value = get.FontColor(obj)
+            value = obj.FontColor_I;
+        end
+
+        function set.FontColor(obj, value)
+            obj.FontColorMode = 'manual';
+            obj.FontColor_I = value;
+        end
+
+        function set.FontColorMode(obj, value)
+            obj.FontColorMode = value;
+            obj.applyTheme();
+        end
+
+        function set.FontColor_I(obj,value)
+            obj.FontColor_I = value;
+            obj.updateFontStyledComponents("FontColor", obj.FontColor_I);
         end
 
         function set.FontStyledComponents(obj,value)
             obj.FontStyledComponents = value;
-            obj.updateFontStyledComponents();
+            obj.applyTheme();
+            obj.updateFontStyledComponents()
         end
 
     end %methods
 
 
+    %% Constructor
+    methods
 
-    %% Methods
+        function obj = FontStyled()
+
+            % Confirm BaseWidget and R2025a or newer
+            if matches("WidgetThemeChanged", events(obj)) ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
+
+                % Listen to theme changes
+                obj.ThemeChangedListener = ...
+                    listener(obj, "WidgetThemeChanged", @(~,~)applyTheme(obj));
+
+            end %if
+
+        end %function
+
+    end %methods
+
+
+    %% Protected Methods
     methods (Access = protected)
 
         function updateFontStyledComponents(obj,prop,value)
@@ -81,35 +143,75 @@ classdef FontStyled < handle
             % Get the components
             comps = obj.FontStyledComponents;
 
+            % Font color properties in prioritized order
+            colorProps = ["FontColor","ForegroundColor"];
+
             % Updating all or a specific property?
             if nargin < 3
-
-                % Font color properties in prioritized order
-                colorProps = ["FontColor","ForegroundColor"];
 
                 % Set all subcomponent properties
                 wt.utility.setStylePropsInPriority(comps,"FontName",obj.FontName)
                 wt.utility.setStylePropsInPriority(comps,"FontSize",obj.FontSize)
                 wt.utility.setStylePropsInPriority(comps,"FontWeight",obj.FontWeight)
                 wt.utility.setStylePropsInPriority(comps,"FontAngle",obj.FontAngle)
-                wt.utility.setStylePropsInPriority(comps,colorProps, obj.FontColor);
+                wt.utility.setStylePropsInPriority(comps,colorProps, obj.FontColor_I);
 
             elseif prop == "FontColor"
                 % Update just the FontColor property
 
                 % Set the subcomponent property
-                wt.utility.setStylePropsInPriority(comps,...
-                    ["FontColor","ForegroundColor"], value);
+                wt.utility.setStylePropsInPriority(comps, colorProps, value);
 
             else
 
                 % Set the subcomponent property
-                wt.utility.setStylePropsInPriority(comps,prop,value);
+                wt.utility.setStylePropsInPriority(comps, prop, value);
+
+            end %if
+
+        end %function
+
+
+        function color = getDefaultFontColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
+
+            try
+                color = obj.getThemeColor("--mw-color-primary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.FontColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
+
+        end %function
+
+    end %methods
+
+
+    %% Private Methods
+    methods (Access = private)
+
+        function applyTheme(obj)
+
+            % If color mode is auto, use standard theme color
+            if obj.FontColorMode == "auto" ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
+
+                % Use standard theme color
+                obj.FontColor_I = obj.getDefaultFontColor();
 
             end %if
 
         end %function
 
     end %methods
+
 
 end %classdef
