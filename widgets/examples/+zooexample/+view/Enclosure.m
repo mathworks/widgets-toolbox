@@ -1,5 +1,6 @@
 classdef Enclosure < wt.abstract.BaseViewController
     % View/Controller for Exhibit
+%   Copyright 2025 The MathWorks Inc.
 
     %% Properties
     properties (AbortSet, SetObservable)

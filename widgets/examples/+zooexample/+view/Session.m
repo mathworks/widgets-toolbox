@@ -1,5 +1,6 @@
 classdef Session < wt.abstract.BaseViewController
     % View for zooexample.model.Session
+%   Copyright 2025 The MathWorks Inc.
 
     %% Properties
     properties (SetObservable)

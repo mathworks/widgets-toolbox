@@ -1,5 +1,6 @@
 function y = resizeVector(x,n,val)
 % Resizes the vector x to match the size n using val to pad
+%   Copyright 2025 The MathWorks Inc.
 
 arguments
     x {mustBeVector}

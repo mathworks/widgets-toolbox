@@ -17,7 +17,7 @@ function fastSet(obj,varargin)
 %           none
 %
 
-%   Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 % ---------------------------------------------------------------------
 
 for oIdx = 1:numel(obj)

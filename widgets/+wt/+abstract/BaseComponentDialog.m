@@ -1,7 +1,7 @@
 classdef BaseComponentDialog < wt.abstract.BaseDialog
     % Base dialog attached to a ComponentContainer component
 
-    % Copyright 2022-2023 The MathWorks Inc.
+%   Copyright 2022-2025 The MathWorks Inc.
 
 
     %% Read-Only Properties

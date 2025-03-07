@@ -1,7 +1,7 @@
 classdef BaseWidgetTest < matlab.uitest.TestCase
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Properties

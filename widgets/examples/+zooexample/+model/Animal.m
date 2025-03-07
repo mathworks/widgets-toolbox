@@ -1,5 +1,6 @@
 classdef Animal < wt.model.BaseModel
     % Implements the model class for a zoo animal
+%   Copyright 2025 The MathWorks Inc.
 
 
     %% Public Properties

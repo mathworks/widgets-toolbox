@@ -1,7 +1,7 @@
 classdef Toolbar < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2021 The MathWorks, Inc.
+%   Copyright 2021-2025 The MathWorks Inc.
     
     
     %% Properties

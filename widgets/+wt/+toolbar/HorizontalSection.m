@@ -1,7 +1,7 @@
 classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     % A row of horizontally stacked controls for a toolbar
     
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties

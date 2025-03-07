@@ -1,5 +1,6 @@
 classdef BasicBaseAppSubclass < wt.apps.BaseApp
     % Test app utilizing the BaseApp subclass
+%   Copyright 2025 The MathWorks Inc.
     
 %% Internal Properties
 properties (Hidden, SetAccess = private)

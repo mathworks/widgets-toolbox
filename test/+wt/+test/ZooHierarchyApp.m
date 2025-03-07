@@ -1,5 +1,6 @@
 classdef ZooHierarchyApp < matlab.uitest.TestCase
     % Implements unit tests for the zoo hierarchy example app
+%   Copyright 2025 The MathWorks Inc.
 
     %% Properties
     properties

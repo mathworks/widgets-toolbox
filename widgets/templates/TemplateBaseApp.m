@@ -1,7 +1,7 @@
 classdef TemplateBaseApp < wt.apps.BaseApp
     % Implements a template for a BaseApp
     
-    % Copyright 2020-2023 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Internal Components

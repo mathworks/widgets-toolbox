@@ -1,5 +1,6 @@
 function value = convertEnumToValue(value)
 % Convert enumaration value to its double or string associated value
+%   Copyright 2025 The MathWorks Inc.
 
 valueClass = class(value);
 

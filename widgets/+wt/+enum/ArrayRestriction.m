@@ -2,7 +2,7 @@ classdef ArrayRestriction
     %ARRAYRESTRICTION Represent array restriction selections
     %   Enumerates a list of choices
 
-    % Copyright 2024 The MathWorks Inc.
+%   Copyright 2024-2025 The MathWorks Inc.
     
     
     %% Enumerations

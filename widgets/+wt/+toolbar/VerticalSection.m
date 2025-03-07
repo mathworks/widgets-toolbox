@@ -1,7 +1,7 @@
 classdef (Sealed, Hidden) VerticalSection < wt.toolbar.BaseSection
     % A column of vertically stacked controls for a toolbar
     
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties

@@ -1,5 +1,6 @@
 classdef (HandleCompatible) Orderable
     % Implements functionality for orderable lists
+%   Copyright 2025 The MathWorks Inc.
 
 
     %% Internal Static methods

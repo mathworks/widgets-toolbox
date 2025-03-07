@@ -1,5 +1,6 @@
 classdef Sex
     % Implements a selection list
+%   Copyright 2025 The MathWorks Inc.
 
     enumeration
         unspecified
