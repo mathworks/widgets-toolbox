@@ -80,7 +80,7 @@ classdef ContextualView < wt.abstract.BaseWidget
             SetAccess = protected, UsedInUpdate = false)
 
         % Top-level grid to manage content vs. loading
-        Grid matlab.ui.container.GridLayout
+        % Grid matlab.ui.container.GridLayout
 
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
@@ -279,10 +279,18 @@ classdef ContextualView < wt.abstract.BaseWidget
 
             % Children order of the widget
             % - widget itself
-            %   - MainGrid
+            %   - Grid
             %       - ContentGrid (views go here)
             %       - LoadingImage (visible gets toggled to cover view)
 
+
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
+            % Adjust default size
+            obj.Position = [10 10 400 400];
+
+            % Configure Grid
             obj.Grid.Padding = [1 1 1 1];
 
             % Show an temporary border around the edge. This makes the
@@ -299,9 +307,6 @@ classdef ContextualView < wt.abstract.BaseWidget
             obj.ContentGrid.Padding = [0 0 0 0];
             obj.ContentGrid.Layout.Row = 1;
             obj.ContentGrid.Layout.Column = 1;
-
-            % Set default size and position
-            obj.Position = [10 10 400 400];
 
             % Image to display while loading content
             obj.LoadingImage = uiimage(obj.Grid);
