@@ -424,4 +424,29 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
     end %methods
 
+
+    %% Reserved for future use
+    % These may be added in the future. Defining them here so that
+    % subclasses should not use these reserved properties yet. 
+    properties (Hidden, Transient, SetAccess = immutable)
+        TitleFontName
+        TitleFontSize
+        TitleFontAngle
+        TitleFontSizeMode
+        TitleFontUnits
+        TitleFontWeight
+        TitleFontSmoothing
+        TitleFontColor
+        TitleFontColorMode
+        TitleFontColor_I
+        TitleFontStyledComponents
+        AxesColor_I
+        AxesColorMode
+        GridColor
+        GridColor_I
+        GridColorMode
+        AxesGridColor_I
+        AxesGridColorMode
+    end %properties
+
 end %classdef

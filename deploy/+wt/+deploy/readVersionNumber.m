@@ -1,5 +1,5 @@
 function [versionStr, versionParts, versionFile] = readVersionNumber()
-% Retrieves the version number for PDT
+% Retrieves the version number
 
 % Version file path
 thisPath = mfilename("fullpath");

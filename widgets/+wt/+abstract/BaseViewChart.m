@@ -1,5 +1,7 @@
-classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
-        wt.mixin.ModelObserver
+classdef BaseViewChart < ...
+        matlab.graphics.chartcontainer.ChartContainer & ...
+        wt.mixin.ModelObserver & ...
+        wt.mixin.ErrorHandling
     % Base class for view charts referencing a BaseModel class
 
     % Copyright 2025 The MathWorks Inc.
@@ -33,7 +35,7 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
             GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
-        TriggerUpdate_Private (1,1) logical = false
+        Dirty_ (1,1) logical = false
 
     end %properties
 
@@ -62,6 +64,7 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         function forceUpdateChart(obj)
             % Forces update to run (For debugging only!)
 
+            disp("DEBUG: Forcing update for " + class(obj));
             obj.update();
 
         end %function
@@ -109,7 +112,7 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         function requestUpdate(obj)
             % Request update to occur at next drawnow cycle
 
-            obj.TriggerUpdate_Private = ~obj.TriggerUpdate_Private;
+            obj.Dirty_ = ~obj.Dirty_;
 
         end %function
         
@@ -132,5 +135,45 @@ classdef BaseViewChart < matlab.graphics.chartcontainer.ChartContainer & ...
         end %function
 
     end %methods
+
+
+    %% Reserved for future use
+    % These may be added in the future. Defining them here so that
+    % subclasses should not use these reserved properties yet. 
+    properties (Hidden, Transient, SetAccess = immutable)
+        FontName
+        FontSize
+        FontAngle
+        FontSizeMode
+        FontUnits
+        FontWeight
+        FontSmoothing
+        FontColor
+        FontColorMode
+        FontColor_I
+        FontStyledComponents
+        TitleFontName
+        TitleFontSize
+        TitleFontAngle
+        TitleFontSizeMode
+        TitleFontUnits
+        TitleFontWeight
+        TitleFontSmoothing
+        TitleFontColor
+        TitleFontColorMode
+        TitleFontColor_I
+        TitleFontStyledComponents
+        AxesColor
+        AxesColor_I
+        AxesColorMode
+        GridColor
+        GridColor_I
+        GridColorMode
+        AxesGridColor
+        AxesGridColor_I
+        AxesGridColorMode
+        ShowGrid
+        ShowLegend
+    end %properties
 
 end %classdef
