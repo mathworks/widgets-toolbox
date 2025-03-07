@@ -311,7 +311,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
                     warning("wtslrt:BaseTimeAlignedChart:LinkAxesError",...
                         "Unable to link axes: %s", err.message);
                     %RJ - Occasionally gets here, unsure why.
-                    keyboard
+                    %keyboard
                 end
             end
 
@@ -350,8 +350,8 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
                 set(allComponents, "FontName", obj.FontName)
                 set(allComponents, "FontSize", obj.FontSize)
-                set(axesAndLegend, "FontWeight", obj.FontWeight)
-                set(allComponents, "FontAngle", obj.FontAngle)
+                set(axesAndLegend, "FontWeight", char(obj.FontWeight))
+                set(allComponents, "FontAngle", char(obj.FontAngle))
 
                 set(obj.Axes, "XColor", obj.FontColor)
                 set(obj.Axes, "YColor", obj.FontColor)
@@ -371,7 +371,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
 
             elseif prop == "FontWeight"
 
-                set(axesAndLegend, "FontWeight", obj.FontWeight)
+                set(axesAndLegend, "FontWeight", char(obj.FontWeight))
 
             else
                 % Update other specific property

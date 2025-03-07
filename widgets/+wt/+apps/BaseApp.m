@@ -122,12 +122,6 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
     end %methods
 
-    methods (Abstract, Access = public)
-
-        close(app)
-
-    end %methods
-
 
 
     %% Debugging
@@ -252,6 +246,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
     %% Public Methods
     methods
+        
+        function close(app)
+            % Triggered on figure closed
+            
+            app.delete();
+            
+        end %function
+
 
         function selection = promptYesNoCancel(app, message, title, default, icon)
             % Prompt the user with a yes/no/cancel selection
