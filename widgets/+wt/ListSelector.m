@@ -48,31 +48,20 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
             % Get original items and highlight
             oldValue = obj.Value; %#ok<MCSUP>
             oldHighlight = obj.HighlightedValue; %#ok<MCSUP>
-            
-            % What's currently selected?
-            oldLBHighlight = obj.getListBoxSelectedIndex();
 
             % Retain the matching original value selection
             isPresent = ismember(oldValue, newItems);
             newValue = oldValue(isPresent);
 
-            % Retain the matching original highlight indices
-            isPresentIdx = find(isPresent);
-            newHighlightIdx = intersect(oldLBHighlight, isPresentIdx, 'stable');
-
-            % In case items were removed, we can back up to the highlight
-            % values
+            % Attempt to retain the highlight values
             isPresent = ismember(oldHighlight, newItems);
             newHighlight = oldHighlight(isPresent);
 
             % Set new items
             obj.Items = newItems;
-            % newValue = intersect(oldValue, value, 'stable')
 
-            % Set selection and highlight for consistency
-            % newHighlight = intersect(oldHighlightValue, value, 'stable')
+            % Set selection for consistency
             obj.Value = newValue; %#ok<MCSUP>
-            % obj.HighlightedValue = newHighlight; %#ok<MCSUP>
 
             % Set highlight for consistency
             if obj.AllowDuplicates %#ok<MCSUP>
@@ -83,18 +72,6 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 % This is the best guess we can make
                 obj.HighlightedValue = newHighlight; %#ok<MCSUP>
             end
-
-            % elseif isempty(newHighlightIdx)
-            % 
-            %     % Set empty selection
-            %     obj.ListBox.ValueIndex = []; %#ok<MCSUP>
-            % 
-            % else
-            % 
-            %     % Keep the same indices selected
-            %     obj.ListBox.ValueIndex = newHighlightIdx; %#ok<MCSUP>
-            % 
-            % end
 
         end
 
