@@ -151,9 +151,21 @@ classdef BaseApp < matlab.apps.AppBase & ...
     %% Constructor / destructor
     methods (Access = public)
 
-        function app = BaseApp(varargin)
+        function app = BaseApp(options)
             % Constructor
 
+            arguments
+                options.?wt.apps.BaseApp
+                options.Preferences (1,1) wt.model.Preferences = wt.model.Preferences;
+                options.PreferenceGroup (1,1) string = "";
+            end
+
+            % Check for preference input and assign it first, in case
+            % Preferences was subclassed
+            app.Preferences = options.Preferences;
+            app.PreferenceGroup = options.PreferenceGroup;
+            options = rmfield(options, ["Preferences" "PreferenceGroup"]);
+            
             % Create the figure and hide until components are created
             app.Figure = uifigure( ...
                 'AutoResizeChildren','off',...
@@ -190,8 +202,9 @@ classdef BaseApp < matlab.apps.AppBase & ...
             app.setup();
 
             % Set any P-V pairs
-            if ~isempty(varargin)
-                set(app, varargin{:});
+            cellArgs = namedargs2cell(options);
+            if ~isempty(cellArgs)
+                set(app, cellArgs{:});
             end
 
             % Show output if Debug is on
@@ -216,7 +229,11 @@ classdef BaseApp < matlab.apps.AppBase & ...
             drawnow('limitrate')
 
             % Now, make it visible
+            if isfield(options, 'Visible')
+                app.Figure.Visible = options.Visible;
+            else
             app.Figure.Visible = 'on';
+            end
 
         end %function
 
@@ -228,7 +245,13 @@ classdef BaseApp < matlab.apps.AppBase & ...
             app.displayDebugText();
 
             % Store last position in preferences
-            if isscalar(app.Figure) && isvalid(app.Figure)
+
+            % Note: Use isprop instead of isvalid. 
+            % If a user deletes the figure instead of the app, 
+            % this delete method is still triggered. Although
+            % not yet fully deleted (prop values still available), 
+            % the app and figure are not valid at this point. 
+            if isscalar(app.Figure) && isprop(app.Figure, "Position")
                 app.setPreference('Position',app.Figure.Position)
             end
 
