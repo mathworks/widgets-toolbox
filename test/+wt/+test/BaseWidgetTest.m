@@ -130,6 +130,16 @@ classdef BaseWidgetTest < matlab.uitest.TestCase
         end %function
 
         
+        function assumeMinimumRelease(testCase, releaseName)
+            % Callback when a button is pressed
+            
+            isUnsupported = isMATLABReleaseOlderThan(releaseName);
+            diag = "Release not supported.";
+            testCase.assumeFalse(isUnsupported, diag)
+            
+        end %function
+
+        
         function onCallbackTriggered(testCase, evt)
             % Callback when a button is pressed
             
