@@ -447,6 +447,10 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         end
 
         function set.HighlightedValue(obj,value)
+            if isempty(value)
+                obj.ListBox.Value = {};
+                return;
+            end
             if isempty(obj.ItemsData)
                 [~, obj.ListBox.Value] = ismember(value, obj.Items);
             else
