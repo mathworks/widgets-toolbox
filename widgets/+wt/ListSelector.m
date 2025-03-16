@@ -42,6 +42,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
     end %properties
 
 
+    %% Public dependent properties
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
@@ -56,22 +57,6 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
     end %properties
 
 
-    properties (AbortSet, Dependent, SetAccess = private)
-
-        % Indices of the highlighted items
-        HighlightedIndex
-
-    end %properties
-
-
-    properties (AbortSet, Dependent, Hidden)
-
-        % Indices of displayed items that are currently added to the list (for backward compatibility - use ValueIndex instead)
-        SelectedIndex (1,:)
-
-    end %properties
-
-
     properties (AbortSet, Dependent, UsedInUpdate = false)
 
         % Width of the buttons
@@ -80,14 +65,98 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
     end %properties
 
 
+    methods
 
-    %% Read-Only properties
-    properties (SetAccess = private)
+        function value = get.ValueIndex(obj)
+            value = obj.ListBox.ItemsData;
+        end
 
-        % Additional user buttons
-        UserButtons wt.ButtonGrid
+        function set.ValueIndex(obj,value)
+            obj.ListBox.Items = obj.Items(value);
+            obj.ListBox.ItemsData = value;
+        end
+
+        function value = get.Value(obj)
+            if isempty(obj.ItemsData)
+                value = obj.Items(:,obj.ListBox.ItemsData);
+            else
+                value = obj.ItemsData(:,obj.ListBox.ItemsData);
+            end
+        end
+
+        function set.Value(obj,value)
+            if isempty(value)
+                obj.SelectedIndex = [];
+            else
+                if isempty(obj.ItemsData)
+                    [tf, selIdx] = ismember(value, obj.Items);
+                else
+                    [tf, selIdx] = ismember(value, obj.ItemsData);
+                end
+                if ~all(tf)
+                    warning("widgets:ListSelector:InvalidValue",...
+                        "Attempt to set an invalid Value to the list.")
+                    selIdx(~tf) = [];
+                end
+                obj.SelectedIndex = selIdx;
+            end
+        end
+
+
+        function value = get.HighlightedValue(obj)
+            selIdx = obj.ListBox.Value;
+            if isempty(selIdx) || ~isnumeric(selIdx)
+                selIdx = [];
+            end
+            if isempty(obj.ItemsData)
+                value = obj.Items(:,selIdx);
+            else
+                value = obj.ItemsData(:,selIdx);
+            end
+        end
+
+        function set.HighlightedValue(obj,value)
+            if isempty(value)
+                obj.ListBox.Value = {};
+                return;
+            end
+            if isempty(obj.ItemsData)
+                [~, obj.ListBox.Value] = ismember(value, obj.Items);
+            else
+                [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
+            end
+        end
+        
+
+        function value = get.ButtonWidth(obj)
+            value = obj.Grid.ColumnWidth{2};
+        end
+
+        function set.ButtonWidth(obj,value)
+            obj.Grid.ColumnWidth{2} = value;
+        end
+
+    end %methods
+
+
+    %% Read-only dependent properties
+    properties (AbortSet, Dependent, SetAccess = private)
+
+        % Indices of the highlighted items
+        HighlightedIndex
 
     end %properties
+
+    methods
+
+        function value = get.HighlightedIndex(obj)
+            value = obj.ListBox.Value;
+            if isempty(value)
+                value = [];
+            end
+        end
+
+    end %methods
 
 
 
@@ -104,6 +173,35 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         ButtonPushedListener event.listener
 
     end %properties
+
+
+    properties (SetAccess = private)
+
+        % Additional user buttons may be attached to this ButtonGrid
+        UserButtons wt.ButtonGrid
+
+    end %properties
+
+
+    %% Hidden compatibility properties
+    properties (AbortSet, Dependent, Hidden)
+
+        % Indices of displayed items that are currently added to the list (for backward compatibility - use ValueIndex instead)
+        SelectedIndex (1,:)
+
+    end %properties
+    
+    methods
+
+        function value = get.SelectedIndex(obj)
+            value = obj.ValueIndex;
+        end
+
+        function set.SelectedIndex(obj,value)
+            obj.ValueIndex = value;
+        end
+
+    end %methods
 
 
 
@@ -384,96 +482,5 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         end %function
 
     end %methods
-
-
-
-    %% Accessors
-    methods
-
-        function value = get.SelectedIndex(obj)
-            value = obj.ListBox.ItemsData;
-        end
-
-        function set.SelectedIndex(obj,value)
-            obj.ListBox.Items = obj.Items(value);
-            obj.ListBox.ItemsData = value;
-        end
-
-        function value = get.ValueIndex(obj)
-            value = obj.ListBox.ItemsData;
-        end
-
-        function set.ValueIndex(obj,value)
-            obj.ListBox.Items = obj.Items(value);
-            obj.ListBox.ItemsData = value;
-        end
-
-        function value = get.Value(obj)
-            if isempty(obj.ItemsData)
-                value = obj.Items(:,obj.ListBox.ItemsData);
-            else
-                value = obj.ItemsData(:,obj.ListBox.ItemsData);
-            end
-        end
-
-        function set.Value(obj,value)
-            if isempty(value)
-                obj.SelectedIndex = [];
-            else
-                if isempty(obj.ItemsData)
-                    [tf, selIdx] = ismember(value, obj.Items);
-                else
-                    [tf, selIdx] = ismember(value, obj.ItemsData);
-                end
-                if ~all(tf)
-                    warning("widgets:ListSelector:InvalidValue",...
-                        "Attempt to set an invalid Value to the list.")
-                    selIdx(~tf) = [];
-                end
-                obj.SelectedIndex = selIdx;
-            end
-        end
-
-        function value = get.HighlightedValue(obj)
-            selIdx = obj.ListBox.Value;
-            if isempty(selIdx) || ~isnumeric(selIdx)
-                selIdx = [];
-            end
-            if isempty(obj.ItemsData)
-                value = obj.Items(:,selIdx);
-            else
-                value = obj.ItemsData(:,selIdx);
-            end
-        end
-
-        function set.HighlightedValue(obj,value)
-            if isempty(value)
-                obj.ListBox.Value = {};
-                return;
-            end
-            if isempty(obj.ItemsData)
-                [~, obj.ListBox.Value] = ismember(value, obj.Items);
-            else
-                [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
-            end
-        end
-
-        function value = get.HighlightedIndex(obj)
-            value = obj.ListBox.Value;
-            if isempty(value)
-                value = [];
-            end
-        end
-
-        function value = get.ButtonWidth(obj)
-            value = obj.Grid.ColumnWidth{2};
-        end
-
-        function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth{2} = value;
-        end
-
-    end %methods
-
 
 end % classdef
