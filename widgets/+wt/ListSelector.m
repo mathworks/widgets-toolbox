@@ -41,6 +41,66 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
     end %properties
 
+    methods
+
+        function set.Items(obj, newItems)
+
+            % Get original items and highlight
+            oldValue = obj.Value; %#ok<MCSUP>
+            oldHighlight = obj.HighlightedValue; %#ok<MCSUP>
+            
+            % What's currently selected?
+            oldLBHighlight = obj.getListBoxSelectedIndex();
+
+            % Retain the matching original value selection
+            isPresent = ismember(oldValue, newItems);
+            newValue = oldValue(isPresent);
+
+            % Retain the matching original highlight indices
+            isPresentIdx = find(isPresent);
+            newHighlightIdx = intersect(oldLBHighlight, isPresentIdx, 'stable');
+
+            % In case items were removed, we can back up to the highlight
+            % values
+            isPresent = ismember(oldHighlight, newItems);
+            newHighlight = oldHighlight(isPresent);
+
+            % Set new items
+            obj.Items = newItems;
+            % newValue = intersect(oldValue, value, 'stable')
+
+            % Set selection and highlight for consistency
+            % newHighlight = intersect(oldHighlightValue, value, 'stable')
+            obj.Value = newValue; %#ok<MCSUP>
+            % obj.HighlightedValue = newHighlight; %#ok<MCSUP>
+
+            % Set highlight for consistency
+            if obj.AllowDuplicates %#ok<MCSUP>
+                % If duplicates allowed, it can be inconsistent, so must
+                % deselect all instead
+                obj.HighlightedValue = []; %#ok<MCSUP>
+            else
+                % This is the best guess we can make
+                obj.HighlightedValue = newHighlight; %#ok<MCSUP>
+            end
+
+            % elseif isempty(newHighlightIdx)
+            % 
+            %     % Set empty selection
+            %     obj.ListBox.ValueIndex = []; %#ok<MCSUP>
+            % 
+            % else
+            % 
+            %     % Keep the same indices selected
+            %     obj.ListBox.ValueIndex = newHighlightIdx; %#ok<MCSUP>
+            % 
+            % end
+
+        end
+
+        
+    end %methods
+
 
     %% Public dependent properties
     properties (AbortSet, Dependent)
@@ -77,10 +137,12 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         end
 
         function value = get.Value(obj)
+            itemIdx = obj.ListBox.ItemsData;
+            itemIdx(itemIdx > numel(obj.Items)) = [];
             if isempty(obj.ItemsData)
-                value = obj.Items(:,obj.ListBox.ItemsData);
+                value = obj.Items(:, itemIdx);
             else
-                value = obj.ItemsData(:,obj.ListBox.ItemsData);
+                value = obj.ItemsData(:, itemIdx);
             end
         end
 
@@ -126,7 +188,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
             end
         end
-        
+
 
         function value = get.ButtonWidth(obj)
             value = obj.Grid.ColumnWidth{2};
