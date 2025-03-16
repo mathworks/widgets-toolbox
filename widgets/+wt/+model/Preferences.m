@@ -31,12 +31,12 @@ classdef Preferences < wt.model.BaseModel
             value = obj.LastFolder;
             % Default to pwd if invalid path
             if ~isfolder(value)
-                value = pwd;
+                value = string(pwd);
             end
         end
 
         function value = get.RecentSessionPaths(obj)
-            value = obj.RecentSessionPaths;
+            value = string(obj.RecentSessionPaths);
             % Remove any invalid paths
             value(~isfile(value)) = [];
         end
