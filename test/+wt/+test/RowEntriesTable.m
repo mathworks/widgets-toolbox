@@ -53,9 +53,7 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
 
         function setup(testCase)
 
-            isUnsupported = isMATLABReleaseOlderThan("R2022a");
-            diag = "Release not supported.";
-            testCase.assumeFalse(isUnsupported, diag)
+            testCase.assumeMinimumRelease("R2022a");
 
             fcn = @()wt.RowEntriesTable(testCase.Grid);
             testCase.Widget = verifyWarningFree(testCase,fcn);

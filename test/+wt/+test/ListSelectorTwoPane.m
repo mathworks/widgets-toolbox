@@ -1,7 +1,7 @@
 classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2025 The MathWorks Inc.
     
     %% Properties
     properties
@@ -22,7 +22,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.Figure.Position(3:4) = [700 800];
             testCase.Grid.RowHeight = repmat({175},1,4);
             testCase.Grid.ColumnWidth = {'1x','1x','1x'};
-
+            
         end %function
         
     end %methods
@@ -55,7 +55,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
     
     %% Unit Tests
     methods (Test)
-            
+        
         function testProgrammaticItemsValueSelection(testCase)
             
             % Get the RightList
@@ -117,10 +117,10 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 0);
             
         end %function
-
-
+        
+        
         function testProgrammaticItemsAndItemsDataValueSelection(testCase)
-
+            
             % Get the RightList
             listControl = testCase.Widget.RightList;
             
@@ -141,7 +141,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             newSelIdx = [1 2];
             newValue = testCase.ItemData(newSelIdx);
             testCase.verifySetProperty("Value", newValue);
-
+            
             % List and selection should now match value
             testCase.verifyEqual(string(listControl.Items), testCase.ItemNames(newSelIdx));
             testCase.verifyEqual(listControl.ItemsData, newSelIdx);
@@ -155,7 +155,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
             % Verify callback did not fire
             testCase.verifyEqual(testCase.CallbackCount, 0);
-        end        
+        end
         
         
         function testHighlightedValue(testCase)
@@ -183,7 +183,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
         end %function
         
         
-            
+        
         function testInteractiveSelection(testCase)
             
             % Get the RightList
@@ -214,7 +214,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         function testButtonEnables(testCase)
             
             % Get the RightList and button grid
@@ -269,7 +269,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         function testButtonFunctions(testCase)
             
             % Get the RightList and button grid
@@ -329,7 +329,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
             % Verify new highlight
             testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(1));
-           
+            
             % Verify button enables
             testCase.verifyEquality(buttonGrid.ButtonEnable(2:4), [1 0 1]);
             
@@ -343,10 +343,10 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.CallbackCount, 5);
             
         end %function
-
-
+        
+        
         function testHighlightedSelectionChange(testCase)
-
+            
             % Get the RightList and button grid
             w = testCase.Widget;
             leftlistControl = testCase.Widget.LeftList;
@@ -369,54 +369,58 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
             % Give a moment for update to run
             drawnow
-
+            
             % Verify new order
             newIdx = [1 3 4];
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
-
+            
             % Verify highlighted values
             testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(newIdx(selIdx)));
             testCase.verifyEqual(w.LeftList.Value, 2);
-
+            
             % Select item to deselect
             selIdx = 1;
             testCase.choose(rightListControl, selIdx)
-
+            
             % Check button enables
             testCase.verifyEquality(buttonGrid.ButtonEnable, [1 1 0 1]);
-
+            
             % Move items to the left
             testCase.press(button(2))
-
+            
             % Verify new order
             newIdx = [3 4];
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
-
+            
             % Verify highlighted values
             testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(newIdx(1)));
             testCase.verifyEqual(w.LeftList.Value, 1);
-
+            
             % Verify callbacks fired
             testCase.verifyEqual(testCase.CallbackCount, 3);
-
+            
         end
         
         
         function testItemsChange(testCase)
 
+            testCase.assumeMinimumRelease("R2022a");
+            
             % Get the RightList and button grid
             w = testCase.Widget;
             leftlistControl = testCase.Widget.LeftList;
             buttonGrid = testCase.Widget.ListButtons;
             button = buttonGrid.Button;
-
-            for idx = 1:numel(w.Items)
-
-                % Select last item
-                testCase.choose(leftlistControl, numel(w.Items) + 1 - idx)
             
+            for idx = 1:numel(w.Items)
+                
+                % Select last item
+                %RJ - This may fail in R2021a
+                idxSel = numel(w.Items) + 1 - idx;
+                testCase.choose(leftlistControl, idxSel)
+                
                 % Check button enables
                 switch idx
                     case 1
@@ -433,34 +437,34 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
                 % Give a moment for update to run
                 drawnow
             end
-
+            
             % Check button enables
             testCase.verifyEquality(buttonGrid.ButtonEnable, [0 1 1 0]);
-
+            
             % Verify new order
             newIdx = 5:-1:1;
-            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));% Fails in 21a
             testCase.verifyEqual(w.SelectedIndex, newIdx);
-
+            
             % Change items
             newSel = [1 3 5];
             w.Items = w.Items(newSel);
-
+            
             % Give a moment for update to run
             drawnow
-
+            
             % Verify new value and selected index
             testCase.verifyEqual(w.Value, testCase.ItemNames([5 3 1]));
             testCase.verifyEqual(w.SelectedIndex, [3 2 1]);
             testCase.verifyEqual(w.HighlightedValue, testCase.ItemNames(5));
-
+            
             % Move items to the left
             testCase.press(button(2))
             testCase.press(button(2))
-
+            
             % Give a moment for update to run
             drawnow
-
+            
             % Verify new order
             newIdx = 1;
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
@@ -469,18 +473,20 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             testCase.verifyEqual(w.LeftList.Value, 2);
             
         end
-
-
+        
+        
         function testSortable(testCase)
 
+            testCase.assumeMinimumRelease("R2022a");
+            
             % Get the RightList and button grid
             w = testCase.Widget;
             leftlistControl = testCase.Widget.LeftList;
             buttonGrid = testCase.Widget.ListButtons;
             button = buttonGrid.Button;
-
+            
             for idx = 1:numel(w.Items)
-
+                
                 % Select last item
                 testCase.choose(leftlistControl, numel(w.Items) + 1 - idx)
                 
@@ -490,25 +496,25 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
                 % Give a moment for update to run
                 drawnow
             end
-
+            
             % Verify new order
             newIdx = 5:-1:1;
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
-
+            
             % Set sortable
             w.Sortable = false;
-
+            
             % Give a moment for update to run
             drawnow
-
+            
             % Check new order
             newIdx = 1:5;
             testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
             testCase.verifyEqual(w.SelectedIndex, newIdx);
         end
         
-            
+        
         function testUserButtons(testCase)
             
             % Get the widget
@@ -516,7 +522,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
             % Add User buttons
             w.UserButtons.Icon = ["plot_24.png","play_24.png"];
-            drawnow            
+            drawnow
             
             % Add user buttons
             b = w.UserButtons.Button;
@@ -531,7 +537,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         function testStyleProperties(testCase)
             
             % Set ButtonWidth
@@ -548,7 +554,7 @@ classdef ListSelectorTwoPane < wt.test.BaseWidgetTest
             
         end %function
         
-            
+        
         
     end %methods (Test)
     
