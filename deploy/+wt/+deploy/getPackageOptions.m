@@ -101,7 +101,7 @@ opts.ToolboxFiles(isMatch) = [];
 
 
 %% Metadata
-opts.ToolboxName = "Widgets Toolbox - MATLAB App Designer and Advanced App Components";
+opts.ToolboxName = "Widgets Toolbox - App Designer and Advanced App Components";
 
 opts.Summary = "Additional app building components to efficiently " + ...
     "develop advanced user interfaces in MATLAB";
@@ -123,8 +123,13 @@ opts.Description = join([
     " - Slider control linked to a numeric spinner and edit field"
     " - List of tasks with icons indicating status (pass, fail, running, complete, etc.)"
     " - Toolbar with advanced layout functionality that can appear like a toolstrip"
+    " - Contextual pane that can switch contents (similar to card panel, tab panel, uitab)"
     ""
     "Additional object-oriented code components provide enable you to work more efficiently developing advanced apps using a modular hand-code approach. You can use model-view-controller or a similar separated presentation architecture."
+    ""
+    " - Application superclasses for managing single or multiple session files"
+    " - Preference management"
+    " - Superclasses for model-view-controller implementation"
     ""
     "This version of Widgets Toolbox is intended for NEW development of uifigure or App Designer apps starting from R2021a or newer releases."
     ""
