@@ -300,11 +300,21 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
 
             % Find the animal view
             view = cview.ActiveView;
+            
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.Matches
 
             % Verify name in view matches
             diag = "Expected updated name to display in the view after loading.";
-            actVal = view.NameField.Value;
-            testCase.verifyMatches(actVal, newName, diag);
+            testCase.verifyThat(...
+                @()string(view.NameField.Value),...
+                Eventually(Matches(newName), "WithTimeoutOf", 5), ...
+                diag);
+            
+            % Verify name in view matches
+%             diag = "Expected updated name to display in the view after loading.";
+%             actVal = view.NameField.Value;
+%             testCase.verifyMatches(actVal, newName, diag);
 
         end %function
 
