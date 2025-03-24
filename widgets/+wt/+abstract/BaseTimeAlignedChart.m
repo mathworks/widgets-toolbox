@@ -3,7 +3,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         wt.mixin.ErrorHandling
     % Base class for a chart with time-aligned axes
 
-%   Copyright 2022-2025 The MathWorks Inc.
+    %   Copyright 2022-2025 The MathWorks Inc.
 
 
     %% Public Properties
@@ -42,7 +42,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         % Axes Titles
         Title (:,1) string
 
-        % Overall grou title
+        % Overall group title
         GroupTitle (1,1) string
 
     end %properties
@@ -308,7 +308,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
                 try
                     linkaxes(ax, 'x');
                 catch err
-                    warning("wtslrt:BaseTimeAlignedChart:LinkAxesError",...
+                    warning("wt:abstract:BaseTimeAlignedChart:LinkAxesError",...
                         "Unable to link axes: %s", err.message);
                     %RJ - Occasionally gets here, unsure why.
                     %keyboard

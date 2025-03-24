@@ -69,7 +69,7 @@ classdef FontStyled < handle
 
         function set.FontName(obj,value)
             obj.FontName = value;
-            obj.updateFontStyledComponents("FontName",value)
+            obj.updateFontStyledComponents("FontName",char(value))
         end
 
         function set.FontSize(obj,value)
@@ -79,12 +79,12 @@ classdef FontStyled < handle
 
         function set.FontWeight(obj,value)
             obj.FontWeight = value;
-            obj.updateFontStyledComponents("FontWeight",value)
+            obj.updateFontStyledComponents("FontWeight",char(value))
         end
 
         function set.FontAngle(obj,value)
             obj.FontAngle = value;
-            obj.updateFontStyledComponents("FontAngle",value)
+            obj.updateFontStyledComponents("FontAngle",char(value))
         end
 
         function value = get.FontColor(obj)

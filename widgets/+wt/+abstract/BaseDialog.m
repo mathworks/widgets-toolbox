@@ -66,10 +66,6 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
         function setup(obj)
             % Configure the widget
 
-            % Configure component
-            %obj.Position = [10 10 300 300];
-            obj.BackgroundColor = [0 0 0];
-
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget();
             
@@ -110,14 +106,11 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
             % Update components that are affected by BackgroundColor
             
             % Update dialog components
-            obj.Grid.BackgroundColor = obj.BackgroundColor;
-            obj.TitleBar.BackgroundColor = obj.BackgroundColor;
+            set(obj.TitleBar, "BackgroundColor", obj.BackgroundColor);
 
-            % Update other components
-            hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            set(obj.BackgroundColorableComponents(hasProp),...
-                "BackgroundColor",obj.BackgroundColor);
-            
+            % Call superclass method
+            obj.updateBackgroundColorableComponents@wt.abstract.BaseWidget();
+
         end %function
 
         
@@ -125,7 +118,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
             % Update components that are affected by ButtonColor
             
             % Update dialog components
-            obj.CloseButton.BackgroundColor = obj.ButtonColor;
+            set(obj.CloseButton, "BackgroundColor", obj.ButtonColor);
 
             % Update other components
             obj.updateButtonColorableComponents@wt.mixin.ButtonColorable()
