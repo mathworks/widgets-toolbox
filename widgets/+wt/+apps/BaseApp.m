@@ -151,20 +151,8 @@ classdef BaseApp < matlab.apps.AppBase & ...
     %% Constructor / destructor
     methods (Access = public)
 
-        function app = BaseApp(options)
+        function app = BaseApp(varargin)
             % Constructor
-
-            arguments
-                options.?wt.apps.BaseApp
-                options.Preferences (1,1) wt.model.Preferences = wt.model.Preferences;
-                options.PreferenceGroup (1,1) string = "";
-            end
-
-            % Check for preference input and assign it first, in case
-            % Preferences was subclassed
-            app.Preferences = options.Preferences;
-            app.PreferenceGroup = options.PreferenceGroup;
-            options = rmfield(options, ["Preferences" "PreferenceGroup"]);
             
             % Create the figure and hide until components are created
             app.Figure = uifigure( ...
@@ -179,11 +167,13 @@ classdef BaseApp < matlab.apps.AppBase & ...
             app.Grid.Padding = [0 0 0 0];
 
             % Check for preference input and assign it first, in case
-            % Preferences was subclassed
-            % [splitArgs,varargin] = app.splitArgs('Preferences', varargin{:});
-            % if ~isempty(splitArgs)
-            %     app.Preferences = splitArgs{2};
-            % end
+            % Preferences was subclassed. Can also set Visible here if
+            % desired to do earlier.
+            [prefArgs, remArgs] = app.splitArgs(...
+                ["Visible", "PreferenceGroup", "Preferences"], varargin{:});
+            if ~isempty(prefArgs)
+                set(app, prefArgs{:});
+            end
 
             % Retrieve preferences
             app.loadPreferences();
@@ -202,9 +192,8 @@ classdef BaseApp < matlab.apps.AppBase & ...
             app.setup();
 
             % Set any P-V pairs
-            cellArgs = namedargs2cell(options);
-            if ~isempty(cellArgs)
-                set(app, cellArgs{:});
+            if ~isempty(remArgs)
+                set(app, remArgs{:});
             end
 
             % Show output if Debug is on
@@ -225,15 +214,11 @@ classdef BaseApp < matlab.apps.AppBase & ...
             % Update the title
             app.updateTitle();
 
-            % Force drawing to finish
+            % Force drawing to finish now
             drawnow('limitrate')
 
             % Now, make it visible
-            if isfield(options, 'Visible')
-                app.Figure.Visible = options.Visible;
-            else
             app.Figure.Visible = 'on';
-            end
 
         end %function
 
@@ -552,6 +537,34 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
     end %methods
 
+
+    %% Private methods
+    methods (Access = private)
+        
+        function  [splitArgs, remArgs] = splitArgs(~,argnames,varargin)
+            % Separate specified P-V arguments from the rest of P-V pairs
+            
+            narginchk(1,inf) ;
+            splitArgs = {};
+            remArgs = {};
+            
+            if nargin>1
+                props = cellstr( varargin(1:2:end) );
+                values = varargin(2:2:end);
+                if ( numel( props ) ~= numel( values ) ) || ...
+                        any( ~cellfun( @(x)ischar(x)||isStringScalar(x), props ) )
+                    error( 'wt:baseApp:splitArgs:BadSyntax', ...
+                        'Arguments must be supplied as property-value pairs' );
+                end
+                ToSplit = ismember(props,argnames);
+                ToSplit = reshape([ToSplit; ToSplit],1,[]);
+                splitArgs = varargin(ToSplit);
+                remArgs = varargin(~ToSplit);
+            end
+            
+        end %function
+
+    end %methods
 
 
     %% Display Customization
