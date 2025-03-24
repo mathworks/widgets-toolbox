@@ -120,7 +120,7 @@ classdef BaseApp < matlab.uitest.TestCase
             % Verifies behavior of the app with custom preferences and custom input arguments
 
             % Launch the app with input args
-            propAInputValue = 15;
+            propAInputValue = randi(1000); % random integer
             diag = "Expected BaseAppSubclassWithPrefs to launch without warnings.";
             fcn = @()wt.test.apps.BaseAppSubclassWithPrefs("PropertyA", propAInputValue);
             testCase.App = testCase.verifyWarningFree(fcn, diag);
