@@ -123,6 +123,19 @@ classdef BaseWidget < ...
             obj.Dirty = true;
 
         end %function
+        
+
+        function updateBackgroundColorableComponents(obj)
+            % Update components that are affected by BackgroundColor
+            % (overrides the superclass method)
+            
+            % Update grid color
+            set(obj.Grid, "BackgroundColor", obj.BackgroundColor);
+
+            % Call superclass method
+            obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
+            
+        end %function
 
 
         function groups = getPropertyGroups(obj)
