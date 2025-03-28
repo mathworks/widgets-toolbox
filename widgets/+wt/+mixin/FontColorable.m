@@ -66,7 +66,7 @@ classdef FontColorable < handle
 
         function set.FontColor_I(obj,value)
             obj.FontColor_I = value;
-            obj.updateFontColorableComponents("FontColor", obj.FontColor_I);
+            obj.updateFontColorableComponents();
         end
 
         function set.FontColorableComponents(obj,value)
