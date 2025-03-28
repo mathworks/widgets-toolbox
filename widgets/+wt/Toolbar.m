@@ -100,6 +100,13 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
 
+            % Adjust default title fonts for toolbar purposes
+            obj.TitleFontSize = 10;
+            obj.TitleFontWeight = "normal";
+            if isMATLABReleaseOlderThan("R2025a")
+                obj.TitleColor = [0.5333 0.5333 0.5333];
+            end
+
             % Set default size
             obj.Position(3:4) = [500 90];
 
