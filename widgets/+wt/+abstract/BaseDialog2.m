@@ -134,14 +134,16 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
 
         function onClosePushed(obj)
-            % Delete the dialog on close button pushed
+            % Triggered when close button is pushed
 
+            % Delete the dialog
             delete(obj)
 
         end %function
 
 
         function onOuterPanelResize(obj)
+            % Triggered when the dialog window is resized
 
             % Outer panel inner/outer position
             outerPos = obj.OuterPanel.OuterPosition;
@@ -168,39 +170,17 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
 
         function onTitleButtonDown(obj,~)
+            % Triggered on title bar button down
 
-            % Instantiate a figure drag helper
+            % Instantiate a figure drag helper to begin dragging dialog
             obj.DragHelper = wt.utility.FigureDragHelper(obj);
             obj.DragHelper.DragFcn = @(dhObj,evt)onMouseDrag(obj,evt);
-            
-
-            % % Listen to figure motion
-            % fig = ancestor(obj,'figure');
-            % if fig.Units ~= "pixels"
-            %     fig.Units = "pixels";
-            % end
-            % 
-            % obj.StartPoint = fig.CurrentPoint;
-            % obj.StartOuterPos = obj.Position(1:2);
-            % 
-            % 
-            % % Get figure and dialog sizing
-            % szPanel = obj.OuterPanel.OuterPosition(3:4);
-            % szFig = fig.Position(3:4);
-            % 
-            % % Find valid drag position range
-            % obj.MaxDragPosition = szFig - szPanel;
-            % 
-            % % While dragging, listen to figure mouse events
-            % obj.MouseMotionListener = listener(fig,"WindowMouseMotion",...
-            %     @(~,evt)onMouseMotion(obj,evt));
-            % obj.MouseReleaseListener = listener(fig,"WindowMouseRelease",...
-            %     @(~,evt)onMouseRelease(obj,evt));
 
         end %function
 
 
         function onMouseDrag(obj,evt)
+            % Triggered from DragHelper during drag or release
 
             % Check the drag event status
             switch evt.Status
@@ -214,36 +194,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
                     obj.DragHelper(:) = [];
 
             end %switch
-
-        end %function
-
-
-        function onMouseMotion(obj,evt)
-
-            % dPos = evt.Point - obj.StartPoint;
-            % 
-            % posNew = obj.StartOuterPos + dPos
-            % 
-            % % Keep within bounds
-            % posNew = max(posNew, [1 1]);
-            % posNew = min(posNew, obj.MaxDragPosition);
-            % 
-            % 
-            % 
-            % obj.Position(1:2) = posNew;
-
-        end %function
-
-
-        function onMouseRelease(obj,~)
-
-            % delete(obj.MouseMotionListener)
-            % delete(obj.MouseReleaseListener)
-            % 
-            % obj.MouseMotionListener = [];
-            % obj.MouseReleaseListener = [];
-            % obj.StartPoint = nan(1,2);
-            % obj.MaxDragPosition = nan(1,2);
 
         end %function
 
