@@ -15,17 +15,6 @@ classdef ContextualView < wt.abstract.BaseWidget
     % Copyright 2024-2025 The MathWorks Inc.
 
 
-    %% Public Properties
-    properties (AbortSet, Access = public)
-
-        % Block while loading
-        BlockWhileLoading (1,1) logical = false
-
-        % Image to use on loading screen
-        LoadingImageSource (1,1) string = "loading_32.gif"
-
-    end %properties
-
 
     %% Read-Only Properties
     properties (Dependent, SetAccess = immutable)
@@ -33,19 +22,24 @@ classdef ContextualView < wt.abstract.BaseWidget
         % The currently active view, or empty if none
         ActiveView
 
+        % Class of the active view
         ActiveViewType
 
-        LoadedViewTypes
-
+        % The loaded views
         LoadedViews
+
+        % Class of the loaded views
+        LoadedViewTypes
 
     end %properties
 
-    properties (SetAccess = private, UsedInUpdate = false)
+    properties (Access = private)
 
         % The array of views loaded into memory
         LoadedViews_I (:,1) matlab.graphics.Graphics = ...
             wt.abstract.BaseViewController.empty(0,1)
+
+        FirstLoad_I (1,1) logical = true
 
     end %properties
 
@@ -56,12 +50,6 @@ classdef ContextualView < wt.abstract.BaseWidget
         function value = get.ActiveView(obj)
             value = obj.ContentGrid.Children;
         end
-
-        % function set.ActiveView(obj,value)
-        %     % Remove view if deleted
-        %     value(~isvalid(value)) = [];
-        %     obj.ActiveView = value;
-        % end
 
         function value = get.LoadedViews(obj)
             value = obj.LoadedViews_I;
@@ -87,13 +75,6 @@ classdef ContextualView < wt.abstract.BaseWidget
             end
         end
 
-        % function set.LoadedViews(obj,value)
-        %     % Remove any deleted views from the list
-        %     keepItems = arrayfun(@isvalid, value);
-        %     value(~keepItems) = [];
-        %     obj.LoadedViews = value;
-        % end
-
     end %methods
 
 
@@ -101,17 +82,11 @@ classdef ContextualView < wt.abstract.BaseWidget
     properties (AbortSet, Transient, NonCopyable, Hidden, ...
             SetAccess = protected, UsedInUpdate = false)
 
-        % Top-level grid to manage content vs. loading
-        % Grid matlab.ui.container.GridLayout
-
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
 
-        % Image to show when loading a pane
-        % LoadingImage matlab.ui.control.Image
-
-        % First load flag
-        FirstLoad (1,1) logical = true
+        % The internal panel to show border
+        Panel matlab.ui.container.Panel
 
     end %properties
 
@@ -119,71 +94,8 @@ classdef ContextualView < wt.abstract.BaseWidget
     %% Public Methods
     methods
 
-        % function varargout = launchView(obj, viewClass, model)
-        %     % This method may be overloaded as needed
-        % 
-        %     arguments
-        %         obj (1,1) wt.ContextualView
-        %         viewClass (1,1) string
-        %         model wt.model.BaseModel = wt.model.BaseModel.empty
-        %     end
-        % 
-        %     fprintf("\nlaunchView: start %s\n", viewClass)
-        % 
-        %     % Remove the initial box on first load
-        %     if obj.FirstLoad
-        %         obj.Grid.Padding = 0;
-        %         obj.FirstLoad = false;
-        %     end
-        % 
-        %     % After launch is complete, toggle off loading image
-        %     cleanupObj = onCleanup(@()set(obj.LoadingImage,"Visible","off"));
-        % 
-        %     % Is the loading image non-visible?
-        %     if ~obj.LoadingImage.Visible
-        % 
-        %         % If the view will change, show the loading image
-        %         fprintf("launchView: prepare %s\n", viewClass)
-        %         obj.prepareToLaunchView(viewClass)
-        % 
-        %     end %if
-        % 
-        %     % Was a view provided?
-        %     if strlength(viewClass)
-        % 
-        %         % Validate view class
-        %         view = validateViewClass_Private(obj, viewClass);
-        % 
-        %         % If no existing view found, instantiate the view
-        %         if isempty(view)
-        %             fprintf("launchView: instantiate %s\n", viewClass)
-        %             obj.instantiateView_Private(viewClass, model);
-        %         else
-        %             fprintf("launchView: activate %s\n", viewClass)
-        %             obj.activateView_Private(view, model)
-        %         end
-        % 
-        %     else
-        % 
-        %         % Empty view, clear the contents
-        %         fprintf("launchView: clear %s\n", viewClass)
-        %         obj.clearView();
-        % 
-        %     end %if
-        % 
-        %     % Return the active view
-        %     if nargout
-        %         varargout{1} = obj.ActiveView;
-        %     end
-        % 
-        %     % fprintf("\n  launchView: finish ** DRAWNOW ** %s\n", viewClass)
-        %     % drawnow("nocallbacks")
-        % 
-        % end %function
-
-
         function varargout = launchView(obj, viewClass, model)
-            % This method may be overloaded as needed
+            % Launch one or more views
 
             arguments
                 obj (1,:) wt.ContextualView
@@ -197,21 +109,9 @@ classdef ContextualView < wt.abstract.BaseWidget
             % Convert viewClass cell to string array
             viewClass = [viewClass{:}];
 
-            % After launch is complete, toggle off loading image
-            % cleanupObj = onCleanup(@()set([obj.LoadingImage],"Visible","off"));
-
-            % Remove the initial box on first load
-            % for thisObj = obj
-            %     if thisObj.FirstLoad
-            %         thisObj.Grid.Padding = 0;
-            %         thisObj.FirstLoad = false;
-            %     end
-            % end
-
-            % Determine whic views will be changing
+            % Determine which views will be changing
             % Loop on each ContextualView provided
             numViews = numel(obj);
-            % isEmptyView = false(1,numViews);
             needsDeactivate = false(1,numViews);
             for idx = 1:numViews
 
@@ -220,7 +120,6 @@ classdef ContextualView < wt.abstract.BaseWidget
                 thisViewClass = viewClass(idx);
 
                 % Determine if the viewClass is empty or if viewClass will change
-                % isEmptyView(idx) = ~strlength(thisViewClass);
                 needsDeactivate(idx) = isscalar(thisObj.ActiveView) && ...
                     isvalid(thisObj.ActiveView) && ...
                     thisObj.ActiveViewType ~= thisViewClass;
@@ -233,10 +132,9 @@ classdef ContextualView < wt.abstract.BaseWidget
                 % Deactivate the views that will be changing
                 obj(needsDeactivate).deactivateView_Private();
 
-                % Force update if requested
-                if any([obj.BlockWhileLoading])
+                % Force update for deactivation if multiple views changing
+                if sum(needsDeactivate) > 1
                     drawnow("nocallbacks")
-                    disp("DRAWNOW!");
                 end
 
             end %if
@@ -252,6 +150,12 @@ classdef ContextualView < wt.abstract.BaseWidget
 
                 % Was a view provided?
                 if strlength(thisViewClass)
+
+                    % Remove the initial box on first load
+                    if thisObj.FirstLoad_I
+                        thisObj.Panel.BorderType = "none";
+                        thisObj.FirstLoad_I = false;
+                    end
 
                     % Validate view class (get existing view if present)
                     view = validateViewClass_Private(thisObj, thisViewClass);
@@ -271,68 +175,6 @@ classdef ContextualView < wt.abstract.BaseWidget
             if nargout
                 varargout = {obj.ActiveView};
             end
-
-        end %function
-
-
-        function prepareToLaunchView(viewArray, viewClassArray)
-            % Puts the ContextualView in a loading state if a different
-            % view is about to be launched. Use this if your app has
-            % multiple ContextualView instances and you need to potentially
-            % load multiple simultaneously. You can provide an array of
-            % views here to turn them to loading state together.
-
-            arguments
-                viewArray wt.ContextualView
-                viewClassArray string
-            end
-
-            fprintf("\nprepareToLaunchView: start %s\n",join(viewClassArray,"; "));
-
-            % Flag if we need to trigger a drawnow to give time to display
-            % the loading image
-            updateNeeded = false;
-
-            % Check each ContextualView in the input array
-            for idx = 1:numel(viewArray)
-
-                % Get one at a time
-                thisView = viewArray(idx);
-                viewClass = viewClassArray(idx);
-
-                % Is the view class going to change?
-                willLaunchView = isempty(thisView.ActiveView) && strlength(viewClass);
-                willChangeView = isscalar(thisView.ActiveView) && ...
-                    class(thisView.ActiveView) ~= viewClass;
-                loadingCurrentState = thisView.LoadingImage.Visible;
-
-                % If the view will change, show the loading image
-                if thisView.BlockWhileLoading && ...
-                        loadingCurrentState == "off" && ...
-                        (willLaunchView || willChangeView)
-
-                    % Yes we will toggle the loading image.
-                    % This will prevent interaction during launch
-                    thisView.LoadingImage.Visible = "on";
-                    updateNeeded = true;
-
-                end %if
-
-            end %for
-
-            % If a change was made, give an opportunity to update the
-            % display so the loading image will display. (This is guarded
-            % in a conditional to avoid multiple calls
-            % causing performance issues.)
-            % if updateNeeded
-            %     fprintf("\n  prepareToLaunchView: finish with ** DRAWNOW ** %s\n",join(viewClassArray,"; "));
-            % drawnow
-            % drawnow("nocallbacks")
-            % drawnow("limitrate")
-            % else
-            fprintf("prepareToLaunchView: finish %s\n",join(viewClassArray,"; "));
-            % end
-
 
         end %function
 
@@ -428,9 +270,8 @@ classdef ContextualView < wt.abstract.BaseWidget
             % Children order of the widget
             % - widget itself
             %   - Grid
+            %     - Panel (for border)
             %       - ContentGrid (views go here)
-            %       - LoadingImage (visible gets toggled to cover view)
-
 
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
@@ -438,44 +279,21 @@ classdef ContextualView < wt.abstract.BaseWidget
             % Set default size and position
             obj.Position = [10 10 400 400];
 
-            % Configure grid
-            % Show an temporary border around the edge. This makes the
-            % component more obvious in App Designer
-            obj.Grid.Padding = [1 1 1 1];
-
-            % Default to theme color
-            if isMATLABReleaseOlderThan("R2025a")
-                color = [.5 .5 .5];
-            else
-                color = obj.getThemeColor("--mw-borderColor-primary");
-            end
-            obj.Grid.BackgroundColor = color;
+            % Create panel
+            obj.Panel = uipanel(obj.Grid);
+            obj.Panel.BorderWidth = 2;
 
             % Grid Layout to place the contents
-            obj.ContentGrid = uigridlayout(obj.Grid,[1 1]);
+            obj.ContentGrid = uigridlayout(obj.Panel,[1 1]);
             obj.ContentGrid.Padding = [0 0 0 0];
-            obj.ContentGrid.Layout.Row = 1;
-            obj.ContentGrid.Layout.Column = 1;
-
-            % Image to display while loading content
-            % obj.LoadingImage = uiimage(obj.Grid);
-            % obj.LoadingImage.Layout.Row = 1;
-            % obj.LoadingImage.Layout.Column = 1;
-            % obj.LoadingImage.Visible = "off";
-            % obj.LoadingImage.ScaleMethod = "none";
 
             % Components to apply background color
-            % obj.BackgroundColorableComponents = ...
-            %     [obj.ContentGrid, obj.LoadingImage];
             obj.BackgroundColorableComponents = obj.ContentGrid;
 
         end %function
 
 
-        function update(obj)
-
-            % Configure the loading image
-            % obj.LoadingImage.ImageSource = obj.LoadingImageSource;
+        function update(~)
 
         end %function
 

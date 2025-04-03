@@ -188,7 +188,7 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
             % Get the app components
             app = testCase.App;
             tree = app.Tree;
-            cview = app.ContextualView;
+            % cview = app.ContextualView;
 
             % Import the sample dataset
             session1 = testCase.importSampleSession();
