@@ -1,5 +1,4 @@
-classdef BaseDialog2  < wt.abstract.BaseWidget & ...
-        wt.mixin.TitleFontStyled
+classdef BaseDialog2  < wt.abstract.BaseWidget
     % Base class for a dialog
 
     % Copyright 2022-2025 The MathWorks Inc.
@@ -7,6 +6,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
     % To do:
     % - finish importing old BaseDialog
     % - make examples
+    % - handle theme changes
 
     %% Public Properties
     properties (AbortSet, Access = public)
@@ -26,7 +26,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
         Title
 
         % Background Color
-        TitleBackgroundColor
+        % TitleBackgroundColor
 
         % Background color mode
         %TitleBackgroundColorMode (1,1) wt.enum.AutoManualState = 'auto'
@@ -51,12 +51,12 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             obj.OuterPanel.Title = value;
         end
 
-        function value = get.TitleBackgroundColor(obj)
-            value = obj.OuterPanel.BackgroundColor;
-        end
-        function set.TitleBackgroundColor(obj, value)
-            obj.OuterPanel.BackgroundColor = value;
-        end
+        % function value = get.TitleBackgroundColor(obj)
+        %     value = obj.OuterPanel.BackgroundColor;
+        % end
+        % function set.TitleBackgroundColor(obj, value)
+        %     obj.OuterPanel.BackgroundColor = value;
+        % end
 
         % function value = get.TitleBackgroundColorMode(obj)
         %     value = wt.enum.AutoManualState(obj.OuterPanel.BackgroundColorMode);
@@ -84,6 +84,9 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
         % Outer panel for the dialog
         OuterPanel matlab.ui.container.Panel
 
+        % Inner grid to manage the content grid and status/button row
+        InnerGrid matlab.ui.container.GridLayout
+
         % Close button
         CloseButton matlab.ui.control.Button
 
@@ -105,15 +108,119 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
     end %properties
 
 
+    %% Public methods
+    methods (Access = public)
+
+        function positionOver(obj, refComp)
+            % Positions the dialog centered over a given reference component
+
+            arguments
+                obj (1,1) wt.abstract.BaseDialog2
+                refComp (1,1) matlab.graphics.Graphics
+            end
+
+            % Reference component size and position
+            refPos = getpixelposition(refComp, true);
+            refSize = refPos(3:4);
+            refCornerA = refPos(1:2);
+            %refCornerB = refPos(1:2) + refPos(:,3:4) - 1;
+
+            % Dialog size
+            dlgPos = getpixelposition(obj);
+            dlgSize = dlgPos(3:4);
+
+            % Does it fit entirely within the reference component?
+            if all(refSize >= dlgSize)
+                % Yes - center it over the component
+
+                % Calculate lower-left corner
+                dlgPos = floor((refSize - dlgSize) / 2) + refCornerA;
+
+            else
+                % NO - position within the figure
+
+                % Get the corners of the figure (bottom left and top right)
+                figPos = getpixelposition(obj.Parent);
+                figSize = figPos(3:4);
+
+                % Start with dialog position in lower-left of widget
+                dlgPos = refCornerA;
+                dlgCornerB = dlgPos + dlgSize;
+
+                % Move left and down as needed to fit in figure
+                adj = figSize - dlgCornerB;
+                adj(adj>0) = 0;
+                dlgPos = max(dlgPos + adj, [1 1]);
+                dlgCornerB = dlgPos + dlgSize;
+
+                % If it doesn't fit in the figure, shrink it
+                adj = figSize - dlgCornerB;
+                adj(adj>0) = 0;
+                dlgSize = dlgSize + adj;
+
+            end %if
+
+            % Set final position
+            obj.Position = [dlgPos dlgSize];
+            
+        end %function
+
+
+        function labels = addRowLabels(obj, names, parent, column, startRow)
+            % Add a group of standard row labels to the grid (or specified
+            % grid)
+
+            arguments
+                obj %#ok<INUSA> 
+                names (:,1) string
+                parent = obj.Grid
+                column = 1
+                startRow = 1
+            end
+
+            numRows = numel(names);
+            labels = gobjects(1,numRows);
+            hasText = false(1,numRows);
+            for idx = 1:numel(names)
+                thisName = names(idx);
+                hasText(idx) = strlength(thisName) > 0;
+                if hasText(idx)
+                    h = uilabel(parent);
+                    h.HorizontalAlignment = "right";
+                    h.Text = thisName;
+                    h.Layout.Column = column;
+                    h.Layout.Row = idx + startRow - 1;
+                    labels(idx) = h;
+                end
+            end
+
+            % Remove the empty spaces
+            labels(~hasText) = [];
+            
+        end %function
+
+
+        function b = addButtons(obj, labels)
+            % Adds buttons to the lower dialog area
+
+            b = wt.ButtonGrid(obj.InnerGrid,"Text",labels,"Icon",[]);
+            b.ButtonWidth(:) = {'fit'};
+            b.Layout.Row = 2;
+            b.Layout.Column = 2;
+
+        end %function
+
+    end %methods
+
+
     %% Protected methods
     methods (Access = protected)
         
         function setup(obj)
-            % Configure the widget
+            % Configure the dialog
 
             % Defaults
             obj.Position(3:4) = [350,200];
-            obj.TitleFontSize = 16;
             
             % Outer grid to enable the dialog panel to fill the component
             obj.OuterGrid = uigridlayout(obj,[1 1]);
@@ -122,33 +229,44 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             % Outer dialog panel
             obj.OuterPanel = uipanel(obj.OuterGrid);
             obj.OuterPanel.Title = "Dialog Title";
+            obj.OuterPanel.FontSize = 14;
+            obj.OuterPanel.FontWeight = "bold";
             obj.OuterPanel.BorderWidth = 1;
             obj.OuterPanel.AutoResizeChildren = false;
             obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
             obj.OuterPanel.ButtonDownFcn = @(~,evt)onTitleButtonDown(obj,evt);
-            
-            % Inner Grid to manage building blocks
-            obj.Grid = uigridlayout(obj.OuterPanel,[1 1]);
-            obj.Grid.Padding = 10;
-            obj.Grid.RowSpacing = 5;
-            obj.Grid.ColumnSpacing = 5;
-            obj.Grid.Scrollable = true;
 
             % Close Button
             obj.CloseButton = uibutton(obj.OuterPanel);
             obj.CloseButton.Text = "";
             obj.CloseButton.IconAlignment = "center";
             obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePushed();
+            
+            % Inner Grid to manage content and button area
+            obj.InnerGrid = uigridlayout(obj.OuterPanel,[2 2]);
+            obj.InnerGrid.Padding = 10;
+            obj.InnerGrid.RowHeight = {'1x','fit'};
+            obj.InnerGrid.ColumnWidth = {'1x','fit'};
+            obj.InnerGrid.RowSpacing = 5;
+            
+            % Grid to place dialog content
+            obj.Grid = uigridlayout(obj.InnerGrid,[1 1]);
+            obj.Grid.Layout.Row = 1;
+            obj.Grid.Layout.Column = [1 2];
+            obj.Grid.Padding = 0;
+            obj.Grid.RowSpacing = 5;
+            obj.Grid.ColumnSpacing = 5;
+            obj.Grid.Scrollable = true;
 
             % Apply theme colors
             if ~isMATLABReleaseOlderThan("R2025a")
+                obj.OuterPanel.ForegroundColor = obj.getThemeColor("--mw-color-primary");
                 obj.OuterPanel.BorderColor = obj.getThemeColor("--mw-borderColor-secondary");
                 obj.OuterPanel.BackgroundColor = obj.getThemeColor("--mw-backgroundColor-secondary");
-                % obj.CloseButton.BackgroundColor = obj.getThemeColor("--mw-backgroundColor-iconuiFill-primary");
             else
+                obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
                 obj.OuterPanel.BorderColor = [.5 .5 .5];
                 obj.OuterPanel.BackgroundColor = [.9 .9 .9];
-                % obj.CloseButton.BackgroundColor = [.38 .38 .38];
             end
 
             % Apply close button color
@@ -171,9 +289,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             % Bring the dialog back to the top
             uistack(obj,"top");
 
-            % Update component lists
-            obj.TitleFontStyledComponents = obj.OuterPanel;
-
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
 
@@ -185,8 +300,11 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
         function update(obj)
 
-            
+            % Ensure it fits in the figure
+            obj.resizeToFitFigure();
 
+            % Reposition the close button
+            obj.repositionCloseButton();
             
         end %function
 
@@ -249,14 +367,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
             % Add to any existing listeners
             obj.LifecycleListeners = horzcat(obj.LifecycleListeners, newListeners);
-
-        end %function
-
-
-        function color = getDefaultTitleColor(obj)
-            % Returns the default color for 'auto' mode (R2025a and later)
-
-            color = obj.getThemeColor("--mw-color-primary");
 
         end %function
 
