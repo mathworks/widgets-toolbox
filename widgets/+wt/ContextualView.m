@@ -15,30 +15,31 @@ classdef ContextualView < wt.abstract.BaseWidget
     % Copyright 2024-2025 The MathWorks Inc.
 
 
-    %% Public Properties
-    properties (AbortSet, Access = public)
 
-        % Block while loading
-        BlockWhileLoading (1,1) logical = true
+    %% Read-Only Properties
+    properties (Dependent, SetAccess = immutable)
 
-        % Image to use on loading screen
-        LoadingImageSource (1,1) string = "loading_32.gif"
+        % The currently active view, or empty if none
+        ActiveView
+
+        % Class of the active view
+        ActiveViewType
+
+        % The loaded views
+        LoadedViews
+
+        % Class of the loaded views
+        LoadedViewTypes
 
     end %properties
 
-
-    %% Read-Only Properties
-    properties (SetAccess = private, UsedInUpdate = false)
-
-        % The currently active view, or empty if none
-        ActiveView (:,1) matlab.graphics.Graphics ...
-            {mustBeScalarOrEmpty, mustBeValidView(ActiveView)} = ...
-            wt.abstract.BaseViewController.empty(0,1)
+    properties (Access = private)
 
         % The array of views loaded into memory
-        LoadedViews (:,1) matlab.graphics.Graphics ...
-            {mustBeValidView(LoadedViews)} = ...
+        LoadedViews_I (:,1) matlab.graphics.Graphics = ...
             wt.abstract.BaseViewController.empty(0,1)
+
+        FirstLoad_I (1,1) logical = true
 
     end %properties
 
@@ -47,29 +48,31 @@ classdef ContextualView < wt.abstract.BaseWidget
     methods
 
         function value = get.ActiveView(obj)
-            value = obj.ActiveView;
-            % Remove view if deleted
-            value(~isvalid(value)) = [];
-        end
-
-        function set.ActiveView(obj,value)
-            % Remove view if deleted
-            value(~isvalid(value)) = [];
-            obj.ActiveView = value;
+            value = obj.ContentGrid.Children;
         end
 
         function value = get.LoadedViews(obj)
-            value = obj.LoadedViews;
+            value = obj.LoadedViews_I;
             % Remove any deleted views from the list
             keepItems = arrayfun(@isvalid, value);
             value(~keepItems) = [];
         end
 
-        function set.LoadedViews(obj,value)
-            % Remove any deleted views from the list
-            keepItems = arrayfun(@isvalid, value);
-            value(~keepItems) = [];
-            obj.LoadedViews = value;
+        function value = get.LoadedViewTypes(obj)
+            views = obj.LoadedViews_I;
+            isDel = ~isvalid(views);
+            viewClassCell = arrayfun(@(x)class(x),views,'UniformOutput',false);
+            value = string(viewClassCell(:));
+            value(isDel) = value(isDel) + " (deleted)";
+        end
+
+        function value = get.ActiveViewType(obj)
+            activeView = obj.ActiveView;
+            if isscalar(activeView) && isvalid(activeView)
+                value = string( class(activeView) );
+            else
+                value = "";
+            end
         end
 
     end %methods
@@ -79,17 +82,11 @@ classdef ContextualView < wt.abstract.BaseWidget
     properties (AbortSet, Transient, NonCopyable, Hidden, ...
             SetAccess = protected, UsedInUpdate = false)
 
-        % Top-level grid to manage content vs. loading
-        % Grid matlab.ui.container.GridLayout
-
         % The internal grid to manage contents
         ContentGrid matlab.ui.container.GridLayout
 
-        % Image to show when loading a pane
-        LoadingImage matlab.ui.control.Image
-
-        % First load flag
-        FirstLoad (1,1) logical = true
+        % The internal panel to show border
+        Panel matlab.ui.container.Panel
 
     end %properties
 
@@ -98,108 +95,85 @@ classdef ContextualView < wt.abstract.BaseWidget
     methods
 
         function varargout = launchView(obj, viewClass, model)
-            % This method may be overloaded as needed
+            % Launch one or more views
 
             arguments
-                obj (1,1) wt.ContextualView
+                obj (1,:) wt.ContextualView
+            end
+
+            arguments (Repeating)
                 viewClass (1,1) string
-                model wt.model.BaseModel = wt.model.BaseModel.empty
+                model wt.model.BaseModel
             end
 
-            % Remove the initial box on first load
-            if obj.FirstLoad
-                obj.Grid.Padding = 0;
-                obj.FirstLoad = false;
-            end
+            % Convert viewClass cell to string array
+            viewClass = [viewClass{:}];
 
-            % After launch is complete, toggle off loading image
-            cleanupObj = onCleanup(@()set(obj.LoadingImage,"Visible","off"));
+            % Determine which views will be changing
+            % Loop on each ContextualView provided
+            numViews = numel(obj);
+            needsDeactivate = false(1,numViews);
+            for idx = 1:numViews
 
-            % Is the loading image non-visible?
-            if ~obj.LoadingImage.Visible
+                % Get current ContextualView obj and viewClass to launch
+                thisObj = obj(idx);
+                thisViewClass = viewClass(idx);
 
-                % If the view will change, show the loading image
-                obj.prepareToLaunchView(viewClass)
-
-            end %if
-
-            % Was a view provided?
-            if strlength(viewClass)
-
-                % Validate view class
-                view = validateViewClass(obj, viewClass);
-
-                % If no existing view found, instantiate the view
-                if isempty(view)
-                    obj.instantiateView_Private(viewClass, model);
-                else
-                    obj.activateView_Private(view, model)
-                end
-
-            else
-
-                % Empty view, clear the contents
-                obj.clearView();
-
-            end %if
-
-            % Return the active view
-            if nargout
-                varargout{1} = obj.ActiveView;
-            end
-
-        end %function
-
-
-        function prepareToLaunchView(viewArray, viewClassArray)
-            % Puts the ContextualView in a loading state if a different
-            % view is about to be launched. Use this if your app has
-            % multiple ContextualView instances and you need to potentially
-            % load multiple simultaneously. You can provide an array of
-            % views here to turn them to loading state together.
-
-            arguments
-                viewArray wt.ContextualView
-                viewClassArray string
-            end
-
-            % Flag if we need to trigger a drawnow to give time to display
-            % the loading image
-            updateNeeded = false;
-
-            % Check each ContextualView in the input array
-            for idx = 1:numel(viewArray)
-
-                % Get one at a time
-                thisView = viewArray(idx);
-                viewClass = viewClassArray(idx);
-
-                % Is the view class going to change?
-                willLaunchView = isempty(thisView.ActiveView) && strlength(viewClass);
-                willChangeView = isscalar(thisView.ActiveView) && ...
-                    class(thisView.ActiveView) ~= viewClass;
-                loadingCurrentState = thisView.LoadingImage.Visible;
-
-                % If the view will change, show the loading image
-                if thisView.BlockWhileLoading && ...
-                        loadingCurrentState == "off" && ...
-                        (willLaunchView || willChangeView)
-
-                    % Yes we will toggle the loading image.
-                    % This will prevent interaction during launch
-                    thisView.LoadingImage.Visible = "on";
-                    updateNeeded = true;
-
-                end %if
+                % Determine if the viewClass is empty or if viewClass will change
+                needsDeactivate(idx) = isscalar(thisObj.ActiveView) && ...
+                    isvalid(thisObj.ActiveView) && ...
+                    thisObj.ActiveViewType ~= thisViewClass;
 
             end %for
 
-            % If a change was made, give an opportunity to update the
-            % display so the loading image will display. (This is guarded
-            % in a conditional to avoid multiple calls
-            % causing performance issues.)
-            if updateNeeded
-                drawnow("limitrate")
+            % Will any views need to deactivate?
+            if any(needsDeactivate)
+
+                % Deactivate the views that will be changing
+                obj(needsDeactivate).deactivateView_Private();
+
+                % Force update for deactivation if multiple views changing
+                if sum(needsDeactivate) > 1
+                    drawnow("nocallbacks")
+                end
+
+            end %if
+
+            % Instantiate or activate any new views
+            % Loop on each ContextualView provided
+            for idx = 1:numel(obj)
+
+                % Get current ContextualView and content
+                thisObj = obj(idx);
+                thisViewClass = viewClass(idx);
+                thisModel = model{idx};
+
+                % Was a view provided?
+                if strlength(thisViewClass)
+
+                    % Remove the initial box on first load
+                    if thisObj.FirstLoad_I
+                        thisObj.Panel.BorderType = "none";
+                        thisObj.FirstLoad_I = false;
+                    end
+
+                    % Validate view class (get existing view if present)
+                    view = validateViewClass_Private(thisObj, thisViewClass);
+
+                    % If no existing view found, instantiate the view
+                    if isempty(view)
+                        thisObj.instantiateView_Private(thisViewClass, thisModel);
+                    else
+                        thisObj.activateView_Private(view, thisModel)
+                    end
+
+                end %if
+
+            end
+
+            % Return the active views
+            if nargout
+                varargout = {obj.ActiveView};
             end
 
         end %function
@@ -209,14 +183,21 @@ classdef ContextualView < wt.abstract.BaseWidget
             % This method may be overloaded as needed
 
             arguments
-                obj (1,1) wt.ContextualView
+                obj (1,:) wt.ContextualView
             end
 
-            % Deactivate the view
-            obj.deactivateView_Private();
+            % Loop on views
+            for thisObj = obj
 
-            % Delete any orphaned children
-            delete(obj.ContentGrid.Children);
+                % Deactivate the view
+                thisObj.deactivateView_Private();
+
+                % Delete any orphaned children
+                if ~isempty(thisObj.ContentGrid.Children)
+                    delete(thisObj.ContentGrid.Children);
+                end
+
+            end %for
 
         end %function
 
@@ -224,27 +205,34 @@ classdef ContextualView < wt.abstract.BaseWidget
         function relaunchActiveView(obj)
             % Delete and reload the active view
 
-            % Is there an active view? If no, return early
-            activeView = obj.ActiveView;
-            if isempty(activeView)
-                warning("wt:ContextualView:noActiveView",...
-                    "No active view is present.")
-                return
+            arguments
+                obj (1,:) wt.ContextualView
             end
 
-            % Get the current view and model
-            viewClass = class(activeView);
-            model = activeView.Model;
+            % Loop on views
+            for thisObj = obj
 
-            % Deactivate the active view
-            obj.clearView();
+                % Is there an active view?
+                activeView = thisObj.ActiveView;
+                if ~isempty(activeView)
 
-            % Delete the previously active view
-            delete(activeView);
-            obj.LoadedViews(obj.LoadedViews == activeView) = [];
+                    % Get the current view and model
+                    viewClass = class(activeView);
+                    model = activeView.Model;
 
-            % Launch the same view again
-            obj.launchView(viewClass, model);
+                    % Deactivate the active view
+                    thisObj.clearView();
+
+                    % Delete the previously active view
+                    delete(activeView);
+                    thisObj.LoadedViews_I(thisObj.LoadedViews_I == activeView) = [];
+
+                    % Launch the same view again
+                    thisObj.launchView(viewClass, model);
+
+                end %if
+
+            end %for
 
         end %function
 
@@ -252,19 +240,21 @@ classdef ContextualView < wt.abstract.BaseWidget
         function reset(obj)
             % Reset the control by deactivating current view and delete loaded views
 
-            % Deactivate any active view
-            obj.deactivateView_Private();
+            arguments
+                obj (1,:) wt.ContextualView
+            end
 
-            % Delete any loaded views
-            delete(obj.LoadedViews);
-            obj.LoadedViews(:) = [];
+                % Deactivate any active view
+                obj.deactivateView_Private();
 
-            % Delete any orphaned children
-            delete(obj.ContentGrid.Children);
+            % Loop on views
+            for thisObj = obj
 
-            % Reset the layout state
-            obj.ContentGrid.ColumnWidth = {'1x'};
-            obj.ContentGrid.RowHeight = {'1x'};
+                % Delete any loaded views
+                delete(thisObj.LoadedViews_I);
+                thisObj.LoadedViews_I(:) = [];
+
+            end %for
 
         end %function
 
@@ -280,53 +270,30 @@ classdef ContextualView < wt.abstract.BaseWidget
             % Children order of the widget
             % - widget itself
             %   - Grid
+            %     - Panel (for border)
             %       - ContentGrid (views go here)
-            %       - LoadingImage (visible gets toggled to cover view)
-
 
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
-            
-             % Set default size and position
+
+            % Set default size and position
             obj.Position = [10 10 400 400];
 
-            % Configure grid
-            % Show an temporary border around the edge. This makes the
-            % component more obvious in App Designer
-            obj.Grid.Padding = [1 1 1 1];
-
-            % Default to theme color
-            if isMATLABReleaseOlderThan("R2025a")
-                color = [.5 .5 .5];
-            else
-                color = obj.getThemeColor("--mw-borderColor-primary");
-            end
-            obj.Grid.BackgroundColor = color;
+            % Create panel
+            obj.Panel = uipanel(obj.Grid);
+            obj.Panel.BorderWidth = 2;
 
             % Grid Layout to place the contents
-            obj.ContentGrid = uigridlayout(obj.Grid,[1 1]);
+            obj.ContentGrid = uigridlayout(obj.Panel,[1 1]);
             obj.ContentGrid.Padding = [0 0 0 0];
-            obj.ContentGrid.Layout.Row = 1;
-            obj.ContentGrid.Layout.Column = 1;
-
-            % Image to display while loading content
-            obj.LoadingImage = uiimage(obj.Grid);
-            obj.LoadingImage.Layout.Row = 1;
-            obj.LoadingImage.Layout.Column = 1;
-            obj.LoadingImage.Visible = "off";
-            obj.LoadingImage.ScaleMethod = "none";
 
             % Components to apply background color
-            obj.BackgroundColorableComponents = ...
-                [obj.ContentGrid, obj.LoadingImage];
+            obj.BackgroundColorableComponents = obj.ContentGrid;
 
         end %function
 
 
-        function update(obj)
-
-            % Configure the loading image
-            obj.LoadingImage.ImageSource = obj.LoadingImageSource;
+        function update(~)
 
         end %function
 
@@ -336,7 +303,7 @@ classdef ContextualView < wt.abstract.BaseWidget
     %% Private methods
     methods (Access=private)
 
-        function view = validateViewClass(obj, viewClass)
+        function view = validateViewClass_Private(obj, viewClass)
             % This validates the view class and check for existing
             % instances. If an existing instance is found, it is returned.
             % Otherwise, an empty view is returned
@@ -344,6 +311,12 @@ classdef ContextualView < wt.abstract.BaseWidget
             arguments
                 obj (1,1) wt.ContextualView
                 viewClass (1,1) string
+            end
+
+            loadedViews = obj.LoadedViews_I;
+            isDeleted = ~isvalid(loadedViews);
+            if any(isDeleted)
+                loadedViews(isDeleted) = [];
             end
 
             % Try to locate a valid view
@@ -355,7 +328,7 @@ classdef ContextualView < wt.abstract.BaseWidget
                     "must be a valid class path.";
                 error(id, message, viewClass);
 
-            elseif isequal(viewClass, class(obj.ActiveView))
+            elseif viewClass == obj.ActiveViewType
 
                 % Pane is already active
                 view = obj.ActiveView;
@@ -364,7 +337,7 @@ classdef ContextualView < wt.abstract.BaseWidget
 
                 % Check if the view already exists
                 view = wt.abstract.BaseViewController.empty(0,1);
-                for thisView = obj.LoadedViews'
+                for thisView = loadedViews'
                     if viewClass == class(thisView)
                         view = thisView;
                         break
@@ -385,6 +358,9 @@ classdef ContextualView < wt.abstract.BaseWidget
                 model wt.model.BaseModel %= wt.model.BaseModel.empty(0)
             end
 
+            % Deactivate the old view
+
+
             % Trap errors
             try
 
@@ -392,14 +368,19 @@ classdef ContextualView < wt.abstract.BaseWidget
                 viewConstructorFcn = str2func(viewClass);
 
                 % Launch the view
-                view = viewConstructorFcn(obj.ContentGrid);
+                if ~isempty(model)
+                    view = viewConstructorFcn(obj.ContentGrid,"Model",model);
+                else
+                    view = viewConstructorFcn(obj.ContentGrid);
+                end
 
                 % Position the view in the single grid cell
                 view.Layout.Row = 1;
                 view.Layout.Column = 1;
+                view.Visible = true;
 
                 % Add the new view to the list
-                obj.LoadedViews = vertcat(obj.LoadedViews, view);
+                obj.LoadedViews_I = vertcat(obj.LoadedViews_I, view);
 
             catch err
 
@@ -410,16 +391,10 @@ classdef ContextualView < wt.abstract.BaseWidget
                 title = "Error launching view: " + viewClass;
                 obj.throwError(err.message, title);
 
-                % Deactivate current pane
-                obj.deactivateView_Private();
-
                 % Rethrow the error to the command window
                 rethrow(err)
 
             end %try
-
-            % Activate the view
-            obj.activateView_Private(view, model)
 
         end %function
 
@@ -434,80 +409,23 @@ classdef ContextualView < wt.abstract.BaseWidget
             end
 
             % Does this view need to be made active?
-            needToMarkActive = ~isequal(obj.ActiveView, view);
-            if needToMarkActive
-
-                % Remove the old view at the end of this function
-                oldView = obj.ActiveView;
-                cleanupObj = onCleanup(@()obj.deactivateView_Private(oldView));
+            needToActivate = ~isequal(obj.ActiveView, view);
+            if needToActivate
 
                 % Assign parent
-                if ~isequal(view.Parent, obj.ContentGrid)
-                    view.Parent = obj.ContentGrid;
-                end
+                view.Parent = obj.ContentGrid;
+                view.Layout.Column = 1;
+                view.Layout.Row = 1;
                 view.Visible = true;
-
-                % Store this view as active view
-                obj.ActiveView = view;
 
             end %if
 
             % Attach model
-            if ~isempty(model) && all(isvalid(model(:)))
-
-                % Attach the model
-                obj.attachModel_Private(view, model)
-
-            end %if
-
-        end %function
-
-
-        function deactivateView_Private(obj, view)
-            % Deactivate a view, removing from view and removing model
-            arguments
-                obj (1,1) wt.ContextualView
-                view {mustBeValidView(view)} = obj.ActiveView
-            end
-
-            % Return now if view provided is empty
-            if isempty(view) || ~isvalid(view)
-                return
-            end
-
-            % Remove the view's model and unparent it
-            view.Model(:) = [];
-            view.Parent(:) = [];
-
-            % Remove view from the active view property
-            if isequal(obj.ActiveView, view)
-                obj.ActiveView(:) = [];
-            end
-
-            % Clean up partially loaded children
-            delete(obj.ContentGrid.Children(2:end))
-
-        end %function
-
-
-        function attachModel_Private(obj, view, model)
-            % Attach model to the active view
-
-            arguments
-                obj (1,1) wt.ContextualView
-                view (1,1) {mustBeValidView(view)}
-                model wt.model.BaseModel
-            end
-
-            % Trap errors during model assignment
-            if ~isempty(model) && all(isvalid(model(:)))
+            if ~isempty(model)
 
                 try
                     % Assign model
                     view.Model = model;
-
-                    % Listen to model changes
-                    % obj.attachModelPropertyChangedListener();
 
                 catch err
 
@@ -519,6 +437,44 @@ classdef ContextualView < wt.abstract.BaseWidget
                 end %try
 
             end %if
+
+        end %function
+
+
+        function deactivateView_Private(obj)
+            % Deactivate the active view, hiding and removing model
+            arguments
+                obj (1,:) wt.ContextualView
+            end
+
+            % Loop on each object
+            for thisObj = obj
+
+                % Remove the view's model and unparent it
+                thisView = thisObj.ActiveView;
+                if ~isempty(thisView)
+                    thisView.Model(:) = [];
+                    thisView.Parent(:) = [];
+                end
+
+                % Confirm ContentGrid is empty
+                if ~isempty(thisObj.ContentGrid.Children)
+
+                    % Delete the orphan content
+                    delete(thisObj.ContentGrid.Children)
+
+                    % Throw a warning
+                    id = "wt:ContextualView:OrphanViews";
+                    message = "Orphaned views are being removed from the ContextualView.";
+                    warning(id, message);
+
+                end %if
+
+                % Ensure the ContentGrid layout state is consistent
+                thisObj.ContentGrid.ColumnWidth = {'1x'};
+                thisObj.ContentGrid.RowHeight = {'1x'};
+
+            end %for
 
         end %function
 

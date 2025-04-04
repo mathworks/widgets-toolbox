@@ -188,7 +188,7 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
             % Get the app components
             app = testCase.App;
             tree = app.Tree;
-            cview = app.ContextualView;
+            % cview = app.ContextualView;
 
             % Import the sample dataset
             session1 = testCase.importSampleSession();
@@ -312,9 +312,9 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
                 diag);
             
             % Verify name in view matches
-%             diag = "Expected updated name to display in the view after loading.";
-%             actVal = view.NameField.Value;
-%             testCase.verifyMatches(actVal, newName, diag);
+            % diag = "Expected updated name to display in the view after loading.";
+            % actVal = view.NameField.Value;
+            % testCase.verifyMatches(actVal, newName, diag);
 
         end %function
 

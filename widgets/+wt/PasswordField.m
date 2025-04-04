@@ -101,28 +101,39 @@ classdef PasswordField <  wt.abstract.BaseWidget
             % Grab the data in string format
             newValue = string(evt.Data);
             oldValue = obj.Value;
+            previousData = evt.PreviousData;
 
             % Look at the states
-            if endsWith(evt.PreviousData, newline)
-                % This is needed to ignore double events
-
-                % Clear the newline from the uihtml data
-                newValue = erase(newValue, newline);
-                obj.PasswordControl.Data = newValue;
-
-            elseif endsWith(newValue, newline)
+            if endsWith(newValue, newline)
                 % Enter key was pressed in the uihtml component
 
                 % Clear the newline from the new value
                 newValue = erase(newValue, newline);
+                
+                % Store value
+                obj.Value = newValue;
 
                 % Trigger event
                 evtOut = wt.eventdata.PropertyChangedData('Value', newValue);
                 notify(obj,"ValueChanged",evtOut);
 
+            elseif endsWith(previousData, newline)
+                % This is needed to ignore double events
+
+                % Clear the newline from the uihtml data
+                newValue = erase(newValue, newline);
+
+                % Store value
+                obj.Value = newValue;
+                
+                % Trigger event
+                evtOut = wt.eventdata.PropertyChangedData('Value', ...
+                    newValue, oldValue);
+                notify(obj,"ValueChanging",evtOut);
+
             elseif newValue ~= oldValue
 
-                % Store new result
+                % Store value
                 obj.Value = newValue;
 
                 % Trigger event

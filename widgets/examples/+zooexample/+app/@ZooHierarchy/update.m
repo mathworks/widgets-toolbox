@@ -31,7 +31,7 @@ app.updateTreeHierarchy()
 %% Update the ContextualView contents
 
 % What type of selection?
-if isscalar(selectionData.Model)
+if isscalar(selectionData.Model) && isvalid(selectionData.Model)
     % Choose view that matches the model type
 
     % Which view to launch?
