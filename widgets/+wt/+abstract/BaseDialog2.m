@@ -75,6 +75,72 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
     end %methods
 
 
+    %% Lower Button Properties
+    % The dialog subclass can change these values
+    properties (Dependent)
+
+        LowerButtonText
+
+        LowerButtonTag
+
+        LowerButtonTooltip
+
+        LowerButtonEnable
+
+        LowerButtonWidth
+
+        LowerButtonHeight
+
+    end %methods
+
+    % Accessors
+    methods
+
+        function value = get.LowerButtonText(obj)
+            value = obj.LowerButtons.Text;
+        end
+        function set.LowerButtonText(obj,value)
+            obj.LowerButtons.Text = value;
+        end
+
+        function value = get.LowerButtonTag(obj)
+            value = obj.LowerButtons.ButtonTag;
+        end
+        function set.LowerButtonTag(obj,value)
+            obj.LowerButtons.ButtonTag = value;
+        end
+
+        function value = get.LowerButtonTooltip(obj)
+            value = obj.LowerButtons.Tooltip;
+        end
+        function set.LowerButtonTooltip(obj,value)
+            obj.LowerButtons.Tooltip = value;
+        end
+
+        function value = get.LowerButtonEnable(obj)
+            value = obj.LowerButtons.ButtonEnable;
+        end
+        function set.LowerButtonEnable(obj,value)
+            obj.LowerButtons.ButtonEnable = value;
+        end
+
+        function value = get.LowerButtonWidth(obj)
+            value = obj.LowerButtons.ButtonWidth;
+        end
+        function set.LowerButtonWidth(obj,value)
+            obj.LowerButtons.ButtonWidth = value;
+        end
+
+        function value = get.LowerButtonHeight(obj)
+            value = obj.LowerButtons.ButtonHeight;
+        end
+        function set.LowerButtonHeight(obj,value)
+            obj.LowerButtons.ButtonHeight = value;
+        end
+
+    end %methods
+
+
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
@@ -104,6 +170,9 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
         % Modal image (optional)
         ModalImage matlab.ui.control.Image
+
+        % Lower buttons (optional)
+        LowerButtons wt.ButtonGrid
 
     end %properties
 
@@ -199,17 +268,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             
         end %function
 
-
-        function b = addButtons(obj, labels)
-            % Adds buttons to the lower dialog area
-
-            b = wt.ButtonGrid(obj.InnerGrid,"Text",labels,"Icon",[]);
-            b.ButtonWidth(:) = {'fit'};
-            b.Layout.Row = 2;
-            b.Layout.Column = 2;
-
-        end %function
-
     end %methods
 
 
@@ -239,6 +297,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             % Close Button
             obj.CloseButton = uibutton(obj.OuterPanel);
             obj.CloseButton.Text = "";
+            obj.CloseButton.Tag = "close";
             obj.CloseButton.IconAlignment = "center";
             obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePushed();
             
@@ -286,6 +345,12 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             szF = posF(3:4);
             obj.ModalImage.Position = [1 1 szF];
 
+            % Add lower buttons
+            obj.LowerButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
+            obj.LowerButtons.Layout.Row = 2;
+            obj.LowerButtons.Layout.Column = 2;
+            obj.LowerButtons.DefaultSize = 'fit';
+
             % Bring the dialog back to the top
             uistack(obj,"top");
 
@@ -305,6 +370,19 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             % Reposition the close button
             obj.repositionCloseButton();
+            
+        end %function
+        
+
+        function updateBackgroundColorableComponents(obj)
+            % Update components that are affected by BackgroundColor
+            % (overrides the superclass method)
+            
+            % Update grid color
+            set([obj.InnerGrid, obj.Grid], "BackgroundColor", obj.BackgroundColor);
+
+            % Call superclass method
+            obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
             
         end %function
 

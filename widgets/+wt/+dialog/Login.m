@@ -12,9 +12,9 @@ classdef Login < wt.abstract.BaseDialog2
     end %properties
 
 
- %% Protected methods
+    %% Protected methods
     methods (Access = protected)
-        
+
         function setup(obj)
             % Configure the widget
 
@@ -25,7 +25,8 @@ classdef Login < wt.abstract.BaseDialog2
             obj.setup@wt.abstract.BaseDialog2();
 
             % Add buttons
-            b = addButtons(obj, ["Login","Cancel"]);
+            obj.LowerButtonText = ["Login","Cancel"];
+            obj.LowerButtonTag = ["login","cancel"];
 
             % Configure grid
             obj.Grid.RowHeight = {25,25};
@@ -37,7 +38,7 @@ classdef Login < wt.abstract.BaseDialog2
             % Add labels
             col = 1;
             startRow = 1;
-            lbl = obj.addRowLabels(["Username:","Password"], ...
+            obj.addRowLabels(["Username:","Password"], ...
                 obj.Grid, col, startRow);
 
             % Add controls
@@ -48,7 +49,10 @@ classdef Login < wt.abstract.BaseDialog2
             obj.PasswordField = wt.PasswordField(obj.Grid);
             obj.PasswordField.Layout.Row = 2;
             obj.PasswordField.Layout.Column = 2;
-            
+
+            % Update component lists
+            % obj.BackgroundColorableComponents = [obj.Grid]
+
         end %function
 
     end %methods
