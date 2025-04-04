@@ -4,6 +4,11 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
     % Copyright 2022-2025 The MathWorks Inc.
     
+    % To do:
+    % - finish importing old BaseDialog
+    % - observe figure resize, ensure dialog is always on screen
+    % - add modal backing image
+    % - make examples
 
     %% Public Properties
     properties (AbortSet, Dependent, Access = public)
@@ -113,8 +118,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             obj.CloseButton.Text = "";
             obj.CloseButton.BackgroundColor = [0.8 0.2 0.2];
             obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePushed();
-
-            % obj.Figure = ancestor(obj,)
             
             % Trigger the outer panel resize
             % This positions the close button properly
@@ -126,7 +129,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function update(obj)
+        function update(~)
 
 
             
