@@ -205,7 +205,7 @@ classdef TitleFontStyled < handle
                     && ~isMATLABReleaseOlderThan("R2025a")
 
                 % Use standard theme color
-                obj.TitleColor_I = obj.getDefaultTitleColor();   
+                obj.TitleColor_I = obj.getDefaultTitleColor();
 
             end %if
 
