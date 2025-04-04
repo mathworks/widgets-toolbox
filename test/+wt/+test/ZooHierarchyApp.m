@@ -312,9 +312,9 @@ classdef ZooHierarchyApp < matlab.uitest.TestCase
                 diag);
             
             % Verify name in view matches
-%             diag = "Expected updated name to display in the view after loading.";
-%             actVal = view.NameField.Value;
-%             testCase.verifyMatches(actVal, newName, diag);
+            % diag = "Expected updated name to display in the view after loading.";
+            % actVal = view.NameField.Value;
+            % testCase.verifyMatches(actVal, newName, diag);
 
         end %function
 
