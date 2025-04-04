@@ -114,7 +114,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
             % Close Button
             obj.CloseButton = uibutton(obj.OuterPanel);
-            obj.CloseButton.Icon = "close.png";
+            obj.CloseButton.Icon = "closeButton_32.png";
             obj.CloseButton.Text = "";
             obj.CloseButton.BackgroundColor = [0.8 0.2 0.2];
             obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePushed();
