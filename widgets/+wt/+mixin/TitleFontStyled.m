@@ -206,7 +206,7 @@ classdef TitleFontStyled < handle
                 
                 % Use standard theme color
                 obj.TitleColor_I = obj.getDefaultTitleColor();
-                
+
             end %if
             
         end %function
