@@ -6,7 +6,6 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
     
     % To do:
     % - finish importing old BaseDialog
-    % - add modal backing image
     % - make examples
 
     %% Public Properties
@@ -19,6 +18,9 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
 
     properties (AbortSet, Dependent, Access = public)
+
+        % Modal (block other figure interaction)
+        Modal
 
         % Dialog Title
         Title
@@ -34,6 +36,13 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
     % Accessors
     methods
+
+        function value = get.Modal(obj)
+            value = obj.ModalImage.Visible;
+        end
+        function set.Modal(obj, value)
+            obj.ModalImage.Visible = value;
+        end
 
         function value = get.Title(obj)
             value = obj.OuterPanel.Title;
@@ -89,6 +98,9 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
 
         % Figure resize listener
         FigureResizeListener (1,:) event.listener  {mustBeScalarOrEmpty}
+
+        % Modal image (optional)
+        ModalImage matlab.ui.control.Image
 
     end %properties
 
@@ -147,19 +159,33 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             obj.FigureResizeListener = listener(obj.Figure,"SizeChanged",...
                 @(~,evt)onFigureResized(obj,evt));
 
+            % Add modal image
+            obj.ModalImage = uiimage(obj.Figure);
+            obj.ModalImage.ImageSource = "overlay_gray.png";
+            obj.ModalImage.ScaleMethod = "stretch";
+            obj.ModalImage.Visible = "off";
+            posF = getpixelposition(obj.Figure);
+            szF = posF(3:4);
+            obj.ModalImage.Position = [1 1 szF];
+
+            % Bring the dialog back to the top
+            uistack(obj,"top");
+
+            % Update component lists
+            obj.TitleFontStyledComponents = obj.OuterPanel;
+
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
 
             % Reposition the close button
             obj.repositionCloseButton();
 
-            % Update component lists
-            obj.TitleFontStyledComponents = obj.OuterPanel;
-
         end %function
 
 
-        function update(~)
+        function update(obj)
+
+            
 
             
         end %function
@@ -264,7 +290,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             xB = wO - 2*wBorder - wB - 1;
 
             % Move the close button
-            obj.CloseButton.Position = [xB yB wB hB];
+            set(obj.CloseButton,"Position",[xB yB wB hB]);
 
         end %function
 
@@ -301,9 +327,12 @@ classdef BaseDialog2  < wt.abstract.BaseWidget & ...
             % Don't go below 1
             posLowerLeft = max(posLowerLeft, 1);
 
-            % Update position
+            % Update modal image position
+            set(obj.ModalImage,"Position",[1 1 szF]);
+
+            % Update dialog position
             posNew = [posLowerLeft szD];
-            obj.Position = posNew;
+            set(obj,"Position",posNew);
             
         end %function
 
