@@ -6,11 +6,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
     % Copyright 2022-2025 The MathWorks Inc.
 
-    % To do:
-    % - finish importing old BaseDialog
-    % - make examples
-    % - handle theme changes
-
 
     %% Events
     events (HasCallbackProperty)
@@ -158,7 +153,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
     properties (AbortSet, Access = public)
 
         % Dialog button action names that trigger deletion (button tags/names)
-        DeleteActions (1,:) string = ["close","ok","cancel","exit"]
+        DeleteActions (1,:) string = ["delete","close","ok","cancel","exit"]
 
     end %properties
 
@@ -215,6 +210,95 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
     end %properties
 
 
+    properties (Transient, Hidden)
+
+        % Optional parent component creating the dialog. The component must
+        % be provided to constructor, and the dialog will be centered on
+        % the component where possible. The lifecycle will be tied so that
+        % the dialog will be deleted if the component is deleted.
+        ParentComponent matlab.graphics.Graphics
+
+    end %properties
+
+
+    %% Constructor / Destructor
+    methods
+        function obj = BaseInternalDialog(parentComponent)
+            % Construct a dialog
+
+            arguments
+                parentComponent matlab.graphics.Graphics ...
+                    {mustBeScalarOrEmpty} = gobjects(0)
+            end
+
+            % Get ancestor figure, if possible
+            % If no figure available, place dialog in a new figure
+            id = "wt:abstract:BaseInternalDialog:InvalidParent";
+            msg = "Input to BaseInternalDialog must be a uifigure or a component within a uifigure.";
+            if isempty(parentComponent)
+                % No component or figure, make a new figure
+
+                parent = uifigure;
+                hasComponent = false;
+
+            elseif isa(parentComponent,"matlab.ui.Figure")
+                % Given a figure for the parent
+
+                parent = parentComponent;
+                hasComponent = false;
+
+            elseif isa(parentComponent, "matlab.graphics.Graphics")
+                % Given a component (it must be in a figure)
+
+                parent = ancestor(parentComponent,'figure');
+                if isempty(parent)
+                    % Component not in a figure
+                    error(id,parent)
+                else
+                    hasComponent = true;
+                end
+
+            else
+
+                error(id,msg)
+
+            end
+
+            % Call superclass
+            if hasComponent
+                addedArgs = {"ParentComponent", parentComponent};
+            else
+                addedArgs = {};
+            end
+            obj@wt.abstract.BaseWidget(parent, addedArgs{:});
+            % obj@wt.abstract.BaseWidget(parent);
+
+            % Did it have a component argument?
+            if hasComponent
+
+                % Store the parent component
+                %obj.ParentComponent = parentComponent;
+
+                % Position over the component
+                %obj.positionOver(parentComponent)
+
+                % Set dialog lifecycle to that of the parent component
+                % The dialog will be deleted if the parent component is deleted
+                obj.attachLifecycleListeners(parentComponent);
+
+            else
+
+                % Set dialog lifecycle to that of the parent
+                % The dialog will be deleted if the parent component is deleted
+                obj.attachLifecycleListeners(parent);
+
+            end
+
+        end %function
+        
+    end %methods
+
+
     %% Public methods
     methods (Sealed, Access = public)
 
@@ -267,8 +351,14 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
             end %if
 
+            % Disable warning
+            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
+
             % Set final position
             obj.Position = [dlgPos dlgSize];
+
+            % Restore warning
+            warning(warnState)
 
         end %function
 
@@ -365,8 +455,14 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
         function setup(obj)
             % Configure the dialog
 
+            % Disable warning
+            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
+
             % Defaults
             obj.Position(3:4) = [350,200];
+
+            % Restore warning
+            warning(warnState)
 
             % Outer grid to enable the dialog panel to fill the component
             obj.OuterGrid = uigridlayout(obj,[1 1]);
@@ -375,9 +471,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % Outer dialog panel
             obj.OuterPanel = uipanel(obj.OuterGrid);
             obj.OuterPanel.Title = "Dialog Title";
-            obj.OuterPanel.FontSize = 14;
+            obj.OuterPanel.FontSize = 16;
             obj.OuterPanel.FontWeight = "bold";
-            obj.OuterPanel.BorderWidth = 1;
+            %obj.OuterPanel.BorderWidth = 1;
             obj.OuterPanel.AutoResizeChildren = false;
             obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
             obj.OuterPanel.ButtonDownFcn = @(~,evt)onTitleButtonDown(obj,evt);
@@ -414,6 +510,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
                     obj.getThemeColor("--mw-borderColor-secondary");
                 obj.OuterPanel.BackgroundColor = ...
                     obj.getThemeColor("--mw-backgroundColor-secondary");
+            elseif isMATLABReleaseOlderThan("R2023a")
+                obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
+                obj.OuterPanel.BackgroundColor = [.9 .9 .9];
             else
                 obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
                 obj.OuterPanel.BorderColor = [.5 .5 .5];
@@ -490,17 +589,37 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % Delete the dialog automatically upon destruction of the specified "owner" graphics objects
 
             arguments
-                obj (1,1) wt.abstract.BaseDialog
+                obj (1,1) wt.abstract.BaseInternalDialog
                 owners handle
             end
 
             % Create listeners
             % The dialog will be deleted if the listenObj is deleted
             newListeners = listener(owners, "ObjectBeingDestroyed",...
-                @(src,evt)delete(obj));
+                @(src,evt)forceCloseDialog(obj));
 
             % Add to any existing listeners
             obj.LifecycleListeners = horzcat(obj.LifecycleListeners, newListeners);
+
+        end %function
+
+
+        function forceCloseDialog(obj)
+            % Should the dialog be deleted?
+
+            obj.Output = [];
+            obj.LastAction = 'delete';
+
+            if ~obj.IsWaitingForOutput
+
+                % Delete the dialog
+                delete(obj)
+
+            else
+
+                obj.IsWaitingForOutput = false;
+
+            end
 
         end %function
 
