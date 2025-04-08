@@ -4,8 +4,11 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
         wt.mixin.FieldColorable
     % Base class for a dialog panel
 
-%   Copyright 2022-2025 The MathWorks Inc.
-    
+    % Please note this is an experimental component that may change in the
+    % future. 
+
+    %   Copyright 2022-2025 The MathWorks Inc.
+
 
     %% Public Properties
     properties (AbortSet, Dependent, Access = public)
@@ -39,14 +42,14 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
         end
 
     end %methods
-   
+
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
         % Dialog's grid managing the outer container
         DialogGrid matlab.ui.container.GridLayout
-       
+
         % Title text
         TitleBar matlab.ui.control.Label
 
@@ -62,13 +65,13 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
     %% Protected methods
     methods (Access = protected)
-        
+
         function setup(obj)
             % Configure the widget
 
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget();
-            
+
             % Outer Grid to manage building blocks
             obj.DialogGrid = uigridlayout(obj);
             obj.DialogGrid.RowHeight = {'fit','1x'};
@@ -91,20 +94,20 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
             obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePressed();
             obj.CloseButton.Layout.Row = 1;
             obj.CloseButton.Layout.Column = 2;
-            
+
             % Inner Grid to manage building blocks
             obj.Grid.Parent = obj.DialogGrid;
             obj.Grid.Padding = 10;
             obj.Grid.Scrollable = true;
             obj.Grid.Layout.Row = 2;
             obj.Grid.Layout.Column = [1 2];
-            
+
         end %function
 
-        
+
         function updateBackgroundColorableComponents(obj)
             % Update components that are affected by BackgroundColor
-            
+
             % Update dialog components
             set(obj.TitleBar, "BackgroundColor", obj.BackgroundColor);
 
@@ -113,10 +116,10 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
         end %function
 
-        
+
         function updateButtonColorableComponents(obj)
             % Update components that are affected by ButtonColor
-            
+
             % Update dialog components
             set(obj.CloseButton, "BackgroundColor", obj.ButtonColor);
 
@@ -202,7 +205,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
             % Set final position
             obj.Position = [dlgPos dlgSize];
-            
+
         end %function
 
 
@@ -211,7 +214,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
             % grid)
 
             arguments
-                obj %#ok<INUSA> 
+                obj %#ok<INUSA>
                 names (:,1) string
                 parent = obj.Grid
                 column = 1
@@ -236,7 +239,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
             % Remove the empty spaces
             labels(~hasText) = [];
-            
+
         end %function
 
 
@@ -253,7 +256,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
             arguments
                 obj (1,1) wt.abstract.BaseDialog
-                listenObj handle   
+                listenObj handle
             end
 
             % Create listeners
@@ -304,7 +307,7 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
 
 
         end %function
-        
+
     end %methods
 
 end %classdef

@@ -1,12 +1,25 @@
-classdef BaseDialog2  < wt.abstract.BaseWidget
-    % Base class for a dialog
+classdef BaseInternalDialog  < wt.abstract.BaseWidget
+    % Base class for a dialog that sits internal to the uifigure
+
+    % Please note this is an experimental component that may change in the
+    % future.
 
     % Copyright 2022-2025 The MathWorks Inc.
-    
+
     % To do:
     % - finish importing old BaseDialog
     % - make examples
     % - handle theme changes
+
+
+    %% Events
+    events (HasCallbackProperty)
+
+        % Triggered on dialog button pushed
+        DialogButtonPushed
+
+    end %properties
+
 
     %% Public Properties
     properties (AbortSet, Access = public)
@@ -75,70 +88,92 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
     end %methods
 
 
-    %% Lower Button Properties
+    %% Dialog Button Properties
     % The dialog subclass can change these values
     properties (Dependent)
 
-        LowerButtonText
+        DialogButtonText
 
-        LowerButtonTag
+        DialogButtonTag
 
-        LowerButtonTooltip
+        DialogButtonTooltip
 
-        LowerButtonEnable
+        DialogButtonEnable
 
-        LowerButtonWidth
+        DialogButtonWidth
 
-        LowerButtonHeight
+        DialogButtonHeight
 
     end %methods
 
     % Accessors
     methods
 
-        function value = get.LowerButtonText(obj)
-            value = obj.LowerButtons.Text;
+        function value = get.DialogButtonText(obj)
+            value = obj.DialogButtons.Text;
         end
-        function set.LowerButtonText(obj,value)
-            obj.LowerButtons.Text = value;
-        end
-
-        function value = get.LowerButtonTag(obj)
-            value = obj.LowerButtons.ButtonTag;
-        end
-        function set.LowerButtonTag(obj,value)
-            obj.LowerButtons.ButtonTag = value;
+        function set.DialogButtonText(obj,value)
+            obj.DialogButtons.Text = value;
         end
 
-        function value = get.LowerButtonTooltip(obj)
-            value = obj.LowerButtons.Tooltip;
+        function value = get.DialogButtonTag(obj)
+            value = obj.DialogButtons.ButtonTag;
         end
-        function set.LowerButtonTooltip(obj,value)
-            obj.LowerButtons.Tooltip = value;
-        end
-
-        function value = get.LowerButtonEnable(obj)
-            value = obj.LowerButtons.ButtonEnable;
-        end
-        function set.LowerButtonEnable(obj,value)
-            obj.LowerButtons.ButtonEnable = value;
+        function set.DialogButtonTag(obj,value)
+            obj.DialogButtons.ButtonTag = value;
         end
 
-        function value = get.LowerButtonWidth(obj)
-            value = obj.LowerButtons.ButtonWidth;
+        function value = get.DialogButtonTooltip(obj)
+            value = obj.DialogButtons.Tooltip;
         end
-        function set.LowerButtonWidth(obj,value)
-            obj.LowerButtons.ButtonWidth = value;
+        function set.DialogButtonTooltip(obj,value)
+            obj.DialogButtons.Tooltip = value;
         end
 
-        function value = get.LowerButtonHeight(obj)
-            value = obj.LowerButtons.ButtonHeight;
+        function value = get.DialogButtonEnable(obj)
+            value = obj.DialogButtons.ButtonEnable;
         end
-        function set.LowerButtonHeight(obj,value)
-            obj.LowerButtons.ButtonHeight = value;
+        function set.DialogButtonEnable(obj,value)
+            obj.DialogButtons.ButtonEnable = value;
+        end
+
+        function value = get.DialogButtonWidth(obj)
+            value = obj.DialogButtons.ButtonWidth;
+        end
+        function set.DialogButtonWidth(obj,value)
+            obj.DialogButtons.ButtonWidth = value;
+        end
+
+        function value = get.DialogButtonHeight(obj)
+            value = obj.DialogButtons.ButtonHeight;
+        end
+        function set.DialogButtonHeight(obj,value)
+            obj.DialogButtons.ButtonHeight = value;
         end
 
     end %methods
+
+
+    %% Dialog Actions Properties
+    properties (AbortSet, Access = public)
+
+        % Dialog button action names that trigger deletion (button tags/names)
+        DeleteActions (1,:) string = ["close","ok","cancel","exit"]
+
+    end %properties
+
+
+    properties (SetAccess = protected)
+
+        % Results / Output Data from the dialog
+        Output = []
+
+        % True if dialog is waiting for output
+        IsWaitingForOutput (1,1) logical = false
+        % Pressing a button (ok, cancel, or close) will toggle this false
+        % and cause the waitForOutput() method to complete.
+
+    end %properties
 
 
     %% Internal Properties
@@ -171,20 +206,23 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
         % Modal image (optional)
         ModalImage matlab.ui.control.Image
 
-        % Lower buttons (optional)
-        LowerButtons wt.ButtonGrid
+        % Dialog buttons (optional)
+        DialogButtons wt.ButtonGrid
+
+        % Last action when closing dialog
+        LastAction string = []
 
     end %properties
 
 
     %% Public methods
-    methods (Access = public)
+    methods (Sealed, Access = public)
 
         function positionOver(obj, refComp)
             % Positions the dialog centered over a given reference component
 
             arguments
-                obj (1,1) wt.abstract.BaseDialog2
+                obj (1,1) wt.abstract.BaseInternalDialog
                 refComp (1,1) matlab.graphics.Graphics
             end
 
@@ -231,7 +269,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             % Set final position
             obj.Position = [dlgPos dlgSize];
-            
+
         end %function
 
 
@@ -240,11 +278,11 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             % grid)
 
             arguments
-                obj %#ok<INUSA> 
+                obj %#ok<INUSA>
                 names (:,1) string
-                parent = obj.Grid
-                column = 1
-                startRow = 1
+                parent matlab.graphics.Graphics = obj.Grid
+                column (1,1) double {mustBeInteger} = 1
+                startRow (1,1) double {mustBeInteger} = 1
             end
 
             numRows = numel(names);
@@ -265,7 +303,37 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             % Remove the empty spaces
             labels(~hasText) = [];
-            
+
+        end %function
+
+    end %methods
+
+
+    %% Public Methods
+    methods
+
+        function [output, lastAction] = waitForOutput(obj)
+            % Puts MATLAB in a wait state until the dialog buttons trigger
+            % action
+
+            % Wait for action
+            obj.IsWaitingForOutput = true;
+            waitfor(obj,'IsWaitingForOutput',false)
+
+            % Produce output
+            if isvalid(obj)
+                output = obj.Output;
+                lastAction = obj.LastAction;
+            else
+                % Dialog or figure was deleted
+                output = [];
+                lastAction = "close";
+            end
+
+
+            % Check for deletion criteria
+            obj.checkDeletionCriteria()
+
         end %function
 
     end %methods
@@ -273,13 +341,33 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
     %% Protected methods
     methods (Access = protected)
-        
+
+        function assignOutput(~)
+            % Triggered when the dialog should assign the output, generally
+            % in the case of a blocking dialog.
+
+            % For blocking dialogs, the subclass should implement the
+            % assignOutput method.
+
+            % Example subclass implementation:
+            %
+            %   function assignOutput(obj)
+            %
+            %       % Assign output
+            %       obj.Output = <assign appropriate data here>;
+            %
+            %   end %function
+
+
+        end %function
+
+
         function setup(obj)
             % Configure the dialog
 
             % Defaults
             obj.Position(3:4) = [350,200];
-            
+
             % Outer grid to enable the dialog panel to fill the component
             obj.OuterGrid = uigridlayout(obj,[1 1]);
             obj.OuterGrid.Padding = [0 0 0 0];
@@ -299,15 +387,16 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             obj.CloseButton.Text = "";
             obj.CloseButton.Tag = "close";
             obj.CloseButton.IconAlignment = "center";
-            obj.CloseButton.ButtonPushedFcn = @(src,evt)obj.onClosePushed();
-            
+            obj.CloseButton.ButtonPushedFcn = ...
+                @(src,evt)onDialogButtonPushed(obj,evt);
+
             % Inner Grid to manage content and button area
             obj.InnerGrid = uigridlayout(obj.OuterPanel,[2 2]);
             obj.InnerGrid.Padding = 10;
             obj.InnerGrid.RowHeight = {'1x','fit'};
             obj.InnerGrid.ColumnWidth = {'1x','fit'};
             obj.InnerGrid.RowSpacing = 5;
-            
+
             % Grid to place dialog content
             obj.Grid = uigridlayout(obj.InnerGrid,[1 1]);
             obj.Grid.Layout.Row = 1;
@@ -319,9 +408,12 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             % Apply theme colors
             if ~isMATLABReleaseOlderThan("R2025a")
-                obj.OuterPanel.ForegroundColor = obj.getThemeColor("--mw-color-primary");
-                obj.OuterPanel.BorderColor = obj.getThemeColor("--mw-borderColor-secondary");
-                obj.OuterPanel.BackgroundColor = obj.getThemeColor("--mw-backgroundColor-secondary");
+                obj.OuterPanel.ForegroundColor = ...
+                    obj.getThemeColor("--mw-color-primary");
+                obj.OuterPanel.BorderColor = ...
+                    obj.getThemeColor("--mw-borderColor-secondary");
+                obj.OuterPanel.BackgroundColor = ...
+                    obj.getThemeColor("--mw-backgroundColor-secondary");
             else
                 obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
                 obj.OuterPanel.BorderColor = [.5 .5 .5];
@@ -346,10 +438,12 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             obj.ModalImage.Position = [1 1 szF];
 
             % Add lower buttons
-            obj.LowerButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
-            obj.LowerButtons.Layout.Row = 2;
-            obj.LowerButtons.Layout.Column = 2;
-            obj.LowerButtons.DefaultSize = 'fit';
+            obj.DialogButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
+            obj.DialogButtons.Layout.Row = 2;
+            obj.DialogButtons.Layout.Column = 2;
+            obj.DialogButtons.DefaultSize = 'fit';
+            obj.DialogButtons.ButtonPushedFcn = ...
+                @(src,evt)onDialogButtonPushed(obj,evt);
 
             % Bring the dialog back to the top
             uistack(obj,"top");
@@ -370,64 +464,26 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             % Reposition the close button
             obj.repositionCloseButton();
-            
+
         end %function
-        
+
 
         function updateBackgroundColorableComponents(obj)
             % Update components that are affected by BackgroundColor
             % (overrides the superclass method)
-            
+
             % Update grid color
             set([obj.InnerGrid, obj.Grid], "BackgroundColor", obj.BackgroundColor);
 
             % Call superclass method
             obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
-            
-        end %function
-
-
-        function onClosePushed(obj)
-            % Triggered when close button is pushed
-
-            % Delete the dialog
-            delete(obj)
 
         end %function
 
-
-        function onFigureResized(obj,~)
-            % Triggered on figure resize
-
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
-
-        end %function
+    end %methods
 
 
-        function onOuterPanelResize(obj)
-            % Triggered when the dialog window is resized
-
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
-
-        end %function
-
-
-        function onTitleButtonDown(obj,~)
-            % Triggered on title bar button down
-
-            % Instantiate a figure drag helper to begin dragging dialog
-            obj.DragHelper = wt.utility.FigureDragHelper(obj);
-            obj.DragHelper.DragFcn = @(dhObj,evt)onMouseDrag(obj,evt);
-
-        end %function
+    methods (Sealed, Access = protected)
 
 
         function attachLifecycleListeners(obj, owners)
@@ -435,7 +491,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
             arguments
                 obj (1,1) wt.abstract.BaseDialog
-                owners handle   
+                owners handle
             end
 
             % Create listeners
@@ -448,12 +504,28 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
         end %function
 
+
+        function checkDeletionCriteria(obj)
+            % Should the dialog be deleted?
+
+            % Check if ready to delete
+            isDeleteAction = matches(obj.LastAction, obj.DeleteActions, ...
+                "IgnoreCase", true);
+
+            if ~obj.IsWaitingForOutput && isDeleteAction
+
+                % Delete the dialog
+                delete(obj)
+
+            end
+
+        end %function
+
     end %methods
 
 
     %% Private methods
     methods (Access = private)
-
 
         function repositionCloseButton(obj)
             % Triggered on figure resize
@@ -462,13 +534,13 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             outerPos = obj.OuterPanel.OuterPosition;
             wO = outerPos(3);
             hO = outerPos(4);
-            
+
             innerPos = obj.OuterPanel.InnerPosition();
             wI = innerPos(3);
             hI = innerPos(4);
-            
+
             % Calculate panel border width and title height
-            wBorder = (wO - wI) / 2; 
+            wBorder = (wO - wI) / 2;
             hT = hO - hI - 3*wBorder;
 
             % Calculate close button positioning
@@ -485,7 +557,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
 
         function resizeToFitFigure(obj)
             % Triggered on figure resize
-     
+
             % Get the current positioning
             posD = obj.Position;
             szRequest = obj.Size;
@@ -521,7 +593,7 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
             % Update dialog position
             posNew = [posLowerLeft szD];
             set(obj,"Position",posNew);
-            
+
         end %function
 
 
@@ -540,7 +612,95 @@ classdef BaseDialog2  < wt.abstract.BaseWidget
                     obj.DragHelper(:) = [];
 
             end %switch
-            
+
+        end %function
+
+
+        function onDialogButtonPushed(obj,evt)
+            % Triggered when a dialog button is pushed (close, ok, etc.)
+
+            % For blocking dialogs, the subclass should implement the
+            % assignOutput method. The assignOutput will be called based on
+            % which dialog button was pushed.
+
+            % The pushed button's Tag (or Name if Tag is empty) will be
+            % set as the LastAction
+
+            % Request to assign output
+            obj.assignOutput();
+
+            % What button was pushed?
+            if isa(evt, "wt.eventdata.ButtonPushedData")
+                % The lower dialog buttons (wt.ButtonGrid)
+                srcButton = evt.Button;
+            else
+                % Assume a regular button
+                srcButton = evt.Source;
+            end
+            action = srcButton.Tag;
+            if isempty(action)
+                action = srcButton.Text;
+            end
+
+            % Set last action
+            obj.LastAction = action;
+
+            % Prep event data
+            evtOut = wt.eventdata.DialogButtonPushedData;
+            evtOut.Action = obj.LastAction;
+            evtOut.Output = obj.Output;
+
+            % Notify listeners / callback about output
+            obj.notify("DialogButtonPushed", evtOut)
+
+            % Should the dialog be deleted?
+            if obj.IsWaitingForOutput
+
+                % Don't delete here. Toggle status, allowing
+                % waitForOutput() to complete and handle deletion.
+                obj.IsWaitingForOutput = false;
+
+            else
+
+                % Check for deletion criteria
+                obj.checkDeletionCriteria()
+
+            end
+
+        end %function
+
+
+        function onFigureResized(obj,~)
+            % Triggered on figure resize
+
+            % Ensure it fits in the figure
+            obj.resizeToFitFigure();
+
+            % Reposition the close button
+            obj.repositionCloseButton();
+
+        end %function
+
+
+        function onOuterPanelResize(obj)
+            % Triggered when the dialog window is resized
+
+            % Ensure it fits in the figure
+            obj.resizeToFitFigure();
+
+            % Reposition the close button
+            obj.repositionCloseButton();
+
+        end %function
+
+
+        function onTitleButtonDown(obj,~)
+            % Triggered on title bar button down
+
+            % Instantiate a figure drag helper to begin dragging dialog
+            obj.DragHelper = wt.utility.FigureDragHelper(obj);
+            obj.DragHelper.DragFcn = @(dhObj,evt)onMouseDrag(obj,evt);
+
         end %function
 
 
