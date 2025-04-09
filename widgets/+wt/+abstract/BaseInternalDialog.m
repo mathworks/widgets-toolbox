@@ -22,22 +22,16 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
         % Dialog Size
         Size (1,2) double {mustBePositive} = [350 200]
 
+        % Modal (block other figure interaction)
+        Modal (1,1) logical = false
+
     end %properties
 
 
     properties (AbortSet, Dependent, Access = public)
 
-        % Modal (block other figure interaction)
-        Modal
-
         % Dialog Title
         Title
-
-        % Background Color
-        % TitleBackgroundColor
-
-        % Background color mode
-        %TitleBackgroundColorMode (1,1) wt.enum.AutoManualState = 'auto'
 
     end %properties
 
@@ -45,11 +39,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
     % Accessors
     methods
 
-        function value = get.Modal(obj)
-            value = obj.ModalImage.Visible;
-        end
         function set.Modal(obj, value)
-            obj.ModalImage.Visible = value;
+            obj.Modal = value;
+            obj.updateModalImage();
         end
 
         function value = get.Title(obj)
@@ -58,27 +50,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
         function set.Title(obj, value)
             obj.OuterPanel.Title = value;
         end
-
-        % function value = get.TitleBackgroundColor(obj)
-        %     value = obj.OuterPanel.BackgroundColor;
-        % end
-        % function set.TitleBackgroundColor(obj, value)
-        %     obj.OuterPanel.BackgroundColor = value;
-        % end
-
-        % function value = get.TitleBackgroundColorMode(obj)
-        %     value = wt.enum.AutoManualState(obj.OuterPanel.BackgroundColorMode);
-        % end
-        % function set.TitleBackgroundColorMode(obj, value)
-        %     obj.OuterPanel.BackgroundColorMode = char(value);
-        % end
-
-        % function value = get.Size(obj)
-        %     value = obj.Position(3:4);
-        % end
-        % function set.Size(obj, value)
-        %     obj.Position(3:4) = value;
-        % end
 
     end %methods
 
@@ -210,92 +181,14 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
     end %properties
 
 
-    properties (Transient, Hidden)
-
-        % Optional parent component creating the dialog. The component must
-        % be provided to constructor, and the dialog will be centered on
-        % the component where possible. The lifecycle will be tied so that
-        % the dialog will be deleted if the component is deleted.
-        ParentComponent matlab.graphics.Graphics
-
-    end %properties
-
-
-    %% Constructor / Destructor
+    %% Destructor
     methods
-        function obj = BaseInternalDialog(parentComponent)
-            % Construct a dialog
-
-            arguments
-                parentComponent matlab.graphics.Graphics ...
-                    {mustBeScalarOrEmpty} = gobjects(0)
-            end
-
-            % Get ancestor figure, if possible
-            % If no figure available, place dialog in a new figure
-            id = "wt:abstract:BaseInternalDialog:InvalidParent";
-            msg = "Input to BaseInternalDialog must be a uifigure or a component within a uifigure.";
-            if isempty(parentComponent)
-                % No component or figure, make a new figure
-
-                parent = uifigure;
-                hasComponent = false;
-
-            elseif isa(parentComponent,"matlab.ui.Figure")
-                % Given a figure for the parent
-
-                parent = parentComponent;
-                hasComponent = false;
-
-            elseif isa(parentComponent, "matlab.graphics.Graphics")
-                % Given a component (it must be in a figure)
-
-                parent = ancestor(parentComponent,'figure');
-                if isempty(parent)
-                    % Component not in a figure
-                    error(id,parent)
-                else
-                    hasComponent = true;
-                end
-
-            else
-
-                error(id,msg)
-
-            end
-
-            % Call superclass
-            if hasComponent
-                addedArgs = {"ParentComponent", parentComponent};
-            else
-                addedArgs = {};
-            end
-            obj@wt.abstract.BaseWidget(parent, addedArgs{:});
-            % obj@wt.abstract.BaseWidget(parent);
-
-            % Did it have a component argument?
-            if hasComponent
-
-                % Store the parent component
-                %obj.ParentComponent = parentComponent;
-
-                % Position over the component
-                %obj.positionOver(parentComponent)
-
-                % Set dialog lifecycle to that of the parent component
-                % The dialog will be deleted if the parent component is deleted
-                obj.attachLifecycleListeners(parentComponent);
-
-            else
-
-                % Set dialog lifecycle to that of the parent
-                % The dialog will be deleted if the parent component is deleted
-                obj.attachLifecycleListeners(parent);
-
-            end
-
+        function delete(obj)
+    
+            % Delete the modal image
+            delete(obj.ModalImage)
+            
         end %function
-        
     end %methods
 
 
@@ -313,8 +206,13 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % Reference component size and position
             refPos = getpixelposition(refComp, true);
             refSize = refPos(3:4);
-            refCornerA = refPos(1:2);
-            %refCornerB = refPos(1:2) + refPos(:,3:4) - 1;
+            
+            % Lower left corner depends if it's a figure
+            if isa(refComp, "matlab.ui.Figure")
+                refCornerA = [1 1];
+            else
+                refCornerA = refPos(1:2);
+            end
 
             % Dialog size
             dlgPos = getpixelposition(obj);
@@ -400,7 +298,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
 
     %% Public Methods
-    methods
+    methods (Access = public)
 
         function [output, lastAction] = waitForOutput(obj)
             % Puts MATLAB in a wait state until the dialog buttons trigger
@@ -423,6 +321,31 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
             % Check for deletion criteria
             obj.checkDeletionCriteria()
+
+        end %function
+
+    end %methods
+
+
+    %% Protected methods
+    methods (Sealed, Access = public)
+
+        function attachLifecycleListeners(obj, owners)
+            % Delete the dialog automatically upon destruction of the
+            % specified "owner" graphics objects
+
+            arguments
+                obj (1,1) wt.abstract.BaseInternalDialog
+                owners (1,:) matlab.graphics.Graphics
+            end
+
+            % Create listeners
+            % The dialog will be deleted if the listenObj is deleted
+            newListeners = listener(owners, "ObjectBeingDestroyed",...
+                @(src,evt)forceCloseDialog(obj));
+
+            % Add to any existing listeners
+            obj.LifecycleListeners = horzcat(obj.LifecycleListeners, newListeners);
 
         end %function
 
@@ -532,9 +455,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             obj.ModalImage.ImageSource = "overlay_gray.png";
             obj.ModalImage.ScaleMethod = "stretch";
             obj.ModalImage.Visible = "off";
-            posF = getpixelposition(obj.Figure);
-            szF = posF(3:4);
-            obj.ModalImage.Position = [1 1 szF];
+            obj.ModalImage.Position = [1 1 1 1];
 
             % Add lower buttons
             obj.DialogButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
@@ -543,9 +464,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             obj.DialogButtons.DefaultSize = 'fit';
             obj.DialogButtons.ButtonPushedFcn = ...
                 @(src,evt)onDialogButtonPushed(obj,evt);
-
-            % Bring the dialog back to the top
-            uistack(obj,"top");
 
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
@@ -583,26 +501,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
 
     methods (Sealed, Access = protected)
-
-
-        function attachLifecycleListeners(obj, owners)
-            % Delete the dialog automatically upon destruction of the specified "owner" graphics objects
-
-            arguments
-                obj (1,1) wt.abstract.BaseInternalDialog
-                owners handle
-            end
-
-            % Create listeners
-            % The dialog will be deleted if the listenObj is deleted
-            newListeners = listener(owners, "ObjectBeingDestroyed",...
-                @(src,evt)forceCloseDialog(obj));
-
-            % Add to any existing listeners
-            obj.LifecycleListeners = horzcat(obj.LifecycleListeners, newListeners);
-
-        end %function
-
 
         function forceCloseDialog(obj)
             % Should the dialog be deleted?
@@ -645,6 +543,35 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
     %% Private methods
     methods (Access = private)
+
+        function updateModalImage(obj)
+            % Triggered when the Modal property is changed
+
+            % If toggled on, do the following
+            if obj.Modal
+
+                % Bring the dialog above the modal image
+                if isMATLABReleaseOlderThan("R2025a")
+                    isDlg = obj.Figure.Children == obj;
+                    isModalImage = obj.Figure.Children == obj.ModalImage;
+                    otherChild = obj.Figure.Children(~isDlg & ~isModalImage);
+                    obj.Figure.Children = vertcat(obj, obj.ModalImage, otherChild);
+                else
+                    uistack(obj,"top"); % Works in 25a but not earlier
+                end
+
+                % Set position to match the figure
+                posF = getpixelposition(obj.Figure);
+                szF = posF(3:4);
+                obj.ModalImage.Position = [1 1 szF];
+
+            end %if
+
+            % Toggle visibility
+            obj.ModalImage.Visible = obj.Modal;
+
+        end %function
+
 
         function repositionCloseButton(obj)
             % Triggered on figure resize
@@ -707,7 +634,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             posLowerLeft = max(posLowerLeft, 1);
 
             % Update modal image position
-            set(obj.ModalImage,"Position",[1 1 szF]);
+            if obj.Modal
+                set(obj.ModalImage,"Position",[1 1 szF]);
+            end
 
             % Update dialog position
             posNew = [posLowerLeft szD];
