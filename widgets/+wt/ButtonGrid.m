@@ -42,6 +42,9 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
         % Alignment of the icon
         IconAlignment (1,1) wt.enum.AlignmentState = wt.enum.AlignmentState.top
 
+        % Default size of new buttons ('1x' or 'fit')
+        DefaultSize {mustBeMember(DefaultSize,{'1x','fit'})} = '1x'
+
     end %properties
 
 
@@ -155,6 +158,15 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
                 end %if obj.Orientation == "vertical"
 
             end %for idx = 1:numNew
+
+            % Update layout
+            if obj.Orientation == "vertical"
+                obj.Grid.ColumnWidth = {obj.DefaultSize};
+                obj.Grid.RowHeight = repmat({obj.DefaultSize},1,numNew);
+            else
+                obj.Grid.ColumnWidth = repmat({obj.DefaultSize},1,numNew);
+                obj.Grid.RowHeight = {obj.DefaultSize};
+            end %if obj.Orientation == "vertical"
 
         end %function
 
