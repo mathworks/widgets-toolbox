@@ -152,14 +152,21 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
                 if obj.Orientation == "vertical"
                     obj.Button(idx).Layout.Column = 1;
                     obj.Button(idx).Layout.Row = idx;
-                    obj.Grid.ColumnWidth{idx} = obj.DefaultSize;
                 else
                     obj.Button(idx).Layout.Column = idx;
                     obj.Button(idx).Layout.Row = 1;
-                    obj.Grid.ColumnWidth{idx} = obj.DefaultSize;
                 end %if obj.Orientation == "vertical"
 
             end %for idx = 1:numNew
+
+            % Update layout
+            if obj.Orientation == "vertical"
+                obj.Grid.ColumnWidth = {obj.DefaultSize};
+                obj.Grid.RowHeight = repmat({obj.DefaultSize},1,numNew);
+            else
+                obj.Grid.ColumnWidth = repmat({obj.DefaultSize},1,numNew);
+                obj.Grid.RowHeight = {obj.DefaultSize};
+            end %if obj.Orientation == "vertical"
 
         end %function
 
