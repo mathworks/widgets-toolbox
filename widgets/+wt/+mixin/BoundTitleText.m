@@ -1,6 +1,8 @@
 classdef BoundTitleText < handle
     % Mixin that binds title properties for primitive text object(s)
 
+    %   Copyright 2025 The MathWorks Inc.
+
     %% Protected properties
 
     properties (Access = protected)

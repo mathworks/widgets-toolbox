@@ -1,6 +1,8 @@
 classdef BoundMultiTimeAxes < handle
     % Mixin that binds axes properties for a chartcontainer subclass
 
+    %   Copyright 2025 The MathWorks Inc.
+
     %% Protected properties
 
     properties (Access = protected)

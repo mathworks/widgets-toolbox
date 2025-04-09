@@ -1,6 +1,8 @@
 classdef ProjectIntegrityChecks < matlab.unittest.TestCase
     % Implements a unit test that runs the Project Integrity Checks
 
+    %   Copyright 2025 The MathWorks Inc.
+
 
     methods(Test)
         function runProjectChecks(testCase)
