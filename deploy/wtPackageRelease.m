@@ -26,10 +26,10 @@ gettingStartedOutputPath = fullfile(projectRoot,"widgets","doc");
 
 
 %% Run unit tests
-% [testSuite, testResult]  = runTestSuite;
-% if ~all([testResult.Passed])
-%     error("Unit tests failed. Aborting package release.");
-% end
+[testSuite, testResult]  = runTestSuite;
+if ~all([testResult.Passed])
+    error("Unit tests failed. Aborting package release.");
+end
 
 
 %% Publish doc_input as html
@@ -87,4 +87,4 @@ winopen(releaseFolder);
 
 % Increment the last part of the version number in wtDeployVersion.txt for
 % the next release
-% wt.deploy.incrementVersionNumber();
+wt.deploy.incrementVersionNumber();
