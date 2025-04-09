@@ -1,8 +1,7 @@
 classdef BaseInternalDialog  < wt.abstract.BaseWidget
     % Base class for a dialog that sits internal to the uifigure
 
-    % Please note this is an experimental component that may change in the
-    % future.
+    % ** This is a prototype component that may change in the future. 
 
     % Copyright 2022-2025 The MathWorks Inc.
 
