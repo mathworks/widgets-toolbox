@@ -219,6 +219,9 @@ classdef RowEntriesTable < wt.test.BaseWidgetTest
             % Verify the data match
             testCase.verifyDataProperty(initData);
 
+            % Ensure rendering is finished
+            drawnow
+
             % Type new values
             testCase.type(reTable,[6 1],"Pineapple")
             testCase.type(reTable,[6 2],"1234")

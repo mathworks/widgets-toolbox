@@ -3,17 +3,18 @@
 % Copyright 2025 The MathWorks, Inc.
 
 
+%% Increment Version Number?
+
+% Increment the last part of the version number in wtDeployVersion.txt for
+% the next release
+% wt.deploy.incrementVersionNumber();
+
+
 %% Get paths
 
 % Project root
 proj = currentProject;
 projectRoot = proj.RootFolder;
-
-% docInputPath = fullfile(projectRoot,"doc_input","mlx");
-% docOutputPath = fullfile(projectRoot,"widgets","doc");
-
-% docInputPath = fullfile(projectRoot,"widgets","doc","mlx");
-% docOutputPath = fullfile(projectRoot,"widgets","doc","html");
 
 docInputPath = fullfile(projectRoot,"widgets","doc");
 docOutputPath = fullfile(projectRoot,"widgets","doc");
@@ -26,13 +27,13 @@ gettingStartedOutputPath = fullfile(projectRoot,"widgets","doc");
 
 
 %% Run unit tests
-% [testSuite, testResult]  = runTestSuite;
-% if ~all([testResult.Passed])
-%     error("Unit tests failed. Aborting package release.");
-% end
+[testSuite, testResult]  = runTestSuite;
+if ~all([testResult.Passed])
+    error("Unit tests failed. Aborting package release.");
+end
 
 
-%% Publish doc_input as html
+%% Publish doc and examples mlx as html
 
 % Find the doc input ".mlx" files
 docInputInfo = what(docInputPath);
@@ -61,6 +62,8 @@ wt.deploy.publishLiveScriptToHtml(gettingStartedInputPath, gettingStartedOutputP
 
 
 %% Build search database
+% Create v3 for/from R2021a - R2021b
+% Create v4 for/from R2022a and later
 builddocsearchdb(docOutputPath)
 
 
@@ -81,10 +84,3 @@ matlab.addons.toolbox.packageToolbox(opts);
 
 releaseFolder = fullfile(projectRoot,"release");
 winopen(releaseFolder);
-
-
-%% Increment Version Number
-
-% Increment the last part of the version number in wtDeployVersion.txt for
-% the next release
-% wt.deploy.incrementVersionNumber();

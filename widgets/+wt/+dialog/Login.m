@@ -1,6 +1,8 @@
 classdef Login < wt.abstract.BaseInternalDialog
     % Implements a simple login dialog
 
+    %   Copyright 2025 The MathWorks Inc.
+
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
