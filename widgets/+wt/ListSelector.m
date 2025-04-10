@@ -35,6 +35,9 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         % Indicates whether to allow duplicate entries in the list
         AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
 
+         % Indicates whether to allow sort controls
+        Sortable  (1,1) matlab.lang.OnOffSwitchState = true
+
         % Inidicates what to do when add button is pressed (select from
         % Items or custom using ButtonPushed event or ButtonPushedFcn)
         AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
@@ -104,9 +107,18 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
         function value = get.ValueIndex(obj)
             value = obj.ListBox.ItemsData;
+            value(value > obj.getMaximumValidItemsNumber) = [];
         end
 
         function set.ValueIndex(obj,value)
+            if any(value > numel(obj.Items))
+                error("widgets:ListSelector:ValueIndex",...
+                        "'ValueIndex' must be within the length of the 'Items' property.")
+            end
+            if ~isempty(obj.ItemsData) && any(value > numel(obj.ItemsData))
+                error("widgets:ListSelector:ValueIndex",...
+                        "'ValueIndex' must be within the length of the 'ItemsData' property.")
+            end
             obj.ListBox.Items = obj.Items(value);
             obj.ListBox.ItemsData = value;
         end
@@ -123,7 +135,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
         function set.Value(obj,value)
             if isempty(value)
-                obj.SelectedIndex = [];
+                obj.ValueIndex = [];
             else
                 if isempty(obj.ItemsData)
                     [tf, selIdx] = ismember(value, obj.Items);
@@ -131,11 +143,19 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                     [tf, selIdx] = ismember(value, obj.ItemsData);
                 end
                 if ~all(tf)
-                    warning("widgets:ListSelector:InvalidValue",...
-                        "Attempt to set an invalid Value to the list.")
-                    selIdx(~tf) = [];
+                    if isempty(obj.ItemsData)
+                        itemValueName = 'Items';
+                    else
+                        itemValueName = 'ItemsData';
+                    end
+                    error("widgets:ListSelector:InvalidValue",...
+                        "'Value' must be an element defined in the '%s' property.", itemValueName)
                 end
-                obj.SelectedIndex = selIdx;
+                if ~isempty(obj.ItemsData) && numel(tf) > numel(obj.Items)
+                    error("widgets:ListSelector:InvalidValue",...
+                        "'Value' must be an element defined in the 'ItemsData' property within the length of the 'Items' property.")
+                end
+                obj.ValueIndex = selIdx;
             end
         end
 
@@ -289,7 +309,17 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         function update(obj)
 
             % What is selected?
-            selIdx = obj.SelectedIndex;
+            selIdx = obj.ValueIndex;
+
+            % Is the list sortable?
+            if obj.Sortable
+                obj.ListButtons.Icon = ["add_24.png", "delete_24.png", "up_24.png", "down_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
+            else
+                selIdx = sort(selIdx);
+                obj.ListButtons.Icon = ["add_24.png", "delete_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove"];
+            end
 
             % Update the list
             obj.ListBox.Items = obj.Items(selIdx);
@@ -313,7 +343,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
             if obj.Enable
 
                 % What is selected?
-                selIdx = obj.SelectedIndex;
+                selIdx = obj.ValueIndex;
                 numRows = numel(selIdx);
 
                 % Highlighted selection in list?
@@ -418,21 +448,27 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                     "InitialValue",obj.ListBox.ItemsData);
             end
 
+            % Restore figure focus
+            fig = ancestor(obj,"figure");
+            if isscalar(fig) && isvalid(fig)
+                figure(fig)
+            end
+            
             if isempty(newSelIdx)
                 % User cancelled
                 return
             elseif obj.AllowDuplicates
-                newSelIdx = [obj.SelectedIndex newSelIdx];
+                newSelIdx = [obj.ValueIndex newSelIdx];
             end
 
             % Was a change made?
-            if ~isequal(obj.SelectedIndex, newSelIdx)
+            if ~isequal(obj.ValueIndex, newSelIdx)
 
                 % Get the original value
                 oldValue = obj.Value;
 
                 % Make the update
-                obj.SelectedIndex = newSelIdx;
+                obj.ValueIndex = newSelIdx;
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
@@ -512,6 +548,19 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
             % Update buttons
             obj.updateEnables()
+
+        end %function
+
+        function val = getMaximumValidItemsNumber(obj)
+            % Returns maximum valid selected index.
+            % Takes into account ItemsData and Items.
+
+            % Is ItemsData available?
+            if ~isempty(obj.ItemsData)
+                val = min(numel(obj.ItemsData), numel(obj.Items));
+            else
+                val = numel(obj.Items);
+            end
 
         end %function
 
