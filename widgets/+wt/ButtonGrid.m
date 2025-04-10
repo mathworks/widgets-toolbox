@@ -180,6 +180,18 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
         end %function
 
+        function updateGridForButton(obj, prop, value)
+            % Update main grid properties to value
+
+            % If value is a scalar, repeat it for every button.
+            if isscalar(value)
+                nCells = numel(obj.Grid.(prop));
+                value = repmat(value, 1, nCells);
+            end
+            obj.Grid.(prop) = value;
+            
+        end %function
+
     end %methods
 
 
@@ -191,14 +203,14 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
             value = obj.Grid.ColumnWidth;
         end
         function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth = value;
+            obj.updateGridForButton("ColumnWidth", value);
         end
 
         function value = get.ButtonHeight(obj)
             value = obj.Grid.RowHeight;
         end
         function set.ButtonHeight(obj,value)
-            obj.Grid.RowHeight = value;
+            obj.updateGridForButton("RowHeight", value);
         end
 
     end %methods
