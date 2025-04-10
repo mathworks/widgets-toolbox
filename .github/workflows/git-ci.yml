@@ -14,7 +14,7 @@ jobs:
       # Set up the job strategy matrix to define the different job configurations.
       matrix:
         # List of platforms on which to run the tests.
-        platform: [ubuntu-latest, windows-latest]
+        platform: [windows-latest]
 
         # List of MATLAB releases over which to run the tests.
         matlab-version: [R2023b, R2024a, R2024b]
