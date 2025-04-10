@@ -39,6 +39,12 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         % Items or custom using ButtonPushed event or ButtonPushedFcn)
         AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
 
+         % Width of the buttons
+        ButtonWidth = 25
+
+        % Height of the buttons
+        ButtonHeight = 25
+
     end %properties
 
     methods
@@ -90,14 +96,6 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
         % The current highlighted selection
         HighlightedValue (1,:)
-
-    end %properties
-
-
-    properties (AbortSet, Dependent, UsedInUpdate = false)
-
-        % Width of the buttons
-        ButtonWidth
 
     end %properties
 
@@ -164,15 +162,6 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
             else
                 [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
             end
-        end
-
-
-        function value = get.ButtonWidth(obj)
-            value = obj.Grid.ColumnWidth{2};
-        end
-
-        function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth{2} = value;
         end
 
     end %methods
@@ -257,8 +246,8 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
             % Configure grid
             obj.Grid.Padding = 3;
-            obj.Grid.ColumnWidth = {'1x',25};
-            obj.Grid.RowHeight = {106,'1x'};
+            obj.Grid.ColumnWidth = {'1x','fit'};
+            obj.Grid.RowHeight = {'fit','1x'};
 
             % Create the list buttons
             obj.ListButtons = wt.ButtonGrid(obj.Grid);
@@ -305,6 +294,12 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
             % Update the list
             obj.ListBox.Items = obj.Items(selIdx);
             obj.ListBox.ItemsData = selIdx;
+
+            % Button width and height
+            obj.UserButtons.ButtonWidth = obj.ButtonWidth;
+            obj.ListButtons.ButtonWidth = obj.ButtonWidth;
+            obj.UserButtons.ButtonHeight = obj.ButtonHeight;
+            obj.ListButtons.ButtonHeight = obj.ButtonHeight;
 
             % Update button enable states
             obj.updateEnables();

@@ -35,6 +35,12 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
         % Indicates whether to allow sort controls
         Sortable (1,1) matlab.lang.OnOffSwitchState = true
 
+        % Width of the buttons
+        ButtonWidth = 25
+
+        % Height of the buttons
+        ButtonHeight = 25
+
     end %properties
 
 
@@ -62,14 +68,6 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
 
         % Indices of the highlighted items on left
         HighlightedIndexLeft
-
-    end %properties
-
-
-    properties (AbortSet, Dependent, UsedInUpdate = false)
-
-        % Width of the buttons
-        ButtonWidth
 
     end %properties
 
@@ -117,14 +115,14 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
 
             % Configure grid
             obj.Grid.Padding = 3;
-            obj.Grid.ColumnWidth = {'1x',28,'1x'};
-            obj.Grid.RowHeight = {'fit','1x'};
+            obj.Grid.ColumnWidth = {'1x','fit','1x'};
+            obj.Grid.RowHeight = {'fit','fit','1x'};
 
             % Create the left Listbox
             obj.LeftList = uilistbox(obj.Grid);
             obj.LeftList.Multiselect = true;
             obj.LeftList.Layout.Column = 1;
-            obj.LeftList.Layout.Row = [1 2];
+            obj.LeftList.Layout.Row = [1 3];
             obj.LeftList.ValueChangedFcn = @(h,e)obj.onLeftSelectionChanged(e);
 
             % Create the list buttons
@@ -143,7 +141,7 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             obj.RightList = uilistbox(obj.Grid);
             obj.RightList.Multiselect = true;
             obj.RightList.Layout.Column = 3;
-            obj.RightList.Layout.Row = [1 2];
+            obj.RightList.Layout.Row = [1 3];
             obj.RightList.ValueChangedFcn = @(h,e)obj.onRightSelectionChanged(e);
 
             % Update listeners
@@ -187,12 +185,16 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             if obj.Sortable
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png", "up_24.png", "down_24.png"];
                 obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
-                obj.ListButtons.ButtonHeight = {28 28 28 28};
             else
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png"];
                 obj.ListButtons.ButtonTag = ["Add", "Remove"];
-                obj.ListButtons.ButtonHeight = {28 28};
             end
+
+            % Button width and height
+            obj.UserButtons.ButtonWidth = obj.ButtonWidth;
+            obj.ListButtons.ButtonWidth = obj.ButtonWidth;
+            obj.UserButtons.ButtonHeight = obj.ButtonHeight;
+            obj.ListButtons.ButtonHeight = obj.ButtonHeight;
 
             % Update button enable states
             obj.updateEnables();
@@ -592,13 +594,6 @@ classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
             if isempty(value)
                 value = [];
             end
-        end
-
-        function value = get.ButtonWidth(obj)
-            value = obj.Grid.ColumnWidth{2};
-        end
-        function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth{2} = value;
         end
 
     end %methods
