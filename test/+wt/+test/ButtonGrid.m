@@ -190,6 +190,44 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyMatches(button.IconAlignment, newValue);
             
         end %function
+
+
+        function testButtonWidthHeight(testCase)
+            
+            % Default size
+            testCase.verifySetProperty("DefaultSize", 20, "20");
+            testCase.verifySetProperty("DefaultSize", 'fit', "fit");
+            testCase.verifySetProperty("DefaultSize", '2x', "2x");
+
+            % Horizontal layout
+            testCase.verifySetProperty("ButtonWidth", "fit", {'fit' 'fit'})
+            testCase.verifySetProperty("ButtonWidth", {10 'fit'}, {10 'fit'})
+            testCase.verifySetProperty("ButtonWidth", [10 20 30 40], {10 20})
+
+            testCase.verifySetProperty("ButtonHeight", {10 'fit'}, {10})
+            testCase.verifySetProperty("ButtonHeight", 20, {20})
+
+            % Additional buttons
+            testCase.verifySetProperty("DefaultSize", 30, "30");
+            testCase.verifySetProperty("Text", ["1", "2", "3", "4"], ["1", "2", "3", "4"])
+            testCase.verifyEqual(testCase.Widget.ButtonWidth, {10 20 30 30})
+
+            % Change to vertical layout
+            newOrientation = "vertical";
+            testCase.verifySetProperty("Orientation", newOrientation);
+
+            % Vertical layout
+            testCase.verifySetProperty("ButtonHeight", 30, {30 30 30 30})
+            testCase.verifySetProperty("ButtonHeight", "fit", {'fit' 'fit' 'fit' 'fit'})
+            testCase.verifySetProperty("ButtonHeight", [10 20], {10 20 'fit' 'fit'})
+            testCase.verifySetProperty("ButtonHeight", {10 'fit'}, {10 'fit' 'fit' 'fit'})
+
+            testCase.verifySetProperty("ButtonHeight", [10 20 30 40 50], {10 20 30 40})
+
+            testCase.verifySetProperty("ButtonWidth", {10 'fit'}, {10})
+            testCase.verifySetProperty("ButtonWidth", 20, {20})
+            
+        end
         
     end %methods (Test)
     
