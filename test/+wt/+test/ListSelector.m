@@ -315,6 +315,40 @@ classdef ListSelector < wt.test.BaseWidgetTest
         
         
         
+        function testSortable(testCase)
+
+            % Get the listbox and button grid
+            w = testCase.Widget;
+            listControl = testCase.Widget.ListBox;
+            buttonGrid = testCase.Widget.ListButtons;
+            button = buttonGrid.Button;
+            
+            % Add a list of items and put all on list
+            testCase.verifySetProperty("Value", testCase.ItemNames);
+
+            % Select multiple items with mouse
+            selIdx = [2 3];
+            testCase.choose(listControl, selIdx)
+
+            % Move items further down
+            testCase.press(button(4))
+            testCase.press(button(4))
+
+            % Press down one too many
+            testCase.press(button(4))
+
+            % Switch Sortable option off
+            testCase.verifySetProperty("Sortable", false);
+            testCase.verifyEquality(w.SelectedIndex, 1:numel(testCase.ItemNames));
+            
+            % Switch Sortable option back on
+            testCase.verifySetProperty("Sortable", true);
+            testCase.verifyEquality(w.SelectedIndex, 1:numel(testCase.ItemNames));
+
+        end
+
+
+
         function testUserButtons(testCase)
             
             % Get the widget
