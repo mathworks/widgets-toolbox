@@ -42,6 +42,9 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
         % Alignment of the icon
         IconAlignment (1,1) wt.enum.AlignmentState = wt.enum.AlignmentState.top
 
+        % Default size of new buttons ('1x', 'fit' or a number)
+        DefaultSize (1,1) string {mustBeValidGridSize(DefaultSize)} = "1x"
+
     end %properties
 
 
@@ -156,6 +159,23 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
             end %for idx = 1:numNew
 
+            % Update layout
+
+            % What is the default size?
+            defaultSize = obj.DefaultSize;
+            if ~isnan(str2double(defaultSize))
+                defaultSize = str2double(defaultSize);
+            end
+
+            % Set button grids
+            if obj.Orientation == "vertical"
+                obj.Grid.RowHeight(numOld+1:numNew) = {defaultSize};
+                obj.Grid.ColumnWidth = obj.Grid.ColumnWidth(1);
+            else
+                obj.Grid.ColumnWidth(numOld+1:numNew) = {defaultSize};
+                obj.Grid.RowHeight = obj.Grid.RowHeight(1);
+            end
+
         end %function
 
 
@@ -171,12 +191,20 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
         function updateGridForButton(obj, prop, value)
             % Update main grid properties to value
 
-            % If value is a scalar, repeat it for every button.
-            if isscalar(value)
-                nCells = numel(obj.Grid.(prop));
-                value = repmat(value, 1, nCells);
+            % Convert any text array or numeric array into a cell array
+            value = convertCharsToStrings(value);
+            if ~iscell(value)
+                value = num2cell(value);
             end
-            obj.Grid.(prop) = value;
+
+            % If cell is scalar, repeat value for every button
+            if isscalar(value)
+                value = repmat(value, 1, numel(obj.Grid.(prop)));
+            end
+
+            % Update button size
+            nElements = min(numel(value), numel(obj.Grid.(prop)));
+            obj.Grid.(prop)(1:nElements) = value(1:nElements);
             
         end %function
 
@@ -205,3 +233,34 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
 
 end % classdef
+
+
+function mustBeValidGridSize(val)
+% Validate value is valid size for grid layout
+
+% Value must be either 'fit' or '1x', or convertable to a number.
+numVal = str2double(val);
+
+% Is value convertable to a number?
+if ~isnan(numVal)
+    return
+end
+
+% Is value "fit"?
+if strcmpi(val, "fit")
+    return
+end
+
+% Is value a 1x, 2x, etc?
+valStripped = strip(val, "x");
+numStripped = str2double(valStripped);
+if ~isnan(numStripped)
+    return
+end
+
+% Value was not valid. Throw a validation error
+ME = MException('ButtonGrid:InvalidSize', ...
+    'Value must be a text scalar specifying the keyword ''fit'', numbers, or numbers paired with ''x'' characters.');
+throwAsCaller(ME);
+
+end
