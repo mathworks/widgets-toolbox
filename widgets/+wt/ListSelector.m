@@ -439,12 +439,18 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         function promptToAddListItems(obj)
             % Prompt a dialog to add items to the listbox
 
+            % Take ItemsData into account while displaying Items
+            items = obj.Items;
+            if ~isempty(obj.ItemsData)
+                items = items(1:min(numel(items), numel(obj.ItemsData)));
+            end
+
             % Prompt for stuff to add
             if obj.AllowDuplicates
-                newSelIdx = listdlg("ListString",obj.Items);
+                newSelIdx = listdlg("ListString",items);
             else
                 newSelIdx = listdlg(...
-                    "ListString",obj.Items,...
+                    "ListString",items,...
                     "InitialValue",obj.ListBox.ItemsData);
             end
 
