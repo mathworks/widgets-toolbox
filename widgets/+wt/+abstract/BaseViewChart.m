@@ -31,7 +31,8 @@ classdef BaseViewChart < ...
     end %properties
 
 
-    properties (Transient, NonCopyable, UsedInUpdate = true, Access = private)
+    properties (Transient, NonCopyable, UsedInUpdate = true, ...
+            GetAccess = private, SetAccess = protected)
 
         % Internal flag to trigger an update call
         Dirty_ (1,1) logical = false
