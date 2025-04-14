@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2024b"><title>Range Field</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 3px 10px 5px 4px; padding: 0px; line-height: 28.8px; min-height: 0px; white-space: pre-wrap; color: rgb(192, 76, 11); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 24px; font-weight: 400; text-align: left;  }
+.S1 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.CodeBlock { background-color: #F5F5F5; margin: 10px 15px 10px 0; display: inline-block }
+.S2 { border-left: 0.666667px solid rgb(217, 217, 217); border-right: 0.666667px solid rgb(217, 217, 217); border-top: 0.666667px solid rgb(217, 217, 217); border-bottom: 0px none rgb(33, 33, 33); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace, Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S3 { border-left: 0.666667px solid rgb(217, 217, 217); border-right: 0.666667px solid rgb(217, 217, 217); border-top: 0px none rgb(33, 33, 33); border-bottom: 0.666667px solid rgb(217, 217, 217); border-radius: 0px 0px 4px 4px; padding: 0px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace, Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S4 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(33, 33, 33); font-family: Helvetica, Arial, sans-serif, Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: 400; text-align: left;  }
+.S5 { border-left: 0.666667px solid rgb(217, 217, 217); border-right: 0.666667px solid rgb(217, 217, 217); border-top: 0px none rgb(33, 33, 33); border-bottom: 0px none rgb(33, 33, 33); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace, Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.eoOutputWrapper { width: calc(90vw - 10px) !important; }
+.S6 { border-left: 0.666667px solid rgb(217, 217, 217); border-right: 0.666667px solid rgb(217, 217, 217); border-top: 0px none rgb(33, 33, 33); border-bottom: 0.666667px solid rgb(217, 217, 217); border-radius: 0px; padding: 0px 45px 4px 13px; line-height: 18.004px; min-height: 0px; white-space: nowrap; color: rgb(33, 33, 33); font-family: Menlo, Monaco, Consolas, "Courier New", monospace, Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S7 { color: rgb(33, 33, 33); padding: 10px 0px 6px 17px; background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box; font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px; overflow-x: hidden; line-height: 17.234px;  }
+/* Styling that is common to warnings and errors is in diagnosticOutput.css */.embeddedOutputsErrorElement {    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsErrorElement .diagnosticMessage-errorType {    overflow: auto;}
+.embeddedOutputsErrorElement.activeOutput .eoOutputContent {    user-select: text;    -webkit-user-select: text;}
+.embeddedOutputsErrorElement.activeOutput .eoOutputContent button {    user-select: none;    -webkit-user-select: none;}
+.embeddedOutputsErrorElement .eoOutputContent ::selection {}
+.embeddedOutputsErrorElement.inlineElement {}
+.embeddedOutputsErrorElement.rightPaneElement {}
+/* Styling that is common to warnings and errors is in diagnosticOutput.css */.embeddedOutputsWarningElement {    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsWarningElement .diagnosticMessage-warningType {    overflow: auto;}
+.embeddedOutputsWarningElement.activeOutput .eoOutputContent {    user-select: text;    -webkit-user-select: text;}
+.embeddedOutputsWarningElement .eoOutputContent ::selection {}
+.embeddedOutputsWarningElement.inlineElement {}
+.embeddedOutputsWarningElement.rightPaneElement {}
+/* Copyright 2015-2023 The MathWorks, Inc. *//* In this file, styles are not scoped to rtcContainer since they could be in the Dojo Tooltip */.diagnosticMessage-wrapper {    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;    font-size: 12px;}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType {    /*This fallback value will be used for appdesigner warnings*/    color: var(--rtc-warning-output-color, var(--mw-color-matlabWarning));}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType a {    /*This fallback value will be used for appdesigner warnings*/    color: var(--rtc-warning-output-color, var(--mw-color-matlabWarning));    text-decoration: underline;}
+.rtcThemeDefaultOverride .diagnosticMessage-wrapper.diagnosticMessage-warningType,.rtcThemeDefaultOverride .diagnosticMessage-wrapper.diagnosticMessage-warningType a {    color: var(--mw-color-matlabWarning) !important;}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType {    /*This fallback value will be used in appdesigner error tooltip text*/    color: var(--rtc-error-output-color, var(--mw-color-matlabErrors));}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType a {    /*This fallback value will be used in appdesigner error tooltip text*/    color: var(--rtc-error-output-color, var(--mw-color-matlabErrors));    text-decoration: underline;}
+.rtcThemeDefaultOverride .diagnosticMessage-wrapper.diagnosticMessage-errorType,.rtcThemeDefaultOverride .diagnosticMessage-wrapper.diagnosticMessage-errorType a {    color: var(--mw-color-matlabErrors) !important;}
+.diagnosticMessage-wrapper .diagnosticMessage-messagePart,.diagnosticMessage-wrapper .diagnosticMessage-causePart {    white-space: pre-wrap;}
+.diagnosticMessage-wrapper .diagnosticMessage-stackPart {    white-space: pre;}
+.embeddedOutputsTextElement,.embeddedOutputsVariableStringElement {    white-space: pre;    word-wrap:  initial;    min-height: 18px;    max-height: 550px;}
+.embeddedOutputsTextElement .textElement,.embeddedOutputsVariableStringElement .textElement {    overflow: auto;}
+.embeddedOutputsTextElement.activeOutput .eoOutputContent,.embeddedOutputsVariableStringElement.activeOutput .eoOutputContent {    user-select: text;    -webkit-user-select: text;}
+/*embeddedOutputsTextElement has a different dom structure than embeddedOutputsVariableStringElement.Unlike variableString, the text output has both TEXT nodes and elements as children. Hence we needa selector for each.*/.embeddedOutputsTextElement .eoOutputContent::selection,.embeddedOutputsTextElement .eoOutputContent ::selection,.embeddedOutputsVariableStringElement .eoOutputContent ::selection {}
+.textElement,.rtcDataTipElement .textElement {    padding-top: 2px;}
+.embeddedOutputsTextElement.inlineElement,.embeddedOutputsVariableStringElement.inlineElement {}
+.inlineElement .textElement {}
+.embeddedOutputsTextElement.rightPaneElement,.embeddedOutputsVariableStringElement.rightPaneElement {    min-height: 16px;}
+.rightPaneElement .textElement {    padding-top: 2px;    padding-left: 9px;}</style></head><body><div class = rtcContent><h1  class = 'S0'><span>Range Field</span></h1><div  class = 'S1'><span>This widget combines multiple numeric edit fields that form elements of a 1-dimensional array. It is intended for small arrays typically 2 to 5 values. Optionally you may impose restrictions on the numerical range. You can also force the array to be </span><span style=' font-family: monospace;'>increasing</span><span> or </span><span style=' font-family: monospace;'>decreasing</span><span>. You can also set orientation as </span><span style=' font-family: monospace;'>horizontal</span><span> or </span><span style=' font-family: monospace;'>vertical</span><span>.</span></div><div  class = 'S1'><span>Create a figure with a grid layout:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S2'><span style="white-space: pre"><span >figObj = uifigure(</span><span style="color: #a709f5;">"Position"</span><span >,[100 100 250 50]);</span></span></div></div><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre"><span >gridObj = uigridlayout(figObj,[1 1],</span><span style="color: #a709f5;">"BackgroundColor"</span><span >,[.6 .8 1]);</span></span></div></div></div><div  class = 'S4'><span>Create and configure the widget:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S2'><span style="white-space: pre"><span >rfWidget = wt.RangeField(gridObj);</span></span></div></div><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >rfWidget.ValueChangedFcn = @(src,evt)disp(evt);</span></span></div></div><div class="inlineWrapper"><div  class = 'S3'><span style="white-space: pre"><span >rfWidget.Value = [100 500];</span></span></div></div></div><div  class = 'S4'><span>Optionally, place some restrictions:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S2'><span style="white-space: pre"><span >rfWidget.Tooltip = </span><span style="color: #a709f5;">"Enter the range of positive values to use (must be &gt; 0)."</span><span >;</span></span></div></div><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >rfWidget.LowerLimitInclusive = false;</span></span></div></div><div class="inlineWrapper"><div  class = 'S5'><span style="white-space: pre"><span >rfWidget.UpperLimitInclusive = true;</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S6'><span style="white-space: pre"><span >rfWidget.Limits = [0, inf]</span></span></div><div  class = 'S7'><div class="inlineElement eoOutputWrapper disableDefaultGestureHandling embeddedOutputsFigure" uid="1B39D474" prevent-scroll="true" data-testid="output_0" tabindex="-1" style="width: 1146px;"><div class="figureElement eoOutputContent" role="article" aria-roledescription="Use Browse Mode to explore " aria-description="figure output "><img class="figureImage figureContainingNode" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAAyCAIAAAD6NVGzAAAAB3RJTUUH6QEQFzQrnhkhhwAAAxpJREFUeJzt3DFL61AYBuBzLnfJARGbbFmCS6JT4Y5tJhd/gVKyi9Khi5s49Rd06HAzG0T/gXNxu4KbyVKLkC2puCRj7nC4pXiCbUpvQ/3eZ/MrmI+3LzEBE/77T8EAaPhR9wIAm4O6AyGoOxCCugMhqDsQgroDIag7EIK6AyGoOxDyc8HnT/5G1iDk9PR0/se7u7u6Nvmefp198eGiujPW6XTWtwt1t7e36hAJr0tpvPMW131nZ2dNy0A5JLwxuHYHQlB3IAR1B0JQdyAEdQdCUHcgBHUHQlD3CtI07XQ6URTNJv1+n3PebDZnwyiKms0m57zf79e05lYKgoD/M4uuNEw18+Wh7stK09TzvJeXl9kkCII4jrMsGw6HvV4vTdM0TXu93nA4zLIsjuMgCGpceLuMx+Obm5uiKIqiuL6+ZoyVhqlmXukoqPtSoig6Ojq6uLg4ODiYDcfjseu6mqY5jsMYC8MwSZK9vT3HcTRNc113NBrleV7f1lsjz/M4ji3Lmh+WhqlmXulAqPtSbNt+fn5ut9uzyfw3JISwLGsymSRJsru7K4RgjMlJlmV17bxFsiybTCbtdptzfnx8LM/ZapjT6VTNvNKBUPcVyW/o07Bq+iAlSVIURRiGRVG0Wq2rq6s8z9UwSzOvBHVfkTy7fBqqE1iGbdsPDw+2bTPGTk5OXl9f397e1DBLM68EdV+RpmmmacqTjTzrWJZlGMbHx4e8gJET+bcYKmk0GoZhqGE2Gg0180q/GXVf3f7+vrx/kjdMjuMYhvH+/h6GYZ7no9FI3lTVveYWeHx8PD8/l7f19/f3h4eHuq6XhqlmXulAqPvqPM8zTVMI0e12B4OBruu6rg8Gg263K4QwTdPzvLp33A6tVst1XSEE5zyO48vLS8ZYaZhq5pUOxBe8EvXJPzv76mkoqMT3ffXhPSS8Lr7vf/3wHs7uQAjqDoSg7kAI6g6EoO5ACOoOhKDuQAjqDoSg7kDI4pfm+T7eivp/IeGNWfRPBADfCC5mgBDUHQhB3YEQ1B0IQd2BENQdCEHdgRDUHQhB3YGQv31WeJpttZfeAAAAAElFTkSuQmCC" style="width: 250px;"></div><div class="outputLayer selectedOutputDecorationLayer doNotExport" aria-hidden="true"></div><div class="outputLayer activeOutputDecorationLayer doNotExport" aria-hidden="true"></div><div class="outputLayer scrollableOutputDecorationLayer doNotExport" aria-hidden="true"></div><div class="outputLayer navigationFocusLayer doNotExport" aria-hidden="false" tabindex="-1" role="application" aria-label="figure output "></div></div><div class="inlineElement eoOutputWrapper disableDefaultGestureHandling embeddedOutputsVariableStringElement" uid="6CE7BE71" prevent-scroll="true" data-testid="output_1" tabindex="-1" style="width: 1146px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div class="textElement eoOutputContent" tabindex="-1" data-previous-available-width="1109" data-previous-scroll-height="167" data-hashorizontaloverflow="false" role="article" aria-roledescription="Use Browse Mode to explore " aria-description="variable output " style="max-height: 261px; white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;"><span class="variableNameElement" style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">rfWidget = </span></div><div style="white-space: pre; font-style: normal; color: rgb(33, 33, 33); font-size: 12px;">  RangeField with properties:
+
+                  Value: [100 500]
+                 Limits: [0 Inf]
+    LowerLimitInclusive: off
+    UpperLimitInclusive: on
+        ValueChangedFcn: @(src,evt)disp(evt)
+               Position: [11 11 230 30]
+
+  Show all properties
+</div></div></div></div></div></div><div  class = 'S4'><span style=' font-style: italic;'>Copyright 2024-2025 The MathWorks, Inc.</span></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+%% Range Field
+% This widget combines multiple numeric edit fields that form elements of a 
+% 1-dimensional array. It is intended for small arrays typically 2 to 5 values. 
+% Optionally you may impose restrictions on the numerical range. You can also 
+% force the array to be |increasing| or |decreasing|. You can also set orientation 
+% as |horizontal| or |vertical|.
+% 
+% Create a figure with a grid layout:
+
+figObj = uifigure("Position",[100 100 250 50]);
+gridObj = uigridlayout(figObj,[1 1],"BackgroundColor",[.6 .8 1]);
+%% 
+% Create and configure the widget:
+
+rfWidget = wt.RangeField(gridObj);
+rfWidget.ValueChangedFcn = @(src,evt)disp(evt);
+rfWidget.Value = [100 500];
+%% 
+% Optionally, place some restrictions:
+
+rfWidget.Tooltip = "Enter the range of positive values to use (must be > 0).";
+rfWidget.LowerLimitInclusive = false;
+rfWidget.UpperLimitInclusive = true;
+rfWidget.Limits = [0, inf]
+%% 
+% _Copyright 2024-2025 The MathWorks, Inc._
+##### SOURCE END #####
+-->
+</div></body></html>

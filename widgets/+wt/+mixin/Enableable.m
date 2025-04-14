@@ -1,7 +1,7 @@
 classdef Enableable < handle
-    % Mixin for component with Enable property
+    % Mixin to add styles to a component
 
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Properties
@@ -15,9 +15,8 @@ classdef Enableable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
-        
+    properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % List of graphics controls to apply to
         EnableableComponents (:,1) matlab.graphics.Graphics
         
@@ -46,8 +45,14 @@ classdef Enableable < handle
     methods (Access = protected)
         
         function updateEnableableComponents(obj)
-            
-            wt.utility.fastSet(obj.EnableableComponents,"Enable",obj.Enable);
+
+            % What needs to be updated?
+            comps = obj.EnableableComponents;
+            newValue = obj.Enable;
+            propNames = "Enable";
+
+            % Set the subcomponent properties in prioritized order
+            wt.utility.setStylePropsInPriority(comps, propNames, newValue);
             
         end %function
         

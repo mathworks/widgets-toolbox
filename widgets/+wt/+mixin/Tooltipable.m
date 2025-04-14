@@ -1,7 +1,7 @@
 classdef Tooltipable < handle
     % Mixin for component with Tooltip property
 
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Properties
@@ -15,9 +15,8 @@ classdef Tooltipable < handle
     
     
     %% Internal properties
-    properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
-        
+    properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % List of graphics controls to apply to
         TooltipableComponents (:,1) matlab.graphics.Graphics
         
@@ -46,8 +45,14 @@ classdef Tooltipable < handle
     methods (Access = protected)
         
         function updateTooltipableComponents(obj)
-            
-            wt.utility.fastSet(obj.TooltipableComponents,"Tooltip",obj.Tooltip);
+
+            % What needs to be updated?
+            comps = obj.TooltipableComponents;
+            newValue = obj.Tooltip;
+            propNames = "Tooltip";
+
+            % Set the subcomponent properties in prioritized order
+            wt.utility.setStylePropsInPriority(comps, propNames, newValue);
             
         end %function
         

@@ -1,63 +1,157 @@
 classdef ButtonColorable < handle
-    % Mixin for component with colorable button
-    %
+    % Mixin to add styles to a component
 
-    % Copyright 2020-2021 The MathWorks Inc.
-    
-    
+    % Copyright 2020-2025 The MathWorks Inc.
+
     %% Properties
-    properties (AbortSet)
-        
+    properties (AbortSet, Dependent)
+
         % Button Color
-        ButtonColor (1,3) double {wt.validators.mustBeBetweenZeroAndOne} = [1 1 1] * 0.96
-        
+        ButtonColor (1,3) double {mustBeInRange(ButtonColor,0,1)}
+
     end %properties
-    
-    
-    
+
+
+    properties (AbortSet, NeverAmbiguous)
+
+        % Button color mode
+        ButtonColorMode (1,1) wt.enum.AutoManualState = 'auto'
+
+    end %properties
+
+
     %% Internal properties
-    properties (AbortSet, Transient, NonCopyable, ...
-            Access = {?wt.abstract.BaseWidget, ?wt.test.BaseWidgetTest, ?matlab.ui.componentcontainer.ComponentContainer} )
-        
+    properties (AbortSet, Hidden)
+
+        % Button Color
+        ButtonColor_I (1,3) double {mustBeInRange(ButtonColor_I,0,1)} = [1 1 1]
+
+    end %properties
+
+
+    properties (AbortSet, Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % List of graphics controls to apply to
         ButtonColorableComponents (:,1) matlab.graphics.Graphics
-        
+
     end %properties
-    
-    
-    
-    %% Accessors
+
+
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener for theme changes
+        ThemeChangedListener event.listener
+
+    end %properties
+
+
+    %% Property Accessors
     methods
-        
-        function set.ButtonColor(obj,value)
-            obj.ButtonColor = value;
+
+        function value = get.ButtonColor(obj)
+            value = obj.ButtonColor_I;
+        end
+
+        function set.ButtonColor(obj, value)
+            obj.ButtonColorMode = 'manual';
+            obj.ButtonColor_I = value;
+        end
+
+        function set.ButtonColorMode(obj, value)
+            obj.ButtonColorMode = value;
+            obj.applyTheme();
+        end
+
+        function set.ButtonColor_I(obj,value)
+            obj.ButtonColor_I = value;
             obj.updateButtonColorableComponents()
         end
-        
+
         function set.ButtonColorableComponents(obj,value)
             obj.ButtonColorableComponents = value;
+            obj.applyTheme();
             obj.updateButtonColorableComponents()
         end
-        
+
     end %methods
-    
-    
-    
-    %% Methods
-    methods (Access = protected)
-        
-        function updateButtonColorableComponents(obj)
-            
-            % If the component has ButtonColor, use that. Otherwise, use
-            % BackgroundColor.
-            hasProp = isprop(obj.ButtonColorableComponents,'ButtonColor');
-            wt.utility.fastSet(obj.ButtonColorableComponents(hasProp),...
-                "ButtonColor",obj.ButtonColor);
-            wt.utility.fastSet(obj.ButtonColorableComponents(~hasProp),...
-                "BackgroundColor",obj.ButtonColor);
-            
+
+
+    %% Constructor
+    methods
+
+        function obj = ButtonColorable()
+
+            % Confirm BaseWidget and R2025a or newer
+            if matches("WidgetThemeChanged", events(obj)) ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
+
+                % Listen to theme changes
+                obj.ThemeChangedListener = ...
+                    listener(obj, "WidgetThemeChanged", @(~,~)applyTheme(obj));
+
+            end %if
+
         end %function
-        
+
     end %methods
-    
+
+
+    %% Protected Methods
+    methods (Access = protected)
+
+        function updateButtonColorableComponents(obj)
+
+            % What needs to be updated?
+            comps = obj.ButtonColorableComponents;
+            propNames = ["ButtonColor","BackgroundColor","Color"];
+            color = obj.ButtonColor_I;
+
+            % Set the subcomponent properties in prioritized order
+            wt.utility.setStylePropsInPriority(comps, propNames, color);
+
+        end %function
+
+
+        function color = getDefaultButtonColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
+
+            try
+                color = obj.getThemeColor("--mw-backgroundColor-primary"); %#ok<MCNPN>
+
+            catch exception
+
+                color = obj.ButtonColor_I;
+
+                id = "wt:applyTheme:getThemeColorFail";
+                msg = "Unable to get default theme color: %s";
+                warning(id, msg, exception.message)
+
+            end %try
+
+        end %function
+
+
+    end %methods
+
+
+    %% Private Methods
+    methods (Access = private)
+
+        function applyTheme(obj)
+
+            % If color mode is auto, use standard theme color
+            if obj.ButtonColorMode == "auto" ...
+                    && ~isMATLABReleaseOlderThan("R2025a")
+
+                % Use standard theme color
+                obj.ButtonColor_I = obj.getDefaultButtonColor();
+
+            end %if
+
+        end %function
+
+    end %methods
+
 end %classdef

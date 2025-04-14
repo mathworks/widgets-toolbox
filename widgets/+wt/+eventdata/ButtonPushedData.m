@@ -7,7 +7,7 @@ classdef ButtonPushedData < event.EventData & dynamicprops
     %           obj = wt.eventdata.ButtonPushedData(eventData)
     %
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
     %% Properties
     properties (SetAccess = protected)

@@ -1,19 +1,12 @@
 classdef PropertyViewable < handle
     % Mixin for component to organize the display of properties in the
     % command window.
-    %
     
-    % Copyright 2020-2022 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
-    %% Properties
-    properties (AbortSet, Transient, NonCopyable)
-        
-
-    end
-
-
-    %% Accessors
-    methods (Hidden, Access = protected)
+    
+    %% Protected Methods
+    methods (Access = protected)
 
         function groups = getPropertyGroups(obj)
             % Customize how the properties are displayed
@@ -34,21 +27,22 @@ classdef PropertyViewable < handle
 
             % Split callbacks, fonts, and colorizations
             isCallback = endsWith(propNames, "Fcn");
-            isColor = endsWith(propNames, "Color");
-            normalProps = propNames(~isCallback);
+            isColor = contains(propNames, "Color");
+            normalProps = propNames(~isCallback & ~isColor);
             callbackProps = propNames(isCallback & ~isColor);
 
             % Define the property gorups
             groups = [
                 matlab.mixin.util.PropertyGroup(callbackProps)
                 matlab.mixin.util.PropertyGroup(normalProps)
-                matlab.mixin.util.PropertyGroup(["Position", "Units"])
+                matlab.mixin.util.PropertyGroup("Position")
                 ];
 
             % Ignore Empty Groups
             groups(~[groups.NumProperties]) = [];
 
-       end
-       
-    end
-end
+        end %function
+        
+    end %methods
+    
+end %classdef

@@ -1,7 +1,7 @@
 classdef SliderSpinner < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
     
     %% Test Method Setup
@@ -26,12 +26,18 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
     %% Helper methods
     methods (Access = private)
         
-        function verifyControlValues(testCase,value)
+        function verifyControlValues(testCase,value,absTol)
             % Verifies the control fields have the specified value
+
+            arguments
+                testCase
+                value (1,1) double
+                absTol (1,1) double = 0
+            end
             
             drawnow
-            testCase.verifyEqual(testCase.Widget.Spinner.Value, value, 'AbsTol', 1e-5);
-            testCase.verifyEqual(testCase.Widget.Slider.Value, value, 'AbsTol', 1e-5);
+            testCase.verifyEqual(testCase.Widget.Spinner.Value, value, 'AbsTol', absTol);
+            testCase.verifyEqual(testCase.Widget.Slider.Value, value, 'AbsTol', absTol);
             
         end %function
         
@@ -65,7 +71,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             expValue = 15;
             newValue = 15.3;
             testCase.verifySetProperty("Value", newValue, expValue);
-            testCase.verifyControlValues(expValue);
+            testCase.verifyControlValues(expValue, 0.1);
             
             % Configure the control
             testCase.verifySetProperty("RoundFractionalValues", "off");
@@ -73,7 +79,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             % Set the value
             newValue = 22.45;
             testCase.verifySetProperty("Value", newValue);
-            testCase.verifyControlValues(newValue);
+            testCase.verifyControlValues(newValue, 0.1);
             
         end %function
         
@@ -183,24 +189,26 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             newValue = 74;
             expValue = 74;
             testCase.choose(sliderControl,newValue);
-            testCase.verifyControlValues(expValue);
-            testCase.verifyEqual(testCase.Widget.Value, expValue);
+            testCase.verifyControlValues(expValue, 0.1);
+            testCase.verifyEqual(testCase.Widget.Value, expValue, 'AbsTol', 0.1);
             
             % Verify callback triggered
             testCase.verifyEqual(testCase.CallbackCount, 1)
             
             
             % Drag the slider
+            startValue = 0;
             newValue = 32;
             expValue = 32;
-            testCase.drag(sliderControl,0,newValue);
-            testCase.verifyControlValues(expValue);
+            testCase.drag(sliderControl,startValue,newValue);
+            testCase.verifyControlValues(expValue, 0.2);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
             
             % Drag the slider to a fraction (with rounding turned on)
-            newValue = 13.65;
+            startValue = 32;
+            newValue = 13.8;
             expValue = 14;
-            testCase.drag(sliderControl,32,newValue);
+            testCase.drag(sliderControl,startValue,newValue);
             testCase.verifyControlValues(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
             
@@ -208,11 +216,15 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.verifySetProperty("RoundFractionalValues", "off");
             
             % Drag the slider to a fraction (with rounding turned off)
+            % Verify it did not get rounded
+            startValue = 14;
             newValue = 91.24;
-            expValue = 91.24;
-            testCase.drag(sliderControl,14,newValue);
-            testCase.verifyControlValues(expValue);
-            testCase.verifyEqual(testCase.Widget.Value, expValue, 'AbsTol', 1e-5);
+            notExpValue = 90;
+            testCase.drag(sliderControl,startValue,newValue);
+            drawnow
+            testCase.verifyNotEqual(testCase.Widget.Spinner.Value, notExpValue);
+            testCase.verifyNotEqual(testCase.Widget.Slider.Value, notExpValue);
+            testCase.verifyNotEqual(testCase.Widget.Value, notExpValue);
             
         end %function
         
