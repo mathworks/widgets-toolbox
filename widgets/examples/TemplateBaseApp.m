@@ -29,8 +29,8 @@ classdef TemplateBaseApp < wt.apps.BaseApp
         Tab2 matlab.ui.container.Tab
 
         % View Components
-        %View1 packageName.ClassName
-        %View2 packageName.ClassName
+        %View1 namespace.ClassName
+        %View2 namespace.ClassName
 
         % Temporary label components
         Panel1Text matlab.ui.control.Label
@@ -61,14 +61,11 @@ classdef TemplateBaseApp < wt.apps.BaseApp
             app.Panel1.Title = "Panel 1";
             app.Panel1.Layout.Row = [1 2];
             app.Panel1.Layout.Column = 1;
-            app.Panel1.BackgroundColor = "magenta";
-
             % Create a panel
             app.Panel2 = uipanel(app.Grid);
             app.Panel2.Title = "Panel 2";
             app.Panel2.Layout.Row = 2;
             app.Panel2.Layout.Column = 2;
-            app.Panel2.BackgroundColor = "white";
 
             % Create a tab group
             app.TabGroup = uitabgroup(app.Grid);
@@ -92,32 +89,36 @@ classdef TemplateBaseApp < wt.apps.BaseApp
             % Place some temporary content in each container
             app.Panel1Text = uilabel(app.Panel1Grid);
             app.Panel1Text.Text = "Panel 1 Contents";
+            app.Panel1Text.HorizontalAlignment = "center";
+            app.Panel1Text.FontSize = 30;
             app.Panel1Text.Layout.Row = 1;
             app.Panel1Text.Layout.Column = 1;
-            app.Panel1Text.BackgroundColor = "red";
 
             app.Panel2Text = uilabel(app.Panel2Grid);
             app.Panel2Text.Text = "Panel 2 Contents";
+            app.Panel2Text.HorizontalAlignment = "center";
+            app.Panel2Text.FontSize = 30;
             app.Panel2Text.Layout.Row = 1;
             app.Panel2Text.Layout.Column = 1;
-            app.Panel2Text.BackgroundColor = "green";
 
             app.Tab1Text = uilabel(app.Tab1Grid);
             app.Tab1Text.Text = "Tab 1 Contents";
+            app.Tab1Text.HorizontalAlignment = "center";
+            app.Tab1Text.FontSize = 30;
             app.Tab1Text.Layout.Row = 1;
             app.Tab1Text.Layout.Column = 1;
-            app.Tab1Text.BackgroundColor = "cyan";
 
             app.Tab2Text = uilabel(app.Tab2Grid);
             app.Tab2Text.Text = "Tab 2 Contents";
+            app.Tab2Text.HorizontalAlignment = "center";
+            app.Tab2Text.FontSize = 30;
             app.Tab2Text.Layout.Row = 1;
             app.Tab2Text.Layout.Column = 1;
-            app.Tab2Text.BackgroundColor = "blue";
 
             % Additional examples:
             % (add other views, layouts, and components here as needed)
-            %app.View1 = packageName.ClassName( app.Tab1Grid );
-            %app.View2 = packageName.ClassName( app.Tab2Grid );
+            %app.View1 = namespace.ClassName( app.Tab1Grid );
+            %app.View2 = namespace.ClassName( app.Tab2Grid );
 
         end %function
 

@@ -41,8 +41,8 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
         HelpButton matlab.ui.control.Button
 
         % View Components
-        %View1 packageName.ClassName
-        %View2 packageName.ClassName
+        %View1 namespace.ClassName
+        %View2 namespace.ClassName
 
         % Temporary label components
         Panel1Text matlab.ui.control.Label
@@ -76,14 +76,12 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             app.Panel1.Title = "Panel 1";
             app.Panel1.Layout.Row = [2 3];
             app.Panel1.Layout.Column = 1;
-            app.Panel1.BackgroundColor = "magenta";
 
             % Create a panel
             app.Panel2 = uipanel(app.Grid);
             app.Panel2.Title = "Panel 2";
             app.Panel2.Layout.Row = 3;
             app.Panel2.Layout.Column = 2;
-            app.Panel2.BackgroundColor = "white";
 
             % Create a tab group
             app.TabGroup = uitabgroup(app.Grid);
@@ -107,32 +105,36 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             % Place some temporary content in each container
             app.Panel1Text = uilabel(app.Panel1Grid);
             app.Panel1Text.Text = "Panel 1 Contents";
+            app.Panel1Text.HorizontalAlignment = "center";
+            app.Panel1Text.FontSize = 30;
             app.Panel1Text.Layout.Row = 1;
             app.Panel1Text.Layout.Column = 1;
-            app.Panel1Text.BackgroundColor = "red";
 
             app.Panel2Text = uilabel(app.Panel2Grid);
             app.Panel2Text.Text = "Panel 2 Contents";
+            app.Panel2Text.HorizontalAlignment = "center";
+            app.Panel2Text.FontSize = 30;
             app.Panel2Text.Layout.Row = 1;
             app.Panel2Text.Layout.Column = 1;
-            app.Panel2Text.BackgroundColor = "green";
 
             app.Tab1Text = uilabel(app.Tab1Grid);
             app.Tab1Text.Text = "Tab 1 Contents";
+            app.Tab1Text.HorizontalAlignment = "center";
+            app.Tab1Text.FontSize = 30;
             app.Tab1Text.Layout.Row = 1;
             app.Tab1Text.Layout.Column = 1;
-            app.Tab1Text.BackgroundColor = "cyan";
 
             app.Tab2Text = uilabel(app.Tab2Grid);
             app.Tab2Text.Text = "Tab 2 Contents";
+            app.Tab2Text.HorizontalAlignment = "center";
+            app.Tab2Text.FontSize = 30;
             app.Tab2Text.Layout.Row = 1;
             app.Tab2Text.Layout.Column = 1;
-            app.Tab2Text.BackgroundColor = "blue";
 
             % Additional examples:
             % (add other views, layouts, and components here as needed)
-            %app.View1 = packageName.ClassName( app.Tab1Grid );
-            %app.View2 = packageName.ClassName( app.Tab2Grid );
+            %app.View1 = namespace.ClassName( app.Tab1Grid );
+            %app.View2 = namespace.ClassName( app.Tab2Grid );
 
         end %function
 
@@ -149,11 +151,6 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             app.Toolbar.Layout.Row = 1;
             app.Toolbar.Layout.Column = [1 2];
 
-            % Adjust colors
-            app.Toolbar.BackgroundColor = [.8 .8 .8];
-            app.Toolbar.DividerColor = [.94 .94 .94];
-            app.Toolbar.TitleColor = [.5 .5 .5];
-
             % File Section
             app.FileSection = wt.toolbar.HorizontalSection();
             app.FileSection.Title = "FILE";
@@ -164,9 +161,9 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
 
             % Help Section
             app.HelpSection = wt.toolbar.HorizontalSection();
-            app.HelpSection.Title = "HELP";            
+            app.HelpSection.Title = "HELP";
             app.HelpButton = app.HelpSection.addButton('help_24.png','Help');
-            
+
             % Attach callbacks
             app.NewButton.ButtonPushedFcn = @(h,e)onNewButton(app);
             app.OpenButton.ButtonPushedFcn = @(h,e)onOpenButton(app);
@@ -187,7 +184,7 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             % Create and return a new session object for this app
 
             % The session should be a class that inherits wt.model.BaseSession
-            %sessionObj = packageName.SessionClassName;
+            %sessionObj = namespace.SessionClassName;
 
             % For example purposes, using this one:
             sessionObj = wt.model.BaseSession;

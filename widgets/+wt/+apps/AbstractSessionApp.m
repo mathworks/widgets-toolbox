@@ -359,7 +359,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Define arguments
             arguments
                 app (1,1) wt.apps.BaseApp
-                session (1,1) wt.model.BaseSession = app.Session
+                session wt.model.BaseSession = app.Session
             end
 
             % Show output if Debug is on
@@ -369,7 +369,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             isCancelled = false;
 
             % Don't save and return now if session is invalid or clean
-            if ~isvalid(session) || ~session.Dirty
+            if ~isscalar(session) || ~isvalid(session) || ~session.Dirty
                 return
             end
 
