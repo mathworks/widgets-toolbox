@@ -1,6 +1,8 @@
 classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
     % Implements a template for a BaseSingleSessionApp
 
+    % Copyright 2022-2025 The MathWorks Inc.
+
 
     %% Internal Components
     %   Create properties here for each control, layout, or view component
@@ -16,11 +18,11 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
         % (BaseApp already brings "Grid", the main Grid layout in the window)
         Tab1Grid matlab.ui.container.GridLayout
         Tab2Grid matlab.ui.container.GridLayout
-        Panel1Grid matlab.ui.container.GridLayout
+        SessionDescriptionPanelGrid matlab.ui.container.GridLayout
         Panel2Grid matlab.ui.container.GridLayout
 
         % Panels
-        Panel1 matlab.ui.container.Panel
+        SessionDescriptionPanel matlab.ui.container.Panel
         Panel2 matlab.ui.container.Panel
 
         % Tabs
@@ -37,12 +39,16 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
         NewButton matlab.ui.control.Button
         OpenButton matlab.ui.control.Button
         SaveButton matlab.ui.control.Button
+        SaveAsButton matlab.ui.control.Button
         ExportGTButton matlab.ui.control.Button
         HelpButton matlab.ui.control.Button
 
         % View Components
         %View1 namespace.ClassName
         %View2 namespace.ClassName
+
+        % Session information components
+        SessionDescription matlab.ui.control.TextArea
 
         % Temporary label components
         Panel1Text matlab.ui.control.Label
@@ -71,11 +77,11 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             % Create toolbar (split out for brevity)
             app.createToolbar()
 
-            % Create a panel
-            app.Panel1 = uipanel(app.Grid);
-            app.Panel1.Title = "Panel 1";
-            app.Panel1.Layout.Row = [2 3];
-            app.Panel1.Layout.Column = 1;
+            % Create a panel for session description
+            app.SessionDescriptionPanel = uipanel(app.Grid);
+            app.SessionDescriptionPanel.Title = "Session Description:";
+            app.SessionDescriptionPanel.Layout.Row = [2 3];
+            app.SessionDescriptionPanel.Layout.Column = 1;
 
             % Create a panel
             app.Panel2 = uipanel(app.Grid);
@@ -97,19 +103,18 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             app.Tab2.Title = 'Tab 2';
 
             % Create grid layouts to position content inside each container
-            app.Panel1Grid = uigridlayout(app.Panel1, [1,1],"Padding", 0);
+            app.SessionDescriptionPanelGrid = uigridlayout(...
+                app.SessionDescriptionPanel, [1,1],"Padding", 0);
             app.Panel2Grid = uigridlayout(app.Panel2, [1,1],"Padding", 0);
             app.Tab1Grid = uigridlayout(app.Tab1, [1,1],"Padding", 0);
             app.Tab2Grid = uigridlayout(app.Tab2, [1,1],"Padding", 0);
 
-            % Place some temporary content in each container
-            app.Panel1Text = uilabel(app.Panel1Grid);
-            app.Panel1Text.Text = "Panel 1 Contents";
-            app.Panel1Text.HorizontalAlignment = "center";
-            app.Panel1Text.FontSize = 30;
-            app.Panel1Text.Layout.Row = 1;
-            app.Panel1Text.Layout.Column = 1;
+            % Put a description for the selected session
+            app.SessionDescription = uitextarea(app.SessionDescriptionPanelGrid);
+            app.SessionDescription.ValueChangedFcn = ...
+                @(~,evt)onSessionDescriptionChanged(app,evt);
 
+            % Place some temporary content in each container
             app.Panel2Text = uilabel(app.Panel2Grid);
             app.Panel2Text.Text = "Panel 2 Contents";
             app.Panel2Text.HorizontalAlignment = "center";
@@ -154,20 +159,18 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             % File Section
             app.FileSection = wt.toolbar.HorizontalSection();
             app.FileSection.Title = "FILE";
+            app.FileSection.ButtonPushedFcn = @(~,evt)onFileToolbarButtonPushed(app,evt);
+
             app.NewButton = app.FileSection.addButton('add_24.png','New Session');
             app.OpenButton = app.FileSection.addButton('folder_24.png','Open Session');
             app.SaveButton = app.FileSection.addButton('save_24.png','Save Session');
+            app.SaveAsButton = app.FileSection.addButton("saveClean_24.png","Save As");
             app.FileSection.ComponentWidth(:) = 55;
 
             % Help Section
             app.HelpSection = wt.toolbar.HorizontalSection();
             app.HelpSection.Title = "HELP";
             app.HelpButton = app.HelpSection.addButton('help_24.png','Help');
-
-            % Attach callbacks
-            app.NewButton.ButtonPushedFcn = @(h,e)onNewButton(app);
-            app.OpenButton.ButtonPushedFcn = @(h,e)onOpenButton(app);
-            app.SaveButton.ButtonPushedFcn = @(h,e)onSaveButton(app);
             app.HelpButton.ButtonPushedFcn = @(h,e)onHelpButton(app);
 
             % Add all toolbar sections to the toolbar
@@ -202,9 +205,26 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             % during callbacks or other changes that require contents to
             % refresh.
 
+            % Update the session description text
+            app.SessionDescription.Value = app.Session.Description;
+            
+            % Update toolbar button enables
+            app.updateToolbarEnables()
+
             % Examples:
             %app.View1.Model = sessionObj;
             %app.View2.Model = sessionObj;
+
+        end %function
+
+
+        function updateToolbarEnables(app)
+
+            % Get the session states
+            hasDirtySession = isscalar(app.Session) && app.Session.Dirty;
+
+            % File toolbar enables
+            app.SaveButton.Enable = hasDirtySession;
 
         end %function
 
@@ -225,34 +245,44 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
         end %function
 
 
-        function onNewButton(app)
-            % Triggered when the toolbar button is pressed
+        function onSessionDescriptionChanged(app,evt)
+            % Triggered on editing a session description
 
-            % (this method is optional if using the toolbar)
+            % Get the new value
+            newValue = join(string(evt.Value), newline);
 
-            % Create a new session
-            app.Session = app.createNewSession();
-
-        end %function
-
-
-        function onOpenButton(app)
-            % Triggered when the toolbar button is pressed
-
-            % (this method is optional if using the toolbar)
-
-            app.loadSession()
-            app.update()
+            % Update the session description
+            app.Session.Description = newValue;
 
         end %function
 
 
-        function onSaveButton(app)
-            % Triggered when the toolbar button is pressed
+        function onFileToolbarButtonPushed(app,evt)
 
-            % (this method is optional if using the toolbar)
+            % Which button was pressed?
+            switch evt.Button
 
-            app.saveSession(true);
+                case app.NewButton
+
+                    % Add a new session
+                    app.newSession();
+
+                case app.OpenButton
+
+                    % Prompt and load a session
+                    app.loadSession();
+
+                case app.SaveButton
+
+                    % Save the selected session
+                    app.saveSession(false);
+
+                case app.SaveAsButton
+
+                    % Save the selected session as different file
+                    app.saveSession(true);
+
+            end %switch
 
         end %function
 
@@ -265,15 +295,6 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
             disp("Help Button Pushed!");
 
         end %function
-
-    end %methods
-
-
-
-    %% Private Methods
-    methods ( Access = private )
-
-        % (optionally add any internal methods here)
 
     end %methods
 
