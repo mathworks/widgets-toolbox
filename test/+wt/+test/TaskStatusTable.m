@@ -1,7 +1,7 @@
 classdef TaskStatusTable < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     
@@ -121,7 +121,22 @@ classdef TaskStatusTable < wt.test.BaseWidgetTest
             % Verify selection color of selected label
             actValue = testCase.Widget.Label(newIdx).BackgroundColor;
             testCase.verifyEqual(actValue, selColor)
-            
+
+            % Now, programmatically change the index to empty
+            newIdx = [];
+            testCase.verifySetProperty("SelectedIndex", newIdx);
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, newIdx)
+
+            % Can't press back
+            testCase.verifyFalse(backButton.Enable)
+            testCase.press(backButton)
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, newIdx)
+
+            % Push forward
+            testCase.verifyTrue(fwdButton.Enable)
+            testCase.press(fwdButton)
+            testCase.verifyEqual(testCase.Widget.SelectedIndex, 1)
+
         end %function
             
         

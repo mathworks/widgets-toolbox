@@ -1,12 +1,12 @@
-classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & wt.mixin.Enableable &...
-        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable & wt.mixin.PropertyViewable
-    
+classdef ListSelector < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Orderable
     % Select from an array of items and add them to a list
 
-    % Copyright 2020-2022 The MathWorks Inc.
-
+    % Copyright 2020-2025 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -23,7 +23,6 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     end %events
 
 
-
     %% Public properties
     properties (AbortSet)
 
@@ -36,20 +35,64 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         % Indicates whether to allow duplicate entries in the list
         AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
 
-        % Indicates whether to allow sort controls %RAJ - Future feature
-        %Sortable  (1,1) matlab.lang.OnOffSwitchState = true
+         % Indicates whether to allow sort controls
+        Sortable  (1,1) matlab.lang.OnOffSwitchState = true
 
         % Inidicates what to do when add button is pressed (select from
         % Items or custom using ButtonPushed event or ButtonPushedFcn)
         AddSource (1,1) wt.enum.ListAddSource = wt.enum.ListAddSource.Items
 
+         % Width of the buttons
+        ButtonWidth = 25
+
+        % Height of the buttons
+        ButtonHeight = 25
+
     end %properties
 
+    methods
 
+        function set.Items(obj, newItems)
+
+            % Get original items and highlight
+            oldValue = obj.Value; %#ok<MCSUP>
+            oldHighlight = obj.HighlightedValue; %#ok<MCSUP>
+
+            % Retain the matching original value selection
+            isPresent = ismember(oldValue, newItems);
+            newValue = oldValue(isPresent);
+
+            % Attempt to retain the highlight values
+            isPresent = ismember(oldHighlight, newItems);
+            newHighlight = oldHighlight(isPresent);
+
+            % Set new items
+            obj.Items = newItems;
+
+            % Set selection for consistency
+            obj.Value = newValue; %#ok<MCSUP>
+
+            % Set highlight for consistency
+            if obj.AllowDuplicates %#ok<MCSUP>
+                % If duplicates allowed, it can be inconsistent, so must
+                % deselect all instead
+                obj.HighlightedValue = []; %#ok<MCSUP>
+            else
+                % This is the best guess we can make
+                obj.HighlightedValue = newHighlight; %#ok<MCSUP>
+            end
+
+        end
+
+        
+    end %methods
+
+
+    %% Public dependent properties
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
-        SelectedIndex (1,:)
+        ValueIndex (1,:)
 
         % The current selection
         Value (1,:)
@@ -60,34 +103,116 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
-    properties (AbortSet, Dependent, UsedInUpdate = false)
+    methods
 
-        % Width of the buttons
-        ButtonWidth
+        function value = get.ValueIndex(obj)
+            value = obj.ListBox.ItemsData;
+            value(value > obj.getMaximumValidItemsNumber) = [];
+        end
+
+        function set.ValueIndex(obj,value)
+            if any(value > numel(obj.Items))
+                error("widgets:ListSelector:ValueIndex",...
+                        "'ValueIndex' must be within the length of the 'Items' property.")
+            end
+            if ~isempty(obj.ItemsData) && any(value > numel(obj.ItemsData))
+                error("widgets:ListSelector:ValueIndex",...
+                        "'ValueIndex' must be within the length of the 'ItemsData' property.")
+            end
+            obj.ListBox.Items = obj.Items(value);
+            obj.ListBox.ItemsData = value;
+        end
+
+        function value = get.Value(obj)
+            itemIdx = obj.ListBox.ItemsData;
+            itemIdx(itemIdx > numel(obj.Items)) = [];
+            if isempty(obj.ItemsData)
+                value = obj.Items(:, itemIdx);
+            else
+                value = obj.ItemsData(:, itemIdx);
+            end
+        end
+
+        function set.Value(obj,value)
+            if isempty(value)
+                obj.ValueIndex = [];
+            else
+                if isempty(obj.ItemsData)
+                    [tf, selIdx] = ismember(value, obj.Items);
+                else
+                    [tf, selIdx] = ismember(value, obj.ItemsData);
+                end
+                if ~all(tf)
+                    if isempty(obj.ItemsData)
+                        itemValueName = 'Items';
+                    else
+                        itemValueName = 'ItemsData';
+                    end
+                    error("widgets:ListSelector:InvalidValue",...
+                        "'Value' must be an element defined in the '%s' property.", itemValueName)
+                end
+                if ~isempty(obj.ItemsData) && numel(tf) > numel(obj.Items)
+                    error("widgets:ListSelector:InvalidValue",...
+                        "'Value' must be an element defined in the 'ItemsData' property within the length of the 'Items' property.")
+                end
+                obj.ValueIndex = selIdx;
+            end
+        end
+
+
+        function value = get.HighlightedValue(obj)
+            selIdx = obj.ListBox.Value;
+            if isempty(selIdx) || ~isnumeric(selIdx)
+                selIdx = [];
+            end
+            if isempty(obj.ItemsData)
+                value = obj.Items(:,selIdx);
+            else
+                value = obj.ItemsData(:,selIdx);
+            end
+        end
+
+        function set.HighlightedValue(obj,value)
+            if isempty(value)
+                obj.ListBox.Value = {};
+                return;
+            end
+            if isempty(obj.ItemsData)
+                [~, obj.ListBox.Value] = ismember(value, obj.Items);
+            else
+                [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
+            end
+        end
+
+    end %methods
+
+
+    %% Read-only dependent properties
+    properties (AbortSet, Dependent, SetAccess = private)
+
+        % Indices of the highlighted items
+        HighlightedIndex
 
     end %properties
 
+    methods
 
+        function value = get.HighlightedIndex(obj)
+            value = obj.ListBox.Value;
+            if isempty(value)
+                value = [];
+            end
+        end
 
-    %% Read-Only properties
-    properties (SetAccess = private)
-
-        % Additional user buttons
-        UserButtons wt.ButtonGrid
-
-    end %properties
+    end %methods
 
 
 
     %% Internal Properties
-    properties (Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer})
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % The ListBox control
         ListBox (1,1) matlab.ui.control.ListBox
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
         % The list sorting buttons
         ListButtons wt.ButtonGrid
@@ -98,27 +223,51 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
     end %properties
 
 
+    properties (SetAccess = private)
+
+        % Additional user buttons may be attached to this ButtonGrid
+        UserButtons wt.ButtonGrid
+
+    end %properties
+
+
+    %% Hidden compatibility properties
+    properties (AbortSet, Dependent, Hidden)
+
+        % Indices of displayed items that are currently added to the list (for backward compatibility - use ValueIndex instead)
+        SelectedIndex (1,:)
+
+    end %properties
+    
+    methods
+
+        function value = get.SelectedIndex(obj)
+            value = obj.ValueIndex;
+        end
+
+        function set.SelectedIndex(obj,value)
+            obj.ValueIndex = value;
+        end
+
+    end %methods
+
+
 
     %% Protected methods
     methods (Access = protected)
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [120 130];
 
-            % Construct Default Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
-
             % Configure grid
             obj.Grid.Padding = 3;
-            obj.Grid.ColumnWidth = {'1x',25};
-            obj.Grid.RowHeight = {106,'1x'};
+            obj.Grid.ColumnWidth = {'1x','fit'};
+            obj.Grid.RowHeight = {'fit','1x'};
 
             % Create the list buttons
             obj.ListButtons = wt.ButtonGrid(obj.Grid);
@@ -160,23 +309,30 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function update(obj)
 
             % What is selected?
-            selIdx = obj.SelectedIndex;
+            selIdx = obj.ValueIndex;
+
+            % Is the list sortable?
+            if obj.Sortable
+                obj.ListButtons.Icon = ["add_24.png", "delete_24.png", "up_24.png", "down_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
+            else
+                selIdx = sort(selIdx);
+                obj.ListButtons.Icon = ["add_24.png", "delete_24.png"];
+                obj.ListButtons.ButtonTag = ["Add", "Remove"];
+            end
 
             % Update the list
             obj.ListBox.Items = obj.Items(selIdx);
             obj.ListBox.ItemsData = selIdx;
 
+            % Button width and height
+            obj.UserButtons.ButtonWidth = obj.ButtonWidth;
+            obj.ListButtons.ButtonWidth = obj.ButtonWidth;
+            obj.UserButtons.ButtonHeight = obj.ButtonHeight;
+            obj.ListButtons.ButtonHeight = obj.ButtonHeight;
+
             % Update button enable states
             obj.updateEnables();
-
-        end %function
-
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
 
         end %function
 
@@ -187,21 +343,23 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             if obj.Enable
 
                 % What is selected?
-                selIdx = obj.SelectedIndex;
+                selIdx = obj.ValueIndex;
+                numRows = numel(selIdx);
 
                 % Highlighted selection in list?
                 hiliteIdx = obj.getListBoxSelectedIndex();
 
+                % Should the sort buttons be enabled?
+                [backEnabled, fwdEnabled] = obj.areOrderButtonsEnabled(numRows, hiliteIdx);
+
                 % How many items selected into list
-                numRows = numel(selIdx);
-                numHilite = numel(hiliteIdx);
 
                 % Toggle button enables
                 obj.ListButtons.ButtonEnable = [
                     obj.AllowDuplicates || ( numel(selIdx) < numel(obj.Items) ) %Add Button
                     ~isempty(hiliteIdx) % Delete Button
-                    numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
-                    numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
+                    backEnabled %Up Button
+                    fwdEnabled %Down Button
                     ];
 
             end %if obj.Enable
@@ -281,30 +439,42 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function promptToAddListItems(obj)
             % Prompt a dialog to add items to the listbox
 
+            % Take ItemsData into account while displaying Items
+            items = obj.Items;
+            if ~isempty(obj.ItemsData)
+                items = items(1:min(numel(items), numel(obj.ItemsData)));
+            end
+
             % Prompt for stuff to add
             if obj.AllowDuplicates
-                newSelIdx = listdlg("ListString",obj.Items);
+                newSelIdx = listdlg("ListString",items);
             else
                 newSelIdx = listdlg(...
-                    "ListString",obj.Items,...
+                    "ListString",items,...
                     "InitialValue",obj.ListBox.ItemsData);
             end
 
+            % Restore figure focus
+            fig = ancestor(obj,"figure");
+            if isscalar(fig) && isvalid(fig)
+                figure(fig)
+            end
+            
             if isempty(newSelIdx)
                 % User cancelled
                 return
             elseif obj.AllowDuplicates
-                newSelIdx = [obj.SelectedIndex newSelIdx];
+                newSelIdx = [obj.ValueIndex newSelIdx];
             end
 
             % Was a change made?
-            if ~isequal(obj.SelectedIndex, newSelIdx)
+            if ~isequal(obj.ValueIndex, newSelIdx)
 
                 % Get the original value
                 oldValue = obj.Value;
 
                 % Make the update
-                obj.SelectedIndex = newSelIdx;
+                obj.ValueIndex = newSelIdx;
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
@@ -318,12 +488,16 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
         function selIdx = getListBoxSelectedIndex(obj)
             % Get the current selected row indices in the listbox
 
-            warnState = warning('off','MATLAB:structOnObject');
-            s = struct(obj.ListBox);
-            warning(warnState);
-            selIdx = s.SelectedIndex;
-            if isequal(selIdx, -1)
-                selIdx = [];
+            if isMATLABReleaseOlderThan("R2023b")
+                warnState = warning('off','MATLAB:structOnObject');
+                s = struct(obj.ListBox);
+                warning(warnState);
+                selIdx = s.SelectedIndex;
+                if isequal(selIdx, -1)
+                    selIdx = [];
+                end
+            else
+                selIdx = obj.ListBox.ValueIndex;
             end
 
         end %function
@@ -358,151 +532,44 @@ classdef ListSelector < matlab.ui.componentcontainer.ComponentContainer & ...
             % Shift selected items up/down within a listbox
             % This assumes ItemsData contains unique values
 
-            % What is the current order?
-            selIdx = obj.getListBoxSelectedIndex();
+            % What is the current order and total items?
+            idxSel = obj.getListBoxSelectedIndex();
+            numItems = numel(obj.ListBox.Items);
 
-            % Make indices to all items as they are now
-            idxNew = 1:numel(obj.ListBox.Items);
-            idxOld = idxNew;
+            % Shift the list indices
+            % [idxNew, idxSelAfter] = obj.shiftListIndices(shift, numItems, idxSel);
+            [idxNew, ~] = obj.shiftListIndices(shift, numItems, idxSel);
 
-            % Find the last stable item that doesn't move
-            [~,idxStable] = setdiff(idxNew, selIdx, 'stable');
-            if ~isempty(idxStable)
-                idxFirstStable = idxStable(1);
-                idxLastStable = idxStable(end);
+            % Get the original value
+            oldValue = obj.Value;
+
+            % Make the shift
+            obj.ListBox.Items = obj.ListBox.Items(idxNew);
+            obj.ListBox.ItemsData = obj.ListBox.ItemsData(idxNew);
+            % obj.ListBox.Selection = idxSelAfter;
+
+            % Trigger event
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+            notify(obj,"ValueChanged",evtOut);
+
+            % Update buttons
+            obj.updateEnables()
+
+        end %function
+
+        function val = getMaximumValidItemsNumber(obj)
+            % Returns maximum valid selected index.
+            % Takes into account ItemsData and Items.
+
+            % Is ItemsData available?
+            if ~isempty(obj.ItemsData)
+                val = min(numel(obj.ItemsData), numel(obj.Items));
             else
-                idxFirstStable = inf;
-                idxLastStable = 0;
+                val = numel(obj.Items);
             end
-
-            % Which way do we loop?
-            if shift > 0 %Shift to end
-
-                for idxToMove = numel(selIdx):-1:1
-
-                    % Calculate if there's room to move this item
-                    idxThisBefore = selIdx(idxToMove);
-                    thisShift = max( min(idxLastStable-idxThisBefore, shift), 0 );
-
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-
-                    % Where do other items move from/to
-                    idxOthersBefore = selIdx(idxToMove)+1:1:idxThisAfter;
-                    idxOthersAfter = idxOthersBefore - thisShift;
-
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
-                end
-
-            elseif shift < 0 %Shift to start
-
-                for idxToMove = 1:numel(selIdx)
-
-                    % Calculate if there's room to move this item
-                    idxThisBefore = selIdx(idxToMove);
-                    thisShift = min( max(idxFirstStable-idxThisBefore, shift), 0 );
-
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-
-                    % Where do other items move from/to
-                    idxOthersBefore = idxThisAfter:1:selIdx(idxToMove)-1;
-                    idxOthersAfter = idxOthersBefore - thisShift;
-
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
-                end
-
-            end %if shift > 0
-
-            % Was a change made?
-            if ~isequal(idxOld, idxNew)
-
-                % Get the original value
-                oldValue = obj.Value;
-
-                % Make the shift
-                obj.ListBox.Items = obj.ListBox.Items(idxNew);
-                obj.ListBox.ItemsData = obj.ListBox.ItemsData(idxNew);
-
-                % Trigger event
-                evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
-                notify(obj,"ValueChanged",evtOut);
-
-            end %if
 
         end %function
 
     end %methods
-
-
-
-    %% Accessors
-    methods
-
-        function value = get.SelectedIndex(obj)
-            value = obj.ListBox.ItemsData;
-        end
-        function set.SelectedIndex(obj,value)
-            obj.ListBox.Items = obj.Items(value);
-            obj.ListBox.ItemsData = value;
-        end
-
-        function value = get.Value(obj)
-            if isempty(obj.ItemsData)
-                value = obj.Items(:,obj.ListBox.ItemsData);
-            else
-                value = obj.ItemsData(:,obj.ListBox.ItemsData);
-            end
-        end
-        function set.Value(obj,value)
-            if isempty(value)
-                obj.SelectedIndex = [];
-            else
-                if isempty(obj.ItemsData)
-                    [tf, selIdx] = ismember(value, obj.Items);
-                else
-                    [tf, selIdx] = ismember(value, obj.ItemsData);
-                end
-                if ~all(tf)
-                    warning("widgets:ListSelector:InvalidValue",...
-                        "Attempt to set an invalid Value to the list.")
-                    selIdx(~tf) = [];
-                end
-                obj.SelectedIndex = selIdx;
-            end
-        end
-
-        function value = get.HighlightedValue(obj)
-            selIdx = obj.ListBox.Value;
-            if isempty(selIdx) || ~isnumeric(selIdx)
-                selIdx = [];
-            end
-            if isempty(obj.ItemsData)
-                value = obj.Items(:,selIdx);
-            else
-                value = obj.ItemsData(:,selIdx);
-            end
-        end
-        function set.HighlightedValue(obj,value)
-            if isempty(obj.ItemsData)
-                [~, obj.ListBox.Value] = ismember(value, obj.Items);
-            else
-                [~, obj.ListBox.Value] = ismember(value, obj.ItemsData);
-            end
-        end
-
-        function value = get.ButtonWidth(obj)
-            value = obj.Grid.ColumnWidth{2};
-        end
-        function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth{2} = value;
-        end
-
-    end %methods
-
 
 end % classdef

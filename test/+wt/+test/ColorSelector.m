@@ -1,7 +1,7 @@
 classdef ColorSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     
@@ -34,7 +34,7 @@ classdef ColorSelector < wt.test.BaseWidgetTest
             
             % Test an invalid color
             newColor = [-1 0 1];
-            errorID = 'wt:validators:mustBeBetween';
+            errorID = 'MATLAB:validators:mustBeInRange';
             testCase.verifySetPropertyError("Value", newColor, errorID);
             
             % Test an invalid color

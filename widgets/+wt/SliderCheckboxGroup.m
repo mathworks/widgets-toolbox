@@ -1,12 +1,11 @@
-classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & ...
-        wt.mixin.PropertyViewable
+classdef SliderCheckboxGroup < wt.abstract.BaseWidget & ...
+        wt.mixin.Enableable & ...
+        wt.mixin.FontStyled
 
     % A group of sliders with checkboxes, useful for visibility of various
     % layers of imagery
     
-    % Copyright 2020-2022 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Events
@@ -45,14 +44,35 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         
     end %properties
     
+
+    %% Property Accessors
+    methods
+        
+        function value = get.Value(obj)
+            value = obj.Value;
+            value((end+1):numel(obj.Name)) = 1;
+            value(~obj.State) = 0;
+        end
+        
+        function value = get.State(obj)
+            value = obj.State;
+            value((end+1):numel(obj.Name)) = 1;
+        end
+        
+        function value = get.CheckboxWidth(obj)
+            value = obj.Grid.ColumnWidth{1};
+        end
+        
+        function set.CheckboxWidth(obj,value)
+            obj.Grid.ColumnWidth{1} = value;
+        end
+        
+    end % methods
+    
     
     
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
-        
-        % Grid for Layout
-        Grid (1,1) matlab.ui.container.GridLayout
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Checkboxes
         Checkbox (1,:) matlab.ui.control.CheckBox
@@ -68,26 +88,21 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
     methods (Access = protected)
         
         function setup(obj)
-            
-            % Create and set Default Grid Properties
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;        
 
-            % Establish Background Color Listener
-            obj.BackgroundColorableComponents = obj.Grid;
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()  
             
             % Set default size
             obj.Position(3:4) = [120 150];
             
-            % Configure Main Grid
+            % Configure grid
             obj.Grid.Padding = 2;
             obj.Grid.ColumnSpacing = 5;
             obj.Grid.RowSpacing = 5;
             obj.Grid.ColumnWidth = {'fit','1x'};
+
+            % Update the internal component lists
+            obj.BackgroundColorableComponents = obj.Grid;
             
         end %function
         
@@ -147,16 +162,7 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
                 obj.Slider(idx).Enable = obj.Enable && obj.State(idx);
             end
             
-        end %function
-
-        
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end        
+        end %function   
         
 
         function updateEnableableComponents(obj)
@@ -176,71 +182,46 @@ classdef SliderCheckboxGroup < matlab.ui.componentcontainer.ComponentContainer &
         end %function
         
         
-        function onSliderChanged(obj,e)
+        function onSliderChanged(obj,evt)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
-            idx = find(e.Source == obj.Slider, 1);
+            newValue = evt.Value;
+            idx = find(evt.Source == obj.Slider, 1);
             
             % Update the state
             obj.Value(idx) = newValue;
             
             % Create event data
-            evt = wt.eventdata.SliderCheckboxChangedData(...
+            evtOut = wt.eventdata.SliderCheckboxChangedData(...
                 obj.Name(idx), idx, "Value", obj.State(idx), obj.Value(idx) );
             
             % Trigger event
-            notify(obj,"ValueChanged",evt);
+            notify(obj,"ValueChanged",evtOut);
             
         end %function
         
         
-        function onCheckboxChanged(obj,e)
+        function onCheckboxChanged(obj,evtOut)
             % Triggered on button pushed
             
             % What changed?
-            newValue = e.Value;
-            idx = find(e.Source == obj.Checkbox, 1);
+            newValue = evtOut.Value;
+            idx = find(evtOut.Source == obj.Checkbox, 1);
             
             % Update the state
             obj.State(idx) = newValue;
             
             % Create event data
-            evt = wt.eventdata.SliderCheckboxChangedData(...
+            evtOut = wt.eventdata.SliderCheckboxChangedData(...
                 obj.Name(idx), idx, "State", obj.State(idx), obj.Value(idx) );
             
             % Trigger event
-            notify(obj,"ValueChanged",evt);
+            notify(obj,"ValueChanged",evtOut);
             
         end %function
         
     end %methods
     
-    
-    %% Accessors
-    methods
-        
-        function value = get.Value(obj)
-            value = obj.Value;
-            value((end+1):numel(obj.Name)) = 1;
-            value(~obj.State) = 0;
-        end
-        
-        function value = get.State(obj)
-            value = obj.State;
-            value((end+1):numel(obj.Name)) = 1;
-        end
-        
-        function value = get.CheckboxWidth(obj)
-            value = obj.Grid.ColumnWidth{1};
-        end
-        
-        function set.CheckboxWidth(obj,value)
-            obj.Grid.ColumnWidth{1} = value;
-        end
-        
-    end % methods
-    
-    
+
 end % classdef

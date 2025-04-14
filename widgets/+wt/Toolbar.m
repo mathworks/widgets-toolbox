@@ -1,12 +1,11 @@
-classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.TitleColorable & ...
-        wt.mixin.FontStyled & ...
-        wt.mixin.PropertyViewable
+classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
+        wt.mixin.TitleFontStyled & ...
+        wt.mixin.SeparatorColorable & ...
+        wt.mixin.FontStyled
 
     % A configurable toolbar
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -27,24 +26,33 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
     end %properties
 
 
-    properties (Dependent, AbortSet, UsedInUpdate = false)
+    properties (Dependent, Hidden)
 
-        % Color of the dividers between horizontal sections
+        % Deprecated. Use SeparatorColor instead.
         DividerColor
 
     end %properties
 
 
+    %% Property Accessors
+    methods
+
+        function value = get.DividerColor(obj)
+            value = obj.SeparatorColor;
+        end
+        function set.DividerColor(obj,value)
+            obj.SeparatorColor = value;
+        end
+
+    end %methods
+
+
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % The listbox control
         ListBox (1,1) matlab.ui.control.ListBox
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
         % The label for each section
         SectionLabel (:,1) matlab.ui.control.Label
@@ -67,8 +75,8 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
     end %properties
 
 
-    properties (Dependent, NonCopyable, Access = {?matlab.uitest.TestCase})
-
+    properties (Dependent, NonCopyable, Hidden, SetAccess = private)
+        
         % Indicates which sections are open
         SectionIsOpen (:,1) logical
 
@@ -89,38 +97,32 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
+            % Adjust default title fonts for toolbar purposes
+            obj.TitleFontSize = 10;
+            obj.TitleFontWeight = "normal";
+            if isMATLABReleaseOlderThan("R2025a")
+                obj.TitleColor = [0.5333 0.5333 0.5333];
+            end
+
             % Set default size
             obj.Position(3:4) = [500 90];
 
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
-
-            % Configure style defaults
-            obj.FontColor = [1 1 1] * 0.3;
-            obj.TitleColor = [1 1 1] * 0.5;
-
             % Configure grid
-            obj.Grid.Padding = [0 0 0 0]; %If changed, modify updateLayout!
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.ColumnWidth = {};
-            obj.Grid.ColumnSpacing = 1; %If changed, modify updateLayout!
-
             obj.Grid.RowHeight = {'1x',15};
             obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.ColumnSpacing = 1; %If changed, modify updateLayout!
+            obj.Grid.Padding = [0 0 0 0]; %If changed, modify updateLayout!
             obj.Grid.RowSpacing = 0;
-            obj.Grid.BackgroundColor = [1 1 1]*0.5;
 
             % Add a dummy section to color the empty space
             obj.DummySection = uicontainer(obj.Grid);
             obj.DummySection.Layout.Row = [1 2];
 
             % Set Colorable Background Objects
-            obj.BackgroundColorableComponents = [obj.DummySection obj.Grid];
+            % obj.BackgroundColorableComponents = [obj.DummySection obj.Grid];
 
             % Listen to size changes
             obj.SizeChangedListener = event.listener(obj,'SizeChanged',...
@@ -190,7 +192,9 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
             set(removedSections,'Parent',[]);
 
             % Update component style lists
-            obj.TitleColorableComponents = obj.SectionLabel;
+            % obj.TitleColorableComponents = obj.SectionLabel;
+            obj.TitleFontStyledComponents = [obj.SectionLabel; obj.SectionButton];
+            obj.SeparatorColorableComponents = [obj.DummySection obj.Grid];
             obj.BackgroundColorableComponents = [
                 obj.Section
                 obj.SectionButton
@@ -199,7 +203,6 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
                 ];
             obj.FontStyledComponents = [
                 obj.Section
-                obj.SectionButton
                 ];
 
             % Update listeners
@@ -212,15 +215,6 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
             obj.updateLayout();
 
         end %function
-
-
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end
         
 
         function updateLayout(obj)
@@ -285,10 +279,8 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
             % Update button icons
             obj.updateButtonIcons();
 
-            % Override the default, not setting the Grid background
-            hasProp = isprop(obj.BackgroundColorableComponents,'BackgroundColor');
-            set(obj.BackgroundColorableComponents(hasProp),...
-                "BackgroundColor",obj.BackgroundColor);
+            % Call the superclass method
+            obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
 
         end %function
 
@@ -304,19 +296,30 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
         end %function
 
 
+        function updateTitleFontStyledComponents(obj,varargin)
+
+            % Update button icons
+            obj.updateButtonIcons();
+
+            % Call the superclass method
+            obj.updateTitleFontStyledComponents@wt.mixin.TitleFontStyled(varargin{:});
+
+        end %function
+
+
         function updateButtonIcons(obj)
             % Color the down arrow on buttons the same as font color
 
             % Has foreground or background color changed?
             if ~isempty(obj.SectionButton) && ( ...
-                    ~isequal(obj.SectionButton(end).FontColor, obj.FontColor) || ...
+                    ~isequal(obj.SectionButton(end).FontColor, obj.TitleColor) || ...
                     ~isequal(obj.DummySection.BackgroundColor, obj.BackgroundColor) )
 
                 % Create the button icon
                 icon = cell(1,3);
                 for cIdx = 1:3
                     icon{cIdx} = ~obj.BUTTON_MASK * obj.BackgroundColor(cIdx);
-                    icon{cIdx}(obj.BUTTON_MASK) = obj.FontColor(cIdx);
+                    icon{cIdx}(obj.BUTTON_MASK) = obj.TitleColor(cIdx);
                 end
                 icon = cat(3,icon{:});
 
@@ -335,6 +338,16 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
 
             % Trigger event
             notify(obj,"ButtonPushed",evt);
+
+        end %function
+
+
+        function color = getDefaultSeparatorColor(obj)
+            % Returns the default color for 'auto' mode (R2025a and later)
+            % The result is dependent on theme
+            % Widget subclass may override this
+
+            color = obj.getThemeColor("--mw-borderColor-secondary");
 
         end %function
 
@@ -408,13 +421,6 @@ classdef (Sealed) Toolbar < matlab.ui.componentcontainer.ComponentContainer & ..
 
     %% Accessors
     methods
-
-        function value = get.DividerColor(obj)
-            value = obj.Grid.BackgroundColor;
-        end
-        function set.DividerColor(obj,value)
-            obj.Grid.BackgroundColor = value;
-        end
 
         function value = get.SectionIsOpen(obj)
             value = false(size(obj.Section));

@@ -6,6 +6,6 @@ function mustBeBetweenZeroAnd100(A)
 %         PropertyName dataType {wt.validators.mustBeBetweenZeroAnd100}
 %     end
 
-% Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 
 wt.validators.mustBeBetween(A,0,100);

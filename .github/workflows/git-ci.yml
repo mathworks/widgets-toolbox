@@ -1,0 +1,61 @@
+name: Widgets Toolbox Continuous Integration
+
+# Controls when the workflow will run.
+on: [push, workflow_dispatch]
+  # Triggers the workflow on push or pull request events
+  # This allows the workflow run to be run manually from the Actions tab in GitHub.
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel.
+jobs:
+  # Run the Toolbox tests.
+  run-tests:
+    # Define the job strategy.
+    strategy:
+      # Set up the job strategy matrix to define the different job configurations.
+      matrix:
+        # List of platforms on which to run the tests.
+        platform: [windows-latest]
+
+        # List of MATLAB releases over which to run the tests.
+        matlab-version: [R2023b, R2024a, R2024b]
+
+        # We don't define any startup options until we reach R2023b (handled separately below).
+        # matlab-startup-options: [ '' ]
+
+        # Windows/Mac are supported from R2021a onwards. Ubuntu is supported from R2020b onwards.
+        # Exclude the Windows job on R2020b.
+
+    # Specify the platform that the job will run on.
+    runs-on: ${{ matrix.platform }}
+
+    # Don't fail the entire run if one job fails.
+    continue-on-error: true
+
+    # Steps define a sequence of tasks to be executed as part of the job.
+    steps:
+      # Check out the repository under $GITHUB_WORKSPACE, so that the job can access it.
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # For Linux jobs, start a display server on the runner.
+      - name: Start a display server for jobs running on Linux.
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get install -y xvfb
+          Xvfb :99 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+      # Set up MATLAB on the runner.
+      - name: Set up MATLAB on the runner.
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          # The tests require only base MATLAB.
+          products: MATLAB
+          release: ${{ matrix.matlab-version }}
+
+      # Run the Toolbox tests.
+      - name: Run the Toolbox tests.
+        uses: matlab-actions/run-command@v2
+        with:
+          startup-options: ${{ matrix.matlab-startup-options }}
+          command: openProject("WidgetsToolbox.prj"); [~,results] = runTestSuite(); failedTests = table(results([results.Failed])); disp(failedTests); results.assertSuccess();
