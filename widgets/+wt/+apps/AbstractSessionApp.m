@@ -87,10 +87,6 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Call superclass constructor
             app@wt.apps.BaseApp(varargin{:});
 
-            % Attach listeners to Session being set
-            app.SessionSetListener = listener(app,"Session","PostSet",...
-                @(~,~)app.onSessionSet_Private());
-
         end %function
 
     end %methods
@@ -98,6 +94,19 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
     %% Protected Methods
     methods (Access = protected)
+
+        function setup_internal(app)
+            % Preform internal pre-setup necessary
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Attach listeners to Session being set
+            app.SessionSetListener = listener(app,"Session","PostSet",...
+                @(~,~)app.onSessionSet_Private());
+
+        end %function
+
 
         function onSessionSet(app)
             % This method is called when the Session property has changed,

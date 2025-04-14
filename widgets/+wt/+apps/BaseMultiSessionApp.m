@@ -309,6 +309,9 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         function setup_internal(app)
             % Preform internal pre-setup necessary
 
+            % Call superclass method
+            app.setup_internal@wt.apps.AbstractSessionApp();
+
             % Show output if Debug is on
             app.displayDebugText();
 
