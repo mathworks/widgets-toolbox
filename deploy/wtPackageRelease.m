@@ -7,7 +7,7 @@
 
 % Increment the last part of the version number in wtDeployVersion.txt for
 % the next release
-% wt.deploy.incrementVersionNumber();
+wt.deploy.incrementVersionNumber();
 
 
 %% Get paths
