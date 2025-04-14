@@ -14,17 +14,27 @@ jobs:
       # Set up the job strategy matrix to define the different job configurations.
       matrix:
         # List of platforms on which to run the tests.
-        platform: [windows-latest]
+        platform: [ubuntu-latest, windows-latest]
 
         # List of MATLAB releases over which to run the tests.
-        matlab-version: [R2023b, R2024a, R2024b]
+        matlab-version: [R2023b, R2024a, R2024b, latest]
+
+        # UITest with gestures only from R2023b and later.
 
         # We don't define any startup options until we reach R2023b (handled separately below).
         # matlab-startup-options: [ '' ]
 
         # Windows/Mac are supported from R2021a onwards. Ubuntu is supported from R2020b onwards.
-        # Exclude the Windows job on R2020b.
+        
+        # Exclude unsupported Linux jobs prior to R2024b.
+        exclude:
 
+          - platform: ubuntu-latest
+            matlab-version: R2023b
+
+          - platform: ubuntu-latest
+            matlab-version: R2024a
+            
     # Specify the platform that the job will run on.
     runs-on: ${{ matrix.platform }}
 
