@@ -1,66 +1,54 @@
-classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
-    wt.mixin.BackgroundColorable & wt.mixin.PropertyViewable
-    
+classdef PasswordField <  wt.abstract.BaseWidget
     % A password entry field
-    
-    % Copyright 2020-2022 The MathWorks Inc.
-    
-    
+
+    % Copyright 2020-2025 The MathWorks Inc.
+
+
     %% Public properties
     properties (AbortSet)
-        
+
         % The current value shown
         Value (1,1) string
-        
-                
+
     end %properties
-    
-    
+
+
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
-        
+
         % Triggered on enter key pressed, has companion callback
         ValueChanged
-        
+
         % Triggered on value changing during typing, has companion callback
         ValueChanging
-        
+
     end %events
-    
-    
-    
+
+
+
     %% Internal Properties
-    properties (Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
-        
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
-        
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+
         % Password control
         PasswordControl (1,1) matlab.ui.control.HTML
 
         % Previous value for callback
         PrevValue (1,1) string
-        
+
     end %properties
-    
-    
+
+
     %% Protected methods
     methods (Access = protected)
-        
+
         function setup(obj)
-            
+
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [100 25];
-            
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;   
-            
+
             % Define the HTML source
             html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
                 '<script type="text/javascript">',...
@@ -80,7 +68,7 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
                 '    });',...
                 '}',...
                 '</script>'];
-            
+
             % Create a html password input
             obj.PasswordControl = uihtml(...
                 'Parent',obj.Grid,...
@@ -92,58 +80,60 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
 
         end %function
 
- 
+
         function update(obj)
-            
+
             % Update the edit control text
             obj.PasswordControl.Data = obj.Value;
-            
+
         end %function
-        
-        
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
-
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
-
-        end % function
 
     end %methods
-    
-    
-    
+
+
+
     %% Private methods
     methods (Access = private)
-        
+
         function onPasswordChanged(obj,evt)
             % Triggered on interaction
 
             % Grab the data in string format
             newValue = string(evt.Data);
             oldValue = obj.Value;
+            previousData = evt.PreviousData;
 
             % Look at the states
-            if endsWith(evt.PreviousData, newline)
-            % This is needed to ignore double events
-
-                % Clear the newline from the uihtml data
-                newValue = erase(newValue, newline);
-                obj.PasswordControl.Data = newValue;
-
-            elseif endsWith(newValue, newline)
+            if endsWith(newValue, newline)
                 % Enter key was pressed in the uihtml component
 
                 % Clear the newline from the new value
                 newValue = erase(newValue, newline);
+                
+                % Store value
+                obj.Value = newValue;
 
                 % Trigger event
                 evtOut = wt.eventdata.PropertyChangedData('Value', newValue);
                 notify(obj,"ValueChanged",evtOut);
 
+            elseif endsWith(previousData, newline)
+                % This is needed to ignore double events
+
+                % Clear the newline from the uihtml data
+                newValue = erase(newValue, newline);
+
+                % Store value
+                obj.Value = newValue;
+                
+                % Trigger event
+                evtOut = wt.eventdata.PropertyChangedData('Value', ...
+                    newValue, oldValue);
+                notify(obj,"ValueChanging",evtOut);
+
             elseif newValue ~= oldValue
 
-                % Store new result
+                % Store value
                 obj.Value = newValue;
 
                 % Trigger event
@@ -154,8 +144,8 @@ classdef PasswordField <  matlab.ui.componentcontainer.ComponentContainer & ...
             end
 
         end %function
-    
+
     end %methods
-    
+
 end % classdef
 

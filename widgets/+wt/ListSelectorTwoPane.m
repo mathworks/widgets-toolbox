@@ -1,12 +1,11 @@
-classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.Enableable &...
-        wt.mixin.FontStyled & wt.mixin.ButtonColorable &...
-        wt.mixin.FieldColorable & wt.mixin.BackgroundColorable & ...
-        wt.mixin.PropertyViewable
-    
+classdef ListSelectorTwoPane < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable &...
+        wt.mixin.Enableable & ...
+        wt.mixin.FieldColorable & ...
+        wt.mixin.FontStyled
     % Dual lists where selected items are moved from left to right
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -24,7 +23,6 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
     end %events
 
 
-
     %% Public properties
     properties (AbortSet)
 
@@ -37,13 +35,19 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         % Indicates whether to allow sort controls
         Sortable (1,1) matlab.lang.OnOffSwitchState = true
 
+        % Width of the buttons
+        ButtonWidth = 25
+
+        % Height of the buttons
+        ButtonHeight = 25
+
     end %properties
 
 
     properties (AbortSet, Dependent)
 
         % Indices of displayed items that are currently added to the list
-        SelectedIndex (1,:)
+        SelectedIndex (1,:) {mustBeInteger, mustBePositive}
 
         % The current selection
         Value (1,:)
@@ -51,13 +55,19 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         % The current highlighted selection
         HighlightedValue (1,:)
 
+        % The left list current highlighted selection
+        HighlightedValueLeft
+
     end %properties
 
 
-    properties (AbortSet, Dependent, UsedInUpdate = false)
+    properties (AbortSet, Dependent, SetAccess = private)
 
-        % Width of the buttons
-        ButtonWidth
+        % Indices of the highlighted items
+        HighlightedIndex
+
+        % Indices of the highlighted items on left
+        HighlightedIndexLeft
 
     end %properties
 
@@ -77,14 +87,10 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.uitest.TestCase, ?matlab.ui.componentcontainer.ComponentContainer} )
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % The left listbox control
         LeftList (1,1) matlab.ui.control.ListBox
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
         % The right listbox control
         RightList (1,1) matlab.ui.control.ListBox
@@ -101,27 +107,22 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [200 160];
 
-            % Construct Grid Layout to Manage Building Blocks
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
-            obj.Grid.Padding = 0;
-
             % Configure grid
             obj.Grid.Padding = 3;
-            obj.Grid.ColumnWidth = {'1x',28,'1x'};
-            obj.Grid.RowHeight = {'fit','1x'};
+            obj.Grid.ColumnWidth = {'1x','fit','1x'};
+            obj.Grid.RowHeight = {'fit','fit','1x'};
 
             % Create the left Listbox
             obj.LeftList = uilistbox(obj.Grid);
             obj.LeftList.Multiselect = true;
             obj.LeftList.Layout.Column = 1;
-            obj.LeftList.Layout.Row = [1 2];
+            obj.LeftList.Layout.Row = [1 3];
             obj.LeftList.ValueChangedFcn = @(h,e)obj.onLeftSelectionChanged(e);
 
             % Create the list buttons
@@ -140,7 +141,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             obj.RightList = uilistbox(obj.Grid);
             obj.RightList.Multiselect = true;
             obj.RightList.Layout.Column = 3;
-            obj.RightList.Layout.Row = [1 2];
+            obj.RightList.Layout.Row = [1 3];
             obj.RightList.ValueChangedFcn = @(h,e)obj.onRightSelectionChanged(e);
 
             % Update listeners
@@ -165,40 +166,51 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             % What is selected?
             selIdx = obj.SelectedIndex;
 
+            % Update the list of choices
+            if ~obj.Sortable
+                selIdx = sort(selIdx);
+            end
+
+            % Update the list on right side
+            obj.RightList.Items = obj.Items(selIdx);
+            obj.RightList.ItemsData = selIdx;
+
+            % Update the list on left side
+            itemIds = 1:obj.getMaximumValidItemsNumber;
+            isSelected = ismember(itemIds, obj.SelectedIndex);
+            obj.LeftList.Items = obj.Items(~isSelected);
+            obj.LeftList.ItemsData = itemIds(~isSelected);
+
             % Is the list sortable?
             if obj.Sortable
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png", "up_24.png", "down_24.png"];
                 obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
-                obj.ListButtons.ButtonHeight = {28 28 28 28};
             else
                 obj.ListButtons.Icon = ["right_24.png", "left_24.png"];
                 obj.ListButtons.ButtonTag = ["Add", "Remove"];
-                obj.ListButtons.ButtonHeight = {28 28};
             end
 
-            % Update the list
-            obj.RightList.Items = obj.Items(selIdx);
-            obj.RightList.ItemsData = selIdx;
-
-            % Update button enable states
-            obj.updateEnables();
-
-            % Update the list of choices
-            itemIds = 1:numel(obj.Items);
-            isNotSelected = ~ismember(itemIds, obj.SelectedIndex);
-            obj.LeftList.Items = obj.Items(isNotSelected);
-            obj.LeftList.ItemsData = itemIds(isNotSelected);
+            % Button width and height
+            obj.UserButtons.ButtonWidth = obj.ButtonWidth;
+            obj.ListButtons.ButtonWidth = obj.ButtonWidth;
+            obj.UserButtons.ButtonHeight = obj.ButtonHeight;
+            obj.ListButtons.ButtonHeight = obj.ButtonHeight;
 
             % Update button enable states
             obj.updateEnables();
 
         end %function
 
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
+        function val = getMaximumValidItemsNumber(obj)
+            % Returns maximum valid selected index.
+            % Takes into account ItemsData and Items.
 
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+            % Is ItemsData available?
+            if ~isempty(obj.ItemsData)
+                val = min(numel(obj.ItemsData), numel(obj.Items));
+            else
+                val = numel(obj.Items);
+            end
 
         end %function
 
@@ -220,7 +232,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
                 % Toggle button enables
                 obj.ListButtons.ButtonEnable = [
-                    numel(selIdx) < numel(obj.Items) %Add Button
+                    numel(selIdx) < obj.getMaximumValidItemsNumber %Add Button
                     ~isempty(hiliteIdx) % Delete Button
                     numHilite && ( hiliteIdx(end) > numHilite ) %Up Button
                     numHilite && ( hiliteIdx(1) <= (numRows - numHilite) ) %Down Button
@@ -279,17 +291,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             switch evt.Tag
 
                 case 'Add'
-
-                    % Get the original value
-                    oldValue = obj.Value;
-
-                    % Update the selection
-                    newSelIdx = [obj.SelectedIndex obj.LeftList.Value];
-                    obj.SelectedIndex = newSelIdx;
-
-                    % Trigger event
-                    evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
-                    notify(obj,"ValueChanged",evtOut);
+                    obj.addListBoxSelection();
 
                 case 'Remove'
                     obj.removeListBoxSelection();
@@ -302,7 +304,8 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
                 otherwise
                     % Trigger event for user buttons
-                    notify(obj,"ButtonPushed",evt);
+                    evtOut = wt.eventdata.ButtonPushedData(evt.Button);
+                    notify(obj,"ButtonPushed",evtOut);
 
             end %switch
 
@@ -315,13 +318,42 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
         function selIdx = getListBoxSelectedIndex(obj)
             % Get the current selected row indices in the listbox
 
-            warnState = warning('off','MATLAB:structOnObject');
-            s = struct(obj.RightList);
-            warning(warnState);
-            selIdx = s.SelectedIndex;
-            if isequal(selIdx, -1)
+            if isempty(obj.RightList.Value)
                 selIdx = [];
+            else
+                selIdx = find(ismember(obj.RightList.ItemsData, obj.RightList.Value));
             end
+
+        end %function
+
+
+        function addListBoxSelection(obj)
+            % Adds the currently selected items from the listbox
+
+            % What's currently selected?
+            idxSel = obj.LeftList.Value;
+
+            % Is there something to add?
+            if ~isempty(idxSel)
+
+                % Get the original value
+                oldValue = obj.Value;
+
+                % Update the selection
+                newSelIdx = [obj.SelectedIndex idxSel];
+                obj.SelectedIndex = newSelIdx;
+
+                % Request update
+                obj.update();
+
+                % Set selection on right side
+                obj.RightList.Value = idxSel;
+
+                % Trigger event
+                evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
+                notify(obj,"ValueChanged",evtOut);
+
+            end %if
 
         end %function
 
@@ -330,7 +362,8 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             % Removes the currently selected items from the listbox
 
             % What's currently selected?
-            idxSel = obj.getListBoxSelectedIndex();
+
+            idxSel = obj.RightList.Value;
 
             % Is there something to remove?
             if ~isempty(idxSel)
@@ -339,8 +372,14 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 oldValue = obj.Value;
 
                 % Remove it
-                obj.RightList.Items(idxSel) = [];
-                obj.RightList.ItemsData(idxSel) = [];
+                rmSel = ismember(obj.SelectedIndex, idxSel);
+                obj.SelectedIndex(rmSel) = [];
+
+                % Request update
+                obj.update()
+
+                % Set selection on left side
+                obj.LeftList.Value = idxSel;
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
@@ -359,7 +398,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             selIdx = obj.getListBoxSelectedIndex();
 
             % Make indices to all items as they are now
-            idxNew = 1:numel(obj.RightList.Items);
+            idxNew = 1:numel(obj.SelectedIndex);
             idxOld = idxNew;
 
             % Find the last stable item that doesn't move
@@ -422,8 +461,7 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                 oldValue = obj.Value;
 
                 % Make the shift
-                obj.RightList.Items = obj.RightList.Items(idxNew);
-                obj.RightList.ItemsData = obj.RightList.ItemsData(idxNew);
+                obj.SelectedIndex = obj.SelectedIndex(idxNew);
 
                 % Trigger event
                 evtOut = wt.eventdata.ValueChangedData(obj.Value, oldValue);
@@ -442,10 +480,19 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function value = get.SelectedIndex(obj)
             value = obj.RightList.ItemsData;
+            value(value > obj.getMaximumValidItemsNumber) = [];
         end
         function set.SelectedIndex(obj,value)
             if ~obj.Sortable
                 value = sort(value);
+            end
+            if any(value > numel(obj.Items))
+                error("widgets:ListSelectorTwoPane:InvalidIndex",...
+                    "'SelectedIndex' must be within the length of the 'Items' property.")
+            end
+            if ~isempty(obj.ItemsData) && any(value > numel(obj.ItemsData))
+                error("widgets:ListSelectorTwoPane:InvalidIndex",...
+                    "'SelectedIndex' must be within the length of the 'ItemsData' property.")
             end
             obj.RightList.Items = obj.Items(value);
             obj.RightList.ItemsData = value;
@@ -453,9 +500,9 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
 
         function value = get.Value(obj)
             if isempty(obj.ItemsData)
-                value = obj.Items(:,obj.RightList.ItemsData);
+                value = obj.Items(:, obj.SelectedIndex);
             else
-                value = obj.ItemsData(:,obj.RightList.ItemsData);
+                value = obj.ItemsData(:, obj.SelectedIndex);
             end
         end
         function set.Value(obj,value)
@@ -468,9 +515,17 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
                     [tf, selIdx] = ismember(value, obj.ItemsData);
                 end
                 if ~all(tf)
-                    warning("widgets:ListSelector:InvalidValue",...
-                        "Attempt to set an invalid Value to the list.")
-                    selIdx(~tf) = [];
+                    if isempty(obj.ItemsData)
+                        prop = 'Items';
+                    else
+                        prop = 'ItemsData';
+                    end
+                    error("widgets:ListSelectorTwoPane:InvalidValue",...
+                        "'Value' must be an element defined in the '%s' property.", prop)
+                end
+                if ~isempty(obj.ItemsData) && numel(tf) > numel(obj.Items)
+                    error("widgets:ListSelectorTwoPane:InvalidValue",...
+                        "'Value' must be an element defined in the 'ItemsData' property within the length of the 'Items' property.")
                 end
                 obj.SelectedIndex = selIdx;
             end
@@ -488,18 +543,57 @@ classdef ListSelectorTwoPane < matlab.ui.componentcontainer.ComponentContainer &
             end
         end
         function set.HighlightedValue(obj,value)
-            if isempty(obj.ItemsData)
-                [~, obj.RightList.Value] = ismember(value, obj.Items);
+            if isempty(value)
+                obj.RightList.Value = {};
             else
-                [~, obj.RightList.Value] = ismember(value, obj.ItemsData);
+                if isempty(obj.ItemsData)
+                    [~, obj.RightList.Value] = ismember(value, obj.Items);
+                else
+                    [~, obj.RightList.Value] = ismember(value, obj.ItemsData);
+                end
             end
         end
 
-        function value = get.ButtonWidth(obj)
-            value = obj.Grid.ColumnWidth{2};
+        function value = get.HighlightedValueLeft(obj)
+            selIdx = obj.LeftList.Value;
+            if isempty(selIdx) || ~isnumeric(selIdx)
+                selIdx = [];
+            end
+            if isempty(obj.ItemsData)
+                value = obj.Items(:,selIdx);
+            else
+                value = obj.ItemsData(:,selIdx);
+            end
         end
-        function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth{2} = value;
+        function set.HighlightedValueLeft(obj,value)
+            if isempty(value) || isempty(obj.Items)
+                obj.LeftList.Value = {};
+            else
+                if isempty(obj.ItemsData)
+                    if ismember(value, obj.Items)
+                        obj.LeftList.Value = value;
+                    end
+                else
+                    [~, obj.LeftList.Value] = ismember(value, obj.ItemsData);
+                    if ismember(value, obj.ItemsData)
+                        obj.LeftList.Value = value;
+                    end
+                end
+            end
+        end
+
+        function value = get.HighlightedIndex(obj)
+            value = obj.RightList.Value;
+            if isempty(value)
+                value = [];
+            end
+        end
+
+        function value = get.HighlightedIndexLeft(obj)
+            value = obj.LeftList.Value;
+            if isempty(value)
+                value = [];
+            end
         end
 
     end %methods

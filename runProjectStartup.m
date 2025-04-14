@@ -1,6 +1,6 @@
 % Run project startup tasks
 
-% Copyright 2019-2020 The MathWorks, Inc.
+%   Copyright 2019-2025 The MathWorks Inc.
 
 
 %% Close any open components first

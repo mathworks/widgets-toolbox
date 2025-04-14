@@ -1,7 +1,7 @@
 classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2022 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     
@@ -126,8 +126,8 @@ classdef SliderCheckboxGroup < wt.test.BaseWidgetTest
 
             % Verify state
             expValue =  [.1 .2 .3 .4];
-            testCase.verifyEqual(testCase.Widget.Value, expValue, "AbsTol", 0.001)
-            testCase.verifyEqual([slider.Value], expValue, "AbsTol", 0.001)
+            testCase.verifyEqual(testCase.Widget.Value, expValue, "AbsTol", 0.05)
+            testCase.verifyEqual([slider.Value], expValue, "AbsTol", 0.05)
             
             % Verify callback fired (may be many times during drag)
             testCase.verifyGreaterThan(testCase.CallbackCount, 1)

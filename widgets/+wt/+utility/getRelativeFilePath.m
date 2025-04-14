@@ -30,7 +30,7 @@ function RelPath = getRelativeFilePath(FullPath, RootPath, FlagRequireSubdir)
 %   false, the path will contain parent directory separators "..\"
 %
 
-% Copyright 2016-2020 The MathWorks Inc.
+%   Copyright 2016-2025 The MathWorks Inc.
 % ---------------------------------------------------------------------
 
 

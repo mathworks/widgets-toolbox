@@ -24,7 +24,7 @@ function path = cleanPath(path)
 %         "C:\Program Files\MATLAB"
 %
 
-% Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
 % ---------------------------------------------------------------------
 
 % File separator - in case of regional variants

@@ -1,11 +1,11 @@
-classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
-        wt.mixin.BackgroundColorable & ...
-        wt.mixin.Enableable & wt.mixin.FontStyled & wt.mixin.ButtonColorable & ...
-        wt.mixin.PropertyViewable
+classdef ButtonGrid < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.Enableable
 
     % Array of buttons with a single callback/event
 
-    % Copyright 2020-2022 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
 
 
     %% Events
@@ -42,6 +42,9 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
         % Alignment of the icon
         IconAlignment (1,1) wt.enum.AlignmentState = wt.enum.AlignmentState.top
 
+        % Default size of new buttons ('1x', 'fit' or a number)
+        DefaultSize (1,1) string {mustBeValidGridSize(DefaultSize)} = "1x"
+
     end %properties
 
 
@@ -58,14 +61,10 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
 
     %% Internal Properties
-    properties ( Transient, NonCopyable, ...
-            Access = {?matlab.ui.componentcontainer.ComponentContainer, ?matlab.uitest.TestCase} )
-
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+        
         % Buttons (other widgets like ListSelector also access this)
         Button (1,:) matlab.ui.control.Button
-
-        % Grid
-        Grid (1,1) matlab.ui.container.GridLayout
 
     end %properties
 
@@ -76,18 +75,16 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
         function setup(obj)
 
+            % Call superclass method
+            obj.setup@wt.abstract.BaseWidget()
+
             % Set default size
             obj.Position(3:4) = [100 30];
 
-            % Create and set Default Grid Properties
-            obj.Grid = uigridlayout(obj);
-            obj.Grid.ColumnWidth = {'1x'};
-            obj.Grid.RowHeight = {'1x'};
-            obj.Grid.RowSpacing = 2;
-            obj.Grid.ColumnSpacing = 2;
+            % Configure Main Grid
             obj.Grid.Padding = 2;
-
-            % Establish Background Color Listener
+            
+            % Update the internal component lists
             obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
@@ -162,6 +159,23 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
             end %for idx = 1:numNew
 
+            % Update layout
+
+            % What is the default size?
+            defaultSize = obj.DefaultSize;
+            if ~isnan(str2double(defaultSize))
+                defaultSize = str2double(defaultSize);
+            end
+
+            % Set button grids
+            if obj.Orientation == "vertical"
+                obj.Grid.RowHeight(numOld+1:numNew) = {defaultSize};
+                obj.Grid.ColumnWidth = obj.Grid.ColumnWidth(1);
+            else
+                obj.Grid.ColumnWidth(numOld+1:numNew) = {defaultSize};
+                obj.Grid.RowHeight = obj.Grid.RowHeight(1);
+            end
+
         end %function
 
 
@@ -174,13 +188,25 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
 
         end %function
 
-        function propGroups = getPropertyGroups(obj)
-            % Override the ComponentContainer GetPropertyGroups with newly
-            % customiziable mixin. This can probably also be specific to each control.
+        function updateGridForButton(obj, prop, value)
+            % Update main grid properties to value
 
-            propGroups = getPropertyGroups@wt.mixin.PropertyViewable(obj);
+            % Convert any text array or numeric array into a cell array
+            value = convertCharsToStrings(value);
+            if ~iscell(value)
+                value = num2cell(value);
+            end
 
-        end
+            % If cell is scalar, repeat value for every button
+            if isscalar(value)
+                value = repmat(value, 1, numel(obj.Grid.(prop)));
+            end
+
+            % Update button size
+            nElements = min(numel(value), numel(obj.Grid.(prop)));
+            obj.Grid.(prop)(1:nElements) = value(1:nElements);
+            
+        end %function
 
     end %methods
 
@@ -193,17 +219,48 @@ classdef ButtonGrid < matlab.ui.componentcontainer.ComponentContainer & ...
             value = obj.Grid.ColumnWidth;
         end
         function set.ButtonWidth(obj,value)
-            obj.Grid.ColumnWidth = value;
+            obj.updateGridForButton("ColumnWidth", value);
         end
 
         function value = get.ButtonHeight(obj)
             value = obj.Grid.RowHeight;
         end
         function set.ButtonHeight(obj,value)
-            obj.Grid.RowHeight = value;
+            obj.updateGridForButton("RowHeight", value);
         end
 
     end %methods
 
 
 end % classdef
+
+
+function mustBeValidGridSize(val)
+% Validate value is valid size for grid layout
+
+% Value must be either 'fit' or '1x', or convertable to a number.
+numVal = str2double(val);
+
+% Is value convertable to a number?
+if ~isnan(numVal)
+    return
+end
+
+% Is value "fit"?
+if strcmpi(val, "fit")
+    return
+end
+
+% Is value a 1x, 2x, etc?
+valStripped = strip(val, "x");
+numStripped = str2double(valStripped);
+if ~isnan(numStripped)
+    return
+end
+
+% Value was not valid. Throw a validation error
+ME = MException('ButtonGrid:InvalidSize', ...
+    'Value must be a text scalar specifying the keyword ''fit'', numbers, or numbers paired with ''x'' characters.');
+throwAsCaller(ME);
+
+end

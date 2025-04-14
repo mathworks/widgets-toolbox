@@ -1,7 +1,7 @@
 classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
     % A row of horizontally stacked controls for a toolbar
     
-    % Copyright 2020-2021 The MathWorks Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     %% Public properties
@@ -109,22 +109,22 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
             % Use custom event data
             if isa(evt,'matlab.ui.eventdata.ButtonPushedData')
                 % Push button
-                evt = wt.eventdata.ButtonPushedData(evt.Source);
+                evtOut = wt.eventdata.ButtonPushedData(evt.Source);
             elseif isa(evt,'matlab.ui.eventdata.ValueChangedData')
                 % State button
-                evt = wt.eventdata.ButtonPushedData(evt.Source, evt.Source.Value);
+                evtOut = wt.eventdata.ButtonPushedData(evt.Source, evt.Source.Value);
             end
             
             % Add section name to event data
-            addprop(evt,'Section');
-            evt.Section = obj.Title;
+            addprop(evtOut,'Section');
+            evtOut.Section = obj.Title;
             
             % Trigger event
-            notify(obj,"ButtonPushed",evt);
+            notify(obj,"ButtonPushed",evtOut);
             
             % Trigger callback
             if ~isempty(obj.ButtonPushedFcn)
-                feval(obj.ButtonPushedFcn, obj, evt);
+                feval(obj.ButtonPushedFcn, obj, evtOut);
             end
             
         end %function
@@ -146,9 +146,9 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
         end
         
         function set.ComponentWidth(obj,value)
-            evt = wt.eventdata.PropertyChangedData('ComponentWidth',value,obj.ComponentWidth);
+            evtOut = wt.eventdata.PropertyChangedData('ComponentWidth',value,obj.ComponentWidth);
             obj.ComponentWidth = value;
-            notify(obj,'PropertyChanged',evt)
+            notify(obj,'PropertyChanged',evtOut)
         end
         
         
@@ -171,16 +171,16 @@ classdef (Sealed, Hidden) HorizontalSection < wt.toolbar.BaseSection
         
         
         function set.Title(obj,value)
-            evt = wt.eventdata.PropertyChangedData('Title',value,obj.Title);
+            evtOut = wt.eventdata.PropertyChangedData('Title',value,obj.Title);
             obj.Title = value;
-            notify(obj,'PropertyChanged',evt)
+            notify(obj,'PropertyChanged',evtOut)
         end
         
         
         function set.MinimizedWidth(obj,value)
-            evt = wt.eventdata.PropertyChangedData('MinimizedWidth',value,obj.MinimizedWidth);
+            evtOut = wt.eventdata.PropertyChangedData('MinimizedWidth',value,obj.MinimizedWidth);
             obj.MinimizedWidth = value;
-            notify(obj,'PropertyChanged',evt)
+            notify(obj,'PropertyChanged',evtOut)
         end
         
     end %methods

@@ -1,7 +1,7 @@
 classdef FileSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    % Copyright 2020-2021 The MathWorks, Inc.
+%   Copyright 2020-2025 The MathWorks Inc.
     
     
     
@@ -68,7 +68,8 @@ classdef FileSelector < wt.test.BaseWidgetTest
             testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
 
             % Verify the warn image shows
-            testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
+            testCase.verifyVisible(testCase.Widget.WarnImage)
+            %testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
         
@@ -99,7 +100,8 @@ classdef FileSelector < wt.test.BaseWidgetTest
             testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
 
             % Verify the warn image shows
-            testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
+            testCase.verifyVisible(testCase.Widget.WarnImage)
+            %testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
         
