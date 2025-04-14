@@ -65,6 +65,7 @@ classdef BaseSession < wt.model.BaseModel
             end
         end
     end
+    
 
 
     %% Public methods (subclass may override these)
@@ -138,28 +139,6 @@ classdef BaseSession < wt.model.BaseModel
     end %methods
 
 
-    % %% Hidden methods
-    % methods (Hidden)
-    % 
-    %     function setFilePathSilently(obj, filePath)
-    %         % Set FilePath without triggering change notifications
-    % 
-    %         % Define arguments
-    %         arguments
-    %             obj (1,1) wt.model.BaseModel
-    %             filePath (1,1) string
-    %         end
-    % 
-    %         oldValue = obj.EnableChangeListeners;
-    %         obj.EnableChangeListeners = false;
-    %         obj.FilePath = filePath;
-    %         obj.EnableChangeListeners = oldValue;
-    % 
-    %     end %function
-    % 
-    % end %methods
-
-
     %% Protected methods (subclass may override these)
     methods (Access = protected)
 
@@ -200,7 +179,7 @@ classdef BaseSession < wt.model.BaseModel
         end %function
 
     end %methods
-
+    
 
     %% Accessors
     methods

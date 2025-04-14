@@ -2,7 +2,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
         ?wt.apps.BaseMultiSessionApp}) AbstractSessionApp < wt.apps.BaseApp
     % Abstract base class for Widgets Toolbox app with 1+ sessions
 
-%   Copyright 2024-2025 The MathWorks Inc.
+    % Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Abstract Public Properties
@@ -248,11 +248,12 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 cleanupObj = onCleanup(@()delete(dlg));
 
                 % Save the session
+                % This will trigger update if path updates and/or session
+                % is no longer dirty
                 session.save(sessionPath);
 
-                % Update the app in case filepath changed
+                % Update the title
                 app.updateTitle()
-                app.update()
 
             end %if strlength(sessionPath)
 
