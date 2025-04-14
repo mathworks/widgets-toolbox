@@ -2,7 +2,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
         ?wt.apps.BaseMultiSessionApp}) AbstractSessionApp < wt.apps.BaseApp
     % Abstract base class for Widgets Toolbox app with 1+ sessions
 
-%   Copyright 2024-2025 The MathWorks Inc.
+    % Copyright 2024-2025 The MathWorks Inc.
 
 
     %% Abstract Public Properties
@@ -87,10 +87,6 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Call superclass constructor
             app@wt.apps.BaseApp(varargin{:});
 
-            % Attach listeners to Session being set
-            app.SessionSetListener = listener(app,"Session","PostSet",...
-                @(~,~)app.onSessionSet_Private());
-
         end %function
 
     end %methods
@@ -98,6 +94,19 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
 
     %% Protected Methods
     methods (Access = protected)
+
+        function setup_internal(app)
+            % Preform internal pre-setup necessary
+
+            % Show output if Debug is on
+            app.displayDebugText();
+
+            % Attach listeners to Session being set
+            app.SessionSetListener = listener(app,"Session","PostSet",...
+                @(~,~)app.onSessionSet_Private());
+
+        end %function
+
 
         function onSessionSet(app)
             % This method is called when the Session property has changed,
@@ -248,11 +257,12 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
                 cleanupObj = onCleanup(@()delete(dlg));
 
                 % Save the session
+                % This will trigger update if path updates and/or session
+                % is no longer dirty
                 session.save(sessionPath);
 
-                % Update the app in case filepath changed
+                % Update the title
                 app.updateTitle()
-                app.update()
 
             end %if strlength(sessionPath)
 
@@ -359,7 +369,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             % Define arguments
             arguments
                 app (1,1) wt.apps.BaseApp
-                session (1,1) wt.model.BaseSession = app.Session
+                session wt.model.BaseSession = app.Session
             end
 
             % Show output if Debug is on
@@ -369,7 +379,7 @@ classdef (Abstract, AllowedSubclasses = {?wt.apps.BaseSingleSessionApp, ...
             isCancelled = false;
 
             % Don't save and return now if session is invalid or clean
-            if ~isvalid(session) || ~session.Dirty
+            if ~isscalar(session) || ~isvalid(session) || ~session.Dirty
                 return
             end
 

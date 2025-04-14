@@ -28,6 +28,12 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
         % Number of sessions loaded
         NumSessions (1,1) double
 
+        % Names of sessions loaded
+        SessionNames (:,1) string
+
+        % Names of sessions for display, with * for unsaved session
+        SessionDisplayNames (:,1) string
+
         % Currently selected session
         SelectedSession wt.model.BaseSession
 
@@ -55,6 +61,27 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
 
         function value = get.NumSessions(app)
             value = numel(app.Session);
+        end
+
+        function value = get.SessionNames(app)
+            numSessions = app.NumSessions;
+            value = repmat("",numSessions,1');
+            if numSessions > 0
+                isValidSession = isvalid(app.Session);
+                value(isValidSession) = [app.Session(isValidSession).Name];
+            end
+        end
+
+        function value = get.SessionDisplayNames(app)
+            numSessions = app.NumSessions;
+            value = repmat("",numSessions,1');
+            if numSessions > 0
+                isValidSession = isvalid(app.Session);
+                value(isValidSession) = [app.Session(isValidSession).Name];
+                isDirty = false(numSessions, 1);
+                isDirty(isValidSession) = [app.Session(isValidSession).Dirty];
+                value(isDirty) = value(isDirty) + " *";
+            end
         end
 
         function value = get.SelectedSession(app)
@@ -126,11 +153,22 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
             % Store the session
             % This also triggers app.update(), app.updateTitle()
             if isempty(app.Session)
+
                 app.Session = session;
+
             else
+
+                % Ensure a unique name
+                thisName = matlab.lang.makeUniqueStrings(...
+                    session.Name, app.SessionNames);
+                session.FilePath = thisName;
+                session.Dirty = false;
+
+                % Append the session
                 app.Session(end+1) = session;
-                % Don't select by default, but concrete app may do this
-            end
+                % Don't select it by default, but concrete app may do this
+
+            end %if
 
         end %function
 
@@ -270,6 +308,9 @@ classdef BaseMultiSessionApp < wt.apps.AbstractSessionApp
 
         function setup_internal(app)
             % Preform internal pre-setup necessary
+
+            % Call superclass method
+            app.setup_internal@wt.apps.AbstractSessionApp();
 
             % Show output if Debug is on
             app.displayDebugText();

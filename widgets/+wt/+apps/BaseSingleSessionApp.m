@@ -124,9 +124,11 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
             % Call superclass internal load method
             session = app.loadSession_Internal(sessionPath);
 
-            % Store the session
+            % If successful, store the session
             % This also triggers app.update(), app.updateTitle()
-            app.Session = session;
+            if isscalar(session) && isvalid(session)
+                app.Session = session;
+            end
 
         end %function
 
@@ -138,6 +140,9 @@ classdef (Abstract) BaseSingleSessionApp < wt.apps.AbstractSessionApp
 
         function setup_internal(app)
             % Preform internal pre-setup necessary
+
+            % Call superclass method
+            app.setup_internal@wt.apps.AbstractSessionApp();
 
             % Show output if Debug is on
             app.displayDebugText();
