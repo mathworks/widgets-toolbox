@@ -14,7 +14,7 @@ jobs:
       # Set up the job strategy matrix to define the different job configurations.
       matrix:
         # List of platforms on which to run the tests.
-        platform: [windows-latest]
+        platform: [ubuntu-latest, windows-latest]
 
         # List of MATLAB releases over which to run the tests.
         matlab-version: [R2021a, R2021b, R2022a, R2022b, R2023b, R2024a, R2024b, latest]
@@ -58,4 +58,4 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           startup-options: ${{ matrix.matlab-startup-options }}
-          command: openProject("WidgetsToolbox.prj"); [~,results] = runTestSuite(); failedTests = table(results([results.Failed])); disp(failedTests); results.assertSuccess();
+          command: connector.internal.startConnectionProfile("loopbackHttps"); com.mathworks.matlabserver.connector.api.Connector.ensureServiceOn(); openProject("WidgetsToolbox.prj"); [~,results] = runTestSuite(); failedTests = table(results([results.Failed])); disp(failedTests); results.assertSuccess();
