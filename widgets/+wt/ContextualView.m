@@ -281,7 +281,11 @@ classdef ContextualView < wt.abstract.BaseWidget
 
             % Create panel
             obj.Panel = uipanel(obj.Grid);
-            obj.Panel.BorderWidth = 2;
+
+            % Adjust the initial border width (R2022b and later)
+            if ~isMATLABReleaseOlderThan("R2022b")
+                obj.Panel.BorderWidth = 2;
+            end
 
             % Grid Layout to place the contents
             obj.ContentGrid = uigridlayout(obj.Panel,[1 1]);
