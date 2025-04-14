@@ -1,6 +1,8 @@
 classdef TemplateBaseApp < wt.apps.BaseApp
     % Implements a template for a BaseApp
 
+    % Copyright 2022-2025 The MathWorks Inc.
+
 
     %% Internal Components
     %   Create properties here for each control, layout, or view component
@@ -150,15 +152,6 @@ classdef TemplateBaseApp < wt.apps.BaseApp
             disp("Selected Tab: " + newTab.Title);
 
         end %function
-
-    end %methods
-
-
-
-    %% Private Methods
-    methods ( Access = private )
-
-        % (optionally add any internal methods here)
 
     end %methods
 
