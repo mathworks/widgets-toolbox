@@ -411,7 +411,9 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                             obj.promptToAddListItems()
 
                         case wt.enum.ListAddSource.ButtonPushedFcn
-                            notify(obj,"ButtonPushed",evt);
+                            % Trigger event for user buttons
+                            evtOut = wt.eventdata.ButtonPushedData(evt.Button);
+                            notify(obj,"ButtonPushed",evtOut);
 
                     end %switch obj.AddSource
 
@@ -426,7 +428,8 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
                 otherwise
                     % Trigger event for user buttons
-                    notify(obj,"ButtonPushed",evt);
+                    evtOut = wt.eventdata.ButtonPushedData(evt.Button);
+                    notify(obj,"ButtonPushed",evtOut);
 
             end %switch
 
