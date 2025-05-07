@@ -39,6 +39,11 @@ classdef ListSelector < wt.test.BaseWidgetTest
             
             % Set the initial items
             testCase.verifySetProperty("Items", testCase.ItemNames);
+
+            % Set callback
+            testCase.Widget.ButtonPushedFcn = @(s,e)onCallbackTriggered(testCase,e);
+            testCase.Widget.ValueChangedFcn = @(s,e)onCallbackTriggered(testCase,e);
+            testCase.Widget.HighlightedValueChangedFcn = @(s,e)onCallbackTriggered(testCase,e);
             
         end %function
         
@@ -363,6 +368,29 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.verifyNumElements(b, 2);
             testCase.press(b(1))
             testCase.press(b(2))
+
+            % Verify callbacks fired
+            testCase.verifyEqual(testCase.CallbackCount, 2);
+            
+        end %function
+
+
+
+        function testAddSource(testCase)
+            
+            % Get the widget
+            w = testCase.Widget;
+            buttonGrid = testCase.Widget.ListButtons;
+            button = buttonGrid.Button;
+
+            % Add User buttons
+            w.AddSource = 'ButtonPushedFcn';
+            
+            % Press the buttons
+            testCase.press(button(1))
+
+            % Verify callbacks fired
+            testCase.verifyEqual(testCase.CallbackCount, 1);
             
         end %function
         
