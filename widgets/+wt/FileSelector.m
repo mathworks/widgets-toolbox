@@ -36,6 +36,9 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
 
     properties (AbortSet)
 
+        % Button text that appears on the button
+        ButtonLabel (1,1) string = ""
+
         % Selection type: (get)file, folder, putfile
         SelectionType (1,1) wt.enum.FileFolderState = wt.enum.FileFolderState.file
 
@@ -173,6 +176,14 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             % Show the warning icon?
             showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath;
             obj.WarnImage.Visible = showWarn;
+
+            % Update button appearance
+            obj.ButtonControl.Text = obj.ButtonLabel;
+            if strlength(obj.ButtonLabel)
+                obj.Grid.ColumnWidth{4} = 125;
+            else
+                obj.Grid.ColumnWidth{4} = 25;
+            end
 
         end %function
 
