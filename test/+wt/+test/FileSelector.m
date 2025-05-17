@@ -166,6 +166,24 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
         end %function
         
+        function testButtonLabel(testCase)
+            
+            % Get the edit field
+            buttonControl = testCase.Widget.ButtonControl;
+            
+            % Set the value
+            newValue = "Select File";
+            testCase.verifySetProperty("ButtonLabel", newValue);
+            drawnow
+            testCase.verifyEqual(string(buttonControl.Text), newValue);
+            
+            % Set the value
+            newValue = "Browse";
+            testCase.verifySetProperty("ButtonLabel", newValue);
+            drawnow
+            testCase.verifyEqual(string(buttonControl.Text), newValue);
+            
+        end %function
         
         % function testButton(testCase)
         %
