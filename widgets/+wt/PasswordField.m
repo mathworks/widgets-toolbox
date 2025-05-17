@@ -50,28 +50,12 @@ classdef PasswordField <  wt.abstract.BaseWidget
             obj.Position(3:4) = [100 25];
 
             % Define the HTML source
-            html = ['<input type="password" id="pass" name="password" style="width:100%;height:100%" >',...
-                '<script type="text/javascript">',...
-                'function setup(htmlComponent) {',...
-                '  htmlComponent.addEventListener("DataChanged", function(event) {',... %On uihtml Data prop changed
-                '      if (document.getElementById("pass").value !== htmlComponent.Data) {',... %Does JS value not match uihtml Data?
-                '        document.getElementById("pass").value = htmlComponent.Data;',... %Update the JS value to uihtml Data
-                '      }',...
-                '    });',...
-                '  document.getElementById("pass").addEventListener("input", function() {',...%On input to html field
-                '    htmlComponent.Data = document.getElementById("pass").value;',... %Copy JS value to uihtml data
-                '    });',...
-                '  document.addEventListener("keyup", function(event) {',... %Listen to key press
-                '      if (event.keyCode === 13) {',... %If ENTER key
-                '        htmlComponent.Data = document.getElementById("pass").value + ''\n'';',... %Add CR to data to trigger callback
-                '      }',...
-                '    });',...
-                '}',...
-                '</script>'];
+            html = HTMLComponentForPasswordField();
 
             % Create a html password input
             obj.PasswordControl = uihtml(...
                 'Parent',obj.Grid,...
+                'Data', struct('Value', "", 'DoFocus', false), ...
                 'HTMLSource',html,...
                 'DataChangedFcn',@(h,e)obj.onPasswordChanged(e) );
 
@@ -84,7 +68,7 @@ classdef PasswordField <  wt.abstract.BaseWidget
         function update(obj)
 
             % Update the edit control text
-            obj.PasswordControl.Data = obj.Value;
+            obj.PasswordControl.Data.Value = obj.Value;
 
         end %function
 
@@ -99,9 +83,9 @@ classdef PasswordField <  wt.abstract.BaseWidget
             % Triggered on interaction
 
             % Grab the data in string format
-            newValue = string(evt.Data);
+            newValue = string(evt.Data.Value);
             oldValue = obj.Value;
-            previousData = evt.PreviousData;
+            previousData = evt.PreviousData.Value;
 
             % Look at the states
             if endsWith(newValue, newline)
@@ -147,5 +131,113 @@ classdef PasswordField <  wt.abstract.BaseWidget
 
     end %methods
 
+    %% Public methods
+    methods
+
+        function focus(obj)
+
+            % Brings parent figure to front
+            focus(obj.PasswordControl)
+
+            % What MATLAB version?
+            if ~isMATLABReleaseOlderThan("R2023a")
+                % Fire event 'FocusOnInputField' that will trigger the HTML
+                % component to select the Input Field directly.
+                sendEventToHTMLSource(obj.PasswordControl, 'FocusOnInputField', '')
+            else
+                % Setting 'DoFocus' to TRUE will trigger DataChanged event in HTML
+                % component, selecting the Input Field. 
+                % The HTML component reverts 'DoFocus' back to FALSE.
+                obj.PasswordControl.Data.DoFocus = true;
+            end
+
+        end %function
+
+    end %methods
+
 end % classdef
 
+function T = HTMLComponentForPasswordField()
+% Return HTML component for password field in text
+
+t = {
+    '<input type="password" id="value" style="width:100%;height:100%">                  '
+    '<script type="text/javascript">                                                '
+    '                                                                               '
+    '    function setup(htmlComponent) {                                            '
+    '                                                                               '
+    '        // Code response to data changes in MATLAB                             '
+    '        htmlComponent.addEventListener("DataChanged", dataFromMATLABToHTML);   '
+    '                                                                               '
+    '        // Code response to FocusOnInputField event in MATLAB                  '
+    '        htmlComponent.addEventListener("FocusOnInputField", focusInputField);  '
+    '                                                                               '
+    '        // Update the Data property of the htmlComponent object                '
+    '        // This action also updates the Data property of the MATLAB HTML object'
+    '        // and triggers the DataChangedFcn callback function                   '
+    '        let dataInput = document.getElementById("value")                       '
+    '        dataInput.addEventListener("change", dataFromHTMLToMATLAB);            '
+    '                                                                               '
+    '        // Trigger a DataChangedFcn callback when enter is pressed.            '
+    '        document.addEventListener("keyup", onKeyPressed);                      '
+    '                                                                               '
+    '        function dataFromMATLABToHTML(event) {                                 '
+    '            let changedData = htmlComponent.Data;                              '
+    '            console.log("New data from MATLAB:", changedData);                 '
+    '                                                                               '
+    '            // Update your HTML or JavaScript with the new data                '
+    '            let domValue = document.getElementById("value");                   '
+    '            domValue.value = changedData.Value;                                '
+    '                                                                               '
+    '            // Focus on the input element                                      '
+    '            if (changedData.DoFocus){                                          '
+    '                                                                               '
+    '                // Focus on input field                                        '
+    '                domValue.focus();                                              '
+    '                domValue.select();                                             '
+    '                                                                               '
+    '                // Revert value for focus event                                '
+    '                changedData.DoFocus = false;                                   '
+    '                htmlComponent.Data = changedData;                              '
+    '            }                                                                  '
+    '        }                                                                      '
+    '                                                                               '
+    '        function focusInputField(event) {                                      '
+    '            let domValue = document.getElementById("value");                   '
+    '                                                                               '
+    '            // Focus on the input element                                      '
+    '            if (domValue) {                                                    '
+    '               domValue.focus();                                               '
+    '               domValue.select();                                              '
+    '            }                                                                  '
+    '        }                                                                      '
+    '                                                                               '
+    '        function dataFromHTMLToMATLAB(event) {                                 '
+    '            let newValue = event.target.value;                                 '
+    '            let newData = htmlComponent.Data;                                  '
+    '                                                                               '
+    '            newData.Value = newValue;                                          '
+    '                                                                               '
+    '            htmlComponent.Data = newData;                                      '
+    '        }                                                                      '
+    '                                                                               '
+    '        function onKeyPressed(event) {                                         '
+    '                                                                               '
+    '            // Get data to change                                              '
+    '            let newData = htmlComponent.Data;                                  '
+    '            let domValue = document.getElementById("value");                   '
+    '                                                                               '
+    '            // ENTER key?                                                      '
+    '            if (event.keyCode === 13) {                                        '
+    '                newData.Value = domValue.value + "\n";                         '
+    '                htmlComponent.Data = newData;                                  '
+    '            }                                                                  '
+    '        }                                                                      '
+    '    }                                                                          '
+    '</script>                                                                      '
+};
+
+% Join cellstr to text scalar
+t = convertCharsToStrings(t);
+T = join(t, newline);
+end

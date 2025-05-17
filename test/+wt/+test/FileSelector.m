@@ -166,14 +166,94 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
         end %function
         
+        function testButtonLabel(testCase)
+            
+            % Get the button control
+            buttonControl = testCase.Widget.ButtonControl;
+            
+            % Set the value
+            newValue = "Select File";
+            testCase.verifySetProperty("ButtonLabel", newValue);
+            drawnow
+            testCase.verifyEqual(string(buttonControl.Text), newValue);
+            
+            % Set the value
+            newValue = "Browse";
+            testCase.verifySetProperty("ButtonLabel", newValue);
+            drawnow
+            testCase.verifyEqual(string(buttonControl.Text), newValue);
+            
+        end %function
         
-        % function testButton(testCase)
-        %
-        %     % We can't test the button in this case because it triggers a
-        %     % modal dialog with no way to click on the dialog.
-        %
-        % end %function
+        % Since this test-case unlocks the test figure it should be last in 
+        % line.
+        function testButton(testCase)
+        
+            % Get the button control
+            buttonControl = testCase.Widget.ButtonControl;
+
+            % Ancestor figure
+            fig = ancestor(buttonControl, "Figure");
+
+            % Make sure file dialog window is in-app by setting the
+            % 'ShowInWebApps' value to true.
+            
+            % Get active value to restore
+            s = settings;
+            curTempVal = s.matlab.ui.dialog.fileIO.ShowInWebApps.ActiveValue;
+
+            % Set temporary value of ShowInWebApps setting to true, so that file
+            % selector dialog window is a component in the figure.
+            s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = true;
+            cleanup = onCleanup(@() localRevertShowInWebAppsSetting(s, curTempVal));
+
+            % While dialog window is open and blocked by waitfor, there is still
+            % a possibility to execute code through the timer function.
+
+            % Set timer callback
+            delay = 2; % seconds
+            t = timer;
+            t.StartDelay = delay; % starts after 2 seconds
+            t.TimerFcn = @(s,e) localPressEscape(fig);
+            start(t); % start the timer
+
+            % Now press the button
+            tStart = tic;
+            testCase.press(buttonControl);
+
+            % Wait for escape button to be pressed.
+            tStop = toc(tStart);
+            
+            % Time while MATLAB waits for an action should be larger than the 
+            % StartDelay. If not, MATLAB did not reach the waitfor status after 
+            % pressing the file-selection button.
+            testCase.verifyGreaterThan(tStop, delay)            
+        
+        end %function
         
     end %methods (Test)
     
 end %classdef
+
+function localPressEscape(fig)
+
+% Unlock the figure, otherwise escape will not work.
+matlab.uitest.unlock(fig);
+
+% Bring focus to figure
+figure(fig)
+
+% Press ESCAPE
+r = java.awt.Robot;
+r.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+pause(0.1);
+r.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
+
+end
+
+function localRevertShowInWebAppsSetting(s, val)
+
+% Revert setting on cleanup
+s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = val;
+
+end
