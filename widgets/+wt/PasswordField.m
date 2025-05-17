@@ -136,13 +136,20 @@ classdef PasswordField <  wt.abstract.BaseWidget
 
         function focus(obj)
 
-            % Gets keyboard focus to the UI component and brings parent figure to front
+            % Brings parent figure to front
             focus(obj.PasswordControl)
 
-            % Setting 'DoFocus' to TRUE will trigger DataChanged event in HTML
-            % component, selecting the Input Field. 
-            % The HTML component reverts 'DoFocus' back to FALSE.
-            obj.PasswordControl.Data.DoFocus = true;
+            % What MATLAB version?
+            if ~isMATLABReleaseOlderThan("R2023a")
+                % Fire event 'FocusOnInputField' that will trigger the HTML
+                % component to select the Input Field directly.
+                sendEventToHTMLSource(obj.PasswordControl, 'FocusOnInputField', '')
+            else
+                % Setting 'DoFocus' to TRUE will trigger DataChanged event in HTML
+                % component, selecting the Input Field. 
+                % The HTML component reverts 'DoFocus' back to FALSE.
+                obj.PasswordControl.Data.DoFocus = true;
+            end
 
         end %function
 
@@ -161,6 +168,9 @@ t = {
     '                                                                               '
     '        // Code response to data changes in MATLAB                             '
     '        htmlComponent.addEventListener("DataChanged", dataFromMATLABToHTML);   '
+    '                                                                               '
+    '        // Code response to FocusOnInputField event in MATLAB                  '
+    '        htmlComponent.addEventListener("FocusOnInputField", focusInputField);  '
     '                                                                               '
     '        // Update the Data property of the htmlComponent object                '
     '        // This action also updates the Data property of the MATLAB HTML object'
@@ -189,6 +199,16 @@ t = {
     '                // Revert value for focus event                                '
     '                changedData.DoFocus = false;                                   '
     '                htmlComponent.Data = changedData;                              '
+    '            }                                                                  '
+    '        }                                                                      '
+    '                                                                               '
+    '        function focusInputField(event) {                                      '
+    '            let domValue = document.getElementById("value");                   '
+    '                                                                               '
+    '            // Focus on the input element                                      '
+    '            if (domValue) {                                                    '
+    '               domValue.focus();                                               '
+    '               domValue.select();                                              '
     '            }                                                                  '
     '        }                                                                      '
     '                                                                               '
