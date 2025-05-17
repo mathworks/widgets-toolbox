@@ -177,6 +177,17 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath;
             obj.WarnImage.Visible = showWarn;
 
+            % Set tooltip
+            if showWarn
+                if obj.SelectionType == "file"
+                    obj.WarnImage.Tooltip = 'File does not exist.';
+                elseif obj.SelectionType == "putfile"
+                    obj.WarnImage.Tooltip = 'Folder for file storage does not exist.';
+                else
+                    obj.WarnImage.Tooltip = 'Folder does not exist.';
+                end
+            end
+
             % Update button appearance
             obj.ButtonControl.Text = obj.ButtonLabel;
             if strlength(obj.ButtonLabel)
