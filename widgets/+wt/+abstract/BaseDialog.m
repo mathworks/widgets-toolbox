@@ -4,8 +4,8 @@ classdef BaseDialog < wt.abstract.BaseWidget & ...
         wt.mixin.FieldColorable
     % Base class for a dialog panel
 
-    % Please note this is an experimental component that may change in the
-    % future. 
+    % This component was a prototype that is now deprecated. Please switch
+    % to BaseInternalDialog or BaseExternalDialog instead.
 
     %   Copyright 2022-2025 The MathWorks Inc.
 

@@ -2,7 +2,8 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     % Base class for a dialog that opens externally, in a separate figure
     % window. The dialog's lifecycle is tied to the app that launched it. 
     %
-    % Note that this is incompatible with web apps.
+    % Note that this is incompatible with web apps, which support only a
+    % single figure. Use BaseInternalDialog for web app support.
 
     % ** This is a prototype component that may change in the future. 
 
@@ -21,9 +22,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     %% Public Properties
     properties (AbortSet, Access = public)
 
-        % Dialog Size
-        Size (1,2) double {mustBePositive} = [350 200]
-
         % Modal (block other figure interaction)
         Modal (1,1) logical = false
 
@@ -31,6 +29,15 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
 
     properties (AbortSet, Dependent, Access = public)
+
+        % Modal tooltip
+        ModalTooltip (1,1) string
+
+        % Position on screen [left bottom width height]
+        DialogPosition 
+
+        % Dialog Size
+        Size (1,2) double
 
         % Dialog Title
         Title
@@ -47,10 +54,35 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         end
 
         function value = get.Title(obj)
-            value = obj.OuterPanel.Title;
+            value = string(obj.DialogFigure.Name);
         end
         function set.Title(obj, value)
-            obj.OuterPanel.Title = value;
+            obj.DialogFigure.Name = value;
+        end
+
+        function value = get.DialogPosition(obj)
+            value = obj.DialogFigure.Position;
+        end
+        function set.DialogPosition(obj, value)
+            obj.DialogFigure.Position = value;
+        end
+
+        function value = get.Size(obj)
+            if isscalar(obj.DialogFigure)
+                value = obj.DialogFigure.Position(3:4);
+            end
+        end
+        function set.Size(obj, value)
+            if isscalar(obj.DialogFigure)
+                obj.DialogFigure.Position(3:4) = value;
+            end
+        end
+
+        function value = get.ModalTooltip(obj)
+            value = string(obj.ModalImage.Tooltip);
+        end
+        function set.ModalTooltip(obj, value)
+            obj.ModalImage.Tooltip = value;
         end
 
     end %methods
@@ -147,29 +179,14 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
-        % Outer grid to enable the panel to fill the component
+        % Outer grid to enable the component to fill the figure
         OuterGrid matlab.ui.container.GridLayout
-
-        % Outer panel for the dialog
-        OuterPanel matlab.ui.container.Panel
 
         % Inner grid to manage the content grid and status/button row
         InnerGrid matlab.ui.container.GridLayout
 
-        % Close button
-        CloseButton matlab.ui.control.Button
-
-        % Temporary drag helper for moving the window
-        DragHelper wt.utility.FigureDragHelper {mustBeScalarOrEmpty}
-
         % Listeners to reference/parent objects to trigger dialog delete
         LifecycleListeners (1,:) event.listener
-
-        % Figure containing the dialog
-        Figure matlab.ui.Figure
-
-        % Figure resize listener
-        FigureResizeListener (1,:) event.listener  {mustBeScalarOrEmpty}
 
         % Modal image (optional)
         ModalImage matlab.ui.control.Image
@@ -183,19 +200,16 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     end %properties
 
 
-    %% Constructor
-    methods
-        
-        function obj = BaseExternalDialog(varargin)
+    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
-            % Call superclass constructor
-            obj@wt.abstract.BaseWidget(varargin{:});
+        % Figure tied to the dialog lifecycle
+        Figure matlab.ui.Figure
 
-            
+        % This dialog's figure
+        DialogFigure matlab.ui.Figure
 
-        end %function
-        
-    end %constructor
+    end %properties
+
 
 
     %% Destructor
@@ -204,6 +218,9 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     
             % Delete the modal image
             delete(obj.ModalImage)
+
+            % Delete the figure
+            delete(obj.DialogFigure)
             
         end %function
     end %methods
@@ -388,46 +405,38 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             %
             %   end %function
 
-
         end %function
 
 
         function setup(obj)
             % Configure the dialog
 
-            % Disable warning
-            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
+            % Store the parent figure
+            obj.Figure = ancestor(obj,'figure');
 
-            % Defaults
-            obj.Position(3:4) = [350,200];
+             % Create a new figure for this dialog
+            obj.DialogFigure = uifigure();
+            obj.DialogFigure.AutoResizeChildren = false;
+            obj.DialogFigure.Units = "pixels";
 
-            % Restore warning
-            warning(warnState)
+            % Apply the same theme (R2025a and later)
+            if ~isMATLABReleaseOlderThan("R2025a")
+                obj.DialogFigure.Theme = obj.Figure.Theme;
+            end
 
-            % Outer grid to enable the dialog panel to fill the component
-            obj.OuterGrid = uigridlayout(obj,[1 1]);
-            obj.OuterGrid.Padding = [0 0 0 0];
+            % Give the figure a grid layout
+            obj.OuterGrid = uigridlayout(obj.DialogFigure, [1 1]);
+            obj.OuterGrid.Padding = 0;
 
-            % Outer dialog panel
-            obj.OuterPanel = uipanel(obj.OuterGrid);
-            obj.OuterPanel.Title = "Dialog Title";
-            obj.OuterPanel.FontSize = 16;
-            obj.OuterPanel.FontWeight = "bold";
-            %obj.OuterPanel.BorderWidth = 1;
-            obj.OuterPanel.AutoResizeChildren = false;
-            obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
-            obj.OuterPanel.ButtonDownFcn = @(~,evt)onTitleButtonDown(obj,evt);
+            % Move the content to the new figure
+            obj.Parent = obj.OuterGrid;
 
-            % Close Button
-            obj.CloseButton = uibutton(obj.OuterPanel);
-            obj.CloseButton.Text = "";
-            obj.CloseButton.Tag = "close";
-            obj.CloseButton.IconAlignment = "center";
-            obj.CloseButton.ButtonPushedFcn = ...
-                @(src,evt)onDialogButtonPushed(obj,evt);
+            % Attach figure callbacks
+            obj.DialogFigure.DeleteFcn = @(~,~)delete(obj);
+            obj.DialogFigure.CloseRequestFcn = @(~,evt)onDialogButtonPushed(obj,evt);
 
             % Inner Grid to manage content and button area
-            obj.InnerGrid = uigridlayout(obj.OuterPanel,[2 2]);
+            obj.InnerGrid = uigridlayout(obj,[2 2]);
             obj.InnerGrid.Padding = 10;
             obj.InnerGrid.RowHeight = {'1x','fit'};
             obj.InnerGrid.ColumnWidth = {'1x','fit'};
@@ -442,35 +451,11 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             obj.Grid.ColumnSpacing = 5;
             obj.Grid.Scrollable = true;
 
-            % Apply theme colors
-            if ~isMATLABReleaseOlderThan("R2025a")
-                obj.OuterPanel.ForegroundColor = ...
-                    obj.getThemeColor("--mw-color-primary");
-                obj.OuterPanel.BorderColor = ...
-                    obj.getThemeColor("--mw-borderColor-secondary");
-                obj.OuterPanel.BackgroundColor = ...
-                    obj.getThemeColor("--mw-backgroundColor-secondary");
-            elseif isMATLABReleaseOlderThan("R2023a")
-                obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
-                obj.OuterPanel.BackgroundColor = [.9 .9 .9];
-            else
-                obj.OuterPanel.ForegroundColor = [0.38 0.38 0.38];
-                obj.OuterPanel.BorderColor = [.5 .5 .5];
-                obj.OuterPanel.BackgroundColor = [.9 .9 .9];
-            end
-
-            % Apply close button color
-            obj.applyCloseButtonColor()
-
-            % Listen to figure size changes
-            obj.Figure = ancestor(obj,'figure');
-            obj.FigureResizeListener = listener(obj.Figure,"SizeChanged",...
-                @(~,evt)onFigureResized(obj,evt));
-
-            % Add modal image
+            % Add modal image over the app's figure
             obj.ModalImage = uiimage(obj.Figure);
             obj.ModalImage.ImageSource = "overlay_gray.png";
             obj.ModalImage.ScaleMethod = "stretch";
+            obj.ModalImage.Tooltip = "Close the dialog box to continue using the app.";
             obj.ModalImage.Visible = "off";
             obj.ModalImage.Position = [1 1 1 1];
 
@@ -482,22 +467,11 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             obj.DialogButtons.ButtonPushedFcn = ...
                 @(src,evt)onDialogButtonPushed(obj,evt);
 
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
-
         end %function
 
 
-        function update(obj)
+        function update(~)
 
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
 
         end %function
 
@@ -567,16 +541,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             % If toggled on, do the following
             if obj.Modal
 
-                % Bring the dialog above the modal image
-                if isMATLABReleaseOlderThan("R2025a")
-                    isDlg = obj.Figure.Children == obj;
-                    isModalImage = obj.Figure.Children == obj.ModalImage;
-                    otherChild = obj.Figure.Children(~isDlg & ~isModalImage);
-                    obj.Figure.Children = vertcat(obj, obj.ModalImage, otherChild);
-                else
-                    uistack(obj,"top"); % Works in 25a but not earlier
-                end
-
                 % Set position to match the figure
                 posF = getpixelposition(obj.Figure);
                 szF = posF(3:4);
@@ -586,97 +550,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
             % Toggle visibility
             obj.ModalImage.Visible = obj.Modal;
-
-        end %function
-
-
-        function repositionCloseButton(obj)
-            % Triggered on figure resize
-
-            % Outer panel inner/outer position
-            outerPos = obj.OuterPanel.OuterPosition;
-            wO = outerPos(3);
-            hO = outerPos(4);
-
-            innerPos = obj.OuterPanel.InnerPosition();
-            wI = innerPos(3);
-            hI = innerPos(4);
-
-            % Calculate panel border width and title height
-            wBorder = (wO - wI) / 2;
-            hT = hO - hI - 3*wBorder;
-
-            % Calculate close button positioning
-            hB = max(hT-4, 8) ;
-            yB = hO - 2*wBorder - hB - 1;
-            wB = hB;
-            xB = wO - 2*wBorder - wB - 1;
-
-            % Move the close button
-            set(obj.CloseButton,"Position",[xB yB wB hB]);
-
-        end %function
-
-
-        function resizeToFitFigure(obj)
-            % Triggered on figure resize
-
-            % Get the current positioning
-            posD = obj.Position;
-            szRequest = obj.Size;
-            posLowerLeft = posD(1:2);
-
-            % Get figure size
-            posF = getpixelposition(obj.Figure);
-            szF = posF(3:4);
-            buffer = [20 20];
-            maxSize = szF - buffer;
-
-            % Size is the smaller of requested size and figure size with
-            % buffer space
-            szD = min(szRequest, maxSize);
-
-            % Restrict a minimum size also
-            minSize = [30 20];
-            szD = max(szD, minSize);
-
-            % Calculate fit within figure
-            posUpperRight = posLowerLeft + szD;
-            if any(posUpperRight > szF)
-                posAdjust = szF - posUpperRight;
-                posLowerLeft = posLowerLeft + posAdjust;
-            end
-
-            % Don't go below 1
-            posLowerLeft = max(posLowerLeft, 1);
-
-            % Update modal image position
-            if obj.Modal
-                set(obj.ModalImage,"Position",[1 1 szF]);
-            end
-
-            % Update dialog position
-            posNew = [posLowerLeft szD];
-            set(obj,"Position",posNew);
-
-        end %function
-
-
-        function onMouseDrag(obj,evt)
-            % Triggered from DragHelper during drag or release
-
-            % Check the drag event status
-            switch evt.Status
-
-                case "motion"
-                    obj.Position = evt.NewPosition;
-
-                case "complete"
-                    obj.Position = evt.NewPosition;
-                    delete(obj.DragHelper)
-                    obj.DragHelper(:) = [];
-
-            end %switch
 
         end %function
 
@@ -695,14 +568,20 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             obj.assignOutput();
 
             % What button was pushed?
-            if isa(evt, "wt.eventdata.ButtonPushedData")
+            if isa(evt, "matlab.ui.eventdata.WindowCloseRequestData")
+                srcButton = "close";
+                action = "close";
+            elseif isa(evt, "wt.eventdata.ButtonPushedData")
                 % The lower dialog buttons (wt.ButtonGrid)
                 srcButton = evt.Button;
+                action = srcButton.Tag;
             else
                 % Assume a regular button
                 srcButton = evt.Source;
+                action = srcButton.Tag;
             end
-            action = srcButton.Tag;
+
+            % What action is being taken?
             if isempty(action)
                 action = srcButton.Text;
             end
@@ -731,78 +610,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
                 obj.checkDeletionCriteria()
 
             end
-
-        end %function
-
-
-        function onFigureResized(obj,~)
-            % Triggered on figure resize
-
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
-
-        end %function
-
-
-        function onOuterPanelResize(obj)
-            % Triggered when the dialog window is resized
-
-            % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
-
-        end %function
-
-
-        function onTitleButtonDown(obj,~)
-            % Triggered on title bar button down
-
-            % Instantiate a figure drag helper to begin dragging dialog
-            obj.DragHelper = wt.utility.FigureDragHelper(obj);
-            obj.DragHelper.DragFcn = @(dhObj,evt)onMouseDrag(obj,evt);
-
-        end %function
-
-
-        function applyCloseButtonColor(obj)
-            % Set color of close button
-
-            % Create the "X" image mask
-            persistent imgMask
-            if isempty(imgMask)
-                imgMask = eye(16,16,"logical");
-                % Make it an X
-                imgMask = imgMask | flip(imgMask);
-                % Widen the line
-                imgMask = imgMask | circshift(imgMask,1,1)  | circshift(imgMask,-1,1);
-            end
-
-            % Determine the color to use
-            if ~isMATLABReleaseOlderThan("R2025a")
-                bgColor = obj.getThemeColor("--mw-backgroundColor-secondary");
-                iconColor = obj.getThemeColor("--mw-backgroundColor-iconuiFill-primary");
-            else
-                bgColor = [.9 .9 .9];
-                iconColor = [.38 .38 .38];
-            end
-
-            % Create the RGB components of the image
-            closeImgPage = zeros(16,16);
-            closeImg = repmat(closeImgPage,[1 1 3]);
-            for idx = 1:3
-                closeImgPage(imgMask) = iconColor(idx);
-                closeImgPage(~imgMask) = bgColor(idx);
-                closeImg(:,:,idx) = closeImgPage;
-            end
-
-            % Apply theicon
-            obj.CloseButton.Icon = closeImg;
-            obj.CloseButton.BackgroundColor = bgColor;
 
         end %function
 
