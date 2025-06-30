@@ -22,6 +22,9 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     %% Public Properties
     properties (AbortSet, Access = public)
 
+        % Dialog Size
+        Size double {mustBePositive} = [350 200]
+
         % Modal (block other figure interaction)
         Modal (1,1) logical = false
 
@@ -35,9 +38,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
         % Position on screen [left bottom width height]
         DialogPosition 
-
-        % Dialog Size
-        Size (1,2) double
 
         % Dialog Title
         Title
@@ -70,11 +70,14 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         function value = get.Size(obj)
             if isscalar(obj.DialogFigure)
                 value = obj.DialogFigure.Position(3:4);
+            else
+                value = obj.Size;
             end
         end
         function set.Size(obj, value)
-            if isscalar(obj.DialogFigure)
-                obj.DialogFigure.Position(3:4) = value;
+            obj.Size = value;
+            if isscalar(obj.DialogFigure) %#ok<MCSUP> 
+                obj.DialogFigure.Position(3:4) = value; %#ok<MCSUP> 
             end
         end
 
@@ -203,7 +206,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Figure tied to the dialog lifecycle
-        Figure matlab.ui.Figure
+        CallingFigure matlab.ui.Figure
 
         % This dialog's figure
         DialogFigure matlab.ui.Figure
@@ -228,72 +231,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
     %% Public methods
     methods (Sealed, Access = public)
-
-        function positionOver(obj, refComp)
-            % Positions the dialog centered over a given reference component
-
-            arguments
-                obj (1,1) wt.abstract.BaseInternalDialog
-                refComp (1,1) matlab.graphics.Graphics
-            end
-
-            % Reference component size and position
-            refPos = getpixelposition(refComp, true);
-            refSize = refPos(3:4);
-            
-            % Lower left corner depends if it's a figure
-            if isa(refComp, "matlab.ui.Figure")
-                refCornerA = [1 1];
-            else
-                refCornerA = refPos(1:2);
-            end
-
-            % Dialog size
-            dlgPos = getpixelposition(obj);
-            dlgSize = dlgPos(3:4);
-
-            % Does it fit entirely within the reference component?
-            if all(refSize >= dlgSize)
-                % Yes - center it over the component
-
-                % Calculate lower-left corner
-                dlgPos = floor((refSize - dlgSize) / 2) + refCornerA;
-
-            else
-                % NO - position within the figure
-
-                % Get the corners of the figure (bottom left and top right)
-                figPos = getpixelposition(obj.Parent);
-                figSize = figPos(3:4);
-
-                % Start with dialog position in lower-left of widget
-                dlgPos = refCornerA;
-                dlgCornerB = dlgPos + dlgSize;
-
-                % Move left and down as needed to fit in figure
-                adj = figSize - dlgCornerB;
-                adj(adj>0) = 0;
-                dlgPos = max(dlgPos + adj, [1 1]);
-                dlgCornerB = dlgPos + dlgSize;
-
-                % If it doesn't fit in the figure, shrink it
-                adj = figSize - dlgCornerB;
-                adj(adj>0) = 0;
-                dlgSize = dlgSize + adj;
-
-            end %if
-
-            % Disable warning
-            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
-
-            % Set final position
-            obj.Position = [dlgPos dlgSize];
-
-            % Restore warning
-            warning(warnState)
-
-        end %function
-
 
         function labels = addRowLabels(obj, names, parent, column, startRow)
             % Add a group of standard row labels to the grid (or specified
@@ -412,16 +349,21 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             % Configure the dialog
 
             % Store the parent figure
-            obj.Figure = ancestor(obj,'figure');
+            obj.CallingFigure = ancestor(obj,'figure');
+
+            % Get the size input
+            sizeInput = obj.Size;
 
              % Create a new figure for this dialog
             obj.DialogFigure = uifigure();
             obj.DialogFigure.AutoResizeChildren = false;
             obj.DialogFigure.Units = "pixels";
+            obj.DialogFigure.Position(3:4) = sizeInput;
+            obj.positionOverCallingFigure()
 
             % Apply the same theme (R2025a and later)
             if ~isMATLABReleaseOlderThan("R2025a")
-                obj.DialogFigure.Theme = obj.Figure.Theme;
+                obj.DialogFigure.Theme = obj.CallingFigure.Theme;
             end
 
             % Give the figure a grid layout
@@ -452,7 +394,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             obj.Grid.Scrollable = true;
 
             % Add modal image over the app's figure
-            obj.ModalImage = uiimage(obj.Figure);
+            obj.ModalImage = uiimage(obj.CallingFigure);
             obj.ModalImage.ImageSource = "overlay_gray.png";
             obj.ModalImage.ScaleMethod = "stretch";
             obj.ModalImage.Tooltip = "Close the dialog box to continue using the app.";
@@ -529,6 +471,29 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
         end %function
 
+
+        function positionOverCallingFigure(obj)
+            % Positions the dialog centered over the reference figure
+
+            % Reference component size and position
+            refPos = getpixelposition(obj.CallingFigure, true);
+            refSize = refPos(3:4);
+            refCornerA = refPos(1:2);
+
+            % Dialog size
+            dlgSize = obj.DialogFigure.Position(3:4);
+
+            % center it over the figure
+
+            % Calculate lower-left corner
+            dlgPos = floor((refSize - dlgSize) / 2) + refCornerA;
+
+            % Set final position
+            obj.DialogFigure.Position = [dlgPos dlgSize];
+
+
+        end %function
+
     end %methods
 
 
@@ -542,7 +507,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             if obj.Modal
 
                 % Set position to match the figure
-                posF = getpixelposition(obj.Figure);
+                posF = getpixelposition(obj.CallingFigure);
                 szF = posF(3:4);
                 obj.ModalImage.Position = [1 1 szF];
 
