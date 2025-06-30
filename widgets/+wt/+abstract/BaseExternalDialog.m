@@ -1,8 +1,8 @@
-classdef BaseInternalDialog  < wt.abstract.BaseWidget
-    % Base class for a dialog that opens as a panel within the figure
-    % window.  The dialog's lifecycle is tied to the app that launched it. 
+classdef BaseExternalDialog  < wt.abstract.BaseWidget
+    % Base class for a dialog that opens externally, in a separate figure
+    % window. The dialog's lifecycle is tied to the app that launched it. 
     %
-    % This enables compatibility with web apps.
+    % Note that this is incompatible with web apps.
 
     % ** This is a prototype component that may change in the future. 
 
@@ -181,6 +181,21 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
         LastAction string = []
 
     end %properties
+
+
+    %% Constructor
+    methods
+        
+        function obj = BaseExternalDialog(varargin)
+
+            % Call superclass constructor
+            obj@wt.abstract.BaseWidget(varargin{:});
+
+            
+
+        end %function
+        
+    end %constructor
 
 
     %% Destructor
