@@ -187,9 +187,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
             % toolbar is added to the figure.
             app.Figure.Position = app.getPreference('Position',[100 100 1000 700]);
 
+            % Ensure it's on screen
+            app.moveOnScreen();
+
             % Set up components
-            app.setup_internal();
-            app.setup();
+            app.preSetup(); % for pre-setup customization, like a splash screen
+            app.setup_internal(); % sealed, for session subclasses
+            app.setup(); % create the components
+            app.postSetup(); % for post-setup customization
 
             % Set any P-V pairs
             if ~isempty(remArgs)
@@ -463,6 +468,28 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
     %% Protected Methods
     methods (Access = protected)
+
+        function preSetup(~)
+            % Customize behavior between figure creation and setup
+            
+            % Format: 
+            %   function preSetup(app)
+            %       % code here
+            %   end
+
+        end %function
+
+
+        function postSetup(~)
+            % Customize behavior between setup and update
+            
+            % Format: 
+            %   function postSetup(app)
+            %       % code here
+            %   end
+
+        end %function
+
         
         function displayDebugText(app, evt)
             % Display the path to the caller function in the command window
