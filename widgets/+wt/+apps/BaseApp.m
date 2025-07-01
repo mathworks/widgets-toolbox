@@ -386,79 +386,8 @@ classdef BaseApp < matlab.apps.AppBase & ...
             % Show output if Debug is on
             app.displayDebugText();
 
-            if strcmp(app.Figure.Units,'pixels')
-
-                % Get the corners of each screen
-                g = groot;
-                screenPos = g.MonitorPositions;
-                screenCornerA = screenPos(:,1:2);
-                screenCornerB = screenPos(:,1:2) + screenPos(:,3:4) - 1;
-
-                % Buffer for title bar
-                titleBarHeight = 30;
-
-                % Get the corners of the figure (bottom left and top right)
-                figPos = app.Figure.OuterPosition;
-                figCornerA = figPos(1:2);
-                figCornerB = figPos(1:2) + figPos(:,3:4) - 1;
-
-                % Are the corners on any screen?
-                aIsOnScreen = all( figCornerA >= screenCornerA & ...
-                    figCornerA <= screenCornerB, 2 );
-                bIsOnScreen = all( figCornerB >= screenCornerA & ...
-                    figCornerB <= screenCornerB, 2);
-
-                % Are corners on a screen?
-
-                % Are both corners fully on any screen?
-                if any(aIsOnScreen) && any(bIsOnScreen)
-                    % Yes - do nothing
-
-                elseif any(bIsOnScreen)
-                    % No - only upper right corner is on a screen
-
-                    % Calculate the adjustment needed, and make it
-                    figAdjust = max(figCornerA, screenCornerA(bIsOnScreen,:)) ...
-                        - figCornerA;
-                    figPos(1:2) = figPos(1:2) + figAdjust;
-
-                    % Ensure the upper right corner still fits
-                    figPos(3:4) = min(figPos(3:4), ...
-                        screenCornerB(bIsOnScreen,:) - figPos(1:2) - [0 titleBarHeight] + 1);
-
-                    % Move the figure
-                    app.Figure.Position = figPos;
-
-                elseif any(aIsOnScreen)
-                    % No - only lower left corner is on a screen
-
-                    % Calculate the adjustment needed, and make it
-                    figAdjust = min(figCornerB, screenCornerB(aIsOnScreen,:)) ...
-                        - figCornerB;
-                    figPos(1:2) = max( screenCornerA(aIsOnScreen,:),...
-                        figPos(1:2) + figAdjust );
-
-                    % Ensure the upper right corner still fits
-                    figPos(3:4) = min(figPos(3:4), ...
-                        screenCornerB(aIsOnScreen,:) - figPos(1:2) - [0 titleBarHeight] + 1);
-
-                    % Move the figure
-                    app.Figure.Position = figPos;
-
-                else
-                    % No - Not on any screen
-
-                    % This is slower, but uncommon anyway
-                    movegui(app.Figure,'onscreen');
-
-                end %if any( all(aIsOnScreen,2) & all(bIsOnScreen,2) )
-
-            else
-
-                % This is slower, but uncommon anyway
-                movegui(app.Figure,'onscreen');
-
-            end %if strcmp(app.Figure.Units,'pixels')
+            % Move it on screen
+            wt.utility.moveOnScreen(app.Figure);
 
         end %function
 

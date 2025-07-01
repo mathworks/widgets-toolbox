@@ -79,6 +79,9 @@ outputFile = opts.OutputFile;
 % Perform the packaging
 matlab.addons.toolbox.packageToolbox(opts);
 
+% Add the installer to the project
+proj.addFile(outputFile)
+
 
 %% Open the release folder
 
