@@ -34,33 +34,81 @@ classdef PasswordField < wt.test.BaseWidgetTest
             % Change the value programmatically
             newValue = "AbC435!";
             testCase.verifySetProperty("Value", newValue);
-            testCase.verifyMatches(passField.Data, newValue);
-            
-            
-            %testCase.verifyTypeAction(passField, newValue, "Value");
-            % Verify callback triggered
-            %testCase.verifyEqual(testCase.CallbackCount, 1)
+            testCase.verifyMatches(passField.Data.Value, newValue);
             
         end %function
         
         
-        %RAJ - Unfortunately, can't type in a uihtml
         
-        % function testTyping(testCase)
-        %
-        %     % Get the password field
-        %     passField = testCase.Widget.PasswordControl;
-        %
-        %     % Type a new value
-        %     newValue = "PasswordABC123";
-        %     testCase.verifyTypeAction(passField, newValue, "Value");
-        %     testCase.verifyMatches(passField.Data, newValue);
-        %
-        %     % Verify callback triggered
-        %     testCase.verifyEqual(testCase.CallbackCount, 1)
-        %
-        % end %function
+        function testTyping(testCase)
+        
+            % Get the password field
+            passField = testCase.Widget.PasswordControl;
+            newValue = "AbC435!";
+            testCase.verifySetProperty("Value", newValue);
+
+            % Allow for some time for the widget and HTML code to catch up
+            pause(.5)
+            focus(testCase.Widget)
+            pause(.5)
+
+            % Type a new value
+            newValue = "PasswordABC123";
+            simulateTyping(newValue);
+            simulateTyping('ENTER')
+
+            % Allow for some time for the widget to catch up
+            pause(.5)
+            testCase.verifyMatches(passField.Data.Value, newValue);
+        
+            % Verify callback triggered
+            testCase.verifyEqual(testCase.CallbackCount, 1)
+        
+        end %function
         
     end %methods (Test)
     
 end %classdef
+
+function simulateTyping(S)
+% Simulate typing actions
+
+% Convert to chars
+S = convertStringsToChars(S);
+
+%Initialize the java engine 
+import java.awt.*;
+import java.awt.event.*;
+
+%Create a Robot-object to do the key-pressing
+rob = Robot;
+
+% Request to press ENTER?
+if strcmpi(S, 'enter')
+    rob.keyPress(KeyEvent.VK_ENTER); 
+    rob.keyRelease(KeyEvent.VK_ENTER); 
+    return
+end
+
+% Execute each letter/number individually
+for idx = 1:strlength(S)
+
+    % Get key event ID
+    p = ['VK_' upper(S(idx))];
+
+    % For capital letters, press SHIFT
+    if ~strcmp(lower(S(idx)), S(idx))
+        rob.keyPress(KeyEvent.VK_SHIFT); 
+    end
+
+    % Press/release key
+    rob.keyPress(KeyEvent.(p))
+    rob.keyRelease(KeyEvent.(p))
+
+    % For capital letters, release SHIFT
+    if ~strcmp(lower(S(idx)), S(idx))
+        rob.keyRelease(KeyEvent.VK_SHIFT); 
+    end
+end
+
+end
