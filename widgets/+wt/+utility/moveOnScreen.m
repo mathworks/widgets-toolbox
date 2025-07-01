@@ -1,6 +1,8 @@
 function moveOnScreen(fig)
 % Ensure the figure is placed on screen
 
+% Copyright 2025 The MathWorks, Inc.
+
 % Define arguments
 arguments
     fig (1,1) matlab.ui.Figure
