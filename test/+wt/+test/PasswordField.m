@@ -42,6 +42,10 @@ classdef PasswordField < wt.test.BaseWidgetTest
         
         function testTyping(testCase)
         
+            % Running in desktop mode?
+            testCase.assumeEqual(exist('desktop', 'file'), 6, 'Cannot find function ''desktop.m''.')
+            testCase.assumeTrue(desktop('-inuse'), 'MATLAB must run in desktop mode in order to complete current test.')
+            
             % Get the password field
             passField = testCase.Widget.PasswordControl;
             newValue = "AbC435!";
