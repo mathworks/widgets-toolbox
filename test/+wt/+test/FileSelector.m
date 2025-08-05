@@ -189,6 +189,10 @@ classdef FileSelector < wt.test.BaseWidgetTest
         % line.
         function testButton(testCase)
         
+            % Running in desktop mode?
+            testCase.assumeEqual(exist('desktop', 'file'), 6, 'Cannot find function ''desktop.m''.')
+            testCase.assumeTrue(desktop('-inuse'), 'MATLAB must run in desktop mode in order to complete current test.')
+
             % Get the button control
             buttonControl = testCase.Widget.ButtonControl;
 
