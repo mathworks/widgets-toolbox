@@ -66,8 +66,10 @@ classdef BaseViewController < ...
             % Constructor
 
             % Call superclass constructors
-            obj = obj@matlab.ui.componentcontainer.ComponentContainer(varargin{:});
-            obj@wt.mixin.ModelObserver();
+            % ModelObserver is first to establish model set listeners
+            % before assigning inputs
+            obj = obj@wt.mixin.ModelObserver();
+            obj@matlab.ui.componentcontainer.ComponentContainer(varargin{:});
 
             % Listen to theme changes (R2025a and later only)
             if ~isMATLABReleaseOlderThan("R2025a")

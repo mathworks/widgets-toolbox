@@ -51,8 +51,11 @@ classdef BaseViewChart < ...
             end
 
             % Call superclass constructors
-            obj = obj@matlab.graphics.chartcontainer.ChartContainer(parent, varargin{:});
-            obj@wt.mixin.ModelObserver();
+            % ModelObserver is first to establish model set listeners
+            % before assigning inputs
+            obj = obj@wt.mixin.ModelObserver(); 
+            obj@matlab.graphics.chartcontainer.ChartContainer(parent, varargin{:});
+            
 
         end %function
     end %methods
