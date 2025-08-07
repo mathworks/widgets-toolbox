@@ -47,7 +47,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
         end
 
         function value = get.Title(obj)
-            value = obj.OuterPanel.Title;
+            value = string(obj.OuterPanel.Title);
         end
         function set.Title(obj, value)
             obj.OuterPanel.Title = value;
@@ -384,7 +384,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
 
             % Defaults
-            obj.Position(3:4) = [350,200];
+            obj.Position(3:4) = obj.Size;
 
             % Restore warning
             warning(warnState)
@@ -473,6 +473,19 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % Reposition the close button
             obj.repositionCloseButton();
 
+            % Position over figure by default
+            if isscalar(obj.Figure) && isvalid(obj.Figure)
+                obj.positionOver(obj.Figure)
+            end
+
+        end %function
+
+
+        function postSetup(obj)
+
+            % Update modal image now
+            obj.updateModalImage();
+
         end %function
 
 
@@ -548,6 +561,11 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
         function updateModalImage(obj)
             % Triggered when the Modal property is changed
+
+            % Setup must be complete to run this code
+            if ~obj.SetupFinished
+                return
+            end
 
             % If toggled on, do the following
             if obj.Modal
@@ -676,9 +694,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % The pushed button's Tag (or Name if Tag is empty) will be
             % set as the LastAction
 
-            % Request to assign output
-            obj.assignOutput();
-
             % What button was pushed?
             if isa(evt, "wt.eventdata.ButtonPushedData")
                 % The lower dialog buttons (wt.ButtonGrid)
@@ -694,6 +709,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
 
             % Set last action
             obj.LastAction = action;
+
+            % Request to assign output
+            obj.assignOutput();
 
             % Prep event data
             evtOut = wt.eventdata.DialogButtonPushedData;
