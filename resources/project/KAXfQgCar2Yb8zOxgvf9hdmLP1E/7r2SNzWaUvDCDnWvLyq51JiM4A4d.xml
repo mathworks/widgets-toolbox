@@ -1,2 +1,2 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<Info Type="Basic" Visible="1" Icon="" File="runTestSuite.m" Name="Run Test Suite" />
+<?xml version="1.0" encoding="UTF-8"?>
+<Info File="runTestSuite.m" GroupUUID="default" Icon="" Name="Widgets Test Suite" Type="Basic" Visible="1"/>

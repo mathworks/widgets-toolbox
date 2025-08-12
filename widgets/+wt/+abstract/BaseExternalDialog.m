@@ -412,6 +412,14 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         end %function
 
 
+        function postSetup(obj)
+
+            % Update modal image now
+            obj.updateModalImage();
+
+        end %function
+
+
         function update(~)
 
 
