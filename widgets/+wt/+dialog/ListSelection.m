@@ -1,6 +1,4 @@
-classdef ListSelection < wt.abstract.BaseInternalDialog & ...
-        wt.mixin.FieldColorable & ...
-        wt.mixin.FontStyled
+classdef ListSelection < wt.abstract.BaseInternalDialog
     % Implements a simple selection from a list dialog (similar to listdlg)
 
     %   Copyright 2025 The MathWorks Inc.
@@ -75,6 +73,9 @@ classdef ListSelection < wt.abstract.BaseInternalDialog & ...
         end
 
         function set.Value(obj,value)
+            if isequal(value,"")
+                value = {};
+            end
             obj.ListBox.Value = value;
         end
 
@@ -138,12 +139,14 @@ classdef ListSelection < wt.abstract.BaseInternalDialog & ...
             obj.PromptLabel.Text = "";
 
             obj.ListBox = uilistbox(obj.Grid);
+            obj.ListBox.Items = {};
             obj.ListBox.ValueChangedFcn = @(~,~)onValueChanged(obj);
 
             % Update component lists
-            % obj.BackgroundColorableComponents = [obj.Grid]
+            % obj.BackgroundColorableComponents = [];
             obj.FieldColorableComponents = [obj.ListBox];
-            obj.FontStyledComponents = [obj.PromptLabel, obj.ListBox];
+            obj.FontStyledComponents = [obj.FontStyledComponents, ...
+                obj.PromptLabel, obj.ListBox];
 
         end %function
 

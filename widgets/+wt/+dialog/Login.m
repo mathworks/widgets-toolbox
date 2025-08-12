@@ -61,7 +61,9 @@ classdef Login < wt.abstract.BaseInternalDialog
             obj.PasswordField.ValueChangingFcn = @(~,~)onValueEdited(obj);
 
             % Update component lists
-            % obj.BackgroundColorableComponents = [obj.Grid]
+            % obj.BackgroundColorableComponents = []
+            obj.FieldColorableComponents = [obj.LoginField];
+            obj.FontStyledComponents = [obj.FontStyledComponents, obj.LoginField];
 
         end %function
 

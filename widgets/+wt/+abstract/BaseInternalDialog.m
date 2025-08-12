@@ -1,4 +1,8 @@
-classdef BaseInternalDialog  < wt.abstract.BaseWidget
+classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable & ...
+        wt.mixin.TitleFontStyled & ...
+        wt.mixin.FontStyled & ...
+        wt.mixin.FieldColorable
     % Base class for a dialog that opens as a panel within the figure
     % window.  The dialog's lifecycle is tied to the app that launched it. 
     %
@@ -478,6 +482,11 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
                 obj.positionOver(obj.Figure)
             end
 
+            % Update component lists
+            obj.ButtonColorableComponents = [obj.DialogButtons];
+            obj.TitleFontStyledComponents = [obj.OuterPanel];
+            obj.FontStyledComponents = [obj.DialogButtons];
+
         end %function
 
 
@@ -504,8 +513,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget
             % Update components that are affected by BackgroundColor
             % (overrides the superclass method)
 
-            % Update grid color
-            set([obj.InnerGrid, obj.Grid], "BackgroundColor", obj.BackgroundColor);
+            % Update dialog and button background grids
+            set([obj.InnerGrid, obj.Grid, obj.DialogButtons],...
+                "BackgroundColor", obj.BackgroundColor);
 
             % Call superclass method
             obj.updateBackgroundColorableComponents@wt.mixin.BackgroundColorable();
