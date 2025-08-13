@@ -153,6 +153,9 @@ classdef ListSelection < wt.abstract.BaseInternalDialog
 
         function update(obj)
 
+            % Call superclass method
+            obj.update@wt.abstract.BaseInternalDialog;
+
             % Configure list
             obj.ListBox.Items = obj.Items;
             obj.ListBox.ItemsData = obj.ItemsData;
