@@ -213,6 +213,11 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             % (non needed until we make the dialog resizable by user)
             % obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
 
+            % Position over figure by default
+            if isscalar(obj.Figure) && isvalid(obj.Figure)
+                obj.positionOver(obj.Figure)
+            end
+
         end %function
 
     end %methods
@@ -494,11 +499,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
-
-            % Position over figure by default
-            if isscalar(obj.Figure) && isvalid(obj.Figure)
-                obj.positionOver(obj.Figure)
-            end
 
         end %function
 
