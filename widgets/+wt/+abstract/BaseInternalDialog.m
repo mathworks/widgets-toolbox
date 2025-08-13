@@ -7,6 +7,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
     % window.  The dialog's lifecycle is tied to the app that launched it. 
     %
     % This enables compatibility with web apps.
+    %
+    % The dialog may flicker when resizing the figure if
+    % AutoResizeChildren is on. Disabling this is recommended.
 
     % ** This is a prototype component that may change in the future. 
 
@@ -132,7 +135,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         MinimumSize (1,2) double {mustBePositive} = [30 20];
 
         % Buffer border space required on each side when sizing in figure 
-        Buffer (1,1) double {mustBeNonnegative} = 0
+        % Buffer (1,1) double {mustBeNonnegative} = 0
 
     end %properties
 
@@ -181,10 +184,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         function obj = BaseInternalDialog(fig, varargin)
 
             arguments
-                fig matlab.ui.Figure
+                % Figure parent - Create a figure if not provided
+                fig (1,1) matlab.ui.Figure = uifigure("AutoResizeChildren","off");
             end
 
-            arguments(Repeating)
+            arguments (Repeating)
+                % Property-value pairs
                 varargin
             end
 
@@ -208,15 +213,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             % Update the modal image positioning
             obj.updateModalImage();
-
-            % Listen to resizing of OuterPanel
-            % (non needed until we make the dialog resizable by user)
-            % obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
-
-            % Position over figure by default
-            if isscalar(obj.Figure) && isvalid(obj.Figure)
-                obj.positionOver(obj.Figure)
-            end
 
         end %function
 
@@ -247,58 +243,28 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             % Reference component size and position
             refPos = getpixelposition(refComp, true);
-            refSize = refPos(3:4);
+            % refSize = refPos(3:4);
             
             % Lower left corner depends if it's a figure
             if isa(refComp, "matlab.ui.Figure")
-                refCornerA = [1 1];
+                % refCornerA = [1 1];
+                refPos(1:2) = [1 1];
             else
-                refCornerA = refPos(1:2);
+                % refCornerA = refPos(1:2);
             end
 
-            % Dialog size
-            dlgPos = getpixelposition(obj);
-            dlgSize = dlgPos(3:4);
+            % Dialog position
+            posNew = obj.Position;
 
-            % Does it fit entirely within the reference component?
-            if all(refSize >= dlgSize)
-                % Yes - center it over the component
+            % Calculate the dialog position
+            % Request to center over refPos
+            posNew = calculatePositionWithinBounds(obj, posNew, refPos);
 
-                % Calculate lower-left corner
-                dlgPos = floor((refSize - dlgSize) / 2) + refCornerA;
-
-            else
-                % NO - position within the figure
-
-                % Get the corners of the figure (bottom left and top right)
-                figPos = getpixelposition(obj.Parent);
-                figSize = figPos(3:4);
-
-                % Start with dialog position in lower-left of widget
-                dlgPos = refCornerA;
-                dlgCornerB = dlgPos + dlgSize;
-
-                % Move left and down as needed to fit in figure
-                adj = figSize - dlgCornerB;
-                adj(adj>0) = 0;
-                dlgPos = max(dlgPos + adj, [1 1]);
-                dlgCornerB = dlgPos + dlgSize;
-
-                % If it doesn't fit in the figure, shrink it
-                adj = figSize - dlgCornerB;
-                adj(adj>0) = 0;
-                dlgSize = dlgSize + adj;
-
-            end %if
-
-            % Disable warning
-            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
-
-            % Set final position
-            obj.Position = [dlgPos dlgSize];
-
-            % Restore warning
-            warning(warnState)
+            % Update dialog position
+            if ~isequal(obj.Position, posNew)
+                fprintf(" Change position: posOld = %f  posNew = %f\n", obj.Position, posNew);
+                obj.Position = posNew;
+            end
 
         end %function
 
@@ -497,8 +463,15 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.TitleFontStyledComponents = [obj.OuterPanel];
             obj.FontStyledComponents = [obj.DialogButtons];
 
+            % Listen to resizing of OuterPanel
+            % This enables the close button to stay in the correct spot
+            obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
+
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
+
+            % Reposition the close button
+            repositionCloseButton(obj)
 
         end %function
 
@@ -513,7 +486,10 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             end
 
             % Ensure it fits in the figure
-            obj.resizeToFitFigure();
+            % This is only needed if AutoResizeChildren is on
+            if obj.Figure.AutoResizeChildren
+                obj.resizeToFitFigure();
+            end
 
         end %function
 
@@ -585,44 +561,85 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.updateModalImage();
 
             % Get the current positioning
-            posD = obj.Position;
-            szRequest = obj.Size;
-            posLowerLeft = posD(1:2);
+            posNew = obj.Position;
+            % posLowerLeft = posOld(1:2);
+
+            % Calculate the dialog size
+            szDlg = calculateDialogSize(obj);
+            posNew(3:4) = szDlg;
+
+            % Calculate the dialog position
+            if obj.SetupFinished
+                posNew = calculatePositionWithinBounds(obj, posNew);
+            else
+                % Try to center over figure by default
+                posFig = getpixelposition(obj.Figure);
+                posFig(1:2) = 1;
+                posNew = calculatePositionWithinBounds(obj, posNew, posFig);
+            end
+
+            % Update dialog position
+            if ~isequal(obj.Position, posNew)
+                obj.Position = posNew;
+            end
+
+        end %function
+
+
+        function szDlg = calculateDialogSize(obj)
+            % Calculate the dialog size to use, given the set Size and
+            % figure constraints
 
             % Get figure size
             posFig = getpixelposition(obj.Figure);
-            szFig = posFig(3:4);
-            maxSize = szFig - (2 * obj.Buffer);
 
-            % Size is the smaller of requested size and figure size with
-            % buffer space
-            szDlg = min(szRequest, maxSize);
+            % Calculate allowed dialog size
+            szDlg = max( min(obj.Size, posFig(3:4)), obj.MinimumSize);
 
-            % Restrict a minimum size also
-            szDlg = max(szDlg, obj.MinimumSize);
+        end %function
 
-            % Calculate fit within figure
-            posUpperRight = posLowerLeft + szDlg;
-            if any(posUpperRight > szFig)
-                posAdjust = szFig - posUpperRight;
-                posLowerLeft = posLowerLeft + posAdjust;
+
+        function posOut = calculatePositionWithinBounds(obj, posIn, posCenter)
+            % Confirm and verify the position is within the figure bounds
+
+            arguments
+                obj (1,1) wt.abstract.BaseInternalDialog
+                posIn (1,4) double {mustBeFinite} %requested [x,y,w,h] location
+                posCenter (1,4) double = nan(1,4) %optional - center over this [x,y,w,h]
             end
 
-            % Don't go below 1
-            posLowerLeft = max(posLowerLeft, 1);
+            % Default output
+            posOut = posIn;
 
-            % Update dialog position
-            posNew = [posLowerLeft szDlg];
-            set(obj,"Position",posNew);
+            % Get figure size
+            figPos = getpixelposition(obj.Figure);
+            figSize = figPos(3:4);
 
-            % Reposition the close button
-            obj.repositionCloseButton();
+            % Center over a component? (optional posCenter)
+            if ~any(ismissing(posCenter))
+                centerPoint = floor(posCenter(1:2) + posCenter(3:4)/2);
+                posOut(1:2) = floor(centerPoint - posOut(3:4)/2);
+            end
+
+            % Ensure upper right corner is within the figure
+            dlgUpperRight = posOut(1:2) + posOut(3:4) - [1 1];
+            if any(dlgUpperRight > figSize)
+                dlgAdjust = dlgUpperRight - figSize;
+                dlgAdjust(dlgAdjust < 0) = 0;
+                posOut(1:2) = posOut(1:2) - dlgAdjust;
+            end
+            
+            % Ensure lower left corner is within the figure
+            posOut(1:2) = max(posOut(1:2), [1 1]);
 
         end %function
 
 
         function repositionCloseButton(obj)
             % Called at end of resize
+
+            % Get current position
+            oldPos = obj.CloseButton.Position;
 
             % Outer panel inner/outer position
             outerPos = obj.OuterPanel.OuterPosition;
@@ -642,9 +659,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             yB = hO - 2*wBorder - hB - 1;
             wB = hB;
             xB = wO - 2*wBorder - wB - 1;
+            newPos = floor([xB yB wB hB]);
 
             % Move the close button
-            set(obj.CloseButton,"Position",[xB yB wB hB]);
+            if ~isequal(oldPos, newPos)
+                obj.CloseButton.Position = newPos;
+            end
 
         end %function
 
@@ -750,11 +770,11 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function onOuterPanelResize(~)
+        function onOuterPanelResize(obj)
             % Triggered when the dialog window is resized
 
-            % Ensure it fits in the figure
-            %obj.resizeToFitFigure();
+            % Reposition the close button
+            repositionCloseButton(obj)
 
         end %function
 
