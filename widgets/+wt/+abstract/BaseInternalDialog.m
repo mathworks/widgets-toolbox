@@ -31,33 +31,10 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         % Modal (block other figure interaction)
         Modal (1,1) logical = false
 
-    end %properties
-
-
-    properties (AbortSet, Dependent, Access = public)
-
         % Dialog Title
-        Title
+        Title (1,1) string = ""
 
     end %properties
-
-
-    % Accessors
-    methods
-
-        function set.Modal(obj, value)
-            obj.Modal = value;
-            obj.updateModalImage();
-        end
-
-        function value = get.Title(obj)
-            value = string(obj.OuterPanel.Title);
-        end
-        function set.Title(obj, value)
-            obj.OuterPanel.Title = value;
-        end
-
-    end %methods
 
 
     %% Dialog Button Properties
@@ -149,6 +126,17 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
 
     %% Internal Properties
+    properties (Hidden)
+
+        % Minimum allowable size before cropping
+        MinimumSize (1,2) double {mustBePositive} = [30 20];
+
+        % Buffer border space required on each side when sizing in figure 
+        Buffer (1,1) double {mustBeNonnegative} = 0
+
+    end %properties
+
+
     properties (Transient, NonCopyable, Hidden, SetAccess = private)
 
         % Outer grid to enable the panel to fill the component
@@ -185,6 +173,49 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         LastAction string = []
 
     end %properties
+
+
+    %% Constructor
+    methods
+
+        function obj = BaseInternalDialog(fig, varargin)
+
+            arguments
+                fig matlab.ui.Figure
+            end
+
+            arguments(Repeating)
+                varargin
+            end
+
+            % Get the figure size
+            posF = getpixelposition(fig);
+            szFig = posF(3:4);
+
+            % Add modal image
+            modalImage = uiimage(fig);
+            modalImage.ImageSource = "overlay_gray.png";
+            modalImage.ScaleMethod = "stretch";
+            modalImage.Visible = "off";
+            modalImage.Position = [1 1 szFig];
+            modalImage.Tag = "ModalImage";
+
+            % Call superclass constructor
+            obj = obj@wt.abstract.BaseWidget(fig, varargin{:});
+
+            % Store the modal background image
+            obj.ModalImage = modalImage;
+
+            % Update the modal image positioning
+            obj.updateModalImage();
+
+            % Listen to resizing of OuterPanel
+            % (non needed until we make the dialog resizable by user)
+            % obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
+
+        end %function
+
+    end %methods
 
 
     %% Destructor
@@ -384,14 +415,8 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         function setup(obj)
             % Configure the dialog
 
-            % Disable warning
-            warnState = warning('off','MATLAB:ui:components:noPositionSetWhenInLayoutContainer');
-
-            % Defaults
-            obj.Position(3:4) = obj.Size;
-
-            % Restore warning
-            warning(warnState)
+            % Store the figure
+            obj.Figure = ancestor(obj,'figure');
 
             % Outer grid to enable the dialog panel to fill the component
             obj.OuterGrid = uigridlayout(obj,[1 1]);
@@ -404,7 +429,6 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.OuterPanel.FontWeight = "bold";
             %obj.OuterPanel.BorderWidth = 1;
             obj.OuterPanel.AutoResizeChildren = false;
-            obj.OuterPanel.ResizeFcn = @(~,~)onOuterPanelResize(obj);
             obj.OuterPanel.ButtonDownFcn = @(~,evt)onTitleButtonDown(obj,evt);
 
             % Close Button
@@ -452,16 +476,8 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.applyCloseButtonColor()
 
             % Listen to figure size changes
-            obj.Figure = ancestor(obj,'figure');
             obj.FigureResizeListener = listener(obj.Figure,"SizeChanged",...
                 @(~,evt)onFigureResized(obj,evt));
-
-            % Add modal image
-            obj.ModalImage = uiimage(obj.Figure);
-            obj.ModalImage.ImageSource = "overlay_gray.png";
-            obj.ModalImage.ScaleMethod = "stretch";
-            obj.ModalImage.Visible = "off";
-            obj.ModalImage.Position = [1 1 1 1];
 
             % Add lower buttons
             obj.DialogButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
@@ -471,40 +487,33 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.DialogButtons.ButtonPushedFcn = ...
                 @(src,evt)onDialogButtonPushed(obj,evt);
 
+            % Update component lists
+            obj.ButtonColorableComponents = [obj.DialogButtons];
+            obj.TitleFontStyledComponents = [obj.OuterPanel];
+            obj.FontStyledComponents = [obj.DialogButtons];
+
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
 
             % Position over figure by default
             if isscalar(obj.Figure) && isvalid(obj.Figure)
                 obj.positionOver(obj.Figure)
             end
 
-            % Update component lists
-            obj.ButtonColorableComponents = [obj.DialogButtons];
-            obj.TitleFontStyledComponents = [obj.OuterPanel];
-            obj.FontStyledComponents = [obj.DialogButtons];
-
-        end %function
-
-
-        function postSetup(obj)
-
-            % Update modal image now
-            obj.updateModalImage();
-
         end %function
 
 
         function update(obj)
 
+            % Update title
+            if strlength(obj.Title)
+                obj.OuterPanel.Title = obj.Title;
+            else
+                obj.OuterPanel.Title = " ";
+            end
+
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
 
         end %function
 
@@ -569,42 +578,51 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
     %% Private methods
     methods (Access = private)
 
-        function updateModalImage(obj)
-            % Triggered when the Modal property is changed
+        function resizeToFitFigure(obj)
+            % Triggered on figure resize
 
-            % Setup must be complete to run this code
-            if ~obj.SetupFinished
-                return
+            % Update modal image
+            obj.updateModalImage();
+
+            % Get the current positioning
+            posD = obj.Position;
+            szRequest = obj.Size;
+            posLowerLeft = posD(1:2);
+
+            % Get figure size
+            posFig = getpixelposition(obj.Figure);
+            szFig = posFig(3:4);
+            maxSize = szFig - (2 * obj.Buffer);
+
+            % Size is the smaller of requested size and figure size with
+            % buffer space
+            szDlg = min(szRequest, maxSize);
+
+            % Restrict a minimum size also
+            szDlg = max(szDlg, obj.MinimumSize);
+
+            % Calculate fit within figure
+            posUpperRight = posLowerLeft + szDlg;
+            if any(posUpperRight > szFig)
+                posAdjust = szFig - posUpperRight;
+                posLowerLeft = posLowerLeft + posAdjust;
             end
 
-            % If toggled on, do the following
-            if obj.Modal
+            % Don't go below 1
+            posLowerLeft = max(posLowerLeft, 1);
 
-                % Bring the dialog above the modal image
-                if isMATLABReleaseOlderThan("R2025a")
-                    isDlg = obj.Figure.Children == obj;
-                    isModalImage = obj.Figure.Children == obj.ModalImage;
-                    otherChild = obj.Figure.Children(~isDlg & ~isModalImage);
-                    obj.Figure.Children = vertcat(obj, obj.ModalImage, otherChild);
-                else
-                    uistack(obj,"top"); % Works in 25a but not earlier
-                end
+            % Update dialog position
+            posNew = [posLowerLeft szDlg];
+            set(obj,"Position",posNew);
 
-                % Set position to match the figure
-                posF = getpixelposition(obj.Figure);
-                szF = posF(3:4);
-                obj.ModalImage.Position = [1 1 szF];
-
-            end %if
-
-            % Toggle visibility
-            obj.ModalImage.Visible = obj.Modal;
+            % Reposition the close button
+            obj.repositionCloseButton();
 
         end %function
 
 
         function repositionCloseButton(obj)
-            % Triggered on figure resize
+            % Called at end of resize
 
             % Outer panel inner/outer position
             outerPos = obj.OuterPanel.OuterPosition;
@@ -631,46 +649,21 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function resizeToFitFigure(obj)
-            % Triggered on figure resize
+        function updateModalImage(obj)
+            % Update modal image size and visibility
 
-            % Get the current positioning
-            posD = obj.Position;
-            szRequest = obj.Size;
-            posLowerLeft = posD(1:2);
+            % Only run if ModalImage exists
+            if isscalar(obj.ModalImage) && isvalid(obj.ModalImage)
 
-            % Get figure size
-            posF = getpixelposition(obj.Figure);
-            szF = posF(3:4);
-            buffer = [20 20];
-            maxSize = szF - buffer;
+                % Set modal image position to match the figure
+                posF = getpixelposition(obj.Figure);
+                szFig = posF(3:4);
+                obj.ModalImage.Position = [1 1 szFig];
 
-            % Size is the smaller of requested size and figure size with
-            % buffer space
-            szD = min(szRequest, maxSize);
+                % Toggle visibility
+                obj.ModalImage.Visible = obj.Modal;
 
-            % Restrict a minimum size also
-            minSize = [30 20];
-            szD = max(szD, minSize);
-
-            % Calculate fit within figure
-            posUpperRight = posLowerLeft + szD;
-            if any(posUpperRight > szF)
-                posAdjust = szF - posUpperRight;
-                posLowerLeft = posLowerLeft + posAdjust;
-            end
-
-            % Don't go below 1
-            posLowerLeft = max(posLowerLeft, 1);
-
-            % Update modal image position
-            if obj.Modal
-                set(obj.ModalImage,"Position",[1 1 szF]);
-            end
-
-            % Update dialog position
-            posNew = [posLowerLeft szD];
-            set(obj,"Position",posNew);
+            end %if
 
         end %function
 
@@ -754,20 +747,14 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             % Ensure it fits in the figure
             obj.resizeToFitFigure();
 
-            % Reposition the close button
-            obj.repositionCloseButton();
-
         end %function
 
 
-        function onOuterPanelResize(obj)
+        function onOuterPanelResize(~)
             % Triggered when the dialog window is resized
 
             % Ensure it fits in the figure
-            obj.resizeToFitFigure();
-
-            % Reposition the close button
-            obj.repositionCloseButton();
+            %obj.resizeToFitFigure();
 
         end %function
 

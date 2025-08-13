@@ -132,7 +132,7 @@ classdef ListSelection < wt.abstract.BaseInternalDialog
             obj.Grid.ColumnWidth = {'1x'};
 
             % Set title
-            obj.Title = " ";
+            obj.Title = "";
 
             % Add controls
             obj.PromptLabel = uilabel(obj.Grid);
