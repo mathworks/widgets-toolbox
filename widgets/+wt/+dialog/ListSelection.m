@@ -132,7 +132,7 @@ classdef ListSelection < wt.abstract.BaseInternalDialog
             obj.Grid.ColumnWidth = {'1x'};
 
             % Set title
-            obj.Title = " ";
+            obj.Title = "";
 
             % Add controls
             obj.PromptLabel = uilabel(obj.Grid);
@@ -152,6 +152,9 @@ classdef ListSelection < wt.abstract.BaseInternalDialog
 
 
         function update(obj)
+
+            % Call superclass method
+            obj.update@wt.abstract.BaseInternalDialog;
 
             % Configure list
             obj.ListBox.Items = obj.Items;

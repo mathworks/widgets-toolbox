@@ -23,6 +23,9 @@ classdef Login < wt.abstract.BaseInternalDialog
             % Defaults
             obj.Size = [300,140];
 
+            % This is normally a modal dialog
+            obj.Modal = true;
+
             % Configure which actions close the dialog
             obj.DeleteActions = ["close","login","cancel"];
 
