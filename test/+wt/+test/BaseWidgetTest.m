@@ -109,11 +109,12 @@ classdef BaseWidgetTest < wt.test.BaseTest
             testCase.verifyWarningFree(fcn);
             
             % Give a moment for update to run
-            drawnow
+            % drawnow
             
             % Verify new property value
-            actualValue = testCase.Widget.(propName);
-            testCase.verifyEquality(actualValue, expValue);
+            % actualValue = testCase.Widget.(propName);
+            % testCase.verifyEquality(actualValue, expValue);
+            testCase.verifyPropertyValue(testCase.Widget, propName, expValue);
             
         end %function
         
@@ -134,7 +135,7 @@ classdef BaseWidgetTest < wt.test.BaseTest
         end %function
         
         
-        function verifyTypeAction(testCase,control,newValue,propName,expValue)
+        function verifyTypeAction(testCase,component,newValue,propName,expValue)
             
             % If no expected new value after set was given, assume it
             % matches the newValue provided as usual
@@ -143,11 +144,15 @@ classdef BaseWidgetTest < wt.test.BaseTest
             end
             
             % Type the new value into the control
-            testCase.type(control, newValue);
+            testCase.type(component, newValue);
             
             % Verify new property value
-            actualValue = testCase.Widget.(propName);
-            testCase.verifyEquality(actualValue, expValue);
+            % actualValue = testCase.Widget.(propName);
+            % testCase.verifyEquality(actualValue, expValue);
+
+            testCase.verifyPropertyValue(component, propName, expValue);
+
+            
             
         end %function
         
