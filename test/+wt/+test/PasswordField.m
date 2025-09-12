@@ -41,6 +41,8 @@ classdef PasswordField < wt.test.BaseWidgetTest
         
         
         function testTyping(testCase)
+
+            testCase.assumeMinimumRelease("R2024a")
         
             % Running in desktop mode?
             testCase.assumeEqual(exist('desktop', 'file'), 6, 'Cannot find function ''desktop.m''.')
