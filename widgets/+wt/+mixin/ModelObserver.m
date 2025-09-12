@@ -1,6 +1,4 @@
-classdef (Abstract, AllowedSubclasses = ...
-        {?wt.abstract.BaseViewController, ?wt.abstract.BaseViewChart})...
-        ModelObserver < handle
+classdef (Abstract) ModelObserver < handle
     % Mixin for components using a model that observe changes
 
     % Copyright 2025 The MathWorks Inc.
