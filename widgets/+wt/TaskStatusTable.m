@@ -17,6 +17,9 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
         Items (:,1) string = ["Step 1","Step 2","Step 3","Step 4",...
             "Step 5","Step 6","Step 7"]
         
+        % Tooltip of each task
+        ItemsTooltip (:,1) string
+        
         % Status of task
         Status (:,1) wt.enum.StatusState = [
             wt.enum.StatusState.complete
@@ -45,6 +48,12 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
         
         % Enables the task back button to proceed
         EnableBack (1,1) matlab.lang.OnOffSwitchState = true
+
+        % Tooltip for back button
+        BackTooltip (1,1) string = ""
+
+        % Tooltip for forward button
+        ForwardTooltip (1,1) string = ""
         
     end %properties
     
@@ -139,6 +148,7 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
             % Update the internal component lists
             obj.BackgroundColorableComponents = [obj.TaskGrid obj.Grid];
             obj.ButtonColorableComponents = [obj.BackButton, obj.ForwardButton];
+            obj.TooltipableComponents = [obj.TaskGrid obj.Grid obj.StatusLabel];
            
         end %function
         
@@ -176,33 +186,45 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
                 obj.EnableableComponents = [obj.Label, obj.Icon, obj.StatusLabel];
             end
                 
-            % Update the task names and icons
+            % Update the task names, tooltips, and icons
             status = obj.Status;
             imgFile = string(status) + "_16.png";
             imgFile(status=="running") = "running_16.gif";
             numImg = numel(obj.Icon);
+            numTooltip = numel(obj.ItemsTooltip);
             for idx = 1:numNew
-                wt.utility.fastSet(obj.Label(idx),"Text",obj.Items(idx));
-                if idx <= numImg
-                    wt.utility.fastSet(obj.Icon(idx),"Visible","on");
-                    if obj.Icon(idx).ImageSource ~= imgFile(idx)
-                        if exist(imgFile(idx),'file')
-                            obj.Icon(idx).ImageSource = imgFile(idx);
-                        else
-                            obj.Icon(idx).ImageSource = "";
-                        end
-                    end
+
+                % Icon
+                if idx <= numImg && exist(imgFile(idx),'file')
+                    thisVisible = "on";
+                    thisImage = imgFile(idx);
                 else
-                    wt.utility.fastSet(obj.Icon(idx),"Visible","off");
+                    thisVisible = "off";
+                    thisImage = "";
                 end
-            end
+
+                % Tooltip
+                if idx <= numTooltip
+                    thisTooltip = obj.ItemsTooltip(idx);
+                else
+                    thisTooltip = obj.Tooltip;
+                end
+
+                % Set label and icon properties
+                wt.utility.fastSet(obj.Label(idx),"Text",obj.Items(idx));
+                wt.utility.fastSet(obj.Label(idx),"Tooltip",thisTooltip);
+                    wt.utility.fastSet(obj.Icon(idx),"ImageSource",thisImage);
+                    wt.utility.fastSet(obj.Icon(idx),"Visible",thisVisible);
+
+            end %for
             
             % Update row heights
             wt.utility.fastSet(obj.TaskGrid, "RowHeight", repmat({obj.RowHeight},1,numNew));
             
             % Show/hide status and button row
             if obj.ShowButtonRow
-                obj.Grid.RowHeight{2} = 25;
+                obj.Grid.RowHeight{2} = obj.RowHeight;
+                obj.Grid.ColumnWidth([1 3]) = {obj.RowHeight};
             else
                 obj.Grid.RowHeight{2} = 0;
             end
@@ -222,6 +244,10 @@ classdef TaskStatusTable < wt.abstract.BaseWidget & ...
             
             % Update the button enables
             obj.updateEnableableComponents();
+
+            % Update tooltips
+            obj.ForwardButton.Tooltip = obj.ForwardTooltip;
+            obj.BackButton.Tooltip = obj.BackTooltip;
             
         end %function
         
