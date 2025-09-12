@@ -305,8 +305,25 @@
         300,
         200
       ]
+    },
+    {
+      "className": "wt.SearchDropDown",
+      "componentName": "Search Drop Down",
+      "description": "Editable test field that drops down a list of search matches",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB3RJTUUH6QkLFAIxX0lsjgAAAjVJREFUSIm1lT9P40AQxX+7HieOFVmkoqCgoEhBh0BpEEgI0dHQIFFSUfF1+Ap0JF2gRaJBQqSkBhoaaAKOxuu9gnN0vpyI7/C9zn/03r55M7PGe+/5j5Dn52f6/T516njvaTQaHB4eImma8vb2xtraGsaYWgRUldFohKoi3nuSJGFrawtr7bedGGMYj8c8PDwAIPBpSVVrE8iybPpsv8VWAVKohmFYmwMRKQu8vr5yeXmJMaYWAVVlPB5/CnQ6HdbX13HOfYv4V4gIvV6POI6RZrPJ0tJSbeQFilLJy8sL5+fnRFH0z2S/l9V7T57nnJ6eInmes7i4yP7+Pt77v84gCIJSqMYYPj4+GAwGwM+QW60Ww+GQq6srGo1GZfLJZMLu7i4nJydMJpOpQLPZnG4FAXDOsbKywvb2NkEQVBbIsoxut4u1FhFBVaflKTD15pxDVUsf58EYw/39Pbe3t0RRxNHREUmSlP4RAGstT09P3N3dEYZhJfLitAB5ntNut8mybGZhSmF1c3OT5eVlrP16e3jvCYKA1dXVmbxEZGaeBCAMQ4bDIYPBYG7IeZ4TxzFnZ2ckSVIi/FMHSmH34OCAnZ2duXdC4WBhYQHn3Ny2lsLazc0N19fXlTLw3pOmKcfHx2xsbKCqXwt474njmE6nUxqar6CqtFotrLWl1jbGlHIUgPf3d/b29uj1epUnubhYHh8fZ96naTrNRsIwRFW5uLioRFwFRU7WWoxzzhdjXjeiKOIHJNsIDj55zxIAAAAASUVORK5CYII=",
+      "category": "Widgets Toolbox",
+      "authorName": "Robyn Jackey - MathWorks Consulting",
+      "authorEmail": "",
+      "version": "1.0",
+      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAeCAIAAABVOSykAAAAB3RJTUUH6QkLFAI2wS35LQAAAGtJREFUaIHt2rENgDAAA8EEsXZSZHJW4CuEdDeB9bXnWmvwzj3GOOd8PeMH9t7X1xv+RKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArGA6hrz3AHo+BisZkRSqAAAAAElFTkSuQmCC",
+      "defaultPosition": [
+        1,
+        1,
+        100,
+        30
+      ]
     }
   ],
-  "schema": 1,
-  "MATLABRelease": "R2021a"
+  "schema": 2,
+  "MATLABRelease": "R2022a"
 }
