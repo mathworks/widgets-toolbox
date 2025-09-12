@@ -63,6 +63,9 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
         % The dummy section filling up remaining space
         DummySection (:,1) matlab.ui.container.Container
 
+        % This dummy is invisible and tracks section height
+        DummyHeightMonitor (:,1) matlab.ui.container.Container
+
         % Listen to section changes
         SectionChangedListener event.listener
 
@@ -111,7 +114,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
             obj.Position(3:4) = [500 90];
 
             % Configure grid
-            obj.Grid.RowHeight = {'1x',15};
+            obj.Grid.RowHeight = {'1x','fit'};
             obj.Grid.ColumnWidth = {'1x'};
             obj.Grid.ColumnSpacing = 1; %If changed, modify updateLayout!
             obj.Grid.Padding = [0 0 0 0]; %If changed, modify updateLayout!
@@ -121,8 +124,9 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
             obj.DummySection = uicontainer(obj.Grid);
             obj.DummySection.Layout.Row = [1 2];
 
-            % Set Colorable Background Objects
-            % obj.BackgroundColorableComponents = [obj.DummySection obj.Grid];
+            % Add a dummy to track height of the sections
+            obj.DummyHeightMonitor = uicontainer(obj.Grid,"Visible","off");
+            obj.DummyHeightMonitor.Layout.Row = 1;
 
             % Listen to size changes
             obj.SizeChangedListener = event.listener(obj,'SizeChanged',...
@@ -148,8 +152,8 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
                 obj.SectionLabel(sIdx).Parent = obj.Grid;
                 obj.SectionLabel(sIdx).Layout.Row = 2;
                 obj.SectionLabel(sIdx).Layout.Column = sIdx;
-                obj.SectionLabel(sIdx).BackgroundColor = obj.BackgroundColor;
-                obj.SectionLabel(sIdx).FontSize = 10;
+                % obj.SectionLabel(sIdx).BackgroundColor = obj.BackgroundColor;
+                % obj.SectionLabel(sIdx).FontSize = 10;
                 obj.SectionLabel(sIdx).HorizontalAlignment = 'center';
                 obj.SectionLabel(sIdx).Text = upper(obj.Section(sIdx).Title);
 
@@ -157,8 +161,8 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
                 obj.SectionButton(sIdx).Parent = obj.Grid;
                 obj.SectionButton(sIdx).Layout.Row = [1 2];
                 obj.SectionButton(sIdx).Layout.Column = sIdx;
-                obj.SectionButton(sIdx).BackgroundColor = obj.BackgroundColor;
-                obj.SectionButton(sIdx).FontSize = 10;
+                % obj.SectionButton(sIdx).BackgroundColor = obj.BackgroundColor;
+                % obj.SectionButton(sIdx).FontSize = 10;
                 obj.SectionButton(sIdx).IconAlignment = 'bottom';
                 obj.SectionButton(sIdx).WordWrap = 'on';
                 obj.SectionButton(sIdx).Visible = 'off';
@@ -392,10 +396,14 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
                 wt.utility.fastSet(fig,"Units","pixels");
                 figureWidth = fig.Position(3);
 
+                % Height of dummy gives height of panel
+                dPos = getpixelposition(obj.DummyHeightMonitor);
+
                 % Where should the panel go?
                 panelX = bPos(1);
                 panelWidth = section.TotalWidth;
-                panelHeight = bPos(4) - obj.Grid.RowHeight{2} - obj.Grid.RowSpacing;
+                % panelHeight = bPos(4) - obj.Grid.RowHeight{2} - obj.Grid.RowSpacing;
+                panelHeight = dPos(4);
                 panelY = bPos(2) - panelHeight - 1;
 
                 % Adjust panel X position if needed
