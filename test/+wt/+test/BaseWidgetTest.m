@@ -109,12 +109,15 @@ classdef BaseWidgetTest < wt.test.BaseTest
             testCase.verifyWarningFree(fcn);
             
             % Give a moment for update to run
-            % drawnow
+            drawnow
             
             % Verify new property value
-            % actualValue = testCase.Widget.(propName);
-            % testCase.verifyEquality(actualValue, expValue);
-            testCase.verifyPropertyValue(testCase.Widget, propName, expValue);
+            actualValue = testCase.Widget.(propName);
+            testCase.verifyEquality(actualValue, expValue);
+
+            % Tried to use this one, but the above works better because
+            % strings can equate to enumeration strings, etc.
+            % testCase.verifyPropertyValue(testCase.Widget, propName, expValue);
             
         end %function
         
@@ -147,13 +150,13 @@ classdef BaseWidgetTest < wt.test.BaseTest
             testCase.type(component, newValue);
             
             % Verify new property value
-            % actualValue = testCase.Widget.(propName);
-            % testCase.verifyEquality(actualValue, expValue);
+            actualValue = testCase.Widget.(propName);
+            testCase.verifyEquality(actualValue, expValue);
 
-            testCase.verifyPropertyValue(component, propName, expValue);
+            % Tried to use this one, but the above works better because
+            % strings can equate to enumeration strings, etc.
+            % testCase.verifyPropertyValue(component, propName, expValue);
 
-            
-            
         end %function
         
         
