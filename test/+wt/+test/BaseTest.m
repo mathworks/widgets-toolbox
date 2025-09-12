@@ -191,13 +191,34 @@ classdef BaseTest < matlab.uitest.TestCase
                 expValue
             end
 
-            import matlab.unittest.constraints.Eventually
-            import matlab.unittest.constraints.IsEqualTo
+            import matlab.unittest.constraints.*
 
             % Verify values
+            if isStringScalar(expValue)
+
+                constraint = IsEqualTo(expValue,...
+                    "Using", StringComparator);
+
+            elseif islogical(expValue)
+
+                constraint = IsEqualTo(expValue,...
+                    "Using", LogicalComparator);
+
+            elseif isnumeric(expValue)
+
+                constraint = IsEqualTo(expValue,...
+                    "Using", NumericComparator);
+
+            else
+
+                constraint = IsEqualTo(expValue);
+
+            end
+
+            % Perform the verification
             testCase.verifyThat(...
                 @()get(component, property),...
-                Eventually(IsEqualTo(expValue), "WithTimeoutOf", 5));
+                Eventually(constraint, "WithTimeoutOf", 5));
             
         end %function
         

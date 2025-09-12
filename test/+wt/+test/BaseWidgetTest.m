@@ -114,6 +114,10 @@ classdef BaseWidgetTest < wt.test.BaseTest
             % Verify new property value
             actualValue = testCase.Widget.(propName);
             testCase.verifyEquality(actualValue, expValue);
+
+            % Tried to use this one, but the above works better because
+            % strings can equate to enumeration strings, etc.
+            % testCase.verifyPropertyValue(testCase.Widget, propName, expValue);
             
         end %function
         
@@ -134,7 +138,7 @@ classdef BaseWidgetTest < wt.test.BaseTest
         end %function
         
         
-        function verifyTypeAction(testCase,control,newValue,propName,expValue)
+        function verifyTypeAction(testCase,component,newValue,propName,expValue)
             
             % If no expected new value after set was given, assume it
             % matches the newValue provided as usual
@@ -143,12 +147,16 @@ classdef BaseWidgetTest < wt.test.BaseTest
             end
             
             % Type the new value into the control
-            testCase.type(control, newValue);
+            testCase.type(component, newValue);
             
             % Verify new property value
             actualValue = testCase.Widget.(propName);
             testCase.verifyEquality(actualValue, expValue);
-            
+
+            % Tried to use this one, but the above works better because
+            % strings can equate to enumeration strings, etc.
+            % testCase.verifyPropertyValue(component, propName, expValue);
+
         end %function
         
         
