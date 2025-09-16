@@ -141,13 +141,27 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             obj.FieldColorableComponents = [obj.EditControl, obj.DropdownControl];
             obj.EnableableComponents = [obj.EditControl, obj.DropdownControl, obj.ButtonControl];
             obj.ButtonColorableComponents = obj.ButtonControl;
-            obj.TooltipableComponents = [obj.EditControl, obj.DropdownControl, obj.ButtonControl];
+            obj.TooltipableComponents = [obj.ButtonControl];
             obj.BackgroundColorableComponents = obj.Grid;
 
         end %function
 
 
         function update(obj)
+
+            % The Tooltip starts with the property value
+            tooltip = obj.Tooltip;
+
+            % Prepare an extended tooltip in case of a long path
+            if strlength(obj.Value) < 30
+                % Do nothing - the path is short
+            elseif strlength(tooltip)
+                % There is also a Tooltip value, so include both
+                tooltip = tooltip + newline + newline + obj.Value;
+            else
+                % Only a long path
+                tooltip = obj.Value;
+            end
 
             % Is history being shown?
             if obj.ShowHistory
@@ -165,11 +179,17 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
                 obj.DropdownControl.Items = histItems;
                 obj.DropdownControl.Value = obj.Value;
 
+                % Update the tooltip
+                obj.DropdownControl.Tooltip = tooltip;
+
             else
                 % NO - Using edit control
 
                 % Update the edit control text
                 obj.EditControl.Value = obj.Value;
+
+                % Update the tooltip
+                obj.EditControl.Tooltip = tooltip;
 
             end %if obj.ShowHistory
 
@@ -177,7 +197,7 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath;
             obj.WarnImage.Visible = showWarn;
 
-            % Set tooltip
+            % Set warning icon tooltip
             if showWarn
                 if obj.SelectionType == "file"
                     obj.WarnImage.Tooltip = 'File does not exist.';
@@ -195,6 +215,20 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             else
                 obj.Grid.ColumnWidth{4} = 25;
             end
+
+        end %function
+
+        
+        function updateTooltipableComponents(obj)
+            % Override this to ensure the update is called when Tooltip
+            % changes, so the combination of Tooltip and long paths are
+            % shown correctly
+
+            % Call superclass method
+            obj.updateTooltipableComponents@wt.mixin.Tooltipable();
+
+            % Trigger update
+            obj.requestUpdate()
 
         end %function
 
