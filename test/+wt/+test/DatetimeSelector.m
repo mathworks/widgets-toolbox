@@ -171,9 +171,8 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.verifyTimeZoneDisplay();
 
             % Verify the Value field was updated
-            actValue = string(w.Value.TimeZone);
-            testCase.verifyMatches(actValue, expValue)
-            
+            testCase.verifyValueTimeZone(expValue)
+
         end %function
 
             
@@ -322,18 +321,62 @@ methods
             expVal (1,1) string = testCase.Widget.Value.TimeZone
         end
 
-        % Give a moment for any display updates
-        pause(0.01);
-        drawnow
+        import matlab.unittest.constraints.Eventually
+        import matlab.unittest.constraints.IsEqualTo
 
-        % Verify correct timezone is selected
-        actVal = string(testCase.Widget.TimeZoneControl.Value);
-        testCase.verifyEqual(actVal, expVal);
+        % Give a moment for any display updates
+        % pause(0.01);
+        % drawnow
+        % 
+        % % Verify correct timezone is selected
+        % actVal = string(testCase.Widget.TimeZoneControl.Value);
+        % testCase.verifyEqual(actVal, expVal);
+
+        % % Verify the correct timezone
+        % testCase.verifyThat(...
+        %     @()getTimeZoneFromComponentDateTime(testCase.Widget.TimeZoneControl,"Value"),...
+        %     Eventually(IsEqualTo(expVal), "WithTimeoutOf", 5));'
+
+        testCase.verifyPropertyValue(testCase.Widget.TimeZoneControl, "Value", expVal);
 
     end %function
+
+
+    function verifyValueTimeZone(testCase, expVal)
+        % Verify the time zone in Value matches the expected value
+
+        arguments
+            testCase
+            expVal (1,1) string
+        end
+
+        import matlab.unittest.constraints.Eventually
+        import matlab.unittest.constraints.IsEqualTo
+
+        % Verify the correct timezone
+        testCase.verifyThat(...
+            @()getTimeZoneFromComponentDateTime(testCase.Widget,"Value"),...
+            Eventually(IsEqualTo(expVal), "WithTimeoutOf", 5));
+
+    end %function
+
+    % function verifyTimeZone
 
 end %methods
 
 
 end %classdef
+
+
+%% Helper functions
+function tz = getTimeZoneFromComponentDateTime(comp, propName)
+
+    arguments
+        comp (1,1) matlab.graphics.Graphics
+        propName (1,1) string
+    end
+
+    tz = string(comp.(propName).TimeZone);
+
+end %function
 
