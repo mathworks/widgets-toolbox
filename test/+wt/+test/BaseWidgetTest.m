@@ -1,4 +1,4 @@
-classdef BaseWidgetTest < wt.test.BaseTest
+classdef (Abstract) BaseWidgetTest < wt.test.BaseTest
     % Implements a unit test for a widget or component
     
     %   Copyright 2020-2025 The MathWorks Inc.

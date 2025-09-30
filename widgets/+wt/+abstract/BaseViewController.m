@@ -205,7 +205,7 @@ classdef BaseViewController < ...
             newValue = evt.Value;
 
             % Treat char as string
-            if ischar(newValue)
+            if ischar(newValue) || iscellstr(newValue) %#ok<ISCLSTR>
                 newValue = string(newValue);
             end
 
