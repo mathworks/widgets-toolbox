@@ -262,7 +262,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             % Update dialog position
             if ~isequal(obj.Position, posNew)
-                fprintf(" Change position: posOld = %f  posNew = %f\n", obj.Position, posNew);
+                % fprintf(" Change position: posOld = %f  posNew = %f\n", obj.Position, posNew);
                 obj.Position = posNew;
             end
 
