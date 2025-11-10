@@ -20,6 +20,6 @@ addonInfo = matlab.addons.installedAddons();
 addonId = "78895307-cc36-4970-8b66-0697da8f9352"; % Widgets Toolbox 2.x
 
 % Disable
-if ismember(addonId, addonInfo.Identifier)
+if ismember(addonId, addonInfo.Identifier) && matlab.addons.isAddonEnabled(addonId)
     matlab.addons.disableAddon(addonId);
 end
