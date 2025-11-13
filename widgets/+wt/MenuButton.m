@@ -16,6 +16,19 @@ classdef MenuButton < wt.abstract.BaseWidget
     end %events
 
 
+    %% Properties
+
+    properties (AbortSet)
+
+        % Icons
+        Icon (1,1) string = "kebabMenu_50.png"
+
+        % Tooltip
+        Tooltip (1,1) string = ""
+
+    end %properties
+
+
     %% Read-only properties
     properties (SetAccess = protected)
 
@@ -125,7 +138,8 @@ classdef MenuButton < wt.abstract.BaseWidget
 
             % Create the button
             obj.Button = uibutton(obj.Grid);
-            obj.Button.Text = "...";
+            obj.Button.Text = "";
+            obj.Button.Icon = "kebabMenu_50.png";
 
             % Set the callback for the button
             obj.Button.ButtonPushedFcn = @(~,~)obj.onButtonPushed();
@@ -140,10 +154,17 @@ classdef MenuButton < wt.abstract.BaseWidget
             fig = ancestor(obj,'figure');
             obj.Menu.Parent = fig;
 
+            % Update component list
+            obj.BackgroundColorableComponents = obj.Button;
+
         end %function
 
 
-        function update(~)
+        function update(obj)
+
+            % Update the button
+            obj.Button.Icon = obj.Icon;
+            obj.Button.Tooltip = obj.Tooltip;
 
         end %function
 
