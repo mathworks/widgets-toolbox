@@ -8,6 +8,8 @@ classdef MenuButton < wt.test.BaseWidgetTest
 
         function createFigure(testCase)
 
+            testCase.assumeMinimumRelease("R2022a")
+
             % Call superclass method
             testCase.createFigure@wt.test.BaseWidgetTest();
 
