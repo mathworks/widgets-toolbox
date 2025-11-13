@@ -1,4 +1,5 @@
-classdef MenuButton < wt.abstract.BaseWidget
+classdef MenuButton < wt.abstract.BaseWidget & ...
+        wt.mixin.ButtonColorable
     % Implements a button that provides a custom context menu
 
     % Copyright 2025 The MathWorks Inc.
@@ -155,7 +156,7 @@ classdef MenuButton < wt.abstract.BaseWidget
             obj.Menu.Parent = fig;
 
             % Update component list
-            obj.BackgroundColorableComponents = obj.Button;
+            obj.ButtonColorableComponents = obj.Button;
 
         end %function
 
