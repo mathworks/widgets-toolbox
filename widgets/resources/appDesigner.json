@@ -322,6 +322,23 @@
         100,
         30
       ]
+    },
+    {
+      "className": "wt.MenuButton",
+      "componentName": "Menu Button",
+      "description": "Implements a button that provides a custom context menu",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAB3RJTUUH6QsNEDYWGcuOcgAAAqlJREFUSIm1lk9PIlkUxX/vWZSkmCpS+AfQsaMQnKTBEDXRXfcsexb0F+v+GtO7/rNz1f0BMHGFGy0jDFoDopSglISiqnpl0j1RKDP2Wd/cc+695937xGAwCKWUOI7D4eEhtm3jui5hGPIUCCHQNI2lpSWKxSKmaRIEAeLu7i48OjqiVquRz+dZW1sjmUwipXwSQRAE9Ho9Tk9POTk5oVQqsb6+juI4DrVajZ2dHVZXVxmPx/i+j+/7PyWQUiKlJAgCgiB4kMQwDLa3t5mbm6NarbKwsIDY29sLU6kUW1tbjEajRxX2ej2ur68xTZNkMjmxhaqqcnBwQLfbRdq2TS6Xw/O8B4OFEHQ6HT58+Jv379/x6dNHHMdBCPEoged55HI5bNtGuq6LYRgTFXW7XRqNBsPhkPNzeypBGIYYhoHruij3Kichm82yu7vL8bHFxsYG6XR6qsvucyoTo35Q8+bNX7x65aLrOqqqRrbxVIJ7JBIJdF2f6KL/RTAajfA8D1VVmZmZeT4CIQS3tzfs7+/TbP5DofAHm5ubxOPxSG2KVEGr1ebr12+02//Sbl+wsvI7KysvIhFE2gezs7OkUiaJxG8YRpJY7BmHHIYhmUyGSuUtrVaL5eVl5ufnn9dFiqJQKBTI5/NT38x/EalFQgiklMRisSdv2UgV+L7P2dkZnU6HdDpNJpOJXEkkm15ctPny5TONRoOXL4tUKpXIc5DA1MCbm1uazSaXl5fY9jmDwWBqBfc5FU3T6Pf7JBKJR4my2SyvX/+JZR1TLJZYXFycKEoIQb/fR9O0aAdHCMF4PGY4HBKPx6euip8OTrlcxrIs6vU6qqo+6JIwDFEUBV3XUZTHxyalRFVV6vU6lmVRLpdRTNOkVCpRrVa5urp61qNvmibiV39bvgOaqVLcpOAzNAAAAABJRU5ErkJggg==",
+      "category": "Widgets Toolbox",
+      "authorName": "Robyn Jackey",
+      "authorEmail": "",
+      "version": "1.0",
+      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAIAAAC0Ujn1AAAAB3RJTUUH6QsNEDYeFxAGQAAAAllJREFUSIm1lkFvokAYhmdYmhBqwYx1LSQIEpPWAxeNW73o3+j/2x76B7Z347ZysDSNB230QNI0JBxkGgmgTGAPZHvYpDJ07Xsako+Hjzffl3cgxhgAMJ/PZ7OZ4ziEEPBZsSwrSZJhGK1WCwDAAgBGo9HLy0uv19M0jWXZT6MJIbZtm6bpuu5wOISTyeTh4eHq6up/oP984ObmptPpfLu8vOx2u6enpx+VJkmyXC6vr3/e3v4KgrBWq3EctwfNMAzP809PT4zjOJqm7Sl1Xff+/t627c1mc3f3e7FY5DauaZrjOAwhZL8VcRyHYZCdt9ttFEVJkuxHsyxLCGFyWyiXy42Gfnx8zHGcqmpnZ2cMk/8WyCZkv05OTvr9fqWCMH5rNpv1ep2GS4UGAIii2O3+oCS+i+rXPqcvRFMZQkiM8dt2uxUEoVQqQQgPgyYkXq1WlmX5vq/rervdQQgdBu152LKs6XSapunr66solinR+V7vdjvf99M0BQCEYRhFYXY+AFoQBF3XBUE4OjpSVVWW5YN5XSqV2u2OKJajKJRlWVEOtzIQQoQQQihNU8p+MxWY60LcYuiiokKnaer7vud5hZIz3+s4jp+fn8fjcRAE5+fn/X6vUvkwkoqh1+v146O1Wi2TJMHYq9W+I1Sh8Z12ZbJkCYIgCEKalqnQCKFGQ89CTlGUAiuT5dieeOR5fjAYqGp9s9nU62q1Ws2FZkBWkiTbtpvN5kd1EEKe5y8uWu+PuWjbtiVJYgzDME0zd6rgX9G0bJqmYRgQY3zwi5miKMPhEH7ddfIPc/we6t+lCqkAAAAASUVORK5CYII=",
+      "defaultPosition": [
+        1,
+        1,
+        30,
+        30
+      ]
     }
   ],
   "schema": 2,
