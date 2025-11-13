@@ -67,6 +67,48 @@ classdef MenuButton < wt.abstract.BaseWidget
 
         end %function
 
+
+        function newItem = addSubMenuItems(obj, parent, names, tags)
+            % Add sub-menu items to an existing menu item
+
+            arguments
+                obj
+                parent (1,1) matlab.ui.container.Menu
+                names (:,1) string
+                tags (:,1) string = repmat("",size(names))
+            end
+
+            % Validate tags is the same length as names
+            validateattributes(tags, {'string'}, {'vector', 'numel', length(names)});
+
+            % Create menu items based on provided names and tags
+            newItem = matlab.ui.container.Menu.empty(0,1);
+            for idx = 1:length(names)
+                newItem(idx,1) = uimenu("Parent", parent,...
+                    "Text", names(idx),...
+                    "Tag", tags(idx),...
+                    "MenuSelectedFcn", @(~,evt)onMenuSelected(obj,evt) );
+            end
+
+        end %function
+
+
+        function openMenu(obj)
+            % Opens the menu (also triggered by button pushed)
+
+            % Find the figure and attach the context menu
+            fig = ancestor(obj,'figure');
+            obj.Menu.Parent = fig;
+
+            % Find the button's location in the figure
+            pos = getpixelposition(obj.Button, true);
+            pos = [pos(1)+pos(3), pos(2)]; %lower-right
+
+            % Open the menu
+            obj.Menu.open(pos);
+
+        end %function
+
     end %methods
 
 
@@ -111,16 +153,8 @@ classdef MenuButton < wt.abstract.BaseWidget
             % Notify listeners
             notify(obj, 'ButtonPushed');
 
-            % Find the figure and attach the context menu
-            fig = ancestor(obj,'figure');
-            obj.Menu.Parent = fig;
-
-            % Find the button's location in the figure
-            pos = getpixelposition(obj.Button, true);
-            pos = [pos(1)+pos(3), pos(2)]; %lower-right
-
             % Open the menu
-            obj.Menu.open(pos);
+            obj.openMenu();
 
         end %function
 
