@@ -15,9 +15,6 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         % Triggered on value changing during slider motion, has companion callback
         ValueChanging
 
-        % Triggered on limits changed, has companion callback
-        LimitsChanged
-
     end %events
 
     %% Public dependent properties
@@ -80,14 +77,13 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
 
         % ValueIndex
         function set.ValueIndex(obj, val)
-            maxRange = days(obj.Limits(2) - obj.Limits(1));
+            maxRange = days(obj.Limits(2) - obj.Limits(1)) + 1;
             try
-                mustBeInRange(val, 0, maxRange)
+                mustBeInRange(val, 1, maxRange)
             catch ME
                 throwAsCaller(ME)
             end
-            dtArray = (obj.Limits(1):days(1):obj.Limits(2)) - obj.Limits(1);
-            obj.Value = dtArray(val);
+            obj.Value = obj.Limits(1) + days(val - 1);
         end %function
         function val = get.ValueIndex(obj)
             val = obj.Slider.Value;
@@ -100,7 +96,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             catch ME
                 throwAsCaller(ME);
             end
-            obj.Slider.Value = days(val - obj.Limits(1));
+            obj.Slider.Value = days(val - obj.Limits(1)) + 1;
             obj.Datepicker.Value = val;
         end %function
         function val = get.Value(obj)
@@ -114,8 +110,6 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             catch ME
                 throwAsCaller(ME)
             end
-            format = obj.Datepicker.DisplayFormat;
-            obj.Limits.Format = format;
         end %function
         function val = get.DisplayFormat(obj)
             val = obj.Datepicker.DisplayFormat;
@@ -137,6 +131,10 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
                 end
             end
             obj.Limits = startOfDay;
+        end %function
+        function val = get.Limits(obj)
+            val = obj.Limits;
+            val.Format = obj.Datepicker.DisplayFormat;
         end %function
 
         % Datepicker size
@@ -172,8 +170,8 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             obj.Slider = uislider(obj.Grid);
             obj.Slider.ValueChangedFcn = @(h,e)obj.onSliderChanged(e);
             obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanged(e);
-            obj.Slider.Limits = [0 2];
-            obj.Slider.Value = 1;
+            obj.Slider.Limits = [1 3];
+            obj.Slider.Value = 2;
 
             % Date picker
             obj.Datepicker = uidatepicker(obj.Grid);
@@ -234,7 +232,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             end 
 
             % Set component range
-            obj.Slider.Limits = [0 days(obj.Limits(2) - obj.Limits(1))];
+            obj.Slider.Limits = [0 days(obj.Limits(2) - obj.Limits(1))] + 1;
             obj.Datepicker.Limits = obj.Limits;
 
             % Update ticks
@@ -244,7 +242,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             if isnat(obj.Datepicker.Value)
                 obj.Datepicker.Value = obj.Limits(1);
             end
-            obj.Slider.Value = days(obj.Datepicker.Value - obj.Limits(1));
+            obj.Slider.Value = days(obj.Datepicker.Value - obj.Limits(1)) + 1;
 
             % Update the buttons
             updateButtonEnable(obj)
@@ -268,7 +266,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
 
             % Update the state
             obj.Datepicker.Value = newDate;
-            obj.Slider.Value = days(newDate - obj.Limits(1));
+            obj.Slider.Value = days(newDate - obj.Limits(1)) + 1;
 
             % Update button enable status
             updateButtonEnable(obj)
@@ -288,10 +286,10 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
 
             % Round value to whole days
             newValue = round(newValue);
-            newValue = min(max(newValue,0), days(obj.Limits(2) - obj.Limits(1)));
+            newValue = min(max(newValue,1), days(obj.Limits(2) - obj.Limits(1)) + 1);
 
             % Prepare event data
-            newDate = obj.Limits(1) + days(newValue);
+            newDate = obj.Limits(1) + days(newValue - 1);
             evtOut = wt.eventdata.PropertyChangedData('Value', newDate, oldValue);
 
             % Update the state
@@ -321,7 +319,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             evtOut = wt.eventdata.PropertyChangedData('Value', newValue, e.PreviousValue);
 
             % Update the state
-            obj.Slider.Value = days(newValue - obj.Limits(1));
+            obj.Slider.Value = days(newValue - obj.Limits(1)) + 1;
 
             % Update button enable status
             updateButtonEnable(obj)
@@ -362,7 +360,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             % Set slider limits and ticks            
             obj.Slider.MajorTicks = majorTicks;
             obj.Slider.MinorTicks = minorTicks;
-            obj.Slider.MajorTickLabels = categorical(obj.Limits(1) + days(majorTicks));
+            obj.Slider.MajorTickLabels = categorical(obj.Limits(1) + days(majorTicks - 1));
             
         end %function
 

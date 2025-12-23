@@ -22,7 +22,7 @@ classdef TickableDateSlider < handle
             end
 
             % How many days?
-            nDays = obj.Slider.Limits(2) + 1;
+            nDays = obj.Slider.Limits(2);
 
             % What space is needed for the labels?
             % Depends on font size and font weight.
@@ -70,8 +70,8 @@ classdef TickableDateSlider < handle
             end
 
             % At what tick location do the major tick labels need to go?
-            majorTicks = floor(0:majorIntervalStep:(nDays - 1));
-            majorTicks(end + 1) = (nDays - 1);
+            majorTicks = floor(1:majorIntervalStep:nDays);
+            majorTicks(end + 1) = nDays;
 
             % How much space is left for the minor ticks?
             minSpaceForMinorTick = 10;

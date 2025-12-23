@@ -15,9 +15,6 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
         % Triggered on value changing during slider motion, has companion callback
         ValueChanging
 
-        % Triggered on limits changed, has companion callback
-        LimitsChanged
-
     end %events
 
     %% Public properties
@@ -103,31 +100,31 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
         function set.ValueIndex(obj, val)
 
             % Validate input
-            maxRange = days(obj.Limits(2) - obj.Limits(1));
+            maxRange = days(obj.Limits(2) - obj.Limits(1)) + 1;
             try
-                mustBeInRange(val, 0, maxRange)
+                mustBeInRange(val, 1, maxRange)
                 mustBeIncreasing(val)
             catch ME
                 throwAsCaller(ME)
             end
 
             % Set value
-            obj.Value = obj.Limits(1) + days(val);
+            obj.Value = obj.Limits(1) + days(val - 1);
 
         end %function
         function val = get.ValueIndex(obj)
-            val = days([obj.DatepickerLeft.Value obj.DatepickerRight.Value] - obj.Limits(1));
+            val = days([obj.DatepickerLeft.Value obj.DatepickerRight.Value] - obj.Limits(1)) + 1;
         end %function
 
         % Value
         function set.Value(obj, val)
 
             % Validate input
-            valueIndex = days(val - obj.Limits(1));
+            valueIndex = days(val - obj.Limits(1) + 1);
             valueGap = days(diff(val));
-            maxRange = days(obj.Limits(2) - obj.Limits(1));
+            maxRange = days(obj.Limits(2) - obj.Limits(1)) + 1;
             try
-                mustBeInRange(valueIndex, 0, maxRange)
+                mustBeInRange(valueIndex, 1, maxRange)
                 mustBeGreaterThanOrEqual(valueGap, days(obj.MinGap))
                 mustBeIncreasing(valueIndex)                
             catch ME
@@ -297,11 +294,11 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.ButtonsRight = [uibutton(obj.GridButtonRight), uibutton(obj.GridButtonRight)];
             obj.ButtonsRight(1).ButtonPushedFcn = @(h,e)obj.onButtonPushed(e);
             obj.ButtonsRight(1).Tag = "rightUp";
-            obj.ButtonsRight(1).Icon = "Up_Grey_12.png";
+            obj.ButtonsRight(1).Icon = "up_grey_12.png";
             obj.ButtonsRight(1).Text = "";
             obj.ButtonsRight(2).ButtonPushedFcn = @(h,e)obj.onButtonPushed(e);
             obj.ButtonsRight(2).Tag = "rightDown";
-            obj.ButtonsRight(2).Icon = "Down_Grey_12.png";
+            obj.ButtonsRight(2).Icon = "down_grey_12.png";
             obj.ButtonsRight(2).Text = "";
 
             % Update the internal component lists
@@ -544,7 +541,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
             minLimit = obj.Limits(1);
             minLimit.Format = obj.DisplayFormat;
-            obj.Slider.MajorTickLabels = categorical(minLimit + days(majorTicks));
+            obj.Slider.MajorTickLabels = categorical(minLimit + days(majorTicks - 1));
         end %function
     
 
@@ -576,8 +573,8 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.DatepickerRight.Value = val(2);    
 
             % Update the limits and value in the slider
-            obj.Slider.Limits = days([0, diff(obj.Limits)]);
-            obj.Slider.Value = days(val - obj.Limits(1));
+            obj.Slider.Limits = days([0, diff(obj.Limits)]) + 1;
+            obj.Slider.Value = days(val - obj.Limits(1)) + 1;
 
         end %function
 
