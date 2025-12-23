@@ -218,14 +218,14 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValues(datetime("today") + days([5 6]));
 
+            % Allow some time for the component to catch up
+            drawnow;
+            pause(2)
+            
             % Check tick labels
             expLabels = string(datetime("today") + days(5:10));
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
             actualLabels = convertCharsToStrings(actualLabels(1:min(6, numel(actualLabels))));
-
-            % Allow some time for the component to catch up
-            drawnow;
-            pause(2)
 
             testCase.verifyEqual(actualLabels, expLabels)
 
@@ -234,6 +234,10 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValues(datetime("today") + days([5 6]));
+
+            % Allow some time for the component to catch up
+            drawnow
+            pause(2)
 
             % Check tick labels
             expLabels = string(datetime("today") + days(0:2:10));            
@@ -254,6 +258,10 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValues(datetime("today") + days([5 6]));
 
+            % Allow some time for the component to catch up
+            drawnow
+            pause(2)
+            
             % Check widgets exist
             expLabels = string(datetime("today") + days([0 10 20]));
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
