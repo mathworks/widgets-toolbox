@@ -137,9 +137,6 @@ classdef SearchDropDown < wt.abstract.BaseWidget &...
             % Create the search pannel (hidden)
             obj.createSearchPanel()
 
-            % Attach figure
-            obj.Figure = ancestor(obj,'figure');
-
             % Configure listeners
             obj.LocationChangedListener = listener(obj.EditField, ...
                 "LocationChanged", @(~,evt)onLocationChanged(obj,evt));
@@ -319,7 +316,7 @@ classdef SearchDropDown < wt.abstract.BaseWidget &...
             end %if
 
             % Is it in focus? If so, focus to the edit field instead
-            if obj.SearchExists
+            if obj.SearchExists && isscalar(obj.Figure) && isvalid(obj.Figure)
 
                 if obj.Debug
                     disp('  closeSearchPanel: check current focus object');
@@ -617,7 +614,12 @@ classdef SearchDropDown < wt.abstract.BaseWidget &...
             end
 
             % Attach figure
-            obj.Figure = ancestor(obj,'figure');
+            fig = ancestor(obj,'figure');
+            if isempty(fig)
+                return
+            else
+                obj.Figure = fig;
+            end
 
             % Move SearchPanel
             if obj.SearchExists
@@ -638,7 +640,12 @@ classdef SearchDropDown < wt.abstract.BaseWidget &...
             end
 
             % Get the figure ancestor
-            obj.Figure =  ancestor(obj,'figure');
+            fig = ancestor(obj,'figure');
+            if isempty(fig)
+                return
+            else
+                obj.Figure = fig;
+            end
 
             % Listen to current object (focus) changes
             obj.FigureCurrentObjectListener = listener(obj.Figure, ...
