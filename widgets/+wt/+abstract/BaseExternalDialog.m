@@ -7,7 +7,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
     % ** This is a prototype component that may change in the future. 
 
-    % Copyright 2022-2025 The MathWorks Inc.
+    % Copyright 2022-2026 The MathWorks Inc.
 
 
     %% Events
@@ -191,25 +191,27 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         % Listeners to reference/parent objects to trigger dialog delete
         LifecycleListeners (1,:) event.listener
 
-        % Modal image (optional)
-        ModalImage matlab.ui.control.Image
-
         % Dialog buttons (optional)
         DialogButtons wt.ButtonGrid
 
         % Last action when closing dialog
         LastAction string = []
 
+        % This dialog's figure
+        DialogFigure matlab.ui.Figure
+
     end %properties
 
 
-    properties (Transient, NonCopyable, Hidden, SetAccess = protected)
+    properties (Transient, NonCopyable, Hidden)
+        % These properties must be set by the ComponentContainer
+        % constructor arguments, so they can't be made private/protected
 
-        % Figure tied to the dialog lifecycle
+        % Figure tied to dialog lifecycle
         CallingFigure matlab.ui.Figure
 
-        % This dialog's figure
-        DialogFigure matlab.ui.Figure
+        % Modal image (optional)
+        ModalImage matlab.ui.control.Image
 
     end %properties
 
@@ -246,21 +248,14 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
                 modalImage.Tooltip = "Close the dialog box to continue using the app.";
                 modalImage.Tag = "ModalImage";
 
+                % Add special constructor arguments
+                constructArgs = {"CallingFigure", fig, "ModalImage", modalImage};
+                varargin = horzcat(varargin, constructArgs);
+
             end %if
 
             % Call superclass constructor
             obj = obj@wt.abstract.BaseWidget("Parent",[], varargin{:});
-
-            % Was a calling figure provided?
-            if isscalar(fig) && isvalid(fig)
-
-                % Store the modal background image
-                obj.ModalImage = modalImage;
-
-                % Update the modal image positioning
-                obj.updateModalImage();
-
-            end %if
 
         end %function
 
@@ -401,33 +396,19 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         function setup(obj)
             % Configure the dialog
 
-            % Store the parent figure
-            callingFig = ancestor(obj,'figure');
-            if isscalar(callingFig)
-                obj.CallingFigure = callingFig;
-            end
-
-            % Get the size input
-            sizeInput = obj.Size;
-
              % Create a new figure for this dialog
             obj.DialogFigure = uifigure();
             obj.DialogFigure.AutoResizeChildren = false;
             obj.DialogFigure.Units = "pixels";
-            obj.DialogFigure.Position(3:4) = sizeInput;
-            obj.positionOverCallingFigure()
-
-            % Apply the same theme (R2025a and later)
-            if ~isMATLABReleaseOlderThan("R2025a") && ...
-                    isscalar(obj.CallingFigure) && isvalid(obj.CallingFigure)
-                obj.DialogFigure.Theme = obj.CallingFigure.Theme;
-            end
 
             % Give the figure a grid layout
             obj.OuterGrid = uigridlayout(obj.DialogFigure, [1 1]);
             obj.OuterGrid.Padding = 0;
 
             % Move the content to the new figure
+            % (This object itself, the ComponentContainer subclass, is
+            % parented to the OuterGrid in the new figure in property
+            % obj.DialogFigure)
             obj.Parent = obj.OuterGrid;
 
             % Attach figure callbacks
@@ -463,8 +444,26 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
         function postSetup(obj)
 
-            % Update modal image now
+            % Update the modal image in the calling figure
             obj.updateModalImage();
+
+            % % Store the parent figure
+            % callingFig = ancestor(obj,'figure');
+            % if isscalar(callingFig)
+            %     obj.CallingFigure = callingFig;
+            % end
+
+            % Update the size
+            obj.DialogFigure.Position(3:4) = obj.Size;
+
+            % Position over the calling figure
+            obj.positionOverCallingFigure()
+
+            % Apply the same theme as CallingFigure (R2025a and later)
+            if ~isMATLABReleaseOlderThan("R2025a") && ...
+                    isscalar(obj.CallingFigure) && isvalid(obj.CallingFigure)
+                obj.DialogFigure.Theme = obj.CallingFigure.Theme;
+            end
 
         end %function
 
@@ -548,8 +547,19 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
                 % Calculate lower-left corner
                 dlgPos = floor((refSize - dlgSize) / 2) + refCornerA;
 
+                % If either dimension of size is *larger* than the
+                % CallingFigure, don't let the lower-left corner of the
+                % dialog automatically slide left or under the
+                % CallingFigure. We'll check later to ensure it's onscreen.
+                isLarger = dlgSize > refSize;
+                buffer = 50;
+                dlgPos(isLarger) = refCornerA(isLarger) + buffer;
+
                 % Set final position
                 obj.DialogFigure.Position = [dlgPos dlgSize];
+
+                % Ensure it is onscreen
+                movegui(obj.DialogFigure, 'onscreen');
 
             end %if
 
