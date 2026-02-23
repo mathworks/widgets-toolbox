@@ -400,7 +400,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             % Outer dialog panel
             obj.OuterPanel = uipanel(obj.OuterGrid);
-            obj.OuterPanel.Title = "Dialog Title";
+            obj.OuterPanel.Title = " ";
             obj.OuterPanel.FontSize = 16;
             obj.OuterPanel.FontWeight = "bold";
             %obj.OuterPanel.BorderWidth = 1;
