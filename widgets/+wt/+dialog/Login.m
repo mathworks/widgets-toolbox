@@ -73,6 +73,9 @@ classdef Login < wt.abstract.BaseInternalDialog
 
         function update(obj)
 
+            % Call superclass method
+            obj.update@wt.abstract.BaseInternalDialog();
+
             % Check if Login button can be enabled
             obj.updateButtonEnables();
 
