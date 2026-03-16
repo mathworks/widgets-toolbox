@@ -229,7 +229,7 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
 
                 % Hide button - can't do uigetdir on a webapp
                 obj.ButtonControl.Parent = [];
-                obj.Grid.ColumnWidth(4) = [];
+                obj.Grid.ColumnWidth(4:end) = [];
 
             elseif strlength(obj.ButtonLabel)
 

@@ -257,36 +257,55 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
             % Get the button control
             buttonControl = testCase.Widget.ButtonControl;
-            
-            % Normal App, SelectionType == file
-            testCase.Widget.IsWebApp = false;
-            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
-            testCase.verifyEventuallyHasParent(buttonControl);
-            
-            % Web App, SelectionType == file
-            testCase.Widget.IsWebApp = true;
-            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
-            testCase.verifyEventuallyHasParent(buttonControl);
-            
-            % Normal App, SelectionType == folder
-            testCase.Widget.IsWebApp = false;
+
+            % Sample paths to show
+            sampleFile = mfilename("fullpath");
+            sampleFolder = fileparts(sampleFile);
+
+
+            % --- SelectionType == folder --- %
             testCase.Widget.SelectionType = wt.enum.FileFolderState.folder;
-            testCase.verifyEventuallyHasParent(buttonControl);
-            
-            % Web App, SelectionType == folder
-            testCase.Widget.IsWebApp = true;
-            testCase.Widget.SelectionType = wt.enum.FileFolderState.folder;
-            testCase.verifyEventuallyHasParent(buttonControl);
-            
-            % Normal App, SelectionType == putfile
+            testCase.Widget.Value = sampleFolder;
+
+            % Normal App - should show button
             testCase.Widget.IsWebApp = false;
-            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
             testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
             
-            % Web App, SelectionType == putfile
+            % Web App - should NOT show button
             testCase.Widget.IsWebApp = true;
-            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
+            testCase.verifyEventuallyHasNoParent(buttonControl); % NO Parent
+            testCase.Widget.forceUpdate();
+
+
+            % --- SelectionType == file --- %
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
+            testCase.Widget.Value = sampleFile;
+
+            % Normal App - should show button
+            testCase.Widget.IsWebApp = false;
             testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+            
+            % Web App - should show button
+            testCase.Widget.IsWebApp = true;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+
+
+            % --- SelectionType == putfile --- %
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
+            testCase.Widget.Value = sampleFile;
+
+            % Normal App - should show button
+            testCase.Widget.IsWebApp = false;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+            
+            % Web App - should show button
+            testCase.Widget.IsWebApp = true;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
 
         end %function
         

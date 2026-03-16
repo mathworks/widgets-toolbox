@@ -159,7 +159,7 @@ classdef BaseTest < matlab.uitest.TestCase
             diag = "Expected the component to have its Parent be empty.";
             testCase.verifyThat(...
                 @()get(component, "Parent"),...
-                Eventually(IsScalar, "WithTimeoutOf", 5), diag);
+                Eventually(IsEmpty, "WithTimeoutOf", 5), diag);
             
         end %function
         
