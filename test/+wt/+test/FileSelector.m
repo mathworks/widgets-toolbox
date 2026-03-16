@@ -1,7 +1,7 @@
 classdef FileSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2026 The MathWorks Inc.
     
     
     
@@ -232,6 +232,7 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
         end %function
         
+
         function testButtonLabel(testCase)
             
             % Get the button control
@@ -249,6 +250,44 @@ classdef FileSelector < wt.test.BaseWidgetTest
             drawnow
             testCase.verifyEqual(string(buttonControl.Text), newValue);
             
+        end %function
+        
+
+        function testButtonVisibility(testCase)
+            
+            % Get the button control
+            buttonControl = testCase.Widget.ButtonControl;
+            
+            % Normal App, SelectionType == file
+            testCase.Widget.IsWebApp = false;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            
+            % Web App, SelectionType == file
+            testCase.Widget.IsWebApp = true;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            
+            % Normal App, SelectionType == folder
+            testCase.Widget.IsWebApp = false;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.folder;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            
+            % Web App, SelectionType == folder
+            testCase.Widget.IsWebApp = true;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.folder;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            
+            % Normal App, SelectionType == putfile
+            testCase.Widget.IsWebApp = false;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            
+            % Web App, SelectionType == putfile
+            testCase.Widget.IsWebApp = true;
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
+            testCase.verifyEventuallyHasParent(buttonControl);
+
         end %function
         
         % Since this test-case unlocks the test figure it should be last in 
@@ -306,25 +345,25 @@ classdef FileSelector < wt.test.BaseWidgetTest
     
 end %classdef
 
-function localPressEscape(fig)
-
-% Unlock the figure, otherwise escape will not work.
-matlab.uitest.unlock(fig);
-
-% Bring focus to figure
-figure(fig)
-
-% Press ESCAPE
-r = java.awt.Robot;
-r.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
-pause(0.1);
-r.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
-
-end
-
-function localRevertShowInWebAppsSetting(s, val)
-
-% Revert setting on cleanup
-s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = val;
-
-end
+% function localPressEscape(fig)
+% 
+% % Unlock the figure, otherwise escape will not work.
+% matlab.uitest.unlock(fig);
+% 
+% % Bring focus to figure
+% figure(fig)
+% 
+% % Press ESCAPE
+% r = java.awt.Robot;
+% r.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+% pause(0.1);
+% r.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
+% 
+% end
+% 
+% function localRevertShowInWebAppsSetting(s, val)
+% 
+% % Revert setting on cleanup
+% s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = val;
+% 
+% end

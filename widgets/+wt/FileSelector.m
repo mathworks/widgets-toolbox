@@ -6,7 +6,7 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
         wt.mixin.Tooltipable
     % File or folder selection control with browse button
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
 
     %% Public properties
@@ -93,6 +93,14 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
     end %properties
 
 
+    properties (Hidden)
+
+        % Indicates if this is a web app
+        IsWebApp (1,1) logical = false
+
+    end %properties
+
+
 
     %% Protected methods
     methods (Access = protected)
@@ -104,6 +112,13 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
 
             % Adjust default size
             obj.Position(3:4) = [400 25];
+
+            % Is this a web app?
+            try %#ok<TRYNC>
+                % This is undocumented but was mentioned here:
+                % https://www.mathworks.com/matlabcentral/answers/584102-check-if-is-deployed-as-web-app
+                obj.IsWebApp = matlab.internal.environment.context.isWebAppServer();
+            end
 
             % Configure Grid
             obj.Grid.ColumnWidth = {'1x',25,25,25};
@@ -210,10 +225,24 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
 
             % Update button appearance
             obj.ButtonControl.Text = obj.ButtonLabel;
-            if strlength(obj.ButtonLabel)
+            if obj.IsWebApp && obj.SelectionType == "folder"
+
+                % Hide button - can't do uigetdir on a webapp
+                obj.ButtonControl.Parent = [];
+                obj.Grid.ColumnWidth(4) = [];
+
+            elseif strlength(obj.ButtonLabel)
+
+                % Button has a label - make room
+                obj.ButtonControl.Parent = obj.Grid;
                 obj.Grid.ColumnWidth{4} = 125;
+
             else
+
+                % Button is only an icon
+                obj.ButtonControl.Parent = obj.Grid;
                 obj.Grid.ColumnWidth{4} = 25;
+
             end
 
         end %function
