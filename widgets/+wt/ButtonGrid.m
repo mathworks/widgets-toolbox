@@ -83,6 +83,8 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
             % Configure Main Grid
             obj.Grid.Padding = 2;
+            obj.Grid.ColumnWidth = {};
+            obj.Grid.RowHeight = {};
             
             % Update the internal component lists
             obj.BackgroundColorableComponents = obj.Grid;
@@ -95,6 +97,10 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
             % How many tasks?
             numOld = numel(obj.Button);
             numNew = max( numel(obj.Icon), numel(obj.Text) );
+
+            % How many rows/cols in the Grid?
+            numOldRows = numel(obj.Grid.RowHeight);
+            numOldCols = numel(obj.Grid.ColumnWidth);
 
             % Update number of rows
             if numNew > numOld
@@ -169,12 +175,20 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
             % Set button grids
             if obj.Orientation == "vertical"
-                obj.Grid.RowHeight(numOld+1:numNew) = {defaultSize};
+                obj.Grid.RowHeight(numOldRows+1:numNew) = {defaultSize};
+            else
+                obj.Grid.ColumnWidth(numOldCols+1:numNew) = {defaultSize};
+            end
+
+            % Remove any extra rows/cols from the grid
+            if obj.Orientation == "vertical"
+                obj.Grid.RowHeight(numNew+1:end) = [];
                 obj.Grid.ColumnWidth = obj.Grid.ColumnWidth(1);
             else
-                obj.Grid.ColumnWidth(numOld+1:numNew) = {defaultSize};
+                obj.Grid.ColumnWidth(numNew+1:end) = [];
                 obj.Grid.RowHeight = obj.Grid.RowHeight(1);
             end
+
 
         end %function
 
@@ -188,6 +202,7 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
 
         end %function
 
+
         function updateGridForButton(obj, prop, value)
             % Update main grid properties to value
 
@@ -198,13 +213,17 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
             end
 
             % If cell is scalar, repeat value for every button
+            numRowsOrCols = max(1, numel(obj.Grid.(prop)));
             if isscalar(value)
-                value = repmat(value, 1, numel(obj.Grid.(prop)));
+                value = repmat(value, 1, numRowsOrCols);
             end
 
             % Update button size
-            nElements = min(numel(value), numel(obj.Grid.(prop)));
-            obj.Grid.(prop)(1:nElements) = value(1:nElements);
+            numValues = numel(value);
+            obj.Grid.(prop)(1:numValues) = value(1:numValues);
+
+            % Request update
+            obj.requestUpdate();
             
         end %function
 
