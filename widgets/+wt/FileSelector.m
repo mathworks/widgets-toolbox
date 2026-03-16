@@ -330,13 +330,26 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             fig = ancestor(obj,"figure");
 
             % Prompt user for the path
-            if obj.SelectionType == "file"
-                [fileName,pathName] = uigetfile(filter,"Select a file",initialPath);
-            elseif obj.SelectionType == "putfile"
-                [fileName,pathName] = uiputfile(filter,"Specify an output file",initialPath);
+            if obj.IsWebApp
+                % Web app - 
+                if obj.SelectionType == "file"
+                    [fileName,pathName] = uigetfile(filter,"Select a file");
+                elseif obj.SelectionType == "putfile"
+                    [fileName,pathName] = uiputfile(filter,"Specify an output file");
+                else
+                    % Do nothing - no uiputfile on web app
+                    obj.throwError("INTERNAL ERROR: Folder selection dialog not available on web app.")
+                    return
+                end
             else
-                pathName = uigetdir(initialPath, "Select a folder");
-                fileName = "";
+                if obj.SelectionType == "file"
+                    [fileName,pathName] = uigetfile(filter,"Select a file",initialPath);
+                elseif obj.SelectionType == "putfile"
+                    [fileName,pathName] = uiputfile(filter,"Specify an output file",initialPath);
+                else
+                    pathName = uigetdir(initialPath, "Select a folder");
+                    fileName = "";
+                end
             end
 
             % Restore figure focus
