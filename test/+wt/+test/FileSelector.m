@@ -170,6 +170,28 @@ classdef FileSelector < wt.test.BaseWidgetTest
             %testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
+
+            
+        function testWebAddress(testCase)
+            
+            % Get the edit field
+            editControl = testCase.Widget.EditControl;
+            
+            % Set the type
+            testCase.verifySetProperty("SelectionType", "folder");
+            
+            % Type a valid value
+            newValue = "s3://abucket/afolder";
+            testCase.verifyTypeAction(editControl, newValue, "Value");
+            
+            % Verify the ValueIsValidPath value (false because not local
+            % folder)
+            testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image does not show (we ignore web address)
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
+            
+        end %function
         
         
         function testRootDirectoryAndHistory(testCase)

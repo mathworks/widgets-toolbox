@@ -209,7 +209,8 @@ classdef FileSelector < wt.abstract.BaseWidget & ...
             end %if obj.ShowHistory
 
             % Show the warning icon?
-            showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath;
+            isWeb = startsWith(obj.Value, alphanumericsPattern + "://");
+            showWarn = strlength(obj.Value) && ~obj.ValueIsValidPath && ~isWeb;
             obj.WarnImage.Visible = showWarn;
 
             % Set warning icon tooltip
