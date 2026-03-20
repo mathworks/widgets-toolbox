@@ -1,7 +1,7 @@
 classdef FileSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2026 The MathWorks Inc.
     
     
     
@@ -170,6 +170,28 @@ classdef FileSelector < wt.test.BaseWidgetTest
             %testCase.verifyTrue(logical(testCase.Widget.WarnImage.Visible));
             
         end %function
+
+            
+        function testWebAddress(testCase)
+            
+            % Get the edit field
+            editControl = testCase.Widget.EditControl;
+            
+            % Set the type
+            testCase.verifySetProperty("SelectionType", "folder");
+            
+            % Type a valid value
+            newValue = "s3://abucket/afolder";
+            testCase.verifyTypeAction(editControl, newValue, "Value");
+            
+            % Verify the ValueIsValidPath value (false because not local
+            % folder)
+            testCase.verifyFalse(testCase.Widget.ValueIsValidPath)
+
+            % Verify the warn image does not show (we ignore web address)
+            testCase.verifyFalse(logical(testCase.Widget.WarnImage.Visible));
+            
+        end %function
         
         
         function testRootDirectoryAndHistory(testCase)
@@ -232,6 +254,7 @@ classdef FileSelector < wt.test.BaseWidgetTest
             
         end %function
         
+
         function testButtonLabel(testCase)
             
             % Get the button control
@@ -249,6 +272,63 @@ classdef FileSelector < wt.test.BaseWidgetTest
             drawnow
             testCase.verifyEqual(string(buttonControl.Text), newValue);
             
+        end %function
+        
+
+        function testButtonVisibility(testCase)
+            
+            % Get the button control
+            buttonControl = testCase.Widget.ButtonControl;
+
+            % Sample paths to show
+            sampleFile = mfilename("fullpath");
+            sampleFolder = fileparts(sampleFile);
+
+
+            % --- SelectionType == folder --- %
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.folder;
+            testCase.Widget.Value = sampleFolder;
+
+            % Normal App - should show button
+            testCase.Widget.IsWebApp = false;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+            
+            % Web App - should NOT show button
+            testCase.Widget.IsWebApp = true;
+            testCase.verifyEventuallyHasNoParent(buttonControl); % NO Parent
+            testCase.Widget.forceUpdate();
+
+
+            % --- SelectionType == file --- %
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.file;
+            testCase.Widget.Value = sampleFile;
+
+            % Normal App - should show button
+            testCase.Widget.IsWebApp = false;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+            
+            % Web App - should show button
+            testCase.Widget.IsWebApp = true;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+
+
+            % --- SelectionType == putfile --- %
+            testCase.Widget.SelectionType = wt.enum.FileFolderState.putfile;
+            testCase.Widget.Value = sampleFile;
+
+            % Normal App - should show button
+            testCase.Widget.IsWebApp = false;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+            
+            % Web App - should show button
+            testCase.Widget.IsWebApp = true;
+            testCase.verifyEventuallyHasParent(buttonControl);
+            testCase.Widget.forceUpdate();
+
         end %function
         
         % Since this test-case unlocks the test figure it should be last in 
@@ -306,25 +386,25 @@ classdef FileSelector < wt.test.BaseWidgetTest
     
 end %classdef
 
-function localPressEscape(fig)
-
-% Unlock the figure, otherwise escape will not work.
-matlab.uitest.unlock(fig);
-
-% Bring focus to figure
-figure(fig)
-
-% Press ESCAPE
-r = java.awt.Robot;
-r.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
-pause(0.1);
-r.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
-
-end
-
-function localRevertShowInWebAppsSetting(s, val)
-
-% Revert setting on cleanup
-s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = val;
-
-end
+% function localPressEscape(fig)
+% 
+% % Unlock the figure, otherwise escape will not work.
+% matlab.uitest.unlock(fig);
+% 
+% % Bring focus to figure
+% figure(fig)
+% 
+% % Press ESCAPE
+% r = java.awt.Robot;
+% r.keyPress(java.awt.event.KeyEvent.VK_ESCAPE);
+% pause(0.1);
+% r.keyRelease(java.awt.event.KeyEvent.VK_ESCAPE);
+% 
+% end
+% 
+% function localRevertShowInWebAppsSetting(s, val)
+% 
+% % Revert setting on cleanup
+% s.matlab.ui.dialog.fileIO.ShowInWebApps.TemporaryValue = val;
+% 
+% end

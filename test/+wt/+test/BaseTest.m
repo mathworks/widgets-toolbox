@@ -1,7 +1,7 @@
 classdef BaseTest < matlab.uitest.TestCase
     % Implements a unit test with some added helper methods
     
-    %   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2026 The MathWorks Inc.
     
     
     %% Protected Helper Methods
@@ -111,6 +111,55 @@ classdef BaseTest < matlab.uitest.TestCase
             testCase.verifyThat(...
                 @()logical(component.Visible),...
                 Eventually(IsFalse, "WithTimeoutOf", 5));
+            
+        end %function
+        
+        
+        function verifyEventuallyHasParent(testCase, component, parent)
+            % Verify the specified component eventually has a parent
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+                parent matlab.graphics.Graphics {mustBeScalarOrEmpty} = gobjects(0)
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsScalar
+            import matlab.unittest.constraints.IsEqualTo
+
+            % Verify values
+            if isempty(parent)
+                diag = "Expected the component to have a parent.";
+                testCase.verifyThat(...
+                    @()get(component, "Parent"),...
+                    Eventually(IsScalar, "WithTimeoutOf", 5), diag);
+            else
+                diag = "Expected the component to have the specified parent.";
+                testCase.verifyThat(...
+                    @()get(component, "Parent"),...
+                    Eventually(IsEqualTo(parent), "WithTimeoutOf", 5), diag);
+            end
+            
+        end %function
+        
+        
+        function verifyEventuallyHasNoParent(testCase, component)
+            % Verify the specified component gets unparented
+
+            arguments
+                testCase matlab.uitest.TestCase
+                component
+            end
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsEmpty
+
+            % Verify values
+            diag = "Expected the component to have its Parent be empty.";
+            testCase.verifyThat(...
+                @()get(component, "Parent"),...
+                Eventually(IsEmpty, "WithTimeoutOf", 5), diag);
             
         end %function
         
