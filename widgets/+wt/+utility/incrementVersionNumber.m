@@ -19,7 +19,7 @@ arguments (Output)
 end
 
 % Read in the version info
-[~, versionParts] = advappa.utility.readVersionNumber(filePath);
+[~, versionParts] = wt.utility.readVersionNumber(filePath);
 
 % Increment the build index in the version number
 numVersionParts = numel(versionParts);
