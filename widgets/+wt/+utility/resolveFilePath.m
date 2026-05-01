@@ -3,11 +3,13 @@ function filePath = resolveFilePath(fileName)
 %
 % Order of priority:
 %   1. Full path provided
-%   2. If deployed, installation folder of the application 
+%   2. If deployed, installation folder of the application
 %      (e.g. C:\Program Files\...)
 %   3. Folder of the calling function, or the first non-namespace folder
 %      (@/+) up from the calling function's folder.
 %   4. MATLAB path (via "which" command)
+
+%   Copyright 2026 The MathWorks Inc.
 
 arguments
     fileName (1,1) string

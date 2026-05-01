@@ -8,6 +8,8 @@ function versionStr = incrementVersionNumber(filePath)
 %   1.0.3
 %   1.3.9.2019
 
+%   Copyright 2026 The MathWorks Inc.
+
 arguments (Input)
     filePath (1,1) string {mustBeFile}
 end
