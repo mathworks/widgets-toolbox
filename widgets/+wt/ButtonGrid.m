@@ -181,10 +181,10 @@ classdef ButtonGrid < wt.abstract.BaseWidget & ...
             end
 
             % Remove any extra rows/cols from the grid
-            if obj.Orientation == "vertical"
+            if obj.Orientation == "vertical" && numNew > 0
                 obj.Grid.RowHeight(numNew+1:end) = [];
                 obj.Grid.ColumnWidth = obj.Grid.ColumnWidth(1);
-            else
+            elseif obj.Orientation == "horizontal" && numNew > 0
                 obj.Grid.ColumnWidth(numNew+1:end) = [];
                 obj.Grid.RowHeight = obj.Grid.RowHeight(1);
             end
