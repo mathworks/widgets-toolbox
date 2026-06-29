@@ -17,7 +17,7 @@ jobs:
         platform: [ubuntu-latest, windows-latest]
 
         # List of MATLAB releases over which to run the tests.
-        matlab-version: [R2023b, R2024a, R2024b, latest]
+        matlab-version: [R2023b, R2024a, R2024b, R2025b, R2026a, latest]
 
         # UITest with gestures only from R2023b and later.
 
