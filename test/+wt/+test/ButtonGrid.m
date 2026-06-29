@@ -37,7 +37,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Icon", icon);
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -55,7 +55,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -69,7 +69,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyEmpty(testCase.Widget.Button)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -87,7 +87,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -105,7 +105,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -125,7 +125,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -158,7 +158,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyEqual(string({evts.Tag}), tag)
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -171,7 +171,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.Widget.Grid.BackgroundColor, newValue);
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -193,7 +193,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyNumElements(testCase.Widget.Grid.ColumnWidth, 1);
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -228,7 +228,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyMatches(button.IconAlignment, newValue);
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
 
@@ -254,7 +254,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.Widget.ButtonWidth, {10 20 30 30})
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
 
             % Change to vertical layout
             newOrientation = "vertical";
@@ -272,7 +272,7 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifySetProperty("ButtonWidth", 20, {20})
 
             diag = "Expected update to run without warnings.";
-            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(), diag)
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end
         
