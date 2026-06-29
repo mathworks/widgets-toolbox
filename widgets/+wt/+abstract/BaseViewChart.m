@@ -64,10 +64,18 @@ classdef BaseViewChart < ...
     %% Debugging Methods
     methods
         
-        function forceUpdateChart(obj)
+        function forceUpdateChart(obj, showMessage)
             % Forces update to run (For debugging only!)
 
-            disp("DEBUG: Forcing update for " + class(obj));
+            arguments
+                obj
+                showMessage (1,1) logical = true
+            end
+
+            if showMessage
+                disp("DEBUG: Forcing update for " + class(obj));
+            end
+            
             obj.update();
 
         end %function

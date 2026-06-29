@@ -35,6 +35,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             icon = ["add" "delete" "play" "pause" "stop"] + "_24.png";
             
             testCase.verifySetProperty("Icon", icon);
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -50,6 +53,23 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             
             expNum = max(numel(text), numel(icon));
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
+            
+        end %function
+        
+        
+        function testEmptyButtons(testCase)
+            % Add buttons by Icon and Text
+            
+            testCase.verifySetProperty("Icon", strings(1,0));
+            testCase.verifySetProperty("Text", strings(1,0));
+            
+            testCase.verifyEmpty(testCase.Widget.Button)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -65,6 +85,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             
             expNum = max(numel(text), numel(icon));
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -80,6 +103,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             
             expNum = max(numel(text), numel(icon));
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -97,6 +123,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             
             expNum = max(numel(text), numel(icon));
             testCase.verifyNumElements(testCase.Widget.Button, expNum)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -127,6 +156,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifyEqual([evts.Button], buttons)
             testCase.verifyEqual(string({evts.Text}), text)
             testCase.verifyEqual(string({evts.Tag}), tag)
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -137,6 +169,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             newValue = [1 0.5 0.2];
             testCase.verifySetProperty("BackgroundColor", newValue);
             testCase.verifyEqual(testCase.Widget.Grid.BackgroundColor, newValue);
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -156,6 +191,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Orientation", "vertical");
             testCase.verifyNumElements(testCase.Widget.Grid.RowHeight, numel(icon));
             testCase.verifyNumElements(testCase.Widget.Grid.ColumnWidth, 1);
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
         
@@ -188,6 +226,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             newValue = "left";
             testCase.verifySetProperty("IconAlignment", newValue);
             testCase.verifyMatches(button.IconAlignment, newValue);
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end %function
 
@@ -212,6 +253,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Text", ["1", "2", "3", "4"], ["1", "2", "3", "4"])
             testCase.verifyEqual(testCase.Widget.ButtonWidth, {10 20 30 30})
 
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
+
             % Change to vertical layout
             newOrientation = "vertical";
             testCase.verifySetProperty("Orientation", newOrientation);
@@ -226,6 +270,9 @@ classdef ButtonGrid < wt.test.BaseWidgetTest
 
             testCase.verifySetProperty("ButtonWidth", {10 'fit'}, {10})
             testCase.verifySetProperty("ButtonWidth", 20, {20})
+
+            diag = "Expected update to run without warnings.";
+            testCase.verifyWarningFree(@()testCase.Widget.forceUpdate(false), diag)
             
         end
         
