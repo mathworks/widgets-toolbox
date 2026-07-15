@@ -1,96 +1,144 @@
 classdef (HandleCompatible) Orderable
     % Implements functionality for orderable lists
-%   Copyright 2025 The MathWorks Inc.
+
+    % Copyright 2025 The MathWorks Inc.
 
 
     %% Internal Static methods
     methods (Static, Access = protected)
 
         function [idxNew, idxSelAfter] = shiftListIndices(shift, numItems, idxSel)
-            % Shift the selected indices up/down within a list
-
-            % Define arguments
-            arguments %(Input)
-                % Shift amount and direction (typically 1 or -1)
-                shift (1,1) double {mustBeInteger}
-
-                % Total number of items in the list
-                numItems (1,1) double {mustBeInteger, mustBeNonnegative}
-
-                % Selected indices to move
-                idxSel (1,:) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(idxSel,numItems)}
-            end
-
-            % arguments (Output)
-            %     % Indices of the complete list after re-ordering
-            %     idxNew (1,:) double {mustBeInteger, mustBePositive}
+            % shiftListIndices  Move selected item indices within 1:numItems and report new indices
             %
-            %     % Indices where the selected data end up after the move
-            %     idxSelAfter (1,:) double {mustBeInteger, mustBePositive}
-            % end
+            % [idxNew, idxSelAfter] = shiftListIndices(shift, numItems, idxSel)
+            %
+            % Inputs
+            %   shift     - integer shift (positive -> down/increase index, negative -> up/decrease)
+            %               use +Inf to move to bottom, -Inf to move to top
+            %   numItems  - total number of items (positive integer)
+            %   idxSel    - vector of selected indices (1-based). May be unsorted; duplicates ignored.
+            %
+            % Outputs
+            %   idxNew       - permutation vector 1:numItems after applying the move
+            %   idxSelAfter  - vector of same length/order as unique(idxSel) input, giving the
+            %                  positions (indices into idxNew) where each originally selected item now sits
+            %
+            % Notes
+            %   - Preserves relative order of selected items and of remaining items.
+            %   - Non-contiguous selections are supported.
+            %   - Selections outside 1:numItems are ignored.
 
-            % Make indices to all items as they are now
-            idxNew = 1:numItems;
-
-            % Allocate the final indices
-            idxSelAfter = idxSel;
-
-            % Find the last stable item that doesn't move
-            [~,idxStable] = setdiff(idxNew, idxSel, 'stable');
-            if ~isempty(idxStable)
-                idxFirstStable = idxStable(1);
-                idxLastStable = idxStable(end);
-            else
-                idxFirstStable = inf;
-                idxLastStable = 0;
+            arguments
+                shift {mustBeNumeric}
+                numItems (1,1) {mustBeInteger, mustBePositive}
+                idxSel (:,1) {mustBeNumeric} = []
             end
 
-            % Which way do we loop?
-            if shift > 0 %Shift to end
+            % Normalize selection: keep original order of unique entries
+            idxSelOrig = idxSel(:).';
+            if isempty(idxSelOrig)
+                idxNew = 1:numItems;
+                idxSelAfter = zeros(size(idxSelOrig));
+                return
+            end
+            % Unique while preserving first-occurrence order:
+            [~, ia] = unique(idxSelOrig, 'stable');
+            idxSelOrig = idxSelOrig(sort(ia));   % now unique in original order
 
-                for idxToMove = numel(idxSel):-1:1
+            % Clamp to valid range
+            idxSelOrig = idxSelOrig(idxSelOrig >= 1 & idxSelOrig <= numItems);
+            if isempty(idxSelOrig)
+                idxNew = 1:numItems;
+                idxSelAfter = zeros(size(idxSelOrig));
+                return
+            end
+            if numel(idxSelOrig) == numItems
+                idxNew = 1:numItems;
+                idxSelAfter = (1:numItems);
+                return
+            end
 
-                    % Calculate if there's room to move this item
-                    idxThisBefore = idxSel(idxToMove);
-                    thisShift = max( min(idxLastStable-idxThisBefore, shift), 0 );
-
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-                    idxSelAfter(idxToMove) = idxThisAfter;
-
-                    % Where do other items move from/to
-                    idxOthersBefore = idxSel(idxToMove)+1:1:idxThisAfter;
-                    idxOthersAfter = idxOthersBefore - thisShift;
-
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
+            % Quick handle infinities
+            if isinf(shift)
+                if shift > 0
+                    idxNew = [setdiff(1:numItems, idxSelOrig, 'stable'), idxSelOrig];
+                else
+                    idxNew = [idxSelOrig, setdiff(1:numItems, idxSelOrig, 'stable')];
                 end
+                % positions of original selected items in idxNew
+                % For each original selected item, find its index in idxNew
+                idxSelAfter = arrayfun(@(x) find(idxNew==x,1,'first'), idxSelOrig);
+                return
+            end
 
-            elseif shift < 0 %Shift to start
+            k = round(shift);
 
-                for idxToMove = 1:numel(idxSel)
+            % Work with sorted selection for deterministic placement logic, but track originals
+            selSorted = unique(idxSelOrig);  % ascending order
+            % numSel = numel(selSorted);
 
-                    % Calculate if there's room to move this item
-                    idxThisBefore = idxSel(idxToMove);
-                    thisShift = min( max(idxFirstStable-idxThisBefore, shift), 0 );
+            % Compute desired target positions for each selected item (clamped)
+            targets = min(max(selSorted + k, 1), numItems);
 
-                    % Where does this item move from/to
-                    idxThisAfter = idxThisBefore + thisShift;
-                    idxSelAfter(idxToMove) = idxThisAfter;
+            % Prepare result vector and occupancy map
+            res = nan(1, numItems);
+            occupied = false(1, numItems);
 
-                    % Where do other items move from/to
-                    idxOthersBefore = idxThisAfter:1:idxSel(idxToMove)-1;
-                    idxOthersAfter = idxOthersBefore - thisShift;
+            % Determine assignment order to resolve collisions consistent with shift direction
+            if k >= 0
+                % for nonnegative shift, assign in increasing target order (tie-break by original index)
+                [~, ord] = sortrows([targets(:), selSorted(:)]);
+            else
+                % for negative shift, assign in decreasing target order
+                [~, ord] = sortrows([-targets(:), -selSorted(:)]);
+            end
+            ord = ord.';  % make row vector of indices into selSorted
 
-                    % Move the items
-                    idxNew([idxThisAfter idxOthersAfter]) = idxNew([idxThisBefore idxOthersBefore]);
-
+            % Assign selected items to nearest available slot in shift direction
+            for ii = ord
+                t = targets(ii);
+                if k >= 0
+                    % first free position >= t
+                    posRel = find(~occupied(t:end), 1, 'first');
+                    if isempty(posRel)
+                        % place at last free slot
+                        p = find(~occupied, 1, 'last');
+                        assignPos = p;
+                    else
+                        assignPos = t + posRel - 1;
+                    end
+                else
+                    % last free position <= t
+                    pos = find(~occupied(1:t), 1, 'last');
+                    if isempty(pos)
+                        p = find(~occupied, 1, 'first');
+                        assignPos = p;
+                    else
+                        assignPos = pos;
+                    end
                 end
+                res(assignPos) = selSorted(ii);
+                occupied(assignPos) = true;
+            end
 
-            end %if shift > 0
+            % Fill remaining slots with non-selected items in original order
+            remItems = setdiff(1:numItems, selSorted, 'stable');
+            remPtr = 1;
+            for p = 1:numItems
+                if isnan(res(p))
+                    res(p) = remItems(remPtr);
+                    remPtr = remPtr + 1;
+                end
+            end
 
-        end %function
+            idxNew = res;
+
+            % Map original selected items (in the order provided) to their new positions
+            % Note: if input had duplicates or out-of-range entries removed earlier, idxSelOrig reflects uniques in-range
+            idxSelAfter = arrayfun(@(x) find(idxNew==x,1,'first'), idxSelOrig);
+
+        end
+
 
 
         function [backEnabled, fwdEnabled] = areOrderButtonsEnabled(numItems, idxSel, allowSortItem)
