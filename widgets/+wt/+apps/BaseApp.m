@@ -7,6 +7,15 @@ classdef BaseApp < matlab.apps.AppBase & ...
     % Copyright 2020-2025 The MathWorks, Inc.
 
 
+    %% Events
+    events (ListenAccess = public)
+
+        % Triggered after the figure's theme has changed
+        WidgetThemeChanged
+
+    end %event
+
+
     %% Properties
     properties (AbortSet)
 
@@ -32,6 +41,9 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
         % Position of the app window
         Position
+
+        % Theme of the app window
+        Theme
 
         % Visibility of the app window
         Visible
@@ -66,6 +78,15 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
         function set.Position(app,value)
             app.Figure.Position = value;
+        end
+
+
+        function value = get.Theme(app)
+            value = app.Figure.Theme;
+        end
+
+        function set.Theme(app,value)
+            app.Figure.Theme = value;
         end
 
 
@@ -109,6 +130,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
 
         % Is setup complete?
         SetupComplete (1,1) logical = false;
+
+    end %properties
+
+
+    properties (Transient, NonCopyable, Access = private)
+
+        % Listener for theme changes
+        InternalThemeChangedListener event.listener
 
     end %properties
 
@@ -161,6 +190,12 @@ classdef BaseApp < matlab.apps.AppBase & ...
                 'DeleteFcn',@(h,e)delete(app), ...
                 'CloseRequestFcn',@(h,e)close(app), ...
                 'Visible','off');
+
+            % Listen to theme changes (R2025a and later only)
+            if ~isMATLABReleaseOlderThan("R2025a")
+                app.InternalThemeChangedListener = listener(app.Figure,"ThemeChanged",...
+                    @(~,evt)onThemeChanged_I(app));
+            end
 
             % Create MainGridLayout
             app.Grid = uigridlayout(app.Figure,[1 1]);
@@ -494,6 +529,33 @@ classdef BaseApp < matlab.apps.AppBase & ...
     end %methods
 
 
+    %% Hidden Methods
+    methods (Hidden, Sealed)
+
+        function color = getThemeColor(app, semanticColorId)
+            % Get color from theme and semantic variable
+
+            msg = "MATLAB R2025a or later is needed to call wt.apps.BaseApp.getThemeColor().";
+            assert(~isMATLABReleaseOlderThan("R2025a"), msg)
+
+            % Get the theme
+            try
+                theme = app.Figure.Theme;
+            catch exception
+                theme = matlab.graphics.theme.GraphicsTheme();
+            end
+
+            % Get theme from semantic variable
+            % This is undocumented and may change. Better to call the
+            % getThemeColor method rather than reusing this directly.
+            color = matlab.graphics.internal.themes.getAttributeValue(...
+                theme, semanticColorId);
+
+        end %function
+
+    end %methods
+
+
     %% Private methods
     methods (Access = private)
         
@@ -518,6 +580,14 @@ classdef BaseApp < matlab.apps.AppBase & ...
                 remArgs = varargin(~ToSplit);
             end
             
+        end %function
+
+
+        function onThemeChanged_I(app)
+            % Handle theme changes
+
+            notify(app,"WidgetThemeChanged")
+
         end %function
 
     end %methods
