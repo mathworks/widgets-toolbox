@@ -1,10 +1,11 @@
 classdef SliderSpinner < wt.abstract.BaseWidget & ...
         wt.mixin.Enableable & ...
         wt.mixin.FieldColorable & ...
-        wt.mixin.FontStyled
+        wt.mixin.FontStyled & ...
+        wt.mixin.Tooltipable
     % A slider and spinner combination
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
 
     %% Public properties
@@ -255,6 +256,7 @@ classdef SliderSpinner < wt.abstract.BaseWidget & ...
             obj.BackgroundColorableComponents = obj.Grid;
             obj.FontStyledComponents = [obj.Spinner, obj.Slider];
             obj.EnableableComponents = [obj.Spinner, obj.Slider];
+            obj.TooltipableComponents = [obj.Spinner, obj.Slider];
             obj.FieldColorableComponents = [obj.Spinner];
 
         end %function
