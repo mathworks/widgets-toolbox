@@ -90,6 +90,7 @@ classdef SearchDropDown < wt.test.BaseWidgetTest
             % Type a value that is not in the list
             expValue = "Not In List";
             testCase.type(comp.EditField, expValue)
+            drawnow
 
             % Verify the filtered list is empty and the typed value is accepted
             testCase.verifyEmpty(comp.ListBox.Items)

@@ -292,12 +292,12 @@ classdef FileSelector < wt.test.BaseWidgetTest
             % Normal App - should show button
             testCase.Widget.IsWebApp = false;
             testCase.verifyEventuallyHasParent(buttonControl);
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
             
             % Web App - should NOT show button
             testCase.Widget.IsWebApp = true;
             testCase.verifyEventuallyHasNoParent(buttonControl); % NO Parent
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
 
 
             % --- SelectionType == file --- %
@@ -307,12 +307,12 @@ classdef FileSelector < wt.test.BaseWidgetTest
             % Normal App - should show button
             testCase.Widget.IsWebApp = false;
             testCase.verifyEventuallyHasParent(buttonControl);
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
             
             % Web App - should show button
             testCase.Widget.IsWebApp = true;
             testCase.verifyEventuallyHasParent(buttonControl);
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
 
 
             % --- SelectionType == putfile --- %
@@ -322,12 +322,12 @@ classdef FileSelector < wt.test.BaseWidgetTest
             % Normal App - should show button
             testCase.Widget.IsWebApp = false;
             testCase.verifyEventuallyHasParent(buttonControl);
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
             
             % Web App - should show button
             testCase.Widget.IsWebApp = true;
             testCase.verifyEventuallyHasParent(buttonControl);
-            testCase.Widget.forceUpdate();
+            testCase.Widget.forceUpdate(false);
 
         end %function
         
