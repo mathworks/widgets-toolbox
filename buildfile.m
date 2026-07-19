@@ -29,11 +29,9 @@ plan("publishExampleHtml").Dependencies = "prepareRelease";
 plan("publishGettingStarted").Dependencies = "prepareRelease";
 plan("buildDocSearchDb").Dependencies = ...
     ["publishDocHtml","publishExampleHtml","publishGettingStarted"];
-plan("package").Dependencies = ["check","buildDocSearchDb"];
-plan("finalizeRelease").Dependencies = "package";
 
 % Top-level release aggregation task
-plan("archive").Dependencies = "finalizeRelease";
+plan("archive").Dependencies = ["check","buildDocSearchDb"];
 
 % Set default tasks
 plan.DefaultTasks = ["check","test"];
@@ -52,11 +50,10 @@ end
 
 
 function prepareReleaseTask(context)
-% Increment the deploy version for the next packaged release.
+% Perform release preparation ahead of documentation generation.
 
 rootFolder = string(context.Plan.RootFolder);
 ensureProjectLoaded(rootFolder);
-wt.deploy.incrementVersionNumber();
 
 end
 
@@ -101,31 +98,14 @@ wt.deploy.buildDocumentationSearchDb(rootFolder);
 end
 
 
-function packageTask(context)
-% Build the .mltbx release artifact.
-
-rootFolder = string(context.Plan.RootFolder);
-ensureProjectLoaded(rootFolder);
-wt.deploy.packageRelease(rootFolder);
-
-end
-
-
-function finalizeReleaseTask(context)
-% Perform legacy release finalization side effects.
-
-rootFolder = string(context.Plan.RootFolder);
-ensureProjectLoaded(rootFolder);
-wt.deploy.finalizeRelease(rootFolder);
-
-end
-
-
 function archiveTask(context)
-% Aggregate the full release workflow under a single entry point.
+% Package the toolbox and perform legacy release finalization.
 
 rootFolder = string(context.Plan.RootFolder);
 ensureProjectLoaded(rootFolder);
+wt.deploy.incrementVersionNumber();
+outputFile = wt.deploy.packageRelease(rootFolder);
+wt.deploy.finalizeRelease(rootFolder, outputFile);
 
 end
 

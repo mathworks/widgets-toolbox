@@ -14,4 +14,11 @@ opts = wt.deploy.getPackageOptions(projectRoot, toolboxVersion);
 outputFile = opts.OutputFile;
 matlab.addons.toolbox.packageToolbox(opts);
 
+
+% Fail immediately if packaging did not create the expected artifact.
+if ~isfile(outputFile)
+    error("wt:deploy:PackageNotCreated", ...
+        "Toolbox packaging completed without creating %s.", outputFile);
+end
+
 end
