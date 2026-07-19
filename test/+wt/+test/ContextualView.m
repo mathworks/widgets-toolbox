@@ -1,7 +1,7 @@
 classdef ContextualView < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
 
-    % Copyright 2025 The MathWorks, Inc.
+    % Copyright 2025-2026 The MathWorks, Inc.
 
 
     %% Class Setup
@@ -40,6 +40,15 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
     %% Test methods
     methods (Test)
+
+        function testInvalidViewClassErrors(testCase)
+
+            % Invalid class paths should fail with the documented error
+            model = zooexample.model.Animal;
+            fcn = @()testCase.Widget.launchView("not.a.real.ViewClass", model);
+            testCase.verifyError(fcn, "wt:ContextualView:InvalidPaneType");
+
+        end %function
 
         function testLaunchViewWithModel(testCase)
             % This tests:

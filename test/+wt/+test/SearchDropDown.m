@@ -1,7 +1,7 @@
 classdef SearchDropDown < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2025 The MathWorks Inc.
+    %   Copyright 2025-2026 The MathWorks Inc.
 
     %% Properties
     properties
@@ -69,6 +69,38 @@ classdef SearchDropDown < wt.test.BaseWidgetTest
     
     %% Unit Test
     methods (Test)
+
+        function testPlaceholderProperty(testCase)
+
+            % Set placeholder text
+            expValue = "Search for an item";
+            testCase.verifySetProperty("Placeholder", expValue);
+
+            % Verify it reaches the edit field
+            testCase.verifyPropertyValue(testCase.Widget.EditField, "Placeholder", char(expValue))
+
+        end %function
+
+
+        function testInteractiveNoMatchesAcceptsTypedValue(testCase)
+
+            % Get the component
+            comp = testCase.Widget;
+
+            % Type a value that is not in the list
+            expValue = "Not In List";
+            testCase.type(comp.EditField, expValue)
+
+            % Verify the filtered list is empty and the typed value is accepted
+            testCase.verifyEmpty(comp.ListBox.Items)
+            testCase.verifyPropertyValue(comp, "Value", expValue)
+            testCase.verifyPropertyValue(comp.EditField, "Value", char(expValue))
+
+            % Verify the callback fired once for the accepted value
+            testCase.verifyCallbackCount(1)
+
+        end %function
+
 
         function testValueProperty(testCase)
 
