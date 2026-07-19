@@ -23,7 +23,9 @@
 - Reuse existing widget base classes where appropriate.
 - Prefer composition over duplicating widget functionality.
 - Follow existing event and listener patterns used throughout the toolbox.
-- Maintain App Designer compatibility.
+- Maintain App Designer compatibility
+- Reuse existing base classes
+- Preserve API compatibility
 - New widgets should include:
   - automated tests
   - documentation
