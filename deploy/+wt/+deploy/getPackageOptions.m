@@ -1,7 +1,7 @@
 function opts = getPackageOptions(projectRoot, toolboxVersion)
 % Returns the toolbox packaging options
 
-% Copyright 2025 The MathWorks, Inc.
+% Copyright 2025-2026 The MathWorks, Inc.
 
 arguments %(Input)
     projectRoot (1,1) string {mustBeFolder}
@@ -31,6 +31,8 @@ opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, identifier);
 
 %% Requirements
 
+% Maintainers build the toolbox in the latest MATLAB release, but the
+% packaged toolbox output continues to support MATLAB R2021a and later.
 opts.MinimumMatlabRelease = "R2021a";
 
 opts.MaximumMatlabRelease = "";
@@ -77,9 +79,8 @@ opts.ToolboxMatlabPath = fullfile(toolboxFolder, relativePaths);
 % opts.ToolboxJavaPath
 
 % Files to add to the app gallery
-opts.AppGalleryFiles = [
-    fullfile(toolboxFolder, "examples","WidgetsExampleApp.mlapp")
-    ];
+opts.AppGalleryFiles = ...
+    fullfile(toolboxFolder, "examples", "WidgetsExampleApp.mlapp");
 
 % Path to the getting started guide
 opts.ToolboxGettingStartedGuide = fullfile(toolboxFolder,...
