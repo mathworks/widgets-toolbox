@@ -148,7 +148,7 @@ classdef (HandleCompatible) Orderable
             % Define arguments
             arguments %(Input)
                 % Total number of items in the list
-                numItems (1,1) double {mustBeInteger, mustBeNonnegative}
+                numItems (1,1) double {mustBeInteger, mustBeNonnegative} %#ok<INUSA>
 
                 % Selected indices
                 idxSel (1,:) double {mustBeInteger, mustBePositive, mustBeLessThanOrEqual(idxSel,numItems)}
