@@ -39,7 +39,7 @@ opts.MaximumMatlabRelease = "";
 
 opts.SupportedPlatforms.Win64 = true;
 opts.SupportedPlatforms.Glnxa64 = true;
-opts.SupportedPlatforms.Maci64 = true;
+opts.SupportedPlatforms.Mac = true;
 opts.SupportedPlatforms.MatlabOnline = true;
 
 % opts.RequiredAddons
