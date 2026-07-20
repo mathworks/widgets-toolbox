@@ -129,9 +129,9 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             
             % Roll the minutes back by one
             testCase.press(minuteControl,"down");
+            drawnow
             actVal = w.Value;
             testCase.verifyEqual(actVal, dt_12 - minutes(1));
-            drawnow
             testCase.verifyEqual(dateControl.Value, dt_0);
             testCase.verifyEqual(hourControl.Value, 11);
             testCase.verifyEqual(minuteControl.Value, 59);

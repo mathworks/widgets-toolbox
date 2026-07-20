@@ -1,7 +1,7 @@
 classdef MenuButton < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
 
-    % Copyright 2025 The MathWorks, Inc.
+    % Copyright 2025-2026 The MathWorks, Inc.
 
     %% Class Setup
     methods (TestClassSetup)
@@ -59,6 +59,44 @@ classdef MenuButton < wt.test.BaseWidgetTest
 
     %% Unit Tests
     methods (Test)
+
+        function testButtonPushedCallback(testCase)
+
+            % Use the button-pushed callback rather than menu-selected
+            testCase.Widget.ButtonPushedFcn = @(s,e)onCallbackTriggered(testCase,e);
+
+            % Press the button
+            testCase.press(testCase.Widget.Button);
+
+            % Verify the callback fired once
+            testCase.verifyCallbackCount(1)
+
+        end %function
+
+
+        function testIconAndTooltipProperties(testCase)
+
+            % Update display properties
+            expIcon = "add_24.png";
+            expTooltip = "Open menu";
+            testCase.verifySetProperty("Icon", expIcon);
+            testCase.verifySetProperty("Tooltip", expTooltip);
+
+            % Verify the internal button reflects them
+            testCase.verifyPropertyValue(testCase.Widget.Button, "Icon", char(expIcon));
+            testCase.verifyPropertyValue(testCase.Widget.Button, "Tooltip", char(expTooltip));
+
+        end %function
+
+
+        function testAddItemsTagSizeError(testCase)
+
+            % Mismatched tag count should error
+            fcn = @()testCase.Widget.addMenuItems(["Item 1";"Item 2"], "onlyOne");
+            testCase.verifyError(fcn, "MATLAB:incorrectNumel");
+
+        end %function
+
 
         function testAddItemsWithName(testCase)
 
