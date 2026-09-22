@@ -29,9 +29,11 @@ plan("publishExampleHtml").Dependencies = "prepareRelease";
 plan("publishGettingStarted").Dependencies = "prepareRelease";
 plan("buildDocSearchDb").Dependencies = ...
     ["publishDocHtml","publishExampleHtml","publishGettingStarted"];
+plan("package").Dependencies = ["check","buildDocSearchDb"];
+plan("finalizeRelease").Dependencies = "package";
 
 % Top-level release aggregation task
-plan("archive").Dependencies = ["check","buildDocSearchDb"];
+plan("archive").Dependencies = "finalizeRelease";
 
 % Set default tasks
 plan.DefaultTasks = ["check","test"];
@@ -54,6 +56,7 @@ function prepareReleaseTask(context)
 
 rootFolder = string(context.Plan.RootFolder);
 ensureProjectLoaded(rootFolder);
+wt.deploy.incrementVersionNumber();
 
 end
 
@@ -98,14 +101,29 @@ wt.deploy.buildDocumentationSearchDb(rootFolder);
 end
 
 
-function archiveTask(context)
-% Package the toolbox and perform legacy release finalization.
+function packageTask(context)
+% Package the toolbox release.
 
 rootFolder = string(context.Plan.RootFolder);
 ensureProjectLoaded(rootFolder);
-wt.deploy.incrementVersionNumber();
-outputFile = wt.deploy.packageRelease(rootFolder);
+wt.deploy.packageRelease(rootFolder);
+
+end
+
+
+function finalizeReleaseTask(context)
+% Perform legacy release finalization.
+
+rootFolder = string(context.Plan.RootFolder);
+ensureProjectLoaded(rootFolder);
+outputFile = getExpectedReleaseOutputFile(rootFolder);
 wt.deploy.finalizeRelease(rootFolder, outputFile);
+
+end
+
+
+function archiveTask(~)
+% Aggregate the full release workflow.
 
 end
 
@@ -128,5 +146,19 @@ end
 if isempty(project) || string(project.RootFolder) ~= rootFolder
     openProject(projectFile);
 end
+
+end
+
+
+function outputFile = getExpectedReleaseOutputFile(rootFolder)
+% Return the expected package output file for the current deploy version.
+
+arguments
+    rootFolder (1,1) string
+end
+
+toolboxVersion = wt.deploy.readVersionNumber();
+opts = wt.deploy.getPackageOptions(rootFolder, toolboxVersion);
+outputFile = string(opts.OutputFile);
 
 end

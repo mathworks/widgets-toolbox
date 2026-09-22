@@ -88,7 +88,7 @@ classdef SearchDropDown < wt.test.BaseWidgetTest
             comp = testCase.Widget;
 
             % Type a value that is not in the list
-            expValue = "Not In List";
+            expValue = "X";
             testCase.type(comp.EditField, expValue)
             drawnow
 

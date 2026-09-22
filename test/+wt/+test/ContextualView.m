@@ -213,6 +213,62 @@ classdef ContextualView < wt.test.BaseWidgetTest
         end %function
 
 
+        function testChangingViewsClearsInactiveModel(testCase)
+            % This tests:
+            %   Deactivating a view clears its parent and model
+            %   Relaunching a cached view attaches the latest model
+
+            % Create models to display
+            model1 = testCase.createAnimalModel("Simba");
+            model2 = testCase.createAnimalModel("Nala");
+            model3 = zooexample.model.Enclosure;
+            model3.Name = "Lions' Den";
+            model3.Location = [10 20];
+
+            % Launch two different view types
+            view1 = testCase.Widget.launchView("zooexample.view.Animal", model1);
+            view3 = testCase.Widget.launchView("zooexample.view.Enclosure", model3);
+
+            % Verify the inactive view was detached from the UI and model
+            testCase.verifyEmpty(view1.Parent)
+            testCase.verifyEmpty(view1.Model)
+            testCase.verifyEqual(testCase.Widget.ActiveView, view3)
+
+            % Relaunch the original view type with a different model
+            view1b = testCase.Widget.launchView("zooexample.view.Animal", model2);
+
+            % Verify the cached view is reused with the latest model
+            testCase.verifyEqual(view1b, view1)
+            testCase.verifyEqual(view1.Model, model2)
+            testCase.verifyEqual(view1.Parent, testCase.Widget.ContentGrid)
+            testCase.verifyEmpty(view3.Parent)
+            testCase.verifyEmpty(view3.Model)
+
+        end %function
+
+
+        function testDeletedLoadedViewIsRecreated(testCase)
+            % This tests:
+            %   Deleted cached views are ignored and recreated
+
+            % Launch a view, then delete it externally
+            model = testCase.createAnimalModel("Simba");
+            view1 = testCase.Widget.launchView("zooexample.view.Animal", model);
+            delete(view1)
+
+            % Relaunch the same view type
+            view2 = testCase.Widget.launchView("zooexample.view.Animal", model);
+
+            % Verify a valid replacement is active and loaded
+            testCase.verifyFalse(isvalid(view1))
+            testCase.verifyTrue(isvalid(view2))
+            testCase.verifyEqual(testCase.Widget.ActiveView, view2)
+            testCase.verifyEqual(testCase.Widget.LoadedViews, view2)
+            testCase.verifyEqual(view2.Model, model)
+
+        end %function
+
+
         function testClearView(testCase)
             % This tests debugging methods:
             %   clearView
@@ -333,6 +389,17 @@ classdef ContextualView < wt.test.BaseWidgetTest
 
     %% Helper methods
     methods (Access = protected)
+
+        function model = createAnimalModel(~, name)
+            % Create a populated animal model for view launch tests.
+
+            model = zooexample.model.Animal;
+            model.Species = "Lion";
+            model.Name = name;
+            model.Sex = "female";
+            model.BirthDate = "September 13, 1994";
+
+        end %function
 
         function launchMultipleViews(testCase)
             % Launches multiple views into the component to have it in a

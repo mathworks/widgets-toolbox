@@ -1,8 +1,8 @@
 classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
     % Implements a template for a BaseSingleSessionApp
 
-    % Copyright 2022-2025 The MathWorks Inc.
-    
+    % Copyright 2022-2026 The MathWorks Inc.
+
     %#ok<*INUSD,*MANU>
 
 
@@ -209,7 +209,7 @@ classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
 
             % Update the session description text
             app.SessionDescription.Value = app.Session.Description;
-            
+
             % Update toolbar button enables
             app.updateToolbarEnables()
 
