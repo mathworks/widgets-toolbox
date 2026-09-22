@@ -8,6 +8,11 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
         ItemNames = "TestItem" + string(1:5);
         ItemData = "TestData" + string(1:5);
     end
+
+
+    properties (Access = private)
+        ResizePositions = zeros(0,4)
+    end
      
     
     %% Unit Test
@@ -96,6 +101,62 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
             % Verify the figure pointer is restored
             testCase.verifyThat(@()string(testCase.Figure.Pointer), ...
                 Eventually(IsEqualTo("arrow"), "WithTimeoutOf", 5));
+
+        end %function
+
+
+        function testResizableLeftEdgeDragUpdatesSizeDuringGesture(testCase)
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            dlg.Resizable = true;
+            dlg.Position = [250 180 300 260];
+            dlg.Size = [300 260];
+            drawnow
+
+            % Track all size changes while the gesture is running
+            testCase.ResizePositions = zeros(0,4);
+            dlg.SizeChangedFcn = ...
+                @(src,~)recordResizePosition(testCase, src.Position);
+
+            % Drag the left edge leftward
+            pos = dlg.Position;
+            startPoint = [pos(1)+2, pos(2)+round(pos(4)/2)];
+            stopPoint = startPoint + [-60 0];
+            testCase.drag(testCase.Figure, startPoint, stopPoint);
+            drawnow
+
+            % Verify there was at least one live intermediate resize
+            widths = testCase.ResizePositions(:,3);
+            testCase.verifyGreaterThan(size(testCase.ResizePositions,1), 1)
+            testCase.verifyTrue(any(widths > 300 & widths < 360))
+
+            % Verify the right edge stayed anchored
+            testCase.verifyEqual(dlg.Position, [190 180 360 260])
+            testCase.verifyEqual(dlg.Size, [360 260])
+
+        end %function
+
+
+        function testResizableBottomEdgeDragAnchorsTopEdge(testCase)
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            dlg.Resizable = true;
+            dlg.Position = [250 180 300 260];
+            dlg.Size = [300 260];
+            drawnow
+
+            % Drag the bottom edge downward
+            pos = dlg.Position;
+            startPoint = [pos(1)+round(pos(3)/2), pos(2)+2];
+            stopPoint = startPoint + [0 -40];
+            testCase.drag(testCase.Figure, startPoint, stopPoint);
+            drawnow
+
+            % Verify it resized vertically with the top edge anchored
+            testCase.verifyEqual(dlg.Position, [250 140 300 300])
+            testCase.verifyEqual(dlg.Size, [300 300])
 
         end %function
 
@@ -405,5 +466,16 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
         end %function
         
     end %methods (Test)
+
+
+    methods (Access = private)
+
+        function recordResizePosition(testCase, position)
+
+            testCase.ResizePositions(end+1,:) = position;
+
+        end %function
+
+    end %methods
     
 end %classdef

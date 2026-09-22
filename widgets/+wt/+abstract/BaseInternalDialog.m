@@ -771,12 +771,13 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             switch evt.Status
 
                 case "motion"
+                    obj.Size = evt.NewPosition(3:4);
                     obj.Position = evt.NewPosition;
                     drawnow limitrate
 
                 case "complete"
-                    obj.Position = evt.NewPosition;
                     obj.Size = evt.NewPosition(3:4);
+                    obj.Position = evt.NewPosition;
                     delete(obj.ResizeHelper)
                     obj.ResizeHelper(:) = [];
                     updateResizePointer(obj, evt.MouseCurrentPoint)
