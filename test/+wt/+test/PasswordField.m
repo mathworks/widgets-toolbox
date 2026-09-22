@@ -1,7 +1,7 @@
 classdef PasswordField < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2020-2025 The MathWorks Inc.
+%   Copyright 2020-2026 The MathWorks Inc.
     
     
     %% Test Method Setup
@@ -36,6 +36,17 @@ classdef PasswordField < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyMatches(passField.Data.Value, newValue);
             
+        end %function
+
+
+        function testFocusMethod(testCase)
+
+            % Prepare the public focus call.
+            fcn = @()testCase.Widget.focus();
+
+            % Verify the focus method runs without warnings.
+            testCase.verifyWarningFree(fcn)
+
         end %function
         
         

@@ -28,6 +28,8 @@ Additional object-oriented code components provide enable you to work more effic
 
 This version of Widgets Toolbox is intended for NEW development of uifigure or App Designer apps starting from R2021a or newer releases.
 
+Maintainers build and package releases in the latest MATLAB release using MATLAB Build Tool via `buildtool archive`. That maintainer workflow is separate from the packaged toolbox support range above.
+
 If you have an existing MATLAB app using Widgets Toolbox content developed prior to R2020b, you may also need "Widgets Toolbox (Compatibility Support)".  
 https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox-compatibility-support 
 https://github.com/mathworks/widgets-toolbox-legacy
