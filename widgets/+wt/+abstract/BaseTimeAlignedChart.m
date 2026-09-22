@@ -3,7 +3,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         wt.mixin.ErrorHandling
     % Base class for a chart with time-aligned axes
 
-    %   Copyright 2022-2025 The MathWorks Inc.
+    %   Copyright 2022-2026 The MathWorks Inc.
 
 
     %% Public Properties
@@ -193,6 +193,7 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         function forceUpdateChart(obj)
             % Forces update to run (For debugging only!)
 
+            drawnow("nocallbacks")
             obj.update();
 
         end %function
@@ -257,45 +258,61 @@ classdef BaseTimeAlignedChart < matlab.graphics.chartcontainer.ChartContainer & 
         function recreateContent(obj)
             % Create / recreate all the content
 
-            % Delete existing axes
-            % This is required to change the tiledlayout size
-            delete(obj.Axes);
-            delete(obj.TiledLayout.Children)
+            % Delete existing layout children before changing tile count.
+            oldLegends = obj.Legend;
+            oldLegends(~isvalid(oldLegends)) = [];
+            delete(oldLegends);
+            oldChildren = obj.TiledLayout.Children;
+            oldChildren(~isvalid(oldChildren)) = [];
+            delete(oldChildren)
             obj.Axes(:) = [];
+            obj.Legend(:) = [];
 
             % Update the TiledLayout
             obj.TiledLayout.GridSize = [obj.NumAxes 1];
 
             % Create the axes
-            ax = gobjects(1,obj.NumAxes);
-            lgnd = matlab.graphics.illustration.Legend.empty(1,0);
             for idx = 1:obj.NumAxes
 
                 % Create the axes
-                ax(idx) = nexttile(obj.TiledLayout);
+                ax = nexttile(obj.TiledLayout);
 
                 % Configure axes
-                ax(idx).NextPlot = "add";
-                ax(idx).XAxis = matlab.graphics.axis.decorator.DurationRuler();
+                ax.NextPlot = "add";
+                ax.XAxis = matlab.graphics.axis.decorator.DurationRuler();
 
                 % Keep X ticks only on the last axes
                 if idx < obj.NumAxes
-                    ax(idx).XTickLabel = {};
+                    ax.XTickLabel = {};
                 end
 
                 % Configure Interpreters
-                ax(idx).Title.Interpreter = "none";
-                ax(idx).XLabel.Interpreter = "none";
-                ax(idx).YLabel.Interpreter = "none";
-                ax(idx).YAxis.TickLabelInterpreter = "none";
+                ax.Title.Interpreter = "none";
+                ax.XLabel.Interpreter = "none";
+                ax.YLabel.Interpreter = "none";
+                ax.YAxis.TickLabelInterpreter = "none";
 
-                % Start legend
-                if obj.ShowLegend
+            end %for
+
+            % Retrieve valid layout-owned axes in tile order.
+            ax = obj.TiledLayout.Children;
+            ax(~isvalid(ax)) = [];
+            isAxes = arrayfun(@(thisAx)isa(thisAx, ...
+                "matlab.graphics.axis.Axes"), ax);
+            ax = ax(isAxes);
+            tileNumbers = arrayfun(@(thisAx)thisAx.Layout.Tile, ax);
+            [~, tileOrder] = sort(tileNumbers);
+            ax = reshape(ax(tileOrder), 1, []);
+
+            % Start legends
+            lgnd = matlab.graphics.illustration.Legend.empty(1,0);
+            if obj.ShowLegend
+                lgnd = matlab.graphics.illustration.Legend.empty(1,0);
+                for idx = 1:numel(ax)
                     lgnd(idx) = legend(ax(idx),'Location',"northwest");
                     lgnd(idx).Interpreter = "none";
                 end
-
-            end %for
+            end
 
             % Set modes
             set(ax, "ZLimMode", "manual")

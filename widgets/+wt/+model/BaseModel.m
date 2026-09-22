@@ -14,7 +14,7 @@ classdef BaseModel < handle & ...
     %   notifications in a hierarchy of BaseWidget classes
     %
 
-    % Copyright 2020-2025 The MathWorks, Inc.
+    % Copyright 2020-2026 The MathWorks, Inc.
 
 
 
@@ -360,8 +360,11 @@ classdef BaseModel < handle & ...
             % evtOutM.Stack = {obj};
             % evtOutM.ClassStack = class(obj);
 
-            % Revise listeners for model changes given the new value
-            if isa(evtOutM.Value, "wt.model.BaseModel")
+            % Revise listeners for aggregated model changes given the new value
+            changedProp = string(evt.Source.Name);
+            if any(changedProp == obj.getAggregatedModelProperties())
+                obj.attachModelListeners();
+            elseif isa(evtOutM.Value, "wt.model.BaseModel")
                 evtOutM.Model.attachModelListeners();
             end
 
@@ -425,6 +428,9 @@ classdef BaseModel < handle & ...
 
             % Get the properties to listen for
             propNames = obj.getAggregatedModelProperties();
+
+            % Replace old aggregated model listeners when properties change.
+            obj.clearModelListeners();
 
             if obj.Debug
                 if isempty(propNames)

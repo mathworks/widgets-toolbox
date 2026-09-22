@@ -214,6 +214,9 @@ classdef Toolbar < wt.test.BaseWidgetTest
             % Attach the sections to the toolbar
             testCase.verifySetProperty("Section", section)
 
+            % Give time to render
+            drawnow
+
             % Press a state button
             testCase.ButtonPushCallbackDone = false;
             testCase.press(b1)

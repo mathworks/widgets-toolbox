@@ -3,6 +3,8 @@ classdef TemplateBaseMultiSessionApp < wt.apps.BaseMultiSessionApp
 
     % Copyright 2022-2025 The MathWorks Inc.
 
+    %#ok<*INUSD,*MANU>
+
     %% Internal Components
     %   Create properties here for each control, layout, or view component
     %   that will be placed directly into the main app window.

@@ -1,7 +1,9 @@
 classdef TemplateBaseSingleSessionApp < wt.apps.BaseSingleSessionApp
     % Implements a template for a BaseSingleSessionApp
     
-%   Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2025 The MathWorks Inc.
+
+    %#ok<*INUSD,*MANU>
 
 
     %% Internal Components
