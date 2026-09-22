@@ -463,7 +463,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             obj.positionOverCallingFigure()
 
             % Apply the same theme as CallingFigure (R2025a and later)
-            if ~isMATLABReleaseOlderThan("R2025a") && ...
+            if wt.utility.supportsUIThemes() && ...
                     isscalar(obj.CallingFigure) && isvalid(obj.CallingFigure)
                 obj.DialogFigure.Theme = obj.CallingFigure.Theme;
             end

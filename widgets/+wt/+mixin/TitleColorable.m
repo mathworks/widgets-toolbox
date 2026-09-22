@@ -1,7 +1,7 @@
 classdef TitleColorable < handle
     % Mixin to add styles to a component
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
 
     %% Properties
@@ -84,7 +84,7 @@ classdef TitleColorable < handle
 
             % Confirm BaseWidget and R2025a or newer
             if matches("WidgetThemeChanged", events(obj)) ...
-                    && ~isMATLABReleaseOlderThan("R2025a")
+                    && wt.utility.supportsUIThemes()
 
                 % Listen to theme changes
                 obj.ThemeChangedListener = ...
@@ -143,7 +143,7 @@ classdef TitleColorable < handle
 
             % If color mode is auto, use standard theme color
             if obj.TitleColorMode == "auto" ...
-                    && ~isMATLABReleaseOlderThan("R2025a")
+                    && wt.utility.supportsUIThemes()
 
                 % Use standard theme color
                 obj.TitleColor_I = obj.getDefaultTitleColor();
