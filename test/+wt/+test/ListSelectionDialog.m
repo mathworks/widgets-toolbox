@@ -39,8 +39,32 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
             testCase.verifyEqual(dlg.DeleteActions, ["close","ok","cancel"]);
             testCase.verifyEmpty(dlg.Output);
             testCase.verifyFalse(dlg.IsWaitingForOutput);
+            testCase.verifyFalse(dlg.Resizable);
 
             % Size was honored
+            testCase.verifyEqual(dlg.Position(3:4), [300 300]);
+
+        end %function
+
+
+        function testResizableProperty(testCase)
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            drawnow
+
+            % Enable resize behavior
+            dlg.Resizable = true;
+            drawnow
+
+            testCase.verifyTrue(dlg.Resizable);
+            testCase.verifyEqual(dlg.Position(3:4), [300 300]);
+
+            % Disable resize behavior
+            dlg.Resizable = false;
+            drawnow
+
+            testCase.verifyFalse(dlg.Resizable);
             testCase.verifyEqual(dlg.Position(3:4), [300 300]);
 
         end %function

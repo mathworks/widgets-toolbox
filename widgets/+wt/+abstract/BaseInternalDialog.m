@@ -8,6 +8,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
     %
     % This enables compatibility with web apps.
     %
+    % Set Resizable to true to allow edge and corner resizing within the
+    % parent figure.
+    %
     % The dialog may flicker when resizing the figure if
     % AutoResizeChildren is on. Disabling this is recommended.
 
@@ -33,6 +36,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
         % Modal (block other figure interaction)
         Modal (1,1) logical = false
+
+        % Allow the dialog to be resized within the figure
+        Resizable (1,1) logical = false
 
         % Dialog Title
         Title (1,1) string = ""
@@ -60,6 +66,14 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
     % Accessors
     methods
+
+        function set.Resizable(obj,value)
+            obj.Resizable = value;
+            if ~value
+                cancelResize(obj)
+                restoreFigurePointer(obj)
+            end
+        end
 
         function value = get.DialogButtonText(obj)
             value = obj.DialogButtons.Text;
@@ -137,6 +151,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         % Buffer border space required on each side when sizing in figure 
         % Buffer (1,1) double {mustBeNonnegative} = 0
 
+        % Border width that triggers resize behavior
+        ResizeBorderWidth (1,1) double {mustBeNonnegative} = 6
+
     end %properties
 
 
@@ -157,6 +174,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         % Temporary drag helper for moving the window
         DragHelper wt.utility.FigureDragHelper {mustBeScalarOrEmpty}
 
+        % Temporary resize helper for resizing the window
+        ResizeHelper wt.utility.FigureResizeHelper {mustBeScalarOrEmpty}
+
         % Listeners to reference/parent objects to trigger dialog delete
         LifecycleListeners (1,:) event.listener
 
@@ -166,6 +186,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         % Figure resize listener
         FigureResizeListener (1,:) event.listener  {mustBeScalarOrEmpty}
 
+        % Figure mouse motion listener for resize cursor updates
+        FigureMouseMotionListener (1,:) event.listener  {mustBeScalarOrEmpty}
+
+        % Figure mouse press listener for resize start
+        FigureMousePressListener (1,:) event.listener  {mustBeScalarOrEmpty}
+
         % Modal image (optional)
         ModalImage matlab.ui.control.Image
 
@@ -174,6 +200,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
         % Last action when closing dialog
         LastAction string = []
+
+        % Pointer value before the dialog showed a resize cursor
+        PreviousFigurePointer = []
+
+        % True when this dialog has changed the figure pointer
+        IsResizePointerActive (1,1) logical = false
 
     end %properties
 
@@ -223,6 +255,13 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
     methods
         function delete(obj)
     
+            % Restore figure pointer if needed
+            restoreFigurePointer(obj)
+
+            % Delete active helpers
+            delete(obj.DragHelper)
+            delete(obj.ResizeHelper)
+
             % Delete the modal image
             delete(obj.ModalImage)
             
@@ -454,6 +493,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             % Listen to figure size changes
             obj.FigureResizeListener = listener(obj.Figure,"SizeChanged",...
                 @(~,evt)onFigureResized(obj,evt));
+
+            % Listen to figure mouse events for optional resize behavior
+            obj.FigureMouseMotionListener = listener(obj.Figure,...
+                "WindowMouseMotion",@(~,evt)onFigureMouseMotion(obj,evt));
+            obj.FigureMousePressListener = listener(obj.Figure,...
+                "WindowMousePress",@(~,evt)onFigureMousePress(obj,evt));
 
             % Add lower buttons
             obj.DialogButtons = wt.ButtonGrid(obj.InnerGrid,"Text",[],"Icon",[]);
@@ -712,6 +757,27 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
+        function onMouseResize(obj,evt)
+            % Triggered from ResizeHelper during resize or release
+
+            % Check the resize event status
+            switch evt.Status
+
+                case "motion"
+                    obj.Position = evt.NewPosition;
+
+                case "complete"
+                    obj.Position = evt.NewPosition;
+                    obj.Size = evt.NewPosition(3:4);
+                    delete(obj.ResizeHelper)
+                    obj.ResizeHelper(:) = [];
+                    updateResizePointer(obj, evt.MouseCurrentPoint)
+
+            end %switch
+
+        end %function
+
+
         function onDialogButtonPushed(obj,evt)
             % Triggered when a dialog button is pushed (close, ok, etc.)
 
@@ -775,6 +841,31 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
+        function onFigureMouseMotion(obj,evt)
+            % Triggered on mouse motion to update the resize cursor
+
+            if isempty(obj.ResizeHelper)
+                point = getEventPoint(obj, evt);
+                updateResizePointer(obj, point)
+            end
+
+        end %function
+
+
+        function onFigureMousePress(obj,evt)
+            % Triggered on mouse press to begin resize if over an edge
+
+            if ~isempty(obj.ResizeHelper)
+                return
+            end
+
+            point = getEventPoint(obj, evt);
+            edge = getResizeEdgeAtPoint(obj, point);
+            startResize(obj, edge)
+
+        end %function
+
+
         function onOuterPanelResize(obj)
             % Triggered when the dialog window is resized
 
@@ -784,8 +875,150 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
+        function point = getEventPoint(obj, evt)
+            % Get mouse point from event data, falling back to the figure
+
+            if ~isempty(evt) && isprop(evt,"Point")
+                point = evt.Point;
+            else
+                point = obj.Figure.CurrentPoint;
+            end
+
+        end %function
+
+
+        function edge = getResizeEdgeAtPoint(obj, point)
+            % Get the resize edge at the specified figure point
+
+            edge = "";
+
+            if ~obj.Resizable || isPointOverCloseButton(obj, point)
+                return
+            end
+
+            edge = wt.utility.FigureResizeHelper.getResizeEdge(...
+                point, obj.Position, obj.ResizeBorderWidth);
+
+        end %function
+
+
+        function startResize(obj, edge)
+            % Begin resizing the dialog from the specified edge
+
+            if ~obj.Resizable || edge == "" || ~isempty(obj.ResizeHelper)
+                return
+            end
+
+            % Ensure dragging and resizing cannot run concurrently
+            delete(obj.DragHelper)
+            obj.DragHelper(:) = [];
+
+            obj.ResizeHelper = wt.utility.FigureResizeHelper(...
+                obj, edge, obj.MinimumSize);
+            obj.ResizeHelper.ResizeFcn = @(~,evt)onMouseResize(obj,evt);
+            setFigurePointerForResize(obj, edge)
+
+        end %function
+
+
+        function cancelResize(obj)
+            % Cancel any active resize operation
+
+            delete(obj.ResizeHelper)
+            obj.ResizeHelper(:) = [];
+
+        end %function
+
+
+        function updateResizePointer(obj, point)
+            % Update figure pointer based on resize hover state
+
+            if ~obj.Resizable
+                restoreFigurePointer(obj)
+                return
+            end
+
+            edge = getResizeEdgeAtPoint(obj, point);
+            if edge == ""
+                restoreFigurePointer(obj)
+            else
+                setFigurePointerForResize(obj, edge)
+            end
+
+        end %function
+
+
+        function setFigurePointerForResize(obj, edge)
+            % Set the figure pointer for an active resize edge
+
+            if isempty(obj.Figure) || ~isvalid(obj.Figure)
+                return
+            end
+
+            pointer = wt.utility.FigureResizeHelper.getResizePointer(edge);
+
+            if ~obj.IsResizePointerActive
+                obj.PreviousFigurePointer = string(obj.Figure.Pointer);
+                obj.IsResizePointerActive = true;
+            end
+
+            obj.Figure.Pointer = pointer;
+
+        end %function
+
+
+        function restoreFigurePointer(obj)
+            % Restore the figure pointer if this dialog changed it
+
+            if obj.IsResizePointerActive && ...
+                    ~isempty(obj.Figure) && isvalid(obj.Figure)
+
+                previousPointer = obj.PreviousFigurePointer;
+                if isempty(previousPointer)
+                    previousPointer = "arrow";
+                end
+
+                currentPointer = string(obj.Figure.Pointer);
+                if wt.utility.FigureResizeHelper.isResizePointer(currentPointer)
+                    obj.Figure.Pointer = previousPointer;
+                end
+
+            end
+
+            obj.PreviousFigurePointer = [];
+            obj.IsResizePointerActive = false;
+
+        end %function
+
+
+        function tf = isPointOverCloseButton(obj, point)
+            % True if the figure point is over the dialog close button
+
+            tf = false;
+
+            if isempty(obj.CloseButton) || ~isvalid(obj.CloseButton)
+                return
+            end
+
+            closePos = getpixelposition(obj.CloseButton, true);
+            closeRight = closePos(1) + closePos(3) - 1;
+            closeTop = closePos(2) + closePos(4) - 1;
+
+            tf = point(1) >= closePos(1) && point(1) <= closeRight && ...
+                point(2) >= closePos(2) && point(2) <= closeTop;
+
+        end %function
+
+
         function onTitleButtonDown(obj,~)
             % Triggered on title bar button down
+
+            % Resize takes precedence when the pointer is on a resize edge
+            edge = getResizeEdgeAtPoint(obj, obj.Figure.CurrentPoint);
+            if edge ~= ""
+                startResize(obj, edge)
+                return
+            end
 
             % Instantiate a figure drag helper to begin dragging dialog
             obj.DragHelper = wt.utility.FigureDragHelper(obj);
