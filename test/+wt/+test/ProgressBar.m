@@ -1,7 +1,7 @@
 classdef ProgressBar < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2020-2025 The MathWorks Inc.
+%   Copyright 2020-2026 The MathWorks Inc.
     
     
     %% Test Method Setup
@@ -27,6 +27,41 @@ classdef ProgressBar < wt.test.BaseWidgetTest
     %% Unit Tests
     methods (Test)
             
+        function testCancelMethodPreservesStatusText(testCase)
+
+            % Start, cancel, then attempt to overwrite the cancel status
+            testCase.verifyMethod("startProgress", "Running");
+            testCase.verifyMethod("cancel");
+            testCase.verifyMethod(@setProgress, 0.5, "Should not replace cancel text");
+
+            % Verify cancel state and callback
+            testCase.verifyTrue(testCase.Widget.CancelRequested)
+            testCase.verifyCallbackCount(1)
+
+            % Verify cancel status is preserved
+            actVal = string(strtrim(testCase.Widget.StatusTextLabel.Text));
+            testCase.verifyEqual(actVal, "Canceling...")
+
+        end %function
+
+
+        function testBarColorAliasAndSetStatusText(testCase)
+
+            % Deprecated BarColor alias should still update the displayed bar
+            expColor = [0.2 0.4 0.6];
+            testCase.verifySetProperty("BarColor", expColor);
+            testCase.verifyEqual(testCase.Widget.SelectionColor, expColor)
+            testCase.verifyEqual(testCase.Widget.ProgressPanel.BackgroundColor, expColor, "AbsTol", 1e-12)
+
+            % Public status-text helper should update the label
+            expText = "Halfway there";
+            testCase.verifyMethod("setStatusText", expText)
+            actVal = string(strtrim(testCase.Widget.StatusTextLabel.Text));
+            testCase.verifyEqual(actVal, expText)
+
+        end %function
+
+
         function testProgress(testCase)
             import matlab.unittest.constraints.Eventually
             import matlab.unittest.constraints.IsEqualTo

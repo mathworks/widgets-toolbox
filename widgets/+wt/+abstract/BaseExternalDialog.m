@@ -22,9 +22,6 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
     %% Public Properties
     properties (AbortSet, Access = public)
 
-        % Dialog Size
-        Size double {mustBePositive} = [350 200]
-
         % Modal (block other figure interaction)
         Modal (1,1) logical = false
 
@@ -32,6 +29,9 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
 
     properties (AbortSet, Dependent, Access = public)
+
+        % Dialog Size
+        Size
 
         % Modal tooltip
         ModalTooltip (1,1) string
@@ -68,16 +68,16 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
         end
 
         function value = get.Size(obj)
-            if isscalar(obj.DialogFigure)
+            if isscalar(obj.DialogFigure) && isvalid(obj.DialogFigure)
                 value = obj.DialogFigure.Position(3:4);
             else
-                value = obj.Size;
+                value = obj.Size_I;
             end
         end
         function set.Size(obj, value)
-            obj.Size = value;
-            if isscalar(obj.DialogFigure) %#ok<MCSUP> 
-                obj.DialogFigure.Position(3:4) = value; %#ok<MCSUP> 
+            obj.Size_I = value;
+            if isscalar(obj.DialogFigure) && isvalid(obj.DialogFigure)
+                obj.DialogFigure.Position(3:4) = value;
             end
         end
 
@@ -199,6 +199,9 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
 
         % This dialog's figure
         DialogFigure matlab.ui.Figure
+
+        % Stored dialog size while the dialog figure is unavailable
+        Size_I (1,2) double {mustBePositive} = [350 200]
 
     end %properties
 
@@ -354,7 +357,7 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             % specified "owner" graphics objects
 
             arguments
-                obj (1,1) wt.abstract.BaseInternalDialog
+                obj (1,1) wt.abstract.BaseExternalDialog
                 owners (1,:) matlab.graphics.Graphics
             end
 
@@ -454,13 +457,13 @@ classdef BaseExternalDialog  < wt.abstract.BaseWidget
             % end
 
             % Update the size
-            obj.DialogFigure.Position(3:4) = obj.Size;
+            obj.DialogFigure.Position(3:4) = obj.Size_I;
 
             % Position over the calling figure
             obj.positionOverCallingFigure()
 
             % Apply the same theme as CallingFigure (R2025a and later)
-            if ~isMATLABReleaseOlderThan("R2025a") && ...
+            if wt.utility.supportsUIThemes() && ...
                     isscalar(obj.CallingFigure) && isvalid(obj.CallingFigure)
                 obj.DialogFigure.Theme = obj.CallingFigure.Theme;
             end

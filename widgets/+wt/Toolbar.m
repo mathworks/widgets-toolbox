@@ -5,7 +5,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
 
     % A configurable toolbar
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -106,7 +106,7 @@ classdef (Sealed) Toolbar < wt.abstract.BaseWidget & ...
             % Adjust default title fonts for toolbar purposes
             obj.TitleFontSize = 10;
             obj.TitleFontWeight = "normal";
-            if isMATLABReleaseOlderThan("R2025a")
+            if ~wt.utility.supportsUIThemes()
                 obj.TitleColor = [0.5333 0.5333 0.5333];
             end
 

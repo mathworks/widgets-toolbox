@@ -16,7 +16,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
     % ** This is a prototype component that may change in the future. 
 
-    % Copyright 2022-2025 The MathWorks Inc.
+    % Copyright 2022-2026 The MathWorks Inc.
 
 
     %% Events
@@ -474,7 +474,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.Grid.Scrollable = true;
 
             % Apply theme colors
-            if ~isMATLABReleaseOlderThan("R2025a")
+            if wt.utility.supportsUIThemes()
                 obj.OuterPanel.ForegroundColor = ...
                     obj.getThemeColor("--mw-color-primary");
                 obj.OuterPanel.BorderColor = ...
@@ -1065,7 +1065,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             end
 
             % Determine the color to use
-            if ~isMATLABReleaseOlderThan("R2025a")
+            if wt.utility.supportsUIThemes()
                 bgColor = obj.getThemeColor("--mw-backgroundColor-secondary");
                 iconColor = obj.getThemeColor("--mw-backgroundColor-iconuiFill-primary");
             else
