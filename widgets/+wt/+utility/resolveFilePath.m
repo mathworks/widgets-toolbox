@@ -97,13 +97,17 @@ end %if
 
 
 %% Finally, check the MATLAB path
-if isfile(fileName)
 
-    % Use WHICH to locate the file
-    filePath = which(fileName);
-    return
+% Use WHICH to locate the file
+filePath = which(fileName);
 
-else
+% Ensure a string scalar
+filePath = string(filePath);
+
+
+%% Was it found?
+
+if ~isfile(filePath)
 
     % Unable to find the file. Throw a warning.
     id = "resolvePathFromFileName:NotFound";
@@ -112,6 +116,5 @@ else
 
     % Return the original path
     filePath = fileName;
-    return
 
 end %if
