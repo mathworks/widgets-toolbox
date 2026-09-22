@@ -70,6 +70,59 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
         end %function
 
 
+        function testResizableHoverPointer(testCase)
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsEqualTo
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            dlg.Resizable = true;
+            drawnow
+
+            % Hover over the right edge
+            pos = dlg.Position;
+            edgePoint = [pos(1)+pos(3)-2, pos(2)+round(pos(4)/2)];
+            testCase.hover(testCase.Figure, edgePoint);
+
+            % Verify the figure pointer indicates horizontal resizing
+            testCase.verifyThat(@()string(testCase.Figure.Pointer), ...
+                Eventually(IsEqualTo("right"), "WithTimeoutOf", 5));
+
+            % Hover inside the dialog away from the edge
+            centerPoint = pos(1:2) + round(pos(3:4)/2);
+            testCase.hover(testCase.Figure, centerPoint);
+
+            % Verify the figure pointer is restored
+            testCase.verifyThat(@()string(testCase.Figure.Pointer), ...
+                Eventually(IsEqualTo("arrow"), "WithTimeoutOf", 5));
+
+        end %function
+
+
+        function testResizableTopEdgeDragDoesNotMoveDialog(testCase)
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            dlg.Resizable = true;
+            dlg.Position = [250 180 300 260];
+            dlg.Size = [300 260];
+            drawnow
+
+            % Drag the top edge upward
+            pos = dlg.Position;
+            startPoint = [pos(1)+round(pos(3)/2), pos(2)+pos(4)-2];
+            stopPoint = startPoint + [0 60];
+            testCase.drag(testCase.Figure, startPoint, stopPoint);
+            drawnow
+
+            % Verify it resized vertically instead of moving the dialog
+            testCase.verifyEqual(dlg.Position, [250 180 300 320])
+            testCase.verifyEqual(dlg.Size, [300 320])
+
+        end %function
+
+
         function testExampleCode(testCase)
 
             % Create the dialog

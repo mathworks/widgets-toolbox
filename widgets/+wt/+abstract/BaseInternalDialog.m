@@ -207,6 +207,9 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         % True when this dialog has changed the figure pointer
         IsResizePointerActive (1,1) logical = false
 
+        % Resize edge currently under the pointer
+        ResizeEdgeUnderPointer (1,1) string = ""
+
     end %properties
 
 
@@ -741,6 +744,10 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         function onMouseDrag(obj,evt)
             % Triggered from DragHelper during drag or release
 
+            if ~isempty(obj.ResizeHelper)
+                return
+            end
+
             % Check the drag event status
             switch evt.Status
 
@@ -765,6 +772,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
                 case "motion"
                     obj.Position = evt.NewPosition;
+                    drawnow limitrate
 
                 case "complete"
                     obj.Position = evt.NewPosition;
@@ -861,7 +869,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             point = getEventPoint(obj, evt);
             edge = getResizeEdgeAtPoint(obj, point);
-            startResize(obj, edge)
+            startResize(obj, edge, point)
 
         end %function
 
@@ -902,8 +910,12 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function startResize(obj, edge)
-            % Begin resizing the dialog from the specified edge
+        function startResize(obj, edge, startPoint)
+            % Begin resizing the dialog from the specified edge and point
+
+            if nargin < 3
+                startPoint = obj.Figure.CurrentPoint;
+            end
 
             if ~obj.Resizable || edge == "" || ~isempty(obj.ResizeHelper)
                 return
@@ -914,7 +926,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
             obj.DragHelper(:) = [];
 
             obj.ResizeHelper = wt.utility.FigureResizeHelper(...
-                obj, edge, obj.MinimumSize);
+                obj, edge, obj.MinimumSize, nan(1,4), startPoint);
             obj.ResizeHelper.ResizeFcn = @(~,evt)onMouseResize(obj,evt);
             setFigurePointerForResize(obj, edge)
 
@@ -940,8 +952,10 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             edge = getResizeEdgeAtPoint(obj, point);
             if edge == ""
+                obj.ResizeEdgeUnderPointer = "";
                 restoreFigurePointer(obj)
             else
+                obj.ResizeEdgeUnderPointer = edge;
                 setFigurePointerForResize(obj, edge)
             end
 
@@ -987,6 +1001,7 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
 
             obj.PreviousFigurePointer = [];
             obj.IsResizePointerActive = false;
+            obj.ResizeEdgeUnderPointer = "";
 
         end %function
 
@@ -1010,13 +1025,21 @@ classdef BaseInternalDialog  < wt.abstract.BaseWidget & ...
         end %function
 
 
-        function onTitleButtonDown(obj,~)
+        function onTitleButtonDown(obj,evt)
             % Triggered on title bar button down
 
+            if ~isempty(obj.ResizeHelper)
+                return
+            end
+
             % Resize takes precedence when the pointer is on a resize edge
-            edge = getResizeEdgeAtPoint(obj, obj.Figure.CurrentPoint);
+            startPoint = getEventPoint(obj, evt);
+            edge = getResizeEdgeAtPoint(obj, startPoint);
+            if edge == "" && obj.IsResizePointerActive
+                edge = obj.ResizeEdgeUnderPointer;
+            end
             if edge ~= ""
-                startResize(obj, edge)
+                startResize(obj, edge, startPoint)
                 return
             end
 

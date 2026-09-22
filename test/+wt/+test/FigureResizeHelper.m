@@ -150,6 +150,24 @@ classdef FigureResizeHelper < matlab.unittest.TestCase
 
         end %function
 
+
+        function testConstructorUsesProvidedStartPoint(testCase)
+
+            fig = uifigure('Visible','off');
+            testCase.addTeardown(@()delete(fig));
+
+            panel = uipanel(fig);
+            panel.Position = [10 10 100 100];
+            startPoint = [42 43];
+
+            helper = wt.utility.FigureResizeHelper(...
+                panel, "right", [10 10], nan(1,4), startPoint);
+            testCase.addTeardown(@()delete(helper));
+
+            testCase.verifyEqual(helper.StartPoint, startPoint)
+
+        end %function
+
     end %methods
 
 end %classdef

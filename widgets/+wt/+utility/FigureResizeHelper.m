@@ -64,7 +64,7 @@ classdef FigureResizeHelper < handle
     %% Constructor / Destructor
     methods
 
-        function obj = FigureResizeHelper(subject, edge, minimumSize, bounds)
+        function obj = FigureResizeHelper(subject, edge, minimumSize, bounds, startPoint)
 
             arguments
                 subject (1,1) matlab.graphics.Graphics
@@ -72,6 +72,7 @@ classdef FigureResizeHelper < handle
                     "top-left","top-right","bottom-left","bottom-right"])}
                 minimumSize (1,2) double {mustBePositive} = [1 1]
                 bounds (1,4) double = nan(1,4)
+                startPoint (1,2) double = nan(1,2)
             end
 
             % Get figure
@@ -86,7 +87,11 @@ classdef FigureResizeHelper < handle
             end
 
             % Get starting point in figure
-            obj.StartPoint = obj.Figure.CurrentPoint;
+            if any(isnan(startPoint))
+                obj.StartPoint = obj.Figure.CurrentPoint;
+            else
+                obj.StartPoint = startPoint;
+            end
 
             % Get bounds. If not provided, use the figure bounds.
             if any(isnan(bounds))
