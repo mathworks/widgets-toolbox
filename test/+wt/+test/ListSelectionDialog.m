@@ -1,7 +1,7 @@
 classdef ListSelectionDialog < wt.test.BaseDialogTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2025 The MathWorks Inc.
+    %   Copyright 2025-2026 The MathWorks Inc.
     
     %% Properties
     properties
