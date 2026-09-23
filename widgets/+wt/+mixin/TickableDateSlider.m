@@ -1,11 +1,15 @@
 classdef TickableDateSlider < handle
-    % Mixin to add date ticks to a slider component
+    %TickableDateSlider - Add date ticks to a slider component
+    %   OBJ = TickableDateSlider(PARENT) adds shared tick calculation for
+    %   date-based slider widgets.
+    %
+    %   See also wt.DateSlider, wt.DateRangeSlider
 
     %% Abstract properties
     properties (Abstract, Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Slider
-        Slider matlab.ui.control.internal.model.mixin.SliderComponent {mustBeScalarOrEmpty}
+        Slider
 
     end
 
@@ -13,25 +17,31 @@ classdef TickableDateSlider < handle
     methods (Access = protected)
 
         function [majorTicks, minorTicks] = getSliderTicks(obj, orientation, options)
-            % Update the limits in date-picker and slider
+            %getSliderTicks - Calculate major and minor date slider ticks
 
             arguments
-                obj (1,1)                
+                obj (1,1)
                 orientation (1,1) string {mustBeMember(orientation, ["horizontal" "vertical"])} = "horizontal";
-                options.TickLength (1,1) double {mustBeInteger, mustBePositive}
+                options.TickLength (1,1) double {mustBeInteger, mustBePositive} = 11
             end
 
-            % How many days?
-            nDays = obj.Slider.Limits(2);
+            sliderLimits = obj.Slider.Limits;
+            lowerTick = ceil(sliderLimits(1));
+            upperTick = floor(sliderLimits(2));
+
+            if lowerTick > upperTick
+                lowerTick = round(sliderLimits(1));
+                upperTick = lowerTick;
+            end
 
             % What space is needed for the labels?
             % Depends on font size and font weight.
-            if obj.Slider.FontWeight == "bold"
+            if string(obj.Slider.FontWeight) == "bold"
                 elSize = 0.6;
             else
                 elSize = 0.5;
             end
-            fontSize = obj.Slider.FontSize; 
+            fontSize = obj.Slider.FontSize;
 
             % What is the slider orientation?
             if orientation == "horizontal"
@@ -40,13 +50,9 @@ classdef TickableDateSlider < handle
                 sliderSpace = obj.Slider.Position(3);
 
                 % Minimum space required for label
-                if isfield(options, 'TickLength')
-                    tickLength = options.TickLength;
-                else
-                    tickLength = 11;
-                end
-                minSpaceForTickLabel = elSize * fontSize * tickLength;
-            else                
+                minSpaceForTickLabel = ...
+                    elSize * fontSize * options.TickLength;
+            else
                 % Size of slider. Always in pixel units (cannot be changed)
                 sliderSpace = obj.Slider.Position(4);
 
@@ -54,49 +60,43 @@ classdef TickableDateSlider < handle
                 minSpaceForTickLabel = elSize * fontSize * 2;
             end
 
-            % How many major ticks fit in the available size?
-            maxMajorInterval = floor(sliderSpace / minSpaceForTickLabel) - 1;
-            maxMajorInterval = max(1, maxMajorInterval);
-
-            % How large are the steps for the major ticks?
-
-            % Is the interval size a prime number?
-            if isprime((nDays - 1))
-                majorIntervalStep = max(1, round((nDays - 1) / maxMajorInterval));
-            else
-                majorStepArray = (nDays - 1) ./ (maxMajorInterval:-1:1);
-                isIntegerStepSize = majorStepArray == floor(majorStepArray);
-                majorIntervalStep = majorStepArray(find(isIntegerStepSize, 1));
-            end
-
-            % At what tick location do the major tick labels need to go?
-            majorTicks = floor(1:majorIntervalStep:nDays);
-            majorTicks(end + 1) = nDays;
+            minSpaceForTickLabel = max(1, minSpaceForTickLabel);
+            maxMajorTicks = max(2, floor(sliderSpace / minSpaceForTickLabel) + 1);
+            majorTicks = selectSliderTicks(lowerTick, upperTick, maxMajorTicks);
 
             % How much space is left for the minor ticks?
             minSpaceForMinorTick = 10;
-            nMajorInterval = ((nDays - 1) / majorIntervalStep);
-            maxMinorInterval = floor(sliderSpace / nMajorInterval / minSpaceForMinorTick);
-            
-            % Is there enough room for all steps that are left between the major
-            % ticks?
-            if maxMinorInterval < majorIntervalStep
-
-                % What is the maximum number of minor ticks that can fit in the
-                % major tick interval?
-                minorStepArray = majorIntervalStep ./ (maxMinorInterval:-1:1);
-                isIntegerStepSize = minorStepArray == floor(minorStepArray);
-                minorIntervalStep = minorStepArray(find(isIntegerStepSize, 1));
-            else
-                minorIntervalStep = 1;
-            end
-
-            % How much room is available between the major ticks?
-            minorTickSteps = majorTicks(1):minorIntervalStep:majorTicks(2);
-            minorTicks = majorTicks + minorTickSteps(:);
-            minorTicks = unique(minorTicks(:)');
+            maxMinorTicks = max(2, floor(sliderSpace / minSpaceForMinorTick) + 1);
+            minorTicks = selectSliderTicks(lowerTick, upperTick, maxMinorTicks);
         end
 
     end
+
+end
+
+function ticks = selectSliderTicks(lowerTick, upperTick, maxTickCount)
+%selectSliderTicks - Select integer ticks between two slider limits
+
+span = upperTick - lowerTick;
+if span == 0
+    ticks = lowerTick;
+    return
+end
+
+allTicks = lowerTick:upperTick;
+if numel(allTicks) <= maxTickCount
+    ticks = allTicks;
+    return
+end
+
+maxTickCount = max(2, floor(maxTickCount));
+stepSize = max(1, ceil(span / (maxTickCount - 1)));
+ticks = lowerTick:stepSize:upperTick;
+
+if ticks(end) ~= upperTick
+    ticks(end + 1) = upperTick;
+end
+
+ticks = unique(ticks);
 
 end

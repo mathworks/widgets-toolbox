@@ -1,44 +1,44 @@
 classdef DateSlider < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
 
-    
+
     %% Test Method Setup
     methods (TestMethodSetup)
-        
+
         function setup(testCase)
-            
+
             % Call superclass method
             testCase.setup@wt.test.BaseWidgetTest();
 
             % Setup widget
             fcn = @()wt.DateSlider(testCase.Grid);
             testCase.Widget = verifyWarningFree(testCase,fcn);
-            
+
             % Set callback
             testCase.Widget.ValueChangedFcn = @(s,e)onCallbackTriggered(testCase,e);
-            
+
             % Ensure it renders
             drawnow
-            
+
         end %function
-        
+
     end %methods
-    
+
     %% Unit Tests
     methods (Test)
-        
+
         function testValuePropertyAndBoundaries(testCase)
-            
+
             % Set the value
             newValue = datetime("01-Jan-2020");
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyControlValue(newValue);
-            
+
             % Set the value
             newValue = datetime("03-Jan-2020");
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyControlValue(newValue);
-            
+
             % Configure the control
             newLimits = datetime("today") + [-days(20) days(15)];
             testCase.verifySetProperty("Limits", newLimits);
@@ -49,44 +49,44 @@ classdef DateSlider < wt.test.BaseWidgetTest
             newValue = datetime("today") + days(15);
             testCase.verifySetProperty("Value", newValue);
             testCase.verifyControlValue(newValue);
-            
+
             % Change the limits out of bounds
             newLimits = datetime("today") + [days(20) days(30)];
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValue(newLimits(1));
-           
+
             % Set an invalid value
             expValue = datetime("today") + days(20);
             invldValue = datetime("today") + days(31);
             testCase.verifySetPropertyError("Value", invldValue, 'MATLAB:ui:DatePicker:valueNotValid');
             testCase.verifyControlValue(expValue);
-            
+
             % Set an invalid value
             expValue = datetime("today") + days(20);
             invldValue = datetime("today") + days(15);
             testCase.verifySetPropertyError("Value", invldValue, 'MATLAB:ui:DatePicker:valueNotValid');
             testCase.verifyControlValue(expValue);
-            
+
             % Configure a simple range
             newLimits = datetime("today") + [days(0) days(10)];
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifyControlLimits(newLimits);
-    
+
             % Expect index 1 -> min date, index 11 -> max date
             testCase.verifySetProperty("ValueIndex", 1);
             testCase.verifyControlValue(newLimits(1));
             testCase.verifySetProperty("ValueIndex", 11);
             testCase.verifyControlValue(newLimits(2));
-    
+
             % Out-of-bounds should error
             testCase.verifySetPropertyError("ValueIndex", -1, 'MATLAB:validators:mustBeInRange');
             testCase.verifySetPropertyError("ValueIndex", 12, 'MATLAB:validators:mustBeInRange');
 
         end %function
-        
+
         function testDatepicker(testCase)
-    
+
             % Configure the control
             newLimits = datetime("today") + [-days(20) days(15)];
             testCase.verifySetProperty("Limits", newLimits);
@@ -169,12 +169,12 @@ classdef DateSlider < wt.test.BaseWidgetTest
             % Configure range
             newLimits = datetime("today") + [days(0) days(50)];
             testCase.verifySetProperty("Limits", newLimits);
-    
+
             % Drag the slider; ValueChanging should fire at least once
             sliderControl = testCase.Widget.Slider;
             startValue = 5; newValue = 25;
             testCase.drag(sliderControl, startValue, newValue);
-    
+
             % We don't assert exact count (depends on platform), just > 1
             testCase.verifyTrue(testCase.CallbackCount > 1);
         end %function
@@ -187,14 +187,14 @@ classdef DateSlider < wt.test.BaseWidgetTest
             testCase.verifyControlLimits(newLimits);
             testCase.verifySetProperty("Value", newLimits(1));
             testCase.verifyControlValue(newLimits(1));
-    
+
             % Set step to one calendar month, start at min
             testCase.verifySetProperty("Step", calmonths(1));
-    
+
             % Push 'up' twice: Jan->Feb->Mar (clamped at max)
             testCase.verifyButtonPushAction("up", base + calmonths(1));
             testCase.verifyButtonPushAction("up", newLimits(2));
-    
+
             % Push 'down' twice: back to Feb->Jan
             testCase.verifyButtonPushAction("down", base + calmonths(1));
             testCase.verifyButtonPushAction("down", newLimits(1));
@@ -212,10 +212,10 @@ classdef DateSlider < wt.test.BaseWidgetTest
         function testLimitsNormalizationToStartOfDay(testCase)
             % Provide limits with non-midnight time components
             d1 = dateshift(datetime("today"), 'start', 'day') + hours(10);
-            d2 = d1 + days(3) + hours(12);            
+            d2 = d1 + days(3) + hours(12);
             testCase.verifySetProperty("Limits", [d1 d2], [d1 d2 ] - timeofday([d1 d2]));
         end %function
-        
+
         function testTickLabels(testCase)
 
             % Change the limits
@@ -225,11 +225,13 @@ classdef DateSlider < wt.test.BaseWidgetTest
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValue(newLimits(1));
 
-            % Check tick labels
-            expLabels = string(datetime("today") + days(5:10));
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
-            actualLabels = convertCharsToStrings(actualLabels(1:min(6, numel(actualLabels))));
-
+            actualLabels = convertCharsToStrings(actualLabels);
+            actualTicks = testCase.Widget.Slider.MajorTicks;
+            expLabels = string(newLimits(1) + days(actualTicks - 1));
+            testCase.verifySliderTicks(actualTicks)
+            testCase.verifyEqual(actualTicks(1), 1)
+            testCase.verifyEqual(actualTicks(end), 6)
             testCase.verifyEqual(actualLabels, expLabels)
 
             % Change the limits
@@ -241,17 +243,22 @@ classdef DateSlider < wt.test.BaseWidgetTest
             % Change datepicker size so that slider barely fits
             testCase.Widget.DatepickerSize = 240;
 
-            % Check widgets exist
-            expLabels = string(datetime("today") + days([0 5 10]));
+            % Check ticks remain valid when fewer labels fit
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
-            actualLabels = convertCharsToStrings(actualLabels(1:min(3, numel(actualLabels))));
+            actualLabels = convertCharsToStrings(actualLabels);
+            actualTicks = testCase.Widget.Slider.MajorTicks;
+            expLabels = string(newLimits(1) + days(actualTicks - 1));
 
+            testCase.verifySliderTicks(actualTicks)
+            testCase.verifyEqual(actualTicks(1), 1)
+            testCase.verifyEqual(actualTicks(end), 11)
+            testCase.verifyEqual(numel(actualLabels), numel(actualTicks))
             testCase.verifyEqual(actualLabels, expLabels)
-            
-        end %function               
-        
+
+        end %function
+
         function testSlider(testCase)
-            
+
             % Configure the control
             newLimits = datetime("today") + [days(0) days(100)];
             testCase.verifySetProperty("Limits", newLimits);
@@ -259,17 +266,17 @@ classdef DateSlider < wt.test.BaseWidgetTest
 
             % Get the control
             sliderControl = testCase.Widget.Slider;
-                        
+
             % Click the slider
             newValue = 75;
             expValue = datetime("today") + days(newValue - 1);
             testCase.choose(sliderControl,newValue);
             testCase.verifyControlValue(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
-            
+
             % Verify callback triggered
-            testCase.verifyEqual(testCase.CallbackCount, 1)            
-            
+            testCase.verifyEqual(testCase.CallbackCount, 1)
+
             % Drag the slider
             startValue = 1;
             newValue = 32;
@@ -277,7 +284,7 @@ classdef DateSlider < wt.test.BaseWidgetTest
             testCase.drag(sliderControl,startValue,newValue);
             testCase.verifyControlValue(expValue);
             testCase.verifyEqual(testCase.Widget.Value, expValue);
-            
+
             % Verify callback triggered
             testCase.verifyEqual(testCase.CallbackCount, 2)
 
@@ -291,23 +298,23 @@ classdef DateSlider < wt.test.BaseWidgetTest
 
             % Verify callback triggered
             testCase.verifyEqual(testCase.CallbackCount, 3)
-            
+
         end %function
-        
+
         function testOrientationVerticalLayout(testCase)
             % Switch to vertical orientation
             testCase.verifySetProperty("Orientation", wt.enum.HorizontalVerticalState.vertical);
-    
+
             % Slider orientation must change
             testCase.verifyEquality(testCase.Widget.Slider.Orientation, "vertical");
-    
+
             % Layout positions should match update() vertical branch
             drawnow
             testCase.verifyEqual(testCase.Widget.Datepicker.Layout.Row, 2);
             testCase.verifyEqual(testCase.Widget.Datepicker.Layout.Column, 1);
             testCase.verifyEqual(testCase.Widget.GridButtons.Layout.Row, 2);
             testCase.verifyEqual(testCase.Widget.GridButtons.Layout.Column, 2);
-    
+
             % DatepickerSize affects height in vertical orientation
             testCase.verifySetProperty("DatepickerSize", 180);
             drawnow
@@ -320,11 +327,11 @@ classdef DateSlider < wt.test.BaseWidgetTest
             fmt = "uuuu-MM-dd";
             testCase.Widget.DisplayFormat = fmt;
             drawnow
-    
+
             % Verify propagation to datepicker and limits
             testCase.verifyEquality(testCase.Widget.Datepicker.DisplayFormat, fmt);
             testCase.verifyEquality(testCase.Widget.Limits.Format, fmt);
-    
+
             % Ticks/labels should be updated (non-empty categorical labels)
             drawnow
             labels = testCase.Widget.Slider.MajorTickLabels;
@@ -332,10 +339,10 @@ classdef DateSlider < wt.test.BaseWidgetTest
         end %function
 
     end %methods (Test)
-    
+
     %% Helper methods
     methods (Access = private)
-        
+
         function verifyControlValue(testCase, dateValue, absTol)
             % Verifies the control fields have the specified value
 
@@ -344,13 +351,13 @@ classdef DateSlider < wt.test.BaseWidgetTest
                 dateValue (1,1) datetime
                 absTol (1,1) double = 0
             end
-            
+
             drawnow
 
             numValue = days(dateValue - testCase.Widget.Limits(1)) + 1;
             testCase.verifyEqual(testCase.Widget.Slider.Value, numValue, 'AbsTol', absTol);
             testCase.verifyEqual(testCase.Widget.Datepicker.Value, dateValue, 'AbsTol', absTol);
-            
+
         end %function
 
         function verifyControlLimits(testCase, dateLimits, absTol)
@@ -382,13 +389,13 @@ classdef DateSlider < wt.test.BaseWidgetTest
         end %function
 
         function verifyButtonPushAction(testCase, direction, expValue)
-            
+
             arguments
                 testCase
                 direction (1,1) string {mustBeMember(direction, ["up", "down"])}
                 expValue (1,1) datetime
             end
-           
+
             if direction == "up"
                 buttonIdx = 1;
             else
@@ -397,12 +404,21 @@ classdef DateSlider < wt.test.BaseWidgetTest
 
             % Type the new value into the control
             testCase.press(testCase.Widget.Buttons(buttonIdx));
-            
+
             % Verify new property value
             testCase.verifyControlValue(expValue);
-            
+
         end %function
-        
+
+        function verifySliderTicks(testCase, ticks)
+            % Verifies slider ticks are sorted, unique, and in range
+
+            testCase.verifyEqual(ticks, unique(ticks))
+            testCase.verifyTrue(all(ticks == round(ticks)))
+            testCase.verifyTrue(all(ticks >= testCase.Widget.Slider.Limits(1)))
+            testCase.verifyTrue(all(ticks <= testCase.Widget.Slider.Limits(2)))
+        end %function
+
     end %methods
 
 end %classdef

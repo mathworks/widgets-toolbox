@@ -69,6 +69,23 @@
       ]
     },
     {
+      "className": "wt.DateSlider",
+      "componentName": "Date Slider",
+      "description": "A date selection control with a date picker and slider.",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANNSURBVEhLrZa5SyxBEMZr1vVYbxFvTMQj8B8wEET8DwQVDcTM2MTQQDARxEAwNVcE0cTNTRQRRQ1k1wu8xfsWdd78yu1xnJ334KEf9G7bXf1V1VfVvVoSgPf3d3tzc5NvKSsrk9LS0kA7sLOzY9/e3kp2drZUV1cn2YUS3y5sB9fX13J+fi43NzdyeHgoHx8fdmL7G7CNxWJqd3R0JI6jJLskB+D19VUuLy/l6upK7u7uxLL+moBrR1Bk7Ed4dXXVfnp6UhIM4vG45OTkaFSpqakSiUSUZGFhwQ6Hw3rICVzS0tJ0TgBvb28SCoWEfWOHDWdDx8fHSkYEDJyRwcXFhRKzBoGJksEc3cHp6anaYQ+pOQMn3CoRGwzARklJCbrrvLKyUp6fn10bY/f4+KijtrZWHebn5+u6386am5v7VhhkgrSmpkYdpKSkiCNjkr4QIEVjY6M6QNaNjQ2dI5eBNTMzow6MRwAZGkNO9NQnqNBkCRm1QkbOGXJjH2KRTaJhQGoKyDqHzbp/sMe3ITa2DOPQmpqasomyvb3dJf4paJLJyUnJyMj4yoB0fwtwuZLxwQjCw8ODHBwcaCt6a2RwdnYmJycngecNb5gPvPkRjUZleXlZ+5pU6ayuri7Jzc3VuzI7Oyvr6+v6d29vr+Tl5SVOfiIpA2+E+/v7Mj09resdHR1SUVGhLei0tEbd19cni4uLqjVy+DsMLsMbKFFxcbEMDQ1JW1ub9jedkp6eLlVVVZKZmSk9PT3S2dmpDoLaF3xz4JeIN6SoqEijHR8fl62tLX226+vr9VluaGiQgoKCfzaGKxFGfkMKu7Kyord5bGxMmpqadG1iYiJh8QUyIEM/DK9bZG8NlpaWtIh1dXXS3Nws29vbug4Zjxx7FJp7c39/r/Uiw5aWFr1wcLkZmIkXra2tasxjxmFeSvTv7u7WH6K1tTX9IeKB4/YiIUF4gzSBWyMjIzb93t/fr4X0gih5vFgvLCzUNUgorvdBY43scAZeXl5keHhYsrKyPosM0NgPil1eXu6SA4hwCJkZSGXIgeFSiSJO24H5+ajs7u7p/CeAAy4Atzbx4OCg7a2DV8v/gfdO0FkDAwNfK6Ojo/rvx2+A58O57Q63yB/WIHzYbbhnVwAAAABJRU5ErkJggg==",
+      "category": "Widgets Toolbox",
+      "authorName": "Robyn Jackey - MathWorks Consulting",
+      "authorEmail": "",
+      "version": "1.0",
+      "avatar": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANNSURBVEhLrZa5SyxBEMZr1vVYbxFvTMQj8B8wEET8DwQVDcTM2MTQQDARxEAwNVcE0cTNTRQRRQ1k1wu8xfsWdd78yu1xnJ334KEf9G7bXf1V1VfVvVoSgPf3d3tzc5NvKSsrk9LS0kA7sLOzY9/e3kp2drZUV1cn2YUS3y5sB9fX13J+fi43NzdyeHgoHx8fdmL7G7CNxWJqd3R0JI6jJLskB+D19VUuLy/l6upK7u7uxLL+moBrR1Bk7Ed4dXXVfnp6UhIM4vG45OTkaFSpqakSiUSUZGFhwQ6Hw3rICVzS0tJ0TgBvb28SCoWEfWOHDWdDx8fHSkYEDJyRwcXFhRKzBoGJksEc3cHp6anaYQ+pOQMn3CoRGwzARklJCbrrvLKyUp6fn10bY/f4+KijtrZWHebn5+u6386am5v7VhhkgrSmpkYdpKSkiCNjkr4QIEVjY6M6QNaNjQ2dI5eBNTMzow6MRwAZGkNO9NQnqNBkCRm1QkbOGXJjH2KRTaJhQGoKyDqHzbp/sMe3ITa2DOPQmpqasomyvb3dJf4paJLJyUnJyMj4yoB0fwtwuZLxwQjCw8ODHBwcaCt6a2RwdnYmJycngecNb5gPvPkRjUZleXlZ+5pU6ayuri7Jzc3VuzI7Oyvr6+v6d29vr+Tl5SVOfiIpA2+E+/v7Mj09resdHR1SUVGhLei0tEbd19cni4uLqjVy+DsMLsMbKFFxcbEMDQ1JW1ub9jedkp6eLlVVVZKZmSk9PT3S2dmpDoLaF3xz4JeIN6SoqEijHR8fl62tLX226+vr9VluaGiQgoKCfzaGKxFGfkMKu7Kyord5bGxMmpqadG1iYiJh8QUyIEM/DK9bZG8NlpaWtIh1dXXS3Nws29vbug4Zjxx7FJp7c39/r/Uiw5aWFr1wcLkZmIkXra2tasxjxmFeSvTv7u7WH6K1tTX9IeKB4/YiIUF4gzSBWyMjIzb93t/fr4X0gih5vFgvLCzUNUgorvdBY43scAZeXl5keHhYsrKyPosM0NgPil1eXu6SA4hwCJkZSGXIgeFSiSJO24H5+ajs7u7p/CeAAy4Atzbx4OCg7a2DV8v/gfdO0FkDAwNfK6Ojo/rvx2+A58O57Q63yB/WIHzYbbhnVwAAAABJRU5ErkJggg==",
+      "defaultPosition": [
+        1,
+        1,
+        400,
+        40
+      ]
+    },
+    {
       "className": "wt.FileSelector",
       "componentName": "File Selector",
       "description": "A file/folder selection control with browse button. Updated to inherit from ComponentContainer.",

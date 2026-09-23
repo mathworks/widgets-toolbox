@@ -4,7 +4,25 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
         wt.mixin.ButtonColorable
-    % A slider and date-picker combination
+    %DateRangeSlider - Select a date interval
+    %   DateRangeSlider requires MATLAB R2024b or later.
+    %
+    %   OBJ = DateRangeSlider(PARENT) creates a date-range slider in the
+    %   specified parent container. The Value property is a two-element
+    %   datetime row vector, and slider values map to whole-day offsets
+    %   from Limits(1).
+    %
+    %   DateRangeSlider properties:
+    %       Value          - Selected lower and upper dates
+    %       ValueIndex     - One-based selected day indices
+    %       Limits         - Lower and upper selectable dates
+    %       MinGap         - Minimum gap as a duration
+    %       DisplayFormat  - Date display format
+    %       Step           - Button step size as a calendar duration
+    %       Orientation    - Slider orientation
+    %       DatepickerSize - Date picker width or height
+    %
+    %   See also uidatepicker, uislider, DateSlider
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -28,24 +46,24 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
     properties (AbortSet)
 
-        % Limits of the slider and spinner
+        % Limits of the slider and date pickers
         Limits (1,2) datetime = datetime("01-Jan-2020") + days([0 3]);
 
         % Date format
-        DisplayFormat (1,1) string = 'dd-MMM-uuuu'
+        DisplayFormat (1,1) string = "dd-MMM-uuuu"
 
-        % Orientation of the spinner and slider
+        % Orientation of the date pickers and slider
         Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
 
-        % Size of date-picker (width for horizontal, height for vertical
+        % Size of date-picker (width for horizontal, height for vertical)
         DatepickerSize = 120
 
     end %properties
 
     properties (AbortSet, Dependent, UsedInUpdate = false)
 
-        % Minimum gap in value range (days)
-        MinGap (1,1) double {mustBeNonnegative, mustBeInteger} = 1
+        % Minimum gap in the selected date range
+        MinGap
 
     end
 
@@ -57,12 +75,12 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
     end
 
     properties (AbortSet, UsedInUpdate = false)
-    % These properties do not trigger the update method
-    
+        % These properties do not trigger the update method
+
         % Define step size for buttons
         Step (1,1) calendarDuration = calendarDuration(0,0,1)
-    
-    end   
+
+    end
 
     %% Internal Properties
     properties (Access = private)
@@ -75,7 +93,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
 
         % Slider
-        Slider = matlab.ui.control.RangeSlider.empty
+        Slider
 
         % Date picker on the left
         DatepickerLeft matlab.ui.control.DatePicker
@@ -120,13 +138,13 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
         function set.Value(obj, val)
 
             % Validate input
-            valueIndex = days(val - obj.Limits(1) + 1);
+            valueIndex = days(val - obj.Limits(1)) + 1;
             valueGap = days(diff(val));
             maxRange = days(obj.Limits(2) - obj.Limits(1)) + 1;
             try
                 mustBeInRange(valueIndex, 1, maxRange)
                 mustBeGreaterThanOrEqual(valueGap, days(obj.MinGap))
-                mustBeIncreasing(valueIndex)                
+                mustBeIncreasing(valueIndex)
             catch ME
                 if strcmp(ME.identifier, 'MATLAB:validators:mustBeInRange')
                     msg = 'Value must be greater than or equal to %s, and less than or equal to %s.';
@@ -186,12 +204,21 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             % Parse input
             if isduration(val)
                 val = days(val);
+            else
+                mustBeNumeric(val)
             end
+
+            mustBeReal(val)
+            mustBeScalarOrEmpty(val)
+            mustBeNonempty(val)
+            mustBeFinite(val)
+            mustBeNonnegative(val)
+            mustBeInteger(val)
 
             % Validate input
             maxGap = days(diff(obj.Limits));
             try
-                mustBeGreaterThanOrEqual(maxGap, val) 
+                mustBeGreaterThanOrEqual(maxGap, val)
             catch ME
                 if strcmp(ME.identifier, 'MATLAB:validators:mustBeGreaterThanOrEqual')
                     msg = 'Value must be smaller than or equal to %d days.';
@@ -206,6 +233,12 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
             % Set value
             obj.MinGap_I = val;
+
+            if ~isempty(obj.Slider) && ~isempty(obj.DatepickerLeft) ...
+                    && ~isempty(obj.DatepickerRight)
+                updateControlLimitsAndValue(obj);
+                updateButtonEnable(obj);
+            end
         end
 
         function val = get.MinGap(obj)
@@ -230,6 +263,11 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
     methods (Access = protected)
 
         function setup(obj)
+
+            if isMATLABReleaseOlderThan("R2024b")
+                error("wt:DateRangeSlider:UnsupportedRelease", ...
+                    "DateRangeSlider requires MATLAB R2024b or later.")
+            end
 
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
@@ -267,13 +305,13 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.DatepickerLeft.Limits = [obj.Limits(1) datetime("02-Jan-2020")];
             obj.DatepickerLeft.Editable = false;
             obj.DatepickerLeft.Tag = "left";
-            
+
             % Slider
             obj.Slider = uislider(obj.Grid, 'range');
             obj.Slider.ValueChangedFcn = @(h,e)obj.onSliderChanged(e);
             obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanging(e);
             obj.Slider.Limits = [0 3];
-            obj.Slider.Value = [1 2];            
+            obj.Slider.Value = [1 2];
 
             % Date picker right
             obj.DatepickerRight = uidatepicker(obj.Grid);
@@ -310,7 +348,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
             % Update the slider ticks
             tickLoc = 0:days(obj.Limits(2) - obj.Limits(1));
-            dtArray = datetime("01-Jan-2020") + days(tickLoc);            
+            dtArray = datetime("01-Jan-2020") + days(tickLoc);
             obj.Slider.MajorTicks = tickLoc;
             obj.Slider.MinorTicks = tickLoc;
             obj.Slider.MajorTickLabels = categorical(dtArray(tickLoc + 1));
@@ -367,10 +405,10 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
                 obj.Slider.Layout.Column = 3;
             end
 
-            % Make sure values are a datetime number            
+            % Make sure values are a datetime number
             if isnat(obj.DatepickerLeft.Value)
                 obj.DatepickerLeft.Value = obj.DatepickerLeft.Limits(1);
-            end          
+            end
             if isnat(obj.DatepickerRight.Value)
                 obj.DatepickerRight.Value = obj.DatepickerRight.Limits(2);
             end
@@ -379,8 +417,8 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.MinGap = boundValue(obj, days(obj.MinGap), 0, days(diff(obj.Limits)));
 
             % Update datepicker limits
-            updateControlLimitsAndValue(obj);          
-            
+            updateControlLimitsAndValue(obj);
+
             % Update datepicker display formats
             obj.DatepickerLeft.DisplayFormat = obj.DisplayFormat;
             obj.DatepickerRight.DisplayFormat = obj.DisplayFormat;
@@ -403,13 +441,13 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
             switch evt.Source.Tag
                 case "leftUp"
-                    newDate(1) = min(newDate(1) + obj.Step, newDate(2) - days(1));
+                    newDate(1) = min(newDate(1) + obj.Step, newDate(2) - obj.MinGap);
                 case "leftDown"
                     newDate(1) = max(newDate(1) - obj.Step, obj.Limits(1));
                 case "rightUp"
                     newDate(2) = min(newDate(2) + obj.Step, obj.Limits(2));
                 case "rightDown"
-                    newDate(2) = max(newDate(2) - obj.Step, newDate(1) + days(1));
+                    newDate(2) = max(newDate(2) - obj.Step, newDate(1) + obj.MinGap);
             end
 
             % Update the value
@@ -423,10 +461,10 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
         function onSliderChanged(obj,evt)
             % Triggered on slider moved
-            
+
             % What changed the date?
-            prevDate = obj.Limits(1) + round(evt.PreviousValue);
-            newDate = obj.Limits(1) + round(evt.Value);
+            prevDate = obj.Limits(1) + days(round(evt.PreviousValue) - 1);
+            newDate = obj.Limits(1) + days(round(evt.Value) - 1);
 
             % Update datepicker limits
             updateControlLimitsAndValue(obj, newDate);
@@ -444,9 +482,9 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
 
         function onSliderChanging(obj,evt)
             % Triggered on slider moving
-            
+
             % What changed the date?
-            changedDate = obj.Limits(1) + round(evt.Value - 1);
+            changedDate = obj.Limits(1) + days(round(evt.Value) - 1);
 
             % Update datepicker values
             obj.DatepickerLeft.Value = changedDate(1);
@@ -535,7 +573,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
                 obj.Orientation, ...
                 "TickLength", strlength(obj.DisplayFormat));
 
-            % Set slider limits and ticks            
+            % Set slider limits and ticks
             obj.Slider.MajorTicks = majorTicks;
             obj.Slider.MinorTicks = minorTicks;
 
@@ -543,14 +581,14 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             minLimit.Format = obj.DisplayFormat;
             obj.Slider.MajorTickLabels = categorical(minLimit + days(majorTicks - 1));
         end %function
-    
+
 
         function updateControlLimitsAndValue(obj, val)
             % Update values in datepicker components
 
             % Current control value
             currentVal = [obj.DatepickerLeft.Value obj.DatepickerRight.Value];
-            
+
             % Value provided?
             if nargin < 2
                 val = currentVal;
@@ -570,7 +608,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.DatepickerLeft.Value = val(1);
 
             obj.DatepickerRight.Limits = [val(1) + obj.MinGap obj.Limits(2)];
-            obj.DatepickerRight.Value = val(2);    
+            obj.DatepickerRight.Value = val(2);
 
             % Update the limits and value in the slider
             obj.Slider.Limits = days([0, diff(obj.Limits)]) + 1;
@@ -616,9 +654,9 @@ end
 [~, idx] = sort(A, 'ascend');
 if ~all(eq(idx, 1:numel(idx)))
     ME = MException( ...
-        'DateRageSlider:mustBeIncreasing', ...
+        'wt:DateRangeSlider:mustBeIncreasing', ...
         'Value must be increasing.');
     throwAsCaller(ME);
 end
-    
+
 end

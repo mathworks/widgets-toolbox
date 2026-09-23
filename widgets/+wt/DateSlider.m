@@ -4,7 +4,21 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         wt.mixin.FieldColorable & ...
         wt.mixin.FontStyled & ...
         wt.mixin.ButtonColorable
-    % A slider and date-picker combination
+    %DateSlider - Select a single date with a date picker and slider
+    %   OBJ = DateSlider(PARENT) creates a date slider in the specified
+    %   parent container. The Value property is a datetime value, and the
+    %   slider position maps to whole-day offsets from Limits(1).
+    %
+    %   DateSlider properties:
+    %       Value          - Selected date
+    %       ValueIndex     - One-based selected day index
+    %       Limits         - Lower and upper selectable dates
+    %       DisplayFormat  - Date display format
+    %       Step           - Button step size as a calendar duration
+    %       Orientation    - Slider orientation
+    %       DatepickerSize - Date picker width or height
+    %
+    %   See also uidatepicker, uislider, DateRangeSlider
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -28,34 +42,34 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         ValueIndex (1,1) double {mustBeInteger}
 
         % Date format
-        DisplayFormat (1,1) string 
+        DisplayFormat (1,1) string
 
     end %properties
 
-     properties (AbortSet, UsedInUpdate = false)
+    properties (AbortSet, UsedInUpdate = false)
         % These properties do not trigger the update method
 
         % Define step size for buttons
         Step (1,1) calendarDuration = calendarDuration(0,0,1)
-        
-     end
-     
+
+    end
+
     %% Public properties
     properties (AbortSet)
         % These properties trigger the update method
 
-        % Limits of the slider and spinner
+        % Limits of the slider and date picker
         Limits (1,2) datetime = datetime("01-Jan-2020") + days([0 2]);
 
-        % Orientation of the spinner and slider
+        % Orientation of the date picker and slider
         Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
 
-        % Size of date-picker (width for horizontal, height for vertical
+        % Size of date-picker (width for horizontal, height for vertical)
         DatepickerSize = 120
 
     end %properties
 
-   
+
 
     %% Internal Properties
     properties (Transient, NonCopyable, Hidden, SetAccess = protected)
@@ -229,7 +243,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
                 obj.GridButtons.Layout.Row = 1;
                 obj.GridButtons.Layout.Column = 3;
                 obj.Slider.Orientation = "horizontal";
-            end 
+            end
 
             % Set component range
             obj.Slider.Limits = [0 days(obj.Limits(2) - obj.Limits(1))] + 1;
@@ -246,7 +260,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
 
             % Update the buttons
             updateButtonEnable(obj)
-            
+
         end %function
 
 
@@ -298,7 +312,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             % Skip for event ValueChanging for performance
             if evt.EventName == "ValueChanged"
                 obj.Slider.Value = newValue;
-                
+
                 % Update button enable status
                 updateButtonEnable(obj)
             end
@@ -357,11 +371,11 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
                 obj.Orientation, ...
                 "TickLength", strlength(obj.DisplayFormat));
 
-            % Set slider limits and ticks            
+            % Set slider limits and ticks
             obj.Slider.MajorTicks = majorTicks;
             obj.Slider.MinorTicks = minorTicks;
             obj.Slider.MajorTickLabels = categorical(obj.Limits(1) + days(majorTicks - 1));
-            
+
         end %function
 
     end %methods

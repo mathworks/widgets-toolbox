@@ -28,7 +28,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
         end %function
 
-    end %methods   
+    end %methods
 
 
     %% Unit Tests
@@ -125,7 +125,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifyControlLimits(newLimits);
             testCase.verifyButtonsEnabled([true true true true])
             testCase.verifyCallbackCount(4);
-            
+
 
             % Pick an out-of-range date using datepicker
             expValue = datetime("today") + [-days(10) days(10)];
@@ -154,7 +154,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifySetProperty("Value", expValue);
             testCase.verifyControlLimits(newLimits);
-            testCase.verifyControlValues(expValue);            
+            testCase.verifyControlValues(expValue);
 
             % Verify buttons enabled state
             testCase.verifyButtonsEnabled([true false false true])
@@ -167,8 +167,8 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             % Push the button up once
             testCase.verifyButtonPushAction("left", "up", expValue + days([1 0]))
             testCase.verifyButtonPushAction("right", "down", expValue + days([1 -1]))
-            testCase.verifyControlValues(expValue + days([1 -1])); 
-            testCase.verifyControlLimits(newLimits); 
+            testCase.verifyControlValues(expValue + days([1 -1]));
+            testCase.verifyControlLimits(newLimits);
             testCase.verifyButtonsEnabled([true true true true])
             testCase.verifyCallbackCount(2);
 
@@ -180,7 +180,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
             % Push up
             testCase.verifyButtonPushAction("left", "up", expValue + days([4 -1]))
-            testCase.verifyButtonPushAction("left", "up", expValue + days([8 -1]))            
+            testCase.verifyButtonPushAction("left", "up", expValue + days([8 -1]))
             testCase.verifyCallbackCount(5);
 
             % Push up disabled at this point
@@ -190,7 +190,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
             % Push down
             testCase.verifyButtonPushAction("left", "down", expValue + days([4 -1]))
-            testCase.verifyButtonPushAction("left", "down", expValue + days([0 -1])) 
+            testCase.verifyButtonPushAction("left", "down", expValue + days([0 -1]))
             testCase.verifyButtonsEnabled([true false true true])
             testCase.verifyCallbackCount(7);
 
@@ -204,7 +204,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifyButtonPushAction("right", "down", expValue + days([0 -8]))
             testCase.verifyButtonPushAction("right", "down", expValue + days([0 -9]))
             testCase.verifyButtonsEnabled([false false true false])
-            testCase.verifyControlValues(expValue + days([0 -9])); 
+            testCase.verifyControlValues(expValue + days([0 -9]));
             testCase.verifyControlLimits(newLimits);
             testCase.verifyCallbackCount(11);
 
@@ -219,14 +219,15 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifyControlValues(datetime("today") + days([5 6]));
 
             % Allow some time for the component to catch up
-            drawnow;
-            pause(2)
-            
-            % Check tick labels
-            expLabels = string(datetime("today") + days(5:10));
-            actualLabels = testCase.Widget.Slider.MajorTickLabels;
-            actualLabels = convertCharsToStrings(actualLabels(1:min(6, numel(actualLabels))));
+            drawnow
 
+            actualLabels = testCase.Widget.Slider.MajorTickLabels;
+            actualLabels = convertCharsToStrings(actualLabels);
+            actualTicks = testCase.Widget.Slider.MajorTicks;
+            expLabels = string(newLimits(1) + days(actualTicks - 1));
+            testCase.verifySliderTicks(actualTicks)
+            testCase.verifyEqual(actualTicks(1), 1)
+            testCase.verifyEqual(actualTicks(end), 6)
             testCase.verifyEqual(actualLabels, expLabels)
 
             % Change the limits
@@ -237,12 +238,16 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
             % Allow some time for the component to catch up
             drawnow
-            pause(2)
 
             % Check tick labels
-            expLabels = string(datetime("today") + days(0:2:10));            
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
-            actualLabels = convertCharsToStrings(actualLabels(1:min(6, numel(actualLabels))));
+            actualLabels = convertCharsToStrings(actualLabels);
+            actualTicks = testCase.Widget.Slider.MajorTicks;
+            expLabels = string(newLimits(1) + days(actualTicks - 1));
+            testCase.verifySliderTicks(actualTicks)
+            testCase.verifyEqual(actualTicks(1), 1)
+            testCase.verifyEqual(actualTicks(end), 11)
+            testCase.verifyEqual(numel(actualLabels), numel(actualTicks))
             testCase.verifyEqual(actualLabels, expLabels)
 
             % Change datepicker size so that slider barely fits
@@ -250,7 +255,6 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
             % Allow some time for the component to catch up
             drawnow
-            pause(2)
 
             % Change the limits
             newLimits = datetime("today") + days([0 20]);
@@ -260,12 +264,16 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
 
             % Allow some time for the component to catch up
             drawnow
-            pause(2)
-            
-            % Check widgets exist
-            expLabels = string(datetime("today") + days([0 10 20]));
+
+            % Check ticks remain valid when fewer labels fit
             actualLabels = testCase.Widget.Slider.MajorTickLabels;
-            actualLabels = convertCharsToStrings(actualLabels(1:min(3, numel(actualLabels))));
+            actualLabels = convertCharsToStrings(actualLabels);
+            actualTicks = testCase.Widget.Slider.MajorTicks;
+            expLabels = string(newLimits(1) + days(actualTicks - 1));
+            testCase.verifySliderTicks(actualTicks)
+            testCase.verifyEqual(actualTicks(1), 1)
+            testCase.verifyEqual(actualTicks(end), 21)
+            testCase.verifyEqual(numel(actualLabels), numel(actualTicks))
             testCase.verifyEqual(actualLabels, expLabels)
 
         end %function
@@ -280,7 +288,7 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifyControlLimits(newLimits);
             testCase.verifyControlValues(newValue)
-            
+
             % Change the minimum gap
             minGap = 10;
             newValue = datetime("today") + days(50 + [0 minGap]);
@@ -332,8 +340,10 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             % MinGap cannot exceed limits
             testCase.verifyError(@() set(testCase.Widget, 'MinGap', 30), 'MATLAB:validators:mustBeGreaterThanOrEqual')
             testCase.verifyError(@() set(testCase.Widget, 'MinGap', -1), 'MATLAB:validators:mustBeNonnegative')
+            testCase.verifyError(@() set(testCase.Widget, 'MinGap', hours(12)), 'MATLAB:validators:mustBeInteger')
+            testCase.verifyWarningFree(@() set(testCase.Widget, 'MinGap', days(10)))
             testCase.verifyWarningFree(@() set(testCase.Widget, 'MinGap', 10))
-            testCase.verifyButtonsEnabled(["off" "off" "off" "off"])
+            testCase.verifyButtonsEnabled(["on" "off" "off" "on"])
 
             % No callbacks fired
             testCase.verifyCallbackCount(0)
@@ -344,18 +354,18 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             newLimits = datetime("today") + [days(0) days(10)];
             testCase.verifySetProperty("Limits", newLimits);
             testCase.verifyControlLimits(newLimits);
-    
+
             % Set by indices (0-based offsets from lower limit)
             testCase.verifySetProperty("ValueIndex", [1 11]);
             testCase.verifyControlValues([newLimits(1) newLimits(2)]);
-    
+
             % Mid-range indices
             testCase.verifySetProperty("ValueIndex", [2 7]);
             testCase.verifyControlValues([newLimits(1)+days(1) newLimits(1)+days(6)]);
-    
-            % Non-increasing should error (identifier currently has a typo in the class)
-            testCase.verifySetPropertyError("ValueIndex", [5 4], 'DateRageSlider:mustBeIncreasing');
-    
+
+            % Non-increasing should error
+            testCase.verifySetPropertyError("ValueIndex", [5 4], 'wt:DateRangeSlider:mustBeIncreasing');
+
             % Out-of-bounds should error
             testCase.verifySetPropertyError("ValueIndex", [-1 3], 'MATLAB:validators:mustBeInRange');
             testCase.verifySetPropertyError("ValueIndex", [0 11], 'MATLAB:validators:mustBeInRange');
@@ -366,25 +376,25 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             testCase.verifySetProperty("Orientation", wt.enum.HorizontalVerticalState.vertical);
             % Force a distinctive size to assert against
             testCase.verifySetProperty("DatepickerSize", 180);
-    
+
             % Let layout settle
             drawnow;
-    
+
             % Grid is 2 rows; first row equals DatepickerSize
             testCase.verifyEqual(testCase.Widget.Grid.RowHeight{1}, 180);
-    
+
             % Left side positions
             testCase.verifyEqual(testCase.Widget.GridButtonLeft.Layout.Row, 1);
             testCase.verifyEqual(testCase.Widget.GridButtonLeft.Layout.Column, 1);
             testCase.verifyEqual(testCase.Widget.DatepickerLeft.Layout.Row, 1);
             testCase.verifyEqual(testCase.Widget.DatepickerLeft.Layout.Column, 2);
-    
+
             % Right side positions
             testCase.verifyEqual(testCase.Widget.GridButtonRight.Layout.Row, 1);
             testCase.verifyEqual(testCase.Widget.GridButtonRight.Layout.Column, 5);
             testCase.verifyEqual(testCase.Widget.DatepickerRight.Layout.Row, 1);
             testCase.verifyEqual(testCase.Widget.DatepickerRight.Layout.Column, 4);
-    
+
             % Slider spans the second row
             testCase.verifyEqual(testCase.Widget.Slider.Layout.Row, 2);
             testCase.verifyEqual(testCase.Widget.Slider.Layout.Column, [1 5]);
@@ -394,21 +404,21 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             fmt = "yyyy-MM-dd";
             testCase.verifySetProperty("DisplayFormat", fmt);
             drawnow;
-    
+
             % Datepickers should reflect the same format
             testCase.verifyEquality(testCase.Widget.DatepickerLeft.DisplayFormat, fmt);
             testCase.verifyEquality(testCase.Widget.DatepickerRight.DisplayFormat, fmt);
-    
+
             % Tick labels non-empty (format checked indirectly)
             labels = testCase.Widget.Slider.MajorTickLabels;
             testCase.verifyTrue(~isempty(labels));
         end %function
 
         % function testValueChangingEventOnDrag(testCase)
-        % 
+        %
         %     % Add this callback only for this test
         %     testCase.Widget.ValueChangingFcn = @(s,e)onCallbackTriggered(testCase,e);
-        % 
+        %
         %     % NOTE: "drag" gesture does not support objects of class "matlab.ui.control.RangeSlider".
         % end %function
 
@@ -416,31 +426,32 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             base = datetime(2020,1,1);
             newLimits = base + [days(0) calmonths(3)]; % Jan 1 .. Apr 1
             testCase.verifySetProperty("Limits", newLimits);
-    
+
             % Start mid-range
             startVal = [base + calmonths(1), base + calmonths(2)]; % Feb 1 .. Mar 1
             testCase.verifySetProperty("Value", startVal);
-    
+
             % Use month step
             testCase.Widget.Step = calmonths(1);
             testCase.verifyButtonsEnabled(["on" "on" "on" "on"]);
-    
-            % Increase MinGap; inward moves should be prevented or error via Value validation
+
+            % Increase MinGap; inward moves should clamp to the gap
             testCase.verifySetProperty("MinGap", 20, days(20));
-    
-            % Left "up" (narrows gap) — with current code this likely errors due to hardcoded days(1)
-            testCase.verifyError(@() testCase.press(testCase.Widget.ButtonsLeft(1)), ...
-                'MATLAB:validators:mustBeGreaterThanOrEqual');
-    
-            % Right "down" (narrows gap) — same expectation
-            testCase.verifyError(@() testCase.press(testCase.Widget.ButtonsRight(2)), ...
-                'MATLAB:validators:mustBeGreaterThanOrEqual');
+
+            % Left "up" narrows the gap to MinGap
+            expValue = [base + caldays(40), base + calmonths(2)];
+            testCase.verifyButtonPushAction("left", "up", expValue);
+
+            % Right "down" also narrows the gap to MinGap
+            testCase.verifySetProperty("Value", startVal);
+            expValue = [base + calmonths(1), base + caldays(51)];
+            testCase.verifyButtonPushAction("right", "down", expValue);
         end %function
 
         function testLimitsNormalizationToStartOfDay(testCase)
             d1 = dateshift(datetime("today"), 'start', 'day') + hours(9);
             d2 = d1 + days(5) + hours(17);
-    
+
             testCase.verifySetProperty("Limits", [d1 d2], [d1 d2] - timeofday([d1 d2]));
         end
 
@@ -533,6 +544,15 @@ classdef DateRangeSlider < wt.test.BaseWidgetTest
             % Verify new property value
             testCase.verifyControlValues(expValue);
 
+        end %function
+
+        function verifySliderTicks(testCase, ticks)
+            % Verifies slider ticks are sorted, unique, and in range
+
+            testCase.verifyEqual(ticks, unique(ticks))
+            testCase.verifyTrue(all(ticks == round(ticks)))
+            testCase.verifyTrue(all(ticks >= testCase.Widget.Slider.Limits(1)))
+            testCase.verifyTrue(all(ticks <= testCase.Widget.Slider.Limits(2)))
         end %function
 
     end %private methods
