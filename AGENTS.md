@@ -98,6 +98,14 @@ When creating a new MathWorks-owned file:
 - Add the standard MathWorks copyright notice.
 - Match the format used by similar files in the repository.
 
+For contributor-owned or externally contributed files:
+
+- Preserve existing contributor copyright and license notices.
+- Do not add a MathWorks copyright notice unless ownership is explicitly
+  confirmed by maintainers.
+- If an external-contributor file has no notice, leave the notice unchanged
+  and treat missing attribution as a licensing review question.
+
 Exception:
 
 - If a file contains a third-party copyright notice that is not owned by MathWorks, preserve the existing copyright and licensing information.
