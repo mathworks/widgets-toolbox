@@ -43,8 +43,10 @@ classdef AppDesignerMetadata < matlab.unittest.TestCase
                     "Missing App Designer metadata field(s) for " + classNames(idx))
             end
 
-            testCase.verifyTrue(any(classNames == "wt.DateSlider"), ...
-                "wt.DateSlider is missing from App Designer metadata.")
+            testCase.verifyComponentName(components, "wt.DateSlider", ...
+                "Date Slider (R2023b+)")
+            testCase.verifyComponentName(components, "wt.DateRangeSlider", ...
+                "Date Range Slider (R2024b+)")
 
         end %function
 
@@ -77,6 +79,8 @@ classdef AppDesignerMetadata < matlab.unittest.TestCase
                 components, 'UniformOutput', false));
             testCase.verifyTrue(any(classNames == "wt.DateSlider"), ...
                 "wt.DateSlider was not present in registered metadata.")
+            testCase.verifyTrue(any(classNames == "wt.DateRangeSlider"), ...
+                "wt.DateRangeSlider was not present in registered metadata.")
 
         end %function
 
@@ -94,6 +98,22 @@ classdef AppDesignerMetadata < matlab.unittest.TestCase
 
             metadataFile = fullfile(testCase.getMetadataRoot(), ...
                 "resources", "appDesigner.json");
+
+        end %function
+
+        function verifyComponentName(testCase, components, className, ...
+                componentName)
+
+            classNames = string(cellfun(@(component) component.className, ...
+                components, 'UniformOutput', false));
+            componentIdx = find(classNames == className, 1);
+            testCase.verifyNotEmpty(componentIdx, ...
+                className + " is missing from App Designer metadata.")
+            if ~isempty(componentIdx)
+                testCase.verifyEqual( ...
+                    string(components{componentIdx}.componentName), ...
+                    componentName)
+            end
 
         end %function
 
