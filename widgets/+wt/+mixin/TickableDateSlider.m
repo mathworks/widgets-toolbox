@@ -5,6 +5,8 @@ classdef TickableDateSlider < handle
     %
     %   See also wt.DateSlider, wt.DateRangeSlider
 
+    % Copyright 2026 The MathWorks, Inc.
+
     %% Abstract properties
     properties (Abstract, Transient, NonCopyable, Hidden, SetAccess = protected)
 

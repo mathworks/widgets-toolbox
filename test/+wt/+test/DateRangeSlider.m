@@ -1,6 +1,7 @@
 classdef DateRangeSlider < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
 
+%   Copyright 2026 The MathWorks, Inc.
 
     %% Test Method Setup
     methods (TestMethodSetup)

@@ -22,7 +22,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
     %
     %   See also uidatepicker, uislider, DateRangeSlider
 
-    % Copyright 2026 The MathWorks Inc.
+    % Copyright 2026 The MathWorks, Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)

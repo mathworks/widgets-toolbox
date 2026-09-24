@@ -1,7 +1,7 @@
 classdef DateSliderDefaults < matlab.unittest.TestCase
     % Verify default date slider configuration.
 
-%   Copyright 2026 The MathWorks Inc.
+%   Copyright 2026 The MathWorks, Inc.
 
     methods (Test)
 
