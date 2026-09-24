@@ -45,8 +45,12 @@ classdef AppDesignerMetadata < matlab.unittest.TestCase
 
             testCase.verifyComponentName(components, "wt.DateSlider", ...
                 "Date Slider (R2023b+)")
+            testCase.verifyComponentDefaultWidth(components, ...
+                "wt.DateSlider", 600)
             testCase.verifyComponentName(components, "wt.DateRangeSlider", ...
                 "Date Range Slider (R2024b+)")
+            testCase.verifyComponentDefaultWidth(components, ...
+                "wt.DateRangeSlider", 600)
 
         end %function
 
@@ -104,16 +108,30 @@ classdef AppDesignerMetadata < matlab.unittest.TestCase
         function verifyComponentName(testCase, components, className, ...
                 componentName)
 
+            component = testCase.getComponent(components, className);
+            testCase.verifyEqual( ...
+                string(component.componentName), ...
+                componentName)
+
+        end %function
+
+        function verifyComponentDefaultWidth(testCase, components, className, ...
+                defaultWidth)
+
+            component = testCase.getComponent(components, className);
+            defaultPosition = reshape(component.defaultPosition, 1, []);
+            testCase.verifyEqual(defaultPosition(3), defaultWidth)
+
+        end %function
+
+        function component = getComponent(testCase, components, className)
+
             classNames = string(cellfun(@(component) component.className, ...
                 components, 'UniformOutput', false));
             componentIdx = find(classNames == className, 1);
-            testCase.verifyNotEmpty(componentIdx, ...
+            testCase.assertNotEmpty(componentIdx, ...
                 className + " is missing from App Designer metadata.")
-            if ~isempty(componentIdx)
-                testCase.verifyEqual( ...
-                    string(components{componentIdx}.componentName), ...
-                    componentName)
-            end
+            component = components{componentIdx};
 
         end %function
 

@@ -24,6 +24,8 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
     %
     %   See also uidatepicker, uislider, DateSlider
 
+    % Copyright 2026 The MathWorks Inc.
+
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
 
@@ -47,7 +49,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
     properties (AbortSet)
 
         % Limits of the slider and date pickers
-        Limits (1,2) datetime = datetime("01-Jan-2020") + days([0 3]);
+        Limits (1,2) datetime = datetime("01-Jan-2020") + calyears([0 1]);
 
         % Date format
         DisplayFormat (1,1) string = "dd-MMM-uuuu"
@@ -273,7 +275,9 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.setup@wt.abstract.BaseWidget()
 
             % Set default size
-            obj.Position = [20 100 530 40];
+            obj.Position = [20 100 600 40];
+
+            defaultValue = obj.Limits(1) + days([1 2]);
 
             % Configure grid
             obj.Grid.ColumnWidth = {'fit', obj.DatepickerSize, '1x', obj.DatepickerSize, 'fit'};
@@ -301,8 +305,8 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             % Date picker left
             obj.DatepickerLeft = uidatepicker(obj.Grid);
             obj.DatepickerLeft.ValueChangedFcn = @(h,e)obj.onDatepickerChanged(e);
-            obj.DatepickerLeft.Value = datetime("02-Jan-2020");
-            obj.DatepickerLeft.Limits = [obj.Limits(1) datetime("02-Jan-2020")];
+            obj.DatepickerLeft.Value = defaultValue(1);
+            obj.DatepickerLeft.Limits = [obj.Limits(1) defaultValue(1)];
             obj.DatepickerLeft.Editable = false;
             obj.DatepickerLeft.Tag = "left";
 
@@ -310,14 +314,14 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.Slider = uislider(obj.Grid, 'range');
             obj.Slider.ValueChangedFcn = @(h,e)obj.onSliderChanged(e);
             obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanging(e);
-            obj.Slider.Limits = [0 3];
-            obj.Slider.Value = [1 2];
+            obj.Slider.Limits = days([0 diff(obj.Limits)]) + 1;
+            obj.Slider.Value = days(defaultValue - obj.Limits(1)) + 1;
 
             % Date picker right
             obj.DatepickerRight = uidatepicker(obj.Grid);
             obj.DatepickerRight.ValueChangedFcn = @(h,e)obj.onDatepickerChanged(e);
-            obj.DatepickerRight.Value = datetime("03-Jan-2020");
-            obj.DatepickerRight.Limits = [datetime("03-Jan-2020") obj.Limits(2)];
+            obj.DatepickerRight.Value = defaultValue(2);
+            obj.DatepickerRight.Limits = [defaultValue(2) obj.Limits(2)];
             obj.DatepickerRight.Editable = false;
             obj.DatepickerRight.Tag = "right";
 
@@ -347,11 +351,7 @@ classdef DateRangeSlider < wt.abstract.BaseWidget & ...
             obj.ButtonColorableComponents = [obj.ButtonsLeft, obj.ButtonsRight];
 
             % Update the slider ticks
-            tickLoc = 0:days(obj.Limits(2) - obj.Limits(1));
-            dtArray = datetime("01-Jan-2020") + days(tickLoc);
-            obj.Slider.MajorTicks = tickLoc;
-            obj.Slider.MinorTicks = tickLoc;
-            obj.Slider.MajorTickLabels = categorical(dtArray(tickLoc + 1));
+            updateSliderTicks(obj);
 
         end %function
 

@@ -5,6 +5,8 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         wt.mixin.FontStyled & ...
         wt.mixin.ButtonColorable
     %DateSlider - Select a single date with a date picker and slider
+    %   DateSlider requires MATLAB R2023b or later.
+    %
     %   OBJ = DateSlider(PARENT) creates a date slider in the specified
     %   parent container. The Value property is a datetime value, and the
     %   slider position maps to whole-day offsets from Limits(1).
@@ -19,6 +21,8 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
     %       DatepickerSize - Date picker width or height
     %
     %   See also uidatepicker, uislider, DateRangeSlider
+
+    % Copyright 2026 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -59,7 +63,7 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         % These properties trigger the update method
 
         % Limits of the slider and date picker
-        Limits (1,2) datetime = datetime("01-Jan-2020") + days([0 2]);
+        Limits (1,2) datetime = datetime("01-Jan-2020") + calyears([0 1]);
 
         % Orientation of the date picker and slider
         Orientation (1,1) wt.enum.HorizontalVerticalState = wt.enum.HorizontalVerticalState.horizontal
@@ -148,7 +152,9 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
         end %function
         function val = get.Limits(obj)
             val = obj.Limits;
-            val.Format = obj.Datepicker.DisplayFormat;
+            if ~isempty(obj.Datepicker)
+                val.Format = obj.Datepicker.DisplayFormat;
+            end
         end %function
 
         % Datepicker size
@@ -170,11 +176,18 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
 
         function setup(obj)
 
+            if isMATLABReleaseOlderThan("R2023b")
+                error("wt:DateSlider:UnsupportedRelease", ...
+                    "DateSlider requires MATLAB R2023b or later.")
+            end
+
             % Call superclass method
             obj.setup@wt.abstract.BaseWidget()
 
             % Set default size
-            obj.Position(3:4) = [400 40];
+            obj.Position(3:4) = [600 40];
+
+            defaultValue = obj.Limits(1) + days(1);
 
             % Configure grid
             obj.Grid.ColumnWidth = {'1x', obj.DatepickerSize, 'fit'};
@@ -184,13 +197,13 @@ classdef DateSlider < wt.abstract.BaseWidget & ...
             obj.Slider = uislider(obj.Grid);
             obj.Slider.ValueChangedFcn = @(h,e)obj.onSliderChanged(e);
             obj.Slider.ValueChangingFcn = @(h,e)obj.onSliderChanged(e);
-            obj.Slider.Limits = [1 3];
-            obj.Slider.Value = 2;
+            obj.Slider.Limits = [0 days(obj.Limits(2) - obj.Limits(1))] + 1;
+            obj.Slider.Value = days(defaultValue - obj.Limits(1)) + 1;
 
             % Date picker
             obj.Datepicker = uidatepicker(obj.Grid);
             obj.Datepicker.ValueChangedFcn = @(h,e)obj.onDatepickerChanged(e);
-            obj.Datepicker.Value = obj.Limits(1) + days(1);
+            obj.Datepicker.Value = defaultValue;
             obj.Datepicker.Limits = obj.Limits;
             obj.Datepicker.Editable = false;
 
