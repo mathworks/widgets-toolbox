@@ -19,7 +19,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.createFigure@wt.test.BaseWidgetTest();
             
             % Adjust grid size
-            testCase.Figure.Position(3:4) = [800 700];
+            testCase.Figure.Position(3:4) = [800 800];
             testCase.Grid.RowHeight = repmat({175},1,4);
             testCase.Grid.ColumnWidth = {'1x','1x','1x'};
             
