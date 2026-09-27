@@ -1,7 +1,7 @@
 classdef DatetimeSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2021-2025 The MathWorks Inc.
+%   Copyright 2021-2026 The MathWorks Inc.
     
     
     
@@ -44,6 +44,44 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             testCase.verifyEqual(w.MinuteControl.Value, dt.Minute);
             testCase.verifyEqual(w.SecondControl.Value, dt.Second);
             
+        end %function
+
+
+        function testValueChangedPreviousValue(testCase)
+
+            % Get the widget
+            w = testCase.Widget;
+
+            % Configure fixed, timezone-aware value before callback setup
+            testCase.verifySetProperty("ShowSeconds", matlab.lang.OnOffSwitchState.on);
+            testCase.verifySetProperty("ShowTimeZone", matlab.lang.OnOffSwitchState.on);
+            initialValue = datetime(2024,1,2,3,4,5,...
+                "TimeZone","America/New_York",...
+                "Format","dd-MMM-uuuu hh:mm:ss aa");
+            testCase.verifySetProperty("Value", initialValue);
+
+            % Set callback after configuration to isolate user edits
+            w.ValueChangedFcn = @(s,e)onCallbackTriggered(testCase,e);
+
+            % Edit the date
+            previousValue = w.Value;
+            newDate = datetime(2024,2,3);
+            testCase.type(w.DateControl, newDate)
+            testCase.verifyLatestValueChangedEvent(1, previousValue)
+
+            % Edit the time
+            previousValue = w.Value;
+            testCase.press(w.MinuteControl, "up")
+            testCase.verifyLatestValueChangedEvent(2, previousValue)
+
+            % Edit the time zone
+            previousValue = w.Value;
+            expValue = "Europe/Amsterdam";
+            selIdx = find(contains(w.TimeZoneControl.Items, expValue), 1);
+            selValue = w.TimeZoneControl.Items{selIdx};
+            testCase.choose(w.TimeZoneControl, selValue)
+            testCase.verifyLatestValueChangedEvent(3, previousValue)
+
         end %function
         
             
@@ -357,6 +395,23 @@ methods
         testCase.verifyThat(...
             @()getTimeZoneFromComponentDateTime(testCase.Widget,"Value"),...
             Eventually(IsEqualTo(expVal), "WithTimeoutOf", 5));
+
+    end %function
+
+
+    function verifyLatestValueChangedEvent(testCase, expCount, expPreviousValue)
+        % Verify the most recent ValueChanged event data
+
+        arguments
+            testCase
+            expCount (1,1) double {mustBeInteger, mustBeNonnegative}
+            expPreviousValue (1,1) datetime
+        end
+
+        testCase.verifyCallbackCount(expCount);
+        evt = testCase.CallbackEvents(expCount);
+        testCase.verifyEqual(evt.Value, testCase.Widget.Value);
+        testCase.verifyEqual(evt.PreviousValue, expPreviousValue);
 
     end %function
 

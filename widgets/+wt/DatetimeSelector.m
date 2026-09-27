@@ -4,7 +4,7 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
         wt.mixin.Enableable
     % Date and time selection control
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
 
     %% Events
@@ -344,9 +344,10 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
 
             % Get the new date
             newValue = evt.Source.Value;
+            previousValue = obj.Value;
 
             % Existing date (if missing, use today)
-            dt = obj.Value;
+            dt = previousValue;
             if ismissing(dt)
                 dt = datetime("today",...
                     "TimeZone","local",...
@@ -362,7 +363,7 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
             obj.Value = dt;
 
             % Trigger event
-            evtOut = wt.eventdata.ValueChangedData(dt);
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, previousValue);
             notify(obj,"ValueChanged",evtOut);
 
         end %function
@@ -373,9 +374,10 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
 
             % Get the new value
             newValue = evt.Source.Value;
+            previousValue = obj.Value;
 
             % Existing date (if missing, use today)
-            dt = obj.Value;
+            dt = previousValue;
             if ismissing(dt)
                 dt = datetime("today",...
                     "TimeZone","local",...
@@ -414,7 +416,7 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
             obj.Value = dt;
 
             % Trigger event
-            evtOut = wt.eventdata.ValueChangedData(obj.Value);
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, previousValue);
             notify(obj,"ValueChanged",evtOut);
 
         end %function
@@ -425,14 +427,15 @@ classdef DatetimeSelector <  wt.abstract.BaseWidget & ...
 
             % Get the new value
             newValue = evt.Value;
-            dt = obj.Value;
+            previousValue = obj.Value;
+            dt = previousValue;
             dt.TimeZone = newValue;
 
             % Update value
             obj.Value = dt;
 
             % Trigger event
-            evtOut = wt.eventdata.ValueChangedData(obj.Value);
+            evtOut = wt.eventdata.ValueChangedData(obj.Value, previousValue);
             notify(obj,"ValueChanged",evtOut);
 
         end %function
