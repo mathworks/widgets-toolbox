@@ -5,8 +5,17 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         wt.mixin.FontStyled & ...
         wt.mixin.Orderable
     % Select from an array of items and add them to a list
+    %
+    % Set Sortable to false to hide the Move Up and Move Down buttons.
+    % Set AllowAddRemove to false to hide the Add and Delete buttons.
+    % With AllowAddRemove false and Sortable true, the widget provides
+    % built-in reorder-only behavior.
+    %
+    % The built-in Add action uses a Web App-compatible
+    % wt.dialog.ListSelection dialog in MATLAB R2024b and newer. In older
+    % releases it uses listdlg for desktop compatibility.
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
     %% Events
     events (HasCallbackProperty, NotifyAccess = protected)
@@ -35,7 +44,10 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
         % Indicates whether to allow duplicate entries in the list
         AllowDuplicates  (1,1) matlab.lang.OnOffSwitchState = false
 
-         % Indicates whether to allow sort controls
+        % Indicates whether to allow add and remove controls
+        AllowAddRemove  (1,1) matlab.lang.OnOffSwitchState = true
+
+        % Indicates whether to allow sort controls
         Sortable  (1,1) matlab.lang.OnOffSwitchState = true
 
         % Inidicates what to do when add button is pressed (select from
@@ -312,14 +324,13 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
             selIdx = obj.ValueIndex;
 
             % Is the list sortable?
-            if obj.Sortable
-                obj.ListButtons.Icon = ["add_24.png", "delete_24.png", "up_24.png", "down_24.png"];
-                obj.ListButtons.ButtonTag = ["Add", "Remove", "Up", "Down"];
-            else
+            if ~obj.Sortable
                 selIdx = sort(selIdx);
-                obj.ListButtons.Icon = ["add_24.png", "delete_24.png"];
-                obj.ListButtons.ButtonTag = ["Add", "Remove"];
             end
+
+            [buttonIcons, buttonTags] = obj.getListButtonConfiguration();
+            obj.ListButtons.Icon = buttonIcons;
+            obj.ListButtons.ButtonTag = buttonTags;
 
             % Update the list
             obj.ListBox.Items = obj.Items(selIdx);
@@ -352,15 +363,22 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 % Should the sort buttons be enabled?
                 [backEnabled, fwdEnabled] = obj.areOrderButtonsEnabled(numRows, hiliteIdx);
 
-                % How many items selected into list
+                % Which built-in buttons are shown?
+                buttonTags = obj.ListButtons.ButtonTag;
+                buttonEnable = false(size(buttonTags));
+
+                if isempty(buttonTags)
+                    obj.ListButtons.ButtonEnable = false;
+                    return
+                end
 
                 % Toggle button enables
-                obj.ListButtons.ButtonEnable = [
-                    obj.AllowDuplicates || ( numel(selIdx) < numel(obj.Items) ) %Add Button
-                    ~isempty(hiliteIdx) % Delete Button
-                    backEnabled %Up Button
-                    fwdEnabled %Down Button
-                    ];
+                buttonEnable(buttonTags == "Add") = ...
+                    obj.AllowDuplicates || ( numel(selIdx) < numel(obj.Items) );
+                buttonEnable(buttonTags == "Remove") = ~isempty(hiliteIdx);
+                buttonEnable(buttonTags == "Up") = backEnabled;
+                buttonEnable(buttonTags == "Down") = fwdEnabled;
+                obj.ListButtons.ButtonEnable = buttonEnable;
 
             end %if obj.Enable
 
@@ -448,19 +466,12 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 items = items(1:min(numel(items), numel(obj.ItemsData)));
             end
 
-            % Prompt for stuff to add
-            if obj.AllowDuplicates
-                newSelIdx = listdlg("ListString",items);
+            % Prompt for stuff to add. R2022a-R2024a should be manually
+            % tested before lowering this release gate for web app use.
+            if isMATLABReleaseOlderThan("R2024b")
+                newSelIdx = obj.promptToAddListItemsWithListdlg(items);
             else
-                newSelIdx = listdlg(...
-                    "ListString",items,...
-                    "InitialValue",obj.ListBox.ItemsData);
-            end
-
-            % Restore figure focus
-            fig = ancestor(obj,"figure");
-            if isscalar(fig) && isvalid(fig)
-                figure(fig)
+                newSelIdx = obj.promptToAddListItemsWithDialog(items);
             end
             
             if isempty(newSelIdx)
@@ -484,6 +495,72 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 notify(obj,"ValueChanged",evtOut);
 
             end %if
+
+        end %function
+
+
+        function [buttonIcons, buttonTags] = getListButtonConfiguration(obj)
+            % Get the configured built-in button icon and tag lists
+
+            buttonIcons = strings(1,0);
+            buttonTags = strings(1,0);
+
+            if obj.AllowAddRemove
+                buttonIcons = [buttonIcons, "add_24.png", "delete_24.png"];
+                buttonTags = [buttonTags, "Add", "Remove"];
+            end
+
+            if obj.Sortable
+                buttonIcons = [buttonIcons, "up_24.png", "down_24.png"];
+                buttonTags = [buttonTags, "Up", "Down"];
+            end
+
+        end %function
+
+
+        function newSelIdx = promptToAddListItemsWithDialog(obj, items)
+            % Prompt with an internal list selection dialog
+
+            fig = ancestor(obj,"figure");
+            dlg = wt.dialog.ListSelection(fig);
+            dlg.Title = "Select Items";
+            dlg.Prompt = "Select items to add:";
+            dlg.Items = items;
+            dlg.ItemsData = 1:numel(items);
+            dlg.Multiselect = true;
+            dlg.attachLifecycleListeners(obj);
+            dlg.positionOver(obj);
+
+            if ~obj.AllowDuplicates
+                dlg.Value = obj.ValueIndex;
+            end
+
+            [output, lastAction] = dlg.waitForOutput();
+            if lastAction == "ok" && ~isempty(output)
+                newSelIdx = output.ValueIndex;
+            else
+                newSelIdx = [];
+            end
+
+        end %function
+
+
+        function newSelIdx = promptToAddListItemsWithListdlg(obj, items)
+            % Prompt with listdlg for releases before R2024b
+
+            if obj.AllowDuplicates
+                newSelIdx = listdlg("ListString",items);
+            else
+                newSelIdx = listdlg(...
+                    "ListString",items,...
+                    "InitialValue",obj.ListBox.ItemsData);
+            end
+
+            % Restore figure focus
+            fig = ancestor(obj,"figure");
+            if isscalar(fig) && isvalid(fig)
+                figure(fig)
+            end
 
         end %function
 
