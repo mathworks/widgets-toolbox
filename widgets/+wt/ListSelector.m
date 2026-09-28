@@ -12,7 +12,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
     % built-in reorder-only behavior.
     %
     % The built-in Add action uses a Web App-compatible
-    % wt.dialog.ListSelection dialog in MATLAB R2024b and newer. In older
+    % wt.dialog.ListSelection dialog in MATLAB R2022a and newer. In older
     % releases it uses listdlg for desktop compatibility.
 
     % Copyright 2020-2026 The MathWorks Inc.
@@ -466,9 +466,8 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
                 items = items(1:min(numel(items), numel(obj.ItemsData)));
             end
 
-            % Prompt for stuff to add. R2022a-R2024a should be manually
-            % tested before lowering this release gate for web app use.
-            if isMATLABReleaseOlderThan("R2024b")
+            % Prompt for stuff to add
+            if isMATLABReleaseOlderThan("R2022a")
                 newSelIdx = obj.promptToAddListItemsWithListdlg(items);
             else
                 newSelIdx = obj.promptToAddListItemsWithDialog(items);
@@ -546,7 +545,7 @@ classdef ListSelector < wt.abstract.BaseWidget & ...
 
 
         function newSelIdx = promptToAddListItemsWithListdlg(obj, items)
-            % Prompt with listdlg for releases before R2024b
+            % Prompt with listdlg for releases before R2022a
 
             if obj.AllowDuplicates
                 newSelIdx = listdlg("ListString",items);
