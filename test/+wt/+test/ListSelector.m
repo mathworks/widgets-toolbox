@@ -1,7 +1,7 @@
 classdef ListSelector < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2026 The MathWorks Inc.
     
     %% Properties
     properties
@@ -19,7 +19,7 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.createFigure@wt.test.BaseWidgetTest();
             
             % Adjust grid size
-            testCase.Figure.Position(3:4) = [800 700];
+            testCase.Figure.Position(3:4) = [800 800];
             testCase.Grid.RowHeight = repmat({175},1,4);
             testCase.Grid.ColumnWidth = {'1x','1x','1x'};
             
@@ -250,6 +250,74 @@ classdef ListSelector < wt.test.BaseWidgetTest
             testCase.verifyEquality(buttonGrid.ButtonEnable(2:4), [1 1 1]);
             
         end %function
+
+
+
+        function testBuiltInButtonConfiguration(testCase)
+
+            % Default: add/remove and sort buttons
+            testCase.verifyListButtonConfiguration(...
+                ["Add", "Remove", "Up", "Down"], ...
+                [true false false false]);
+
+            % Hide sort buttons
+            testCase.verifySetProperty("Sortable", false);
+            testCase.verifyListButtonConfiguration(...
+                ["Add", "Remove"], ...
+                [true false]);
+
+            % Hide add/remove buttons
+            testCase.verifySetProperty("Sortable", true);
+            testCase.verifySetProperty("AllowAddRemove", false);
+            testCase.verifyListButtonConfiguration(...
+                ["Up", "Down"], ...
+                [false false]);
+
+            % Hide all built-in buttons
+            testCase.verifySetProperty("Sortable", false);
+            testCase.verifyListButtonConfiguration(strings(1,0));
+
+        end %function
+
+
+
+        function testAllowAddRemoveFalseKeepsReordering(testCase)
+
+            % Get the listbox and button grid
+            w = testCase.Widget;
+            listControl = w.ListBox;
+            buttonGrid = w.ListButtons;
+
+            % Configure as reorder-only
+            testCase.verifySetProperty("Value", testCase.ItemNames);
+            testCase.verifySetProperty("AllowAddRemove", false);
+
+            % Select multiple items with mouse
+            selIdx = [2 3];
+            testCase.choose(listControl, selIdx)
+
+            % Verify only sort buttons are shown and enabled
+            testCase.verifyListButtonConfiguration(["Up", "Down"], [true true]);
+
+            % Move items up
+            testCase.press(buttonGrid.Button(1))
+            drawnow
+
+            % Verify new order
+            newIdx = [2 3 1 4 5];
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+            % Move items down
+            testCase.press(buttonGrid.Button(2))
+            drawnow
+
+            % Verify restored order
+            newIdx = 1:5;
+            testCase.verifyEqual(w.Value, testCase.ItemNames(newIdx));
+            testCase.verifyEqual(w.SelectedIndex, newIdx);
+
+        end %function
         
         
         
@@ -410,5 +478,34 @@ classdef ListSelector < wt.test.BaseWidgetTest
         end %function
         
     end %methods (Test)
+
+
+    methods (Access = private)
+
+        function verifyListButtonConfiguration(testCase, expTags, expEnable)
+            % Verify the built-in button grid has the expected visible buttons
+
+            arguments
+                testCase
+                expTags (1,:) string
+                expEnable (1,:) logical = false(1,0)
+            end
+
+            buttonGrid = testCase.Widget.ListButtons;
+            drawnow
+
+            testCase.verifyEqual(buttonGrid.ButtonTag, expTags)
+            testCase.verifyNumElements(buttonGrid.Button, numel(expTags))
+
+            if isempty(expTags)
+                testCase.verifyEmpty(buttonGrid.Button)
+            else
+                testCase.verifyEqual(string({buttonGrid.Button.Tag}), expTags)
+                testCase.verifyEqual(logical(buttonGrid.ButtonEnable), expEnable)
+            end
+
+        end %function
+
+    end %methods
     
 end %classdef

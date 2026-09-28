@@ -12,7 +12,20 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
 
     properties (Access = private)
         ResizePositions = zeros(0,4)
+        DialogButtonEvents (1,:) cell = {}
     end
+
+
+    %% Test Method Setup
+    methods (TestMethodSetup)
+
+        function resetEventTracking(testCase)
+
+            testCase.DialogButtonEvents = {};
+
+        end %function
+
+    end %methods
      
     
     %% Unit Test
@@ -295,6 +308,38 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
         end %function
 
 
+        function testOkOutputWithNumericItemsData(testCase)
+
+            % Create the dialog
+            dlg = wt.dialog.ListSelection(testCase.Figure);
+            dlg.Items = testCase.ItemNames;
+            dlg.ItemsData = 1:numel(testCase.ItemNames);
+            dlg.Multiselect = true;
+            dlg.Value = [2 4];
+            dlg.DialogButtonPushedFcn = ...
+                @(~,evt)recordDialogButtonEvent(testCase, evt);
+
+            % Enable drawing to complete
+            drawnow
+
+            % Press button
+            testCase.assumeTrue(dlg.DialogButtons.Button(1).Enable)
+            testCase.press(dlg.DialogButtons.Button(1))
+            drawnow
+
+            % Verify output captured before deletion
+            testCase.verifyNumElements(testCase.DialogButtonEvents, 1)
+            evt = testCase.DialogButtonEvents{1};
+            testCase.verifyEqual(evt.Action, "ok")
+            testCase.verifyEqual(evt.Output.Value, [2 4])
+            testCase.verifyEqual(evt.Output.ValueIndex, [2 4])
+
+            % Verify dlg was deleted
+            testCase.verifyFalse(isvalid(dlg));
+
+        end %function
+
+
         function testModalBackground(testCase)
 
             % Create the dialog
@@ -473,6 +518,13 @@ classdef ListSelectionDialog < wt.test.BaseDialogTest
         function recordResizePosition(testCase, position)
 
             testCase.ResizePositions(end+1,:) = position;
+
+        end %function
+
+
+        function recordDialogButtonEvent(testCase, evt)
+
+            testCase.DialogButtonEvents{end+1} = evt;
 
         end %function
 
