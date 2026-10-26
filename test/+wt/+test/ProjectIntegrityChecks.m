@@ -21,8 +21,8 @@ classdef ProjectIntegrityChecks < matlab.unittest.TestCase
             % the other checks, including tracked files missing membership.
             replacedCheck = string({checkResults.Description}) == ...
                 "All project files are under source control";
-            testCase.assertEqual(nnz(replacedCheck), 1, ...
-                "Expected the project file source-control check.");
+            % The available check set varies by release and integration.
+            % The Git-based tracking check below always runs.
             checkResults(replacedCheck) = [];
 
             % Verify checks with useful diagnostic

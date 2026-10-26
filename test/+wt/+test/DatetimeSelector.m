@@ -243,7 +243,8 @@ classdef DatetimeSelector < wt.test.BaseWidgetTest
             % Change the time zone interactively
             expValue = "-05:00";
             testCase.choose(w.TimeZoneControl, expValue)
-            testCase.verifyTimeZoneDisplay();
+            testCase.verifyValueTimeZone(expValue);
+            testCase.verifyTimeZoneDisplay(expValue);
 
             % Verify the Value field was updated
             actValue = string(w.Value.TimeZone);
