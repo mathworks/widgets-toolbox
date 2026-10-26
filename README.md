@@ -30,8 +30,12 @@ This version of Widgets Toolbox is intended for NEW development of uifigure or A
 
 Maintainers build and package releases in the latest MATLAB release using MATLAB Build Tool via `buildtool archive`. That maintainer workflow is separate from the packaged toolbox support range above.
 
+For agent-assisted application development, use the [Widgets Toolbox skill](widgets/skills/matlab-use-widgets-toolbox/SKILL.md). Copy the complete `matlab-use-widgets-toolbox` folder, including its `references` folder, into your agent's supported skill directory. In a toolbox installation that includes the skill, find it under `fullfile(wt.utility.widgetsRoot(), 'skills', 'matlab-use-widgets-toolbox')`. The skill supports App Designer and hand-coded apps and requires existing application code or your choice of development approach before app planning or implementation.
+
 If you have an existing MATLAB app using Widgets Toolbox content developed prior to R2020b, you may also need "Widgets Toolbox (Compatibility Support)".  
 https://www.mathworks.com/matlabcentral/fileexchange/66235-widgets-toolbox-compatibility-support 
 https://github.com/mathworks/widgets-toolbox-legacy
 
 Planning a complex or business-critical app? MathWorks Consulting can advise you on design and architecture: https://www.mathworks.com/services/consulting/proven-solutions/software-development-with-matlab.html
+
+<!-- Copyright 2026 The MathWorks, Inc. -->
