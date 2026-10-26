@@ -1,7 +1,7 @@
 classdef SliderSpinner < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2020-2025 The MathWorks Inc.
+%   Copyright 2020-2026 The MathWorks Inc.
 
     
     %% Test Method Setup
@@ -193,7 +193,7 @@ classdef SliderSpinner < wt.test.BaseWidgetTest
             testCase.verifyEqual(testCase.Widget.Value, expValue, 'AbsTol', 0.1);
             
             % Verify callback triggered
-            testCase.verifyEqual(testCase.CallbackCount, 1)
+            testCase.verifyCallbackCount(1)
             
             
             % Drag the slider

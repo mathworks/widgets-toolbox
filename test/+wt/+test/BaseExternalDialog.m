@@ -35,6 +35,9 @@ classdef BaseExternalDialog < wt.test.BaseDialogTest
 
         function testDialogFigureProperties(testCase)
 
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsEqualTo
+
             dlg = testCase.createDialog();
             expTitle = "External Dialog";
             expPosition = [100 120 320 240];
@@ -45,8 +48,9 @@ classdef BaseExternalDialog < wt.test.BaseDialogTest
             dlg.ModalTooltip = expTooltip;
             drawnow
 
+            testCase.verifyThat(@()dlg.DialogPosition, ...
+                Eventually(IsEqualTo(expPosition), "WithTimeoutOf", 5))
             testCase.verifyEqual(dlg.Title, expTitle)
-            testCase.verifyEqual(dlg.DialogPosition, expPosition)
             testCase.verifyEqual(dlg.ModalTooltip, expTooltip)
             testCase.verifyEqual(string(dlg.DialogFigure.Name), expTitle)
 
