@@ -1,7 +1,7 @@
 classdef (Abstract) BaseWidgetTest < wt.test.BaseTest
     % Implements a unit test for a widget or component
     
-    %   Copyright 2020-2025 The MathWorks Inc.
+    %   Copyright 2020-2026 The MathWorks Inc.
     
     
     %% Properties
@@ -177,11 +177,14 @@ classdef (Abstract) BaseWidgetTest < wt.test.BaseTest
         
         function verifyCallbackCount(testCase, expValue)
             % Verify the number of callbacks that have executed
-            
-            actValue = testCase.CallbackCount;
-            diag = sprintf("Expected %d callbacks to have executed " + ...
-                "at this point, but actual is %d.", expValue, actValue);
-            testCase.verifyEqual(actValue, expValue, diag)
+
+            import matlab.unittest.constraints.Eventually
+            import matlab.unittest.constraints.IsEqualTo
+
+            diag = sprintf("Expected exactly %d callbacks to have executed.", ...
+                expValue);
+            testCase.verifyThat(@()testCase.CallbackCount, ...
+                Eventually(IsEqualTo(expValue), "WithTimeoutOf", 5), diag)
             
         end %function
         
