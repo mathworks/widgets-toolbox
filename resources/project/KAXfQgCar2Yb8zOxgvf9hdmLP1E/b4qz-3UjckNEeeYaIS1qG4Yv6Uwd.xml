@@ -1,2 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<Info Type="StartUp" Visible="0" Icon="" File="runProjectStartup.m" Name="runProjectStartup" />
+<?xml version="1.0" encoding="UTF-8"?>
+<Info File="runProjectStartup.m" GroupUUID="default" Icon="" Name="runProjectStartup" Type="StartUp" Visible="0">
+    <Extension Name="StartUpPrev" Value="HEAD"/>
+</Info>

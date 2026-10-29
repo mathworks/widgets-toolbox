@@ -1,2 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<Info Type="Shutdown" Visible="0" Icon="" File="runProjectShutdown.m" Name="runProjectShutdown" />
+<?xml version="1.0" encoding="UTF-8"?>
+<Info File="runProjectShutdown.m" GroupUUID="default" Icon="" Name="runProjectShutdown" Type="Shutdown" Visible="0">
+    <Extension Name="ShutdownPrev" Value="HEAD"/>
+</Info>

@@ -1,0 +1,39 @@
+{
+    // Copyright 2026 The MathWorks, Inc.
+
+    // Basic File Information
+    "name": "Widgets Toolbox Code Formatting",
+    "description": "Project-majority formatting for MATLAB source files.",
+    "author": "Robyn Jackey",
+    "schemaVersion": "1.0.0",
+    "guidelineVersion": "1.0.0",
+
+    // Base Configuration Setting
+    "baseConfiguration": "factory",
+
+    // Formatting Rules
+    "formatting": {
+        // Indentation Options
+        "indentation": "4 spaces",
+        "functionIndentation": "all",
+        "blockCommentIndentation": "fullyIndented",
+
+        // Spacing Options
+        "otherWhitespace": "normalized",
+        "trailingWhitespace": "removed",
+        "inheritanceSpacing": "space",
+        "bracketSpacing": "noSpace",
+        "elementSeparatorSpacing": "space",
+
+        "equalsSpacing": "space",
+        "equalsSpacing.nameValueArgument": "noSpace",
+
+        "operatorSpacing": "space",
+        "operatorSpacing.colon": "noSpace",
+
+        // Line Formatting Options
+        "maxConsecutiveBlankLines": 2,
+        "lineEndings": "lf",
+        "endOfFileNewline": "newline"
+    }
+}
