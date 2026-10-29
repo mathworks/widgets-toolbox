@@ -15,7 +15,7 @@
     "formatting": {
         // Indentation Options
         "indentation": "4 spaces",
-        "functionIndentation": "all",
+        "functionIndentation": "classic",
         "blockCommentIndentation": "fullyIndented",
 
         // Spacing Options
