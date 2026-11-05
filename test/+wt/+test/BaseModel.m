@@ -69,6 +69,40 @@ classdef BaseModel < matlab.unittest.TestCase
 
         end
 
+        function testEmptyAggregatedModelIsAccepted(testCase)
+
+            parent = wt.test.model.AggregatingBaseModel;
+
+            testCase.verifyEmpty(parent.Child)
+
+        end
+
+        function testAggregatedHandleRequiresBaseModel(testCase)
+
+            source = wt.test.model.SimpleBaseModel;
+            child = listener(source, "ModelChanged", @(~,~)[]);
+            testCase.addTeardown(@()delete(child));
+
+            exception = testCase.captureConstructionError(child);
+
+            testCase.assertClass(exception, 'MException')
+            testCase.verifyEqual(exception.identifier, '')
+            testCase.verifyEqual(exception.message, ...
+                'Expected Child to contain a wt.model.BaseModel object.')
+
+        end
+
+        function testAggregatedValueRequiresBaseModel(testCase)
+
+            exception = testCase.captureConstructionError(42);
+
+            testCase.assertClass(exception, 'MException')
+            testCase.verifyEqual(exception.identifier, '')
+            testCase.verifyEqual(exception.message, ...
+                'Expected Child to contain a wt.model.BaseModel object.')
+
+        end
+
         function testAggregatedModelChangePropagates(testCase)
 
             child = wt.test.model.SimpleBaseModel;
@@ -122,6 +156,17 @@ classdef BaseModel < matlab.unittest.TestCase
     end
 
     methods (Access = private)
+        function exception = captureConstructionError(~, child)
+            % Capture the assertion so its identifier and message are tested.
+
+            exception = [];
+            try
+                wt.test.model.AggregatingBaseModel("Child",child);
+            catch exception
+            end
+
+        end
+
         function listenToModel(testCase, model)
 
             testCase.PropertyChangedListener = listener( ...

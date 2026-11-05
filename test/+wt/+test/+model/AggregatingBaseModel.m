@@ -4,7 +4,8 @@ classdef AggregatingBaseModel < wt.model.BaseModel
     % Copyright 2026 The MathWorks, Inc.
 
     properties (AbortSet, SetObservable)
-        Child (:,1) wt.test.model.SimpleBaseModel = ...
+        % Leave the class unrestricted to exercise BaseModel validation.
+        Child (:,1) = ...
             wt.test.model.SimpleBaseModel.empty(0,1)
     end
 
