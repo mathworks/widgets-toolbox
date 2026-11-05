@@ -447,7 +447,7 @@ classdef BaseModel < handle & ...
             newPropListeners = repmat({event.listener.empty(0,1)}, numProps, 1);
 
             % Loop on each property requested, in case of multiple
-            % properties having aggregated handle objects
+            % properties having aggregated BaseModel objects
             for idx = 1:numProps
 
                 % Get the current property
@@ -461,10 +461,10 @@ classdef BaseModel < handle & ...
                     continue
                 end
 
-                % These objects must be handle!
-                allAreHandle = all(isa(aggregatedObjects, "wt.model.BaseModel"));
-                assert(allAreHandle,...
-                    "Expected %s to contain a handle class object.",...
+                % These objects must derive from wt.model.BaseModel.
+                allAreBaseModel = all(isa(aggregatedObjects, "wt.model.BaseModel"));
+                assert(allAreBaseModel,...
+                    "Expected %s to contain a wt.model.BaseModel object.",...
                     thisProp);
 
                 % Clear any invalid objects
