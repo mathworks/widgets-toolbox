@@ -3,6 +3,10 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
         wt.mixin.Enableable & ...
         wt.mixin.Tooltipable
     % List of checkbox items
+    
+    % Select All shares the item font with bold weight and a font-colored
+    % separator below it, with five pixels of spacing on each side.
+    % The separator is dimmed against the background when disabled.
 
     % Copyright 2020-2026 The MathWorks Inc.
 
@@ -23,7 +27,7 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
         % The current value shown
         Value (:,1) logical = true(6,1)
 
-        % Indicates whether to show the Select All field
+        % Show the bold, content-fit Select All field above the items
         ShowSelectAll  (1,1) matlab.lang.OnOffSwitchState = false
 
     end %properties
@@ -60,6 +64,9 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
         % Select All checkbox
         AllCheck (1,1) matlab.ui.control.CheckBox
 
+        % Line separating Select All from the items
+        SelectAllSeparator (1,1) matlab.ui.container.Panel
+
     end %properties
 
 
@@ -76,9 +83,9 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
             obj.Position(3:4) = [100 130];
 
             % Configure Grid
-            obj.Grid.Padding = [10 10 10 0];
-            obj.Grid.ColumnWidth = {'fit'};
-            obj.Grid.RowHeight = {0,'fit'};
+            obj.Grid.Padding = 0;
+            obj.Grid.ColumnWidth = {'1x'};
+            obj.Grid.RowHeight = {0,0,'fit'};
             obj.Grid.RowSpacing = 5;
             obj.Grid.Scrollable = true;
 
@@ -89,11 +96,18 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
                 "FontWeight","bold",...
                 "Visible","off",...
                 "ValueChangedFcn",@(h,e)obj.onSelectAllClicked(e));
+            obj.AllCheck.Layout.Row = 1;
+            obj.AllCheck.Layout.Column = 1;
+
+            obj.SelectAllSeparator = uipanel(obj.Grid, ...
+                "BorderType","none", "Visible","off");
+            obj.SelectAllSeparator.Layout.Row = 2;
+            obj.SelectAllSeparator.Layout.Column = 1;
 
             % Update the internal component lists
             obj.BackgroundColorableComponents = obj.Grid;
             obj.FontStyledComponents = [obj.AllCheck, obj.ItemCheck];
-            obj.EnableableComponents = [obj.AllCheck, obj.ItemCheck];
+            obj.EnableableComponents = [obj.AllCheck, obj.SelectAllSeparator, obj.ItemCheck];
             obj.TooltipableComponents = [obj.AllCheck, obj.ItemCheck];
 
         end %function
@@ -113,12 +127,13 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
                     obj.ItemCheck(idx) = uicheckbox(obj.Grid,...
                         "Text",obj.Items(idx),...
                         'ValueChangedFcn', @(h,e)obj.onCheckboxClicked(e));
-                    obj.Grid.RowHeight{idx+1} = 'fit';
+                    obj.ItemCheck(idx).Layout.Row = idx + 2;
+                    obj.ItemCheck(idx).Layout.Column = 1;
                 end
 
                 % Update the internal component lists
                 obj.FontStyledComponents = [obj.AllCheck, obj.ItemCheck];
-                obj.EnableableComponents = [obj.AllCheck, obj.ItemCheck];
+                obj.EnableableComponents = [obj.AllCheck, obj.SelectAllSeparator, obj.ItemCheck];
                 obj.TooltipableComponents = [obj.AllCheck, obj.ItemCheck];
 
             elseif numOld > numNew
@@ -128,6 +143,8 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
                 obj.ItemCheck((numNew+1):end) = [];
 
             end %if numNew > numOld
+
+            obj.Grid.RowHeight = [ {0,0}, repmat({'fit'},1,numNew) ];
 
             % Update each control
             for idx = 1:numNew
@@ -142,12 +159,14 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
             end
 
             % Show/hide Select All
-            if obj.ShowSelectAll && ~obj.AllCheck.Visible
+            if obj.ShowSelectAll
                 obj.AllCheck.Visible = "on";
-                obj.Grid.RowHeight{1} = 30;
-            elseif ~obj.ShowSelectAll && obj.AllCheck.Visible
+                obj.SelectAllSeparator.Visible = "on";
+                obj.Grid.RowHeight{1} = 'fit';
+                obj.Grid.RowHeight{2} = 1;
+            else
                 obj.AllCheck.Visible = "off";
-                obj.Grid.RowHeight{1} = 0;
+                obj.SelectAllSeparator.Visible = "off";
             end
 
         end %function
@@ -160,6 +179,7 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
 
             % Always make AllCheck bold
             obj.AllCheck.FontWeight = "bold";
+            obj.SelectAllSeparator.BackgroundColor = obj.FontColor;
 
         end %function
 
