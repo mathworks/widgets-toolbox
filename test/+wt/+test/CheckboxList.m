@@ -1,7 +1,7 @@
 classdef CheckboxList < wt.test.BaseWidgetTest
     % Implements a unit test for a widget or component
     
-%   Copyright 2020-2025 The MathWorks Inc.
+%   Copyright 2020-2026 The MathWorks Inc.
     
     
     
@@ -46,6 +46,13 @@ classdef CheckboxList < wt.test.BaseWidgetTest
     
     %% Unit Tests
     methods (Test)
+
+        function testTopPadding(testCase)
+
+            padding = testCase.Widget.ItemCheck(1).Parent.Padding;
+            testCase.verifyEqual(padding, [10 10 10 0]);
+
+        end %function
             
         function testItems(testCase)
             

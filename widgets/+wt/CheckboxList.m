@@ -4,7 +4,7 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
         wt.mixin.Tooltipable
     % List of checkbox items
 
-    % Copyright 2020-2025 The MathWorks Inc.
+    % Copyright 2020-2026 The MathWorks Inc.
 
 
     %% Public properties
@@ -76,7 +76,7 @@ classdef CheckboxList < wt.abstract.BaseWidget & ...
             obj.Position(3:4) = [100 130];
 
             % Configure Grid
-            obj.Grid.Padding = 10;
+            obj.Grid.Padding = [10 10 10 0];
             obj.Grid.ColumnWidth = {'fit'};
             obj.Grid.RowHeight = {0,'fit'};
             obj.Grid.RowSpacing = 5;
